@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.game.trivia;
 
-import com.shadorc.shadbot.api.trivia.category.TriviaCategoriesResponse;
+import com.shadorc.shadbot.api.json.trivia.category.TriviaCategoriesResponse;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.exception.CommandException;
@@ -34,10 +34,12 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
                     if (context.getArg().isPresent()) {
                         // Display a list of available categories
                         if ("categories".equalsIgnoreCase(context.getArg().get())) {
+                            final String ids = FormatUtils.format(this.categories.getIds(), Object::toString, "\n");
+                            final String names = String.join("\n", this.categories.getNames());
                             final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                                     .andThen(embed -> embed.setAuthor("Trivia categories", null, context.getAvatarUrl())
-                                            .addField("ID", FormatUtils.format(this.categories.getIds(), Object::toString, "\n"), true)
-                                            .addField("Name", String.join("\n", this.categories.getNames()), true));
+                                            .addField("ID", ids, true)
+                                            .addField("Name", names, true));
 
                             return context.getChannel()
                                     .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
@@ -46,8 +48,10 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
 
                         // The user tries to access a category that does not exist
                         else if (!this.categories.getIds().contains(categoryId)) {
-                            return Mono.error(new CommandException(String.format("`%s` is not a valid ID. Use `%s%s categories` to see the complete list of available categories.",
-                                    context.getArg().get(), context.getPrefix(), this.getName())));
+                            return Mono.error(new CommandException(
+                                    String.format("`%s` is not a valid ID. Use `%s%s categories` to see the "
+                                                    + "complete list of available categories.",
+                                            context.getArg().get(), context.getPrefix(), this.getName())));
                         }
                     }
 
@@ -78,7 +82,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Start a Trivia game in which everyone can participate.")
                 .addArg("categoryID", "the category ID of the question", true)
                 .addField("Category", String.format("Use `%s%s categories` to see the list of categories",

@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.fun;
 
-import com.shadorc.shadbot.api.joke.JokeResponse;
+import com.shadorc.shadbot.api.json.joke.JokeResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -31,7 +31,8 @@ public class JokeCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading joke...", context.getUsername()))
                 .send()
-                .then(NetUtils.get(header -> header.add(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON), HOME_URL, JokeResponse.class))
+                .then(NetUtils.get(header -> header.add(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON),
+                        HOME_URL, JokeResponse.class))
                 .map(response -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Joke", HOME_URL, context.getAvatarUrl())
                                 .setDescription(response.getJoke()))))
@@ -42,7 +43,7 @@ public class JokeCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show a random joke.")
                 .setSource(HOME_URL)
                 .build();

@@ -3,16 +3,17 @@ package com.shadorc.shadbot.command.game.roulette;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.Inputs;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class RouletteInputs extends Inputs {
 
     private final RouletteGame game;
 
-    public RouletteInputs(DiscordClient client, RouletteGame game) {
+    public RouletteInputs(GatewayDiscordClient client, RouletteGame game) {
         super(client, game.getDuration());
         this.game = game;
     }
@@ -40,14 +41,15 @@ public class RouletteInputs extends Inputs {
     @Override
     public Mono<Void> processEvent(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getMember())
-                .filterWhen(ignored -> this.game.isCancelMessage(event.getMessage()))
-                .flatMap(member -> event.getMessage().getChannel()
-                        .flatMap(channel -> {
-                            this.game.getPlayers().values().forEach(RoulettePlayer::cancelBet);
-                            return DiscordUtils.sendMessage(
-                                    String.format(Emoji.CHECK_MARK + " Roulette game cancelled by **%s**.",
-                                            member.getUsername()), channel);
-                        })
+                .map(Member::getUsername)
+                .filterWhen(username -> this.game.isCancelMessage(event.getMessage()))
+                .flatMap(username -> Flux.fromIterable(this.game.getPlayers().values())
+                        .flatMap(RoulettePlayer::cancelBet)
+                        .then()
+                        .thenReturn(username))
+                .map(username -> String.format(Emoji.CHECK_MARK + " Roulette game cancelled by **%s**.", username))
+                .flatMap(text -> event.getMessage().getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel))
                         .then(Mono.fromRunnable(this.game::stop)));
     }
 

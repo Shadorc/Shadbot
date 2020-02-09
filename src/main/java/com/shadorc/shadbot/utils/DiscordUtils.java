@@ -1,13 +1,23 @@
 package com.shadorc.shadbot.utils;
 
+import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.exception.MissingPermissionException;
 import com.shadorc.shadbot.object.Emoji;
 import discord4j.core.object.VoiceState;
-import discord4j.core.object.entity.*;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.channel.Channel;
+import discord4j.core.object.entity.channel.GuildChannel;
+import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.core.object.entity.channel.PrivateChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -28,23 +38,48 @@ import java.util.function.Consumer;
 
 public final class DiscordUtils {
 
+    /**
+     * @param content The string to send.
+     * @param channel The {@link MessageChannel} in which to send the message.
+     * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
+     * it is emitted through the Mono.
+     */
     public static Mono<Message> sendMessage(String content, MessageChannel channel) {
         return DiscordUtils.sendMessage(spec -> spec.setContent(content), channel, false);
     }
 
+    /**
+     * @param embed   The {@link EmbedCreateSpec} consumer used to attach rich content when creating a message.
+     * @param channel The {@link MessageChannel} in which to send the message.
+     * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
+     * it is emitted through the Mono.
+     */
     public static Mono<Message> sendMessage(Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
         return DiscordUtils.sendMessage(spec -> spec.setEmbed(embed), channel, true);
     }
 
+    /**
+     * @param content The string to send.
+     * @param embed   The {@link EmbedCreateSpec} consumer used to attach rich content when creating a message.
+     * @param channel The {@link MessageChannel} in which to send the message.
+     * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
+     * it is emitted through the Mono.
+     */
     public static Mono<Message> sendMessage(String content, Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
         return DiscordUtils.sendMessage(spec -> spec.setContent(content).setEmbed(embed), channel, true);
     }
 
+    /**
+     * @param spec     A {@link Consumer} that provides a "blank" {@link MessageCreateSpec} to be operated on.
+     * @param channel  The {@link MessageChannel} in which to send the message.
+     * @param hasEmbed Whether or not the spec contains an embed.
+     * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
+     * it is emitted through the Mono.
+     */
     public static Mono<Message> sendMessage(Consumer<MessageCreateSpec> spec, MessageChannel channel, boolean hasEmbed) {
-        final Snowflake selfId = channel.getClient().getSelfId().orElseThrow();
         return Mono.zip(
-                DiscordUtils.hasPermission(channel, selfId, Permission.SEND_MESSAGES),
-                DiscordUtils.hasPermission(channel, selfId, Permission.EMBED_LINKS))
+                DiscordUtils.hasPermission(channel, Shadbot.getSelfId(), Permission.SEND_MESSAGES),
+                DiscordUtils.hasPermission(channel, Shadbot.getSelfId(), Permission.EMBED_LINKS))
                 .flatMap(tuple -> {
                     final boolean canSendMessage = tuple.getT1();
                     final boolean canSendEmbed = tuple.getT2();
@@ -58,7 +93,8 @@ public final class DiscordUtils {
                     if (!canSendEmbed && hasEmbed) {
                         LogUtils.info("{Channel ID: %d} Missing permission: %s",
                                 channel.getId().asLong(), StringUtils.capitalizeEnum(Permission.EMBED_LINKS));
-                        return DiscordUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed links.%nPlease, check my permissions "
+                        return DiscordUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed" +
+                                        " links.%nPlease, check my permissions "
                                         + "and channel-specific ones to verify that **%s** is checked.",
                                 StringUtils.capitalizeEnum(Permission.EMBED_LINKS)), channel);
                     }
@@ -67,44 +103,57 @@ public final class DiscordUtils {
                 })
                 // 403 Forbidden means that the bot is not in the guild
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
-                .retryWhen(Retry.onlyIf(err -> err.exception() instanceof PrematureCloseException || err.exception() instanceof Errors.NativeIoException)
+                .retryWhen(Retry.onlyIf(err ->
+                        err.exception() instanceof PrematureCloseException || err.exception() instanceof Errors.NativeIoException)
                         .exponentialBackoff(Duration.ofSeconds(1), Duration.ofSeconds(5))
                         .retryMax(3));
     }
 
     /**
-     * @param guild - a {@link Guild} containing the channels to extract
-     * @param str   - a string containing channels mentions / names
-     * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted channels
+     * @param guild The {@link Guild} containing the members to extract.
+     * @param str   The string containing members mentions and / or names.
+     * @return A {@link Member} {@link Flux} containing the extracted members.
      */
-    public static Flux<Snowflake> extractChannels(Guild guild, String str) {
+    public static Flux<Member> extractMembers(Guild guild, String str) {
+        final List<String> words = StringUtils.split(str);
+        return guild.getMembers()
+                .filter(member -> words.contains(member.getDisplayName())
+                        || words.contains(String.format("@%s", member.getDisplayName()))
+                        || words.contains(member.getMention())
+                        || words.contains(member.getUsername())
+                        || words.contains(String.format("@%s", member.getUsername()))
+                        || words.contains(member.getNicknameMention()));
+    }
+
+    /**
+     * @param guild The {@link Guild} containing the channels to extract.
+     * @param str   The string containing channels mentions and / or names.
+     * @return A {@link GuildChannel} {@link Flux} containing the extracted channels.
+     */
+    public static Flux<GuildChannel> extractChannels(Guild guild, String str) {
         final List<String> words = StringUtils.split(str);
         return guild.getChannels()
-                .filter(channel -> words.contains(String.format("%s", channel.getName()))
+                .filter(channel -> words.contains(channel.getName())
                         || words.contains(String.format("#%s", channel.getName()))
-                        || words.contains(channel.getMention()))
-                .map(GuildChannel::getId)
-                .distinct();
+                        || words.contains(channel.getMention()));
     }
 
     /**
-     * @param guild - a {@link Guild} containing the roles to extract
-     * @param str   - a string containing role mentions / names
-     * @return A {@link Snowflake} {@link Flux} containing the IDs of the extracted roles
+     * @param guild The {@link Guild} containing the roles to extract.
+     * @param str   The string containing role mentions and / or names.
+     * @return A {@link Role} {@link Flux} containing the extracted roles.
      */
-    public static Flux<Snowflake> extractRoles(Guild guild, String str) {
+    public static Flux<Role> extractRoles(Guild guild, String str) {
         final List<String> words = StringUtils.split(str);
         return guild.getRoles()
-                .filter(role -> words.contains(String.format("%s", role.getName()))
+                .filter(role -> words.contains(role.getName())
                         || words.contains(String.format("@%s", role.getName()))
-                        || words.contains(role.getMention()))
-                .map(Role::getId)
-                .distinct();
+                        || words.contains(role.getMention()));
     }
 
     /**
-     * @param message - the message
-     * @return The members mentioned in a {@link Message}
+     * @param message The {@link Message} containing the members to extract.
+     * @return A {@link Member} {@link Flux} mentioned in the {@link Message}.
      */
     public static Flux<Member> getMembersFrom(Message message) {
         if (message.mentionsEveryone()) {
@@ -117,13 +166,13 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param channel    - the channel
-     * @param userId     - the user ID
-     * @param permission - the permission
-     * @return Return true if the user has the permission in the channel, false otherwise
+     * @param channel    The channel in which the permission has to be checked.
+     * @param userId     The ID of the user to check permissions for.
+     * @param permission The permission to check.
+     * @return {@code true} if the user has the permission in the provided channel, {@code false} otherwise.
      */
     public static Mono<Boolean> hasPermission(Channel channel, Snowflake userId, Permission permission) {
-        // An user has all the permissions in a private channel
+        // A user has all the permissions in a private channel
         if (channel instanceof PrivateChannel) {
             return Mono.just(true);
         }
@@ -131,18 +180,24 @@ public final class DiscordUtils {
                 .map(permissions -> permissions.contains(permission));
     }
 
+    /**
+     * @param channel     The channel in which the permissions have to be checked.
+     * @param permissions The permissions to check.
+     * @return A {@link Mono} containing a {@link MissingPermissionException} if the bot does not have the provided
+     * permissions in the provided channel or an empty Mono otherwise.
+     */
     public static Mono<Void> requirePermissions(Channel channel, Permission... permissions) {
         return Flux.fromArray(permissions)
-                .flatMap(permission -> DiscordUtils.hasPermission(channel, channel.getClient().getSelfId().orElseThrow(), permission)
+                .flatMap(permission -> DiscordUtils.hasPermission(channel, Shadbot.getSelfId(), permission)
                         .filter(Boolean.TRUE::equals)
                         .switchIfEmpty(Mono.error(new MissingPermissionException(permission))))
                 .then();
     }
 
     /**
-     * @param context - the context
-     * @return The user voice channel ID if the user is in a voice channel and the bot is allowed to join or if the user is in a voice channel or if the
-     * user and the bot are in the same voice channel
+     * @param context The context.
+     * @return The user voice channel ID if the user is in a voice channel <b>AND</b> the bot is allowed to join
+     * <b>OR</b> if the user and the bot are in the same voice channel.
      */
     public static Mono<Snowflake> requireSameVoiceChannel(Context context) {
         final Mono<Optional<Snowflake>> getBotVoiceChannelId = context.getSelfAsMember()
@@ -155,14 +210,19 @@ public final class DiscordUtils {
                 .map(VoiceState::getChannelId)
                 .defaultIfEmpty(Optional.empty());
 
-        return Mono.zip(getBotVoiceChannelId, getUserVoiceChannelId)
+        final Mono<Settings> getSetting = DatabaseManager.getGuilds()
+                .getDBGuild(context.getGuildId())
+                .map(DBGuild::getSettings);
+
+        return Mono.zip(getBotVoiceChannelId, getUserVoiceChannelId, getSetting)
                 .map(tuple -> {
                     final Optional<Snowflake> botVoiceChannelId = tuple.getT1();
                     final Optional<Snowflake> userVoiceChannelId = tuple.getT2();
+                    final Settings settings = tuple.getT3();
 
                     // If the user is in a voice channel but the bot is not allowed to join
                     if (userVoiceChannelId.isPresent()
-                            && !DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).getSettings().isVoiceChannelAllowed(userVoiceChannelId.get())) {
+                            && !settings.isVoiceChannelAllowed(userVoiceChannelId.get())) {
                         throw new CommandException("I'm not allowed to join this voice channel.");
                     }
 
@@ -174,13 +234,17 @@ public final class DiscordUtils {
                     // If the user and the bot are not in the same voice channel
                     if (botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
                         throw new CommandException(String.format("I'm currently playing music in voice channel <#%d>"
-                                + ", join me before using this command.", botVoiceChannelId.map(Snowflake::asLong).get()));
+                                        + ", join me before using this command.",
+                                botVoiceChannelId.map(Snowflake::asLong).get()));
                     }
 
                     return userVoiceChannelId.get();
                 });
     }
 
+    /**
+     * @return A default {@link EmbedCreateSpec} with the default color set.
+     */
     public static Consumer<EmbedCreateSpec> getDefaultEmbed() {
         return spec -> spec.setColor(Config.BOT_COLOR);
     }

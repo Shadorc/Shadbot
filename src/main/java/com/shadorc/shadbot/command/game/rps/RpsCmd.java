@@ -47,23 +47,27 @@ public class RpsCmd extends BaseCmd {
                 context.getUsername(), userHandsign.getHandsign(), userHandsign.getEmoji(),
                 botHandsign.getEmoji(), botHandsign.getHandsign()));
 
-        final RpsPlayer player = this.getOrCreatePlayer(context);
-        if (userHandsign.isSuperior(botHandsign)) {
-            final int winStreak = player.getWinStreak().incrementAndGet();
-            final long gains = Math.min((long) GAINS * winStreak, Config.MAX_COINS);
-            player.win(gains);
-            strBuilder.append(String.format(Emoji.BANK + " (**%s**) Well done, you win **%s** (Win Streak x%d)!",
-                    context.getUsername(), FormatUtils.coins(gains), player.getWinStreak().get()));
-        } else if (userHandsign == botHandsign) {
-            player.getWinStreak().set(0);
-            strBuilder.append("It's a draw.");
-        } else {
-            player.getWinStreak().set(0);
-            strBuilder.append("I win !");
-        }
-
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
+        return Mono.just(this.getOrCreatePlayer(context))
+                .flatMap(player -> {
+                    if (userHandsign.isSuperior(botHandsign)) {
+                        final int winStreak = player.getWinStreak().incrementAndGet();
+                        final long gains = Math.min((long) GAINS * winStreak, Config.MAX_COINS);
+                        return player.win(gains)
+                                .thenReturn(strBuilder.append(
+                                        String.format(Emoji.BANK + " (**%s**) Well done, you win **%s** (Win Streak x%d)!",
+                                                context.getUsername(), FormatUtils.coins(gains), player.getWinStreak().get())));
+                    } else if (userHandsign == botHandsign) {
+                        player.getWinStreak().set(0);
+                        strBuilder.append("It's a draw.");
+                    } else {
+                        player.getWinStreak().set(0);
+                        strBuilder.append("I win !");
+                    }
+                    return Mono.just(strBuilder);
+                })
+                .map(StringBuilder::toString)
+                .flatMap(text -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
                 .then();
     }
 
@@ -74,7 +78,7 @@ public class RpsCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Play a Rock–paper–scissors game.")
                 .addArg("handsign", FormatUtils.format(Handsign.values(), Handsign::getHandsign, ", "), false)
                 .addField("Gains", String.format("The winner gets **%s** multiplied by his win-streak.",

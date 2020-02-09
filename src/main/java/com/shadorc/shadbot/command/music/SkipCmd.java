@@ -53,7 +53,8 @@ public class SkipCmd extends BaseCmd {
                         // If the music has been started correctly
                         if (guildMusic.getTrackScheduler().nextTrack()) {
                             // we resume it in case the previous music was paused.
-                            return Mono.fromRunnable(() -> guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false));
+                            guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
+                            return Mono.empty();
                         }
                         // else
                         else {
@@ -66,7 +67,7 @@ public class SkipCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Skip current music and play the next one if it exists."
                         + "\nYou can also directly skip to a music in the playlist by specifying its number.")
                 .addArg("num", "the number of the music in the playlist to play", true)

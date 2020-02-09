@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.core.command.CommandProcessor;
+import com.shadorc.shadbot.core.command.MessageProcessor;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
 
@@ -13,7 +13,7 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
 
     @Override
     public Mono<Void> execute(MessageCreateEvent event) {
-        return CommandProcessor.getInstance().processMessageEvent(event);
+        return new MessageProcessor(event).processMessage();
     }
 
 }

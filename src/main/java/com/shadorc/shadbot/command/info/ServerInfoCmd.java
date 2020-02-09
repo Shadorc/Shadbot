@@ -8,7 +8,11 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.core.object.Region;
-import discord4j.core.object.entity.*;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.channel.GuildChannel;
+import discord4j.core.object.entity.channel.TextChannel;
+import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.core.object.util.Image.Format;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -51,17 +55,17 @@ public class ServerInfoCmd extends BaseCmd {
         return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, avatarUrl)
                         .setThumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
-                        .addField("Owner", owner.getUsername(), true)
-                        .addField("Server ID", guild.getId().asString(), true)
-                        .addField("Creation date", creationDate, true)
-                        .addField("Region", region.getName(), true)
-                        .addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), true)
-                        .addField("Members", Integer.toString(guild.getMemberCount().orElseThrow()), true));
+                        .addField("Owner", owner.getUsername(), false)
+                        .addField("Server ID", guild.getId().asString(), false)
+                        .addField("Creation date", creationDate, false)
+                        .addField("Region", region.getName(), false)
+                        .addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), false)
+                        .addField("Members", Integer.toString(guild.getMemberCount().orElseThrow()), false));
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show info about this server.")
                 .build();
     }

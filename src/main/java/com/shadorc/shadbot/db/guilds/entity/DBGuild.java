@@ -3,12 +3,14 @@ package com.shadorc.shadbot.db.guilds.entity;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.guilds.bean.DBGuildBean;
 import discord4j.core.object.util.Snowflake;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,45 +48,47 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
     }
 
     /**
-     * @Note: {@code value} must be serializable or serialized.
+     * {@code value} must be serializable or serialized.
      */
-    public <T> void setSetting(Setting setting, T value) {
+    public <T> Mono<UpdateResult> setSetting(Setting setting, T value) {
         LOGGER.debug("[DBGuild {}] Updating setting {}: {}", this.getId().asLong(), setting, value);
 
-        DatabaseManager.getGuilds()
+        return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
                         Filters.eq("_id", this.getId().asString()),
                         Updates.set(String.format("settings.%s", setting), value),
-                        new UpdateOptions().upsert(true));
+                        new UpdateOptions().upsert(true)));
     }
 
-    public void removeSetting(Setting setting) {
+    public Mono<UpdateResult> removeSetting(Setting setting) {
         LOGGER.debug("[DBGuild {}] Removing setting {}", this.getId().asLong(), setting);
 
-        DatabaseManager.getGuilds()
+        return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
                         Filters.eq("_id", this.getId().asString()),
-                        Updates.unset(String.format("settings.%s", setting)));
+                        Updates.unset(String.format("settings.%s", setting))));
     }
 
     @Override
-    public void insert() {
+    public Mono<Void> insert() {
         LOGGER.debug("[DBGuild {}] Insertion", this.getId().asLong());
 
-        DatabaseManager.getGuilds()
+        return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
-                .insertOne(this.toDocument());
+                .insertOne(this.toDocument()))
+                .then();
     }
 
     @Override
-    public void delete() {
+    public Mono<Void> delete() {
         LOGGER.debug("[DBGuild {}] Deletion", this.getId().asLong());
 
-        DatabaseManager.getGuilds()
+        return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
-                .deleteOne(Filters.eq("_id", this.getId().asString()));
+                .deleteOne(Filters.eq("_id", this.getId().asString())))
+                .then();
     }
 
     @Override

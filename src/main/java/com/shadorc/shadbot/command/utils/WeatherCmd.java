@@ -4,7 +4,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
@@ -32,12 +32,15 @@ import java.util.function.Consumer;
 public class WeatherCmd extends BaseCmd {
 
     private final SimpleDateFormat dateFormatter;
+    private final OWM owm;
 
     public WeatherCmd() {
         super(CommandCategory.UTILS, List.of("weather"));
         this.setDefaultRateLimiter();
 
         this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy 'at' hh:mm aa", Locale.ENGLISH);
+        this.owm = new OWM(CredentialManager.getInstance().get(Credential.OPENWEATHERMAP_API_KEY));
+        owm.setUnit(Unit.METRIC);
     }
 
     @Override
@@ -45,43 +48,49 @@ public class WeatherCmd extends BaseCmd {
         final List<String> args = context.requireArgs(1, 2, ",");
 
         final UpdatableMessage updatableMessage = new UpdatableMessage(context.getClient(), context.getChannelId());
-        return updatableMessage.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading weather...", context.getUsername()))
+
+        return updatableMessage.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading weather...",
+                context.getUsername()))
                 .send()
                 .then(Mono.fromCallable(() -> {
-                    final OWM owm = new OWM(Credentials.get(Credential.OPENWEATHERMAP_API_KEY));
-                    owm.setUnit(Unit.METRIC);
-
-                    CurrentWeather currentWeather;
+                    final CurrentWeather currentWeather;
                     if (args.size() == 2) {
                         final Country country = Utils.parseEnum(Country.class, args.get(1).replace(" ", "_"));
                         if (country == null) {
-                            return updatableMessage.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Country `%s` not found.",
-                                    context.getUsername(), args.get(1)));
+                            return updatableMessage.setContent(
+                                    String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Country `%s` not found.",
+                                            context.getUsername(), args.get(1)));
                         }
-                        currentWeather = owm.currentWeatherByCityName(args.get(0), country);
+                        currentWeather = this.owm.currentWeatherByCityName(args.get(0), country);
                     } else {
-                        currentWeather = owm.currentWeatherByCityName(args.get(0));
+                        currentWeather = this.owm.currentWeatherByCityName(args.get(0));
                     }
 
                     final Weather weather = currentWeather.getWeatherList().get(0);
                     final Main main = currentWeather.getMainData();
 
+                    final String countryCode = currentWeather.getSystemData().getCountryCode();
+                    final String title = String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode);
+                    final String url = String.format("https://openweathermap.org/city/%d", currentWeather.getCityId());
+                    final String lastUpdated = this.dateFormatter.format(currentWeather.getDateTime());
+                    final String clouds = StringUtils.capitalize(weather.getDescription());
                     final double windSpeed = currentWeather.getWindData().getSpeed() * 3.6;
                     final String windDesc = WeatherCmd.getWindDesc(windSpeed);
-                    final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ? String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
-                    final String countryCode = currentWeather.getSystemData().getCountryCode();
+                    final String wind = String.format("%s%n%.1f km/h", windDesc, windSpeed);
+                    final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ?
+                            String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
+                    final String humidity = String.format("%.1f%%", main.getHumidity());
+                    final String temperature = String.format("%.1f°C", main.getTemp());
 
                     return updatableMessage.setEmbed(DiscordUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor(String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode),
-                                    String.format("http://openweathermap.org/city/%d", currentWeather.getCityId()),
-                                    context.getAvatarUrl())
+                            .andThen(embed -> embed.setAuthor(title, url, context.getAvatarUrl())
                                     .setThumbnail(weather.getIconLink())
-                                    .setDescription(String.format("Last updated %s", this.dateFormatter.format(currentWeather.getDateTime())))
-                                    .addField(Emoji.CLOUD + " Clouds", StringUtils.capitalize(weather.getDescription()), true)
-                                    .addField(Emoji.WIND + " Wind", String.format("%s%n%.1f km/h", windDesc, windSpeed), true)
+                                    .setDescription(String.format("Last updated %s", lastUpdated))
+                                    .addField(Emoji.CLOUD + " Clouds", clouds, true)
+                                    .addField(Emoji.WIND + " Wind", wind, true)
                                     .addField(Emoji.RAIN + " Rain", rain, true)
-                                    .addField(Emoji.DROPLET + " Humidity", String.format("%.1f%%", main.getHumidity()), true)
-                                    .addField(Emoji.THERMOMETER + " Temperature", String.format("%.1f°C", main.getTemp()), true)));
+                                    .addField(Emoji.DROPLET + " Humidity", humidity, true)
+                                    .addField(Emoji.THERMOMETER + " Temperature", temperature, true)));
                 }))
                 .onErrorResume(APIException.class, err -> {
                     if (err.getCode() == HttpStatus.SC_NOT_FOUND) {
@@ -131,12 +140,13 @@ public class WeatherCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show weather report for a city.")
                 .setDelimiter(", ")
                 .addArg("city", false)
                 .addArg("country", true)
-                .setSource("http://openweathermap.org/")
+                .setExample(String.format("%s%s Toulon, United States", context.getPrefix(), this.getName()))
+                .setSource("https://openweathermap.org/")
                 .build();
     }
 }

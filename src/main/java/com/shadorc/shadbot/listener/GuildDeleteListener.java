@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;
@@ -15,11 +16,12 @@ public class GuildDeleteListener implements EventListener<GuildDeleteEvent> {
 
     @Override
     public Mono<Void> execute(GuildDeleteEvent event) {
-        return Mono.fromRunnable(() -> {
-            LogUtils.info("{Guild ID: %d} Disconnected.", event.getGuildId().asLong());
-            MusicManager.getInstance().removeConnection(event.getGuildId());
-            DatabaseManager.getGuilds().getDBGuild(event.getGuildId()).delete();
-        });
+        LogUtils.info("{Guild ID: %d} Disconnected.", event.getGuildId().asLong());
+        return MusicManager.getInstance()
+                .removeConnection(event.getGuildId())
+                .then(DatabaseManager.getGuilds()
+                        .getDBGuild(event.getGuildId()))
+                .flatMap(DBGuild::delete);
     }
 
 }

@@ -2,6 +2,7 @@ package com.shadorc.shadbot.db.premium.entity;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
@@ -9,6 +10,7 @@ import com.shadorc.shadbot.db.premium.RelicType;
 import com.shadorc.shadbot.db.premium.bean.RelicBean;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.core.object.util.Snowflake;
+import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
 import java.time.Duration;
@@ -62,34 +64,36 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
                 .orElse(false);
     }
 
-    public void activate(Snowflake userId, @Nullable Snowflake guildId) {
+    public Mono<UpdateResult> activate(Snowflake userId, @Nullable Snowflake guildId) {
         LOGGER.debug("[Relic {}] Activation", this.getId());
 
-        DatabaseManager.getPremium()
+        return Mono.from(DatabaseManager.getPremium()
                 .getCollection()
                 .updateOne(Filters.eq("_id", this.getId()),
                         Updates.combine(
                                 Updates.set("user_id", userId.asString()),
                                 Updates.set("guild_id", guildId == null ? null : guildId.asString()),
-                                Updates.set("activation", Instant.now().toEpochMilli())));
+                                Updates.set("activation", Instant.now().toEpochMilli()))));
     }
 
     @Override
-    public void insert() {
+    public Mono<Void> insert() {
         LOGGER.debug("[Relic {}] Insertion", this.getId());
 
-        DatabaseManager.getPremium()
+        return Mono.from(DatabaseManager.getPremium()
                 .getCollection()
-                .insertOne(this.toDocument());
+                .insertOne(this.toDocument()))
+                .then();
     }
 
     @Override
-    public void delete() {
+    public Mono<Void> delete() {
         LOGGER.debug("[Relic {}] Deletion", this.getId());
 
-        DatabaseManager.getPremium()
+        return Mono.from(DatabaseManager.getPremium()
                 .getCollection()
-                .deleteOne(Filters.eq("_id", this.getId()));
+                .deleteOne(Filters.eq("_id", this.getId())))
+                .then();
     }
 
     @Override

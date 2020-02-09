@@ -1,23 +1,21 @@
 package com.shadorc.shadbot.command.hidden;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandManager;
-import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.object.entity.Channel;
-import discord4j.core.object.entity.Channel.Type;
+import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class HelpCmd extends BaseCmd {
@@ -40,18 +38,9 @@ public class HelpCmd extends BaseCmd {
                     .then();
         }
 
-        final Optional<Settings> settings = context.getEvent().getGuildId()
-                .map(DatabaseManager.getGuilds()::getDBGuild)
-                .map(DBGuild::getSettings);
-
         return context.getPermissions()
                 .collectList()
-                .flatMap(authorPerms -> Flux.fromIterable(CommandManager.getInstance().getCommands().values())
-                        .distinct()
-                        .filter(cmd -> authorPerms.contains(cmd.getPermission()))
-                        .filterWhen(cmd -> context.getChannel().map(Channel::getType)
-                                .map(type -> type == Type.DM || settings.map(it -> it.isCommandAllowed(cmd)).orElse(false)))
-                        .collectMultimap(BaseCmd::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName())))
+                .flatMap(authorPermissions -> getMultiMap(context, authorPermissions))
                 .map(map -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Shadbot Help", null, context.getAvatarUrl())
@@ -61,8 +50,10 @@ public class HelpCmd extends BaseCmd {
                                             Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
 
                             for (final CommandCategory category : CommandCategory.values()) {
-                                if (map.get(category) != null && !map.get(category).isEmpty() && category != CommandCategory.HIDDEN) {
-                                    embed.addField(String.format("%s Commands", category), String.join(" ", map.get(category)), false);
+                                if (!map.getOrDefault(category, Collections.emptyList()).isEmpty()
+                                        && category != CommandCategory.HIDDEN) {
+                                    embed.addField(String.format("%s Commands", category),
+                                            String.join(" ", map.get(category)), false);
                                 }
                             }
                         }))
@@ -71,9 +62,35 @@ public class HelpCmd extends BaseCmd {
                 .then();
     }
 
+    private static Mono<Map<CommandCategory, Collection<String>>> getMultiMap(Context context,
+                                                                              List<CommandPermission> authorPermissions) {
+        final Mono<Boolean> getIsDm = context.getChannel()
+                .map(Channel::getType)
+                .map(Channel.Type.DM::equals)
+                .cache();
+
+        // Get the settings of the guild or empty if this is a DM
+        final Mono<Settings> getSettings = Mono.justOrEmpty(context.getEvent().getGuildId())
+                .flatMap(DatabaseManager.getGuilds()::getDBGuild)
+                .map(DBGuild::getSettings)
+                .cache();
+
+        // Iterates over all commands...
+        return Flux.fromIterable(CommandManager.getInstance().getCommands().values())
+                // ... and removes duplicate ...
+                .distinct()
+                // ... and removes commands that the author cannot use ...
+                .filter(cmd -> authorPermissions.contains(cmd.getPermission()))
+                // ... and removes commands that are not allowed by the guild
+                .filterWhen(cmd -> Mono.zip(getIsDm,
+                        getSettings.map(settings -> settings.isCommandAllowed(cmd)).defaultIfEmpty(true))
+                        .map(tuple -> tuple.getT1() || tuple.getT2()))
+                .collectMultimap(BaseCmd::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName()));
+    }
+
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show the list of available commands.")
                 .build();
     }

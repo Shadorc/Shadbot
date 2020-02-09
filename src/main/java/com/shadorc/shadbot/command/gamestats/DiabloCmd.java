@@ -1,13 +1,13 @@
 package com.shadorc.shadbot.command.gamestats;
 
-import com.shadorc.shadbot.api.TokenResponse;
-import com.shadorc.shadbot.api.gamestats.diablo.hero.HeroResponse;
-import com.shadorc.shadbot.api.gamestats.diablo.profile.ProfileResponse;
+import com.shadorc.shadbot.api.json.TokenResponse;
+import com.shadorc.shadbot.api.json.gamestats.diablo.hero.HeroResponse;
+import com.shadorc.shadbot.api.json.gamestats.diablo.profile.ProfileResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -26,8 +26,10 @@ import java.util.function.Consumer;
 
 public class DiabloCmd extends BaseCmd {
 
-    private static final String ACCESS_TOKEN_URL = String.format("https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
-            Credentials.get(Credential.BLIZZARD_CLIENT_ID), Credentials.get(Credential.BLIZZARD_CLIENT_SECRET));
+    private static final String ACCESS_TOKEN_URL = String.format(
+            "https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
+            CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_ID),
+            CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_SECRET));
 
     private enum Region {
         EU, US, TW, KR;
@@ -58,9 +60,9 @@ public class DiabloCmd extends BaseCmd {
 
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Diablo III stats...", context.getUsername()))
                 .send()
-                .then(this.getAccessToken())
-                .map(ignored -> String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
-                        region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken()))
+                .then(this.requestAccessToken())
+                .then(Mono.defer(() -> Mono.just(String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
+                        region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken()))))
                 .flatMap(url -> NetUtils.get(url, ProfileResponse.class))
                 .flatMap(profile -> {
                     if (profile.getCode().map("NOTFOUND"::equals).orElse(false)) {
@@ -79,19 +81,7 @@ public class DiabloCmd extends BaseCmd {
                             .collectList()
                             .map(heroResponses -> {
                                 Collections.reverse(heroResponses);
-                                return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                                        .andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, context.getAvatarUrl())
-                                                .setThumbnail("https://i.imgur.com/QUS9QkX.png")
-                                                .setDescription(String.format("Stats for **%s** (Guild: **%s**)"
-                                                                + "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
-                                                                + "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
-                                                        profile.getBattleTag(), profile.getGuildName(),
-                                                        profile.getParagonLevel(), profile.getParagonLevelHardcore(),
-                                                        profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore()))
-                                                .addField("Heroes", FormatUtils.format(heroResponses,
-                                                        hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n"), true)
-                                                .addField("Damage", FormatUtils.format(heroResponses,
-                                                        hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n"), true)));
+                                return updatableMsg.setEmbed(this.getEmbed(context.getAvatarUrl(), profile, heroResponses));
                             });
                 })
                 .flatMap(UpdatableMessage::send)
@@ -99,13 +89,40 @@ public class DiabloCmd extends BaseCmd {
                 .then();
     }
 
+    private Consumer<EmbedCreateSpec> getEmbed(String avatarUrl, ProfileResponse profile, List<HeroResponse> heroResponses) {
+        final String description = String.format("Stats for **%s** (Guild: **%s**)"
+                        + "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
+                        + "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
+                profile.getBattleTag(), profile.getGuildName(),
+                profile.getParagonLevel(), profile.getParagonLevelHardcore(),
+                profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore());
+
+        final String heroes = FormatUtils.format(heroResponses,
+                hero -> String.format("**%s** (*%s*)", hero.getName(), hero.getClassName()), "\n");
+
+        final String damages = FormatUtils.format(heroResponses,
+                hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n");
+
+        return DiscordUtils.getDefaultEmbed()
+                .andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, avatarUrl)
+                        .setThumbnail("https://i.imgur.com/QUS9QkX.png")
+                        .setDescription(description)
+                        .addField("Heroes", heroes, true)
+                        .addField("Damage", damages, true));
+    }
+
     private boolean isTokenExpired() {
         return this.token == null
                 || TimeUtils.getMillisUntil(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
     }
 
-    private Mono<TokenResponse> getAccessToken() {
-        final Mono<TokenResponse> getAccessToken = NetUtils.get(ACCESS_TOKEN_URL, TokenResponse.class)
+    /**
+     * Requests to update the Blizzard token, if expired.
+     *
+     * @return A {@link Mono} that completes once the token has been successfully updated, if expired.
+     */
+    private Mono<Void> requestAccessToken() {
+        final Mono<TokenResponse> requestAccessToken = NetUtils.get(ACCESS_TOKEN_URL, TokenResponse.class)
                 .doOnNext(token -> {
                     this.token = token;
                     this.lastTokenGeneration.set(System.currentTimeMillis());
@@ -114,15 +131,16 @@ public class DiabloCmd extends BaseCmd {
 
         return Mono.justOrEmpty(this.token)
                 .filter(token -> !this.isTokenExpired())
-                .switchIfEmpty(getAccessToken);
+                .switchIfEmpty(requestAccessToken)
+                .then();
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show player's stats for Diablo 3.")
                 .addArg("region", String.format("user's region (%s)", FormatUtils.format(Region.class, ", ")), false)
-                .addArg("battletag#0000", false)
+                .addArg("battletag#0000", "case sensitive", false)
                 .setExample(String.format("`%s%s eu Shadorc#2503`", context.getPrefix(), this.getName()))
                 .build();
     }

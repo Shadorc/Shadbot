@@ -5,7 +5,6 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -55,33 +54,40 @@ public class BlacklistSettingCmd extends BaseSetting {
             }
         }
 
-        final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
-        final List<String> blacklist = dbGuild.getSettings().getBlacklistedCmd();
+        return DatabaseManager.getGuilds()
+                .getDBGuild(context.getGuildId())
+                .flatMap(dbGuild -> {
+                    final List<String> blacklist = dbGuild.getSettings().getBlacklistedCmd();
 
-        final String actionVerbose;
-        if (action == Action.ADD) {
-            blacklist.addAll(commands);
-            actionVerbose = "added";
-        } else {
-            blacklist.removeAll(commands);
-            actionVerbose = "removed";
-        }
+                    final String actionVerbose;
+                    if (action == Action.ADD) {
+                        blacklist.addAll(commands);
+                        actionVerbose = "added";
+                    } else {
+                        blacklist.removeAll(commands);
+                        actionVerbose = "removed";
+                    }
 
-        dbGuild.setSetting(this.getSetting(), blacklist);
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command(s) %s %s to the blacklist.",
-                        FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", "), actionVerbose),
-                        channel))
+                    return dbGuild.setSetting(this.getSetting(), blacklist)
+                            .then(context.getChannel())
+                            .flatMap(channel -> DiscordUtils.sendMessage(
+                                    String.format(Emoji.CHECK_MARK + " Command(s) %s %s to the blacklist.",
+                                            FormatUtils.format(commands, cmd -> String.format("`%s`", cmd), ", "),
+                                            actionVerbose),
+                                    channel));
+                })
                 .then();
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <command(s)>`", context.getPrefix(), this.getCommandName()), false)
+                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <command(s)>`",
+                        context.getPrefix(), this.getCommandName()), false)
                         .addField("Argument", String.format("**action** - %s",
                                 FormatUtils.format(Action.class, "/")), false)
-                        .addField("Example", String.format("`%s%s add rule34 russian_roulette`", context.getPrefix(), this.getCommandName()), false));
+                        .addField("Example", String.format("`%s%s add rule34 russian_roulette`",
+                                context.getPrefix(), this.getCommandName()), false));
     }
 
 }

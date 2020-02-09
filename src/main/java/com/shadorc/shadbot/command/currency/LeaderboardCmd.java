@@ -4,6 +4,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -20,6 +21,8 @@ import java.util.function.Consumer;
 
 public class LeaderboardCmd extends BaseCmd {
 
+    private static final int USER_COUNT = 10;
+
     public LeaderboardCmd() {
         super(CommandCategory.CURRENCY, List.of("leaderboard"));
         this.setDefaultRateLimiter();
@@ -27,17 +30,22 @@ public class LeaderboardCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        return Flux.fromIterable(DatabaseManager.getGuilds().getDBGuild(context.getGuildId()).getMembers())
+        return DatabaseManager.getGuilds()
+                .getDBGuild(context.getGuildId())
+                .map(DBGuild::getMembers)
+                .flatMapMany(Flux::fromIterable)
                 .filter(dbMember -> dbMember.getCoins() > 0)
                 .sort(Comparator.comparingLong(DBMember::getCoins).reversed())
-                .take(10)
-                .flatMap(dbMember -> Mono.zip(context.getClient().getUserById(dbMember.getId()).map(User::getUsername), Mono.just(dbMember.getCoins())))
+                .take(USER_COUNT)
+                .flatMap(dbMember -> Mono.zip(
+                        context.getClient().getUserById(dbMember.getId()).map(User::getUsername),
+                        Mono.just(dbMember.getCoins())))
                 .collectList()
                 .map(list -> {
                     if (list.isEmpty()) {
                         return "\nEveryone is poor here.";
                     }
-                    return FormatUtils.numberedList(10, list.size(),
+                    return FormatUtils.numberedList(USER_COUNT, list.size(),
                             count -> {
                                 final Tuple2<String, Long> tuple = list.get(count - 1);
                                 return String.format("%d. **%s** - %s", count, tuple.getT1(), FormatUtils.coins(tuple.getT2()));
@@ -53,7 +61,7 @@ public class LeaderboardCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show coins leaderboard for this server.")
                 .build();
     }

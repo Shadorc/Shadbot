@@ -1,12 +1,12 @@
 package com.shadorc.shadbot.command.fun;
 
 import com.fasterxml.jackson.databind.JavaType;
-import com.shadorc.shadbot.api.dtc.Quote;
+import com.shadorc.shadbot.api.json.dtc.Quote;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
@@ -22,6 +22,8 @@ import java.util.function.Consumer;
 
 public class DtcCmd extends BaseCmd {
 
+    private static final String HOME_URL = "https://api.danstonchat.com/0.3/view/random";
+
     public DtcCmd() {
         super(CommandCategory.FUN, List.of("dtc"));
         this.setDefaultRateLimiter();
@@ -31,14 +33,13 @@ public class DtcCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        final String url = String.format("https://api.danstonchat.com/0.3/view/random?key=%s&format=json",
-                Credentials.get(Credential.DTC_API_KEY));
+        final String url = String.format("%s?key=%s&format=json",
+                HOME_URL, CredentialManager.getInstance().get(Credential.DTC_API_KEY));
 
         final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading quote...", context.getUsername()))
                 .send()
-                .then(NetUtils.get(url, valueType))
-                .cast((Class<List<Quote>>) (Object) List.class)
+                .<List<Quote>>then(NetUtils.get(url, valueType))
                 .map(quotes -> {
                     Quote quote;
                     do {
@@ -71,7 +72,7 @@ public class DtcCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show a random quote from DansTonChat.com")
                 .setSource("https://www.danstonchat.com/")
                 .build();

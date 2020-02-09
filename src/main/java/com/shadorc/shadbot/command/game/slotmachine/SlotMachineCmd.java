@@ -56,34 +56,34 @@ public class SlotMachineCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        Utils.requireValidBet(context.getMember(), Integer.toString(PAID_COST));
+        return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), PAID_COST)
+                .map(ignored -> new GamblerPlayer(context.getGuildId(), context.getAuthorId(), PAID_COST))
+                .flatMap(player -> player.bet().thenReturn(player))
+                .flatMap(player -> {
+                    final List<SlotOptions> slots = SlotMachineCmd.randSlots();
 
-        final GamblerPlayer player = new GamblerPlayer(context.getGuildId(), context.getAuthorId(), PAID_COST);
-        player.bet();
+                    final StringBuilder strBuilder = new StringBuilder(String.format("%s%n%s (**%s**) ",
+                            FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername()));
 
-        final List<SlotOptions> slots = SlotMachineCmd.randSlots();
-
-        final StringBuilder text = new StringBuilder(String.format("%s%n%s (**%s**) ",
-                FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername()));
-
-        if (slots.stream().distinct().count() == 1) {
-            final int slotGains = slots.get(0).getGains();
-            final long gains = ThreadLocalRandom.current().nextInt((int) (slotGains * RAND_FACTOR),
-                    (int) (slotGains * (RAND_FACTOR + 1)));
-            player.win(gains);
-            text.append(String.format("You win **%s** !", FormatUtils.coins(gains)));
-        } else {
-            text.append(String.format("You lose **%s** !", FormatUtils.coins(PAID_COST)));
-        }
-
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(text.toString(), channel))
+                    if (slots.stream().distinct().count() == 1) {
+                        final int slotGains = slots.get(0).getGains();
+                        final long gains = ThreadLocalRandom.current().nextInt((int) (slotGains * RAND_FACTOR),
+                                (int) (slotGains * (RAND_FACTOR + 1)));
+                        return player.win(gains)
+                                .thenReturn(strBuilder.append(String.format("You win **%s** !", FormatUtils.coins(gains))));
+                    } else {
+                        return Mono.just(strBuilder.append(String.format("You lose **%s** !", FormatUtils.coins(PAID_COST))));
+                    }
+                })
+                .map(StringBuilder::toString)
+                .flatMap(text -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
                 .then();
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Play slot machine.")
                 .addField("Cost", String.format("A game costs **%s**.", FormatUtils.coins(PAID_COST)), false)
                 .addField("Gains", String.format("%s: **%s**, %s: **%s**, %s: **%s**, %s: **%s**. " +

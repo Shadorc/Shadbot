@@ -15,9 +15,9 @@ import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.object.Embed;
 import discord4j.core.object.Embed.Field;
-import discord4j.core.object.entity.GuildMessageChannel;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.channel.GuildMessageChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -43,17 +43,20 @@ public class PruneCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading messages to prune...", context.getUsername()))
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading messages to prune...",
+                context.getUsername()))
                 .send()
                 .then(context.getChannel())
-                .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)
+                .flatMap(channel -> DiscordUtils.requirePermissions(channel,
+                        Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)
                         .then(context.getMessage().getUserMentions().collectList())
                         .flatMapMany(mentions -> {
                             final String arg = context.getArg().orElse("");
                             final List<String> quotedElements = StringUtils.getQuotedElements(arg);
 
                             if (arg.contains("\"") && quotedElements.isEmpty() || quotedElements.size() > 1) {
-                                return Flux.error(new CommandException("You have forgotten a quote or have specified several quotes in quotation marks."));
+                                return Flux.error(new CommandException("You have forgotten a quote or have specified " +
+                                        "several quotes in quotation marks."));
                             }
 
                             final String words = quotedElements.isEmpty() ? null : quotedElements.get(0);
@@ -66,8 +69,9 @@ public class PruneCmd extends BaseCmd {
 
                             Integer count = NumberUtils.toPositiveIntOrNull(argCleaned);
                             if (!argCleaned.isEmpty() && count == null) {
-                                return Flux.error(new CommandException(String.format("`%s` is not a valid number. If you want to specify a word or a sentence, "
-                                                + "please include them in quotation marks. See `%shelp %s` for more information.",
+                                return Flux.error(new CommandException(String.format("`%s` is not a valid number. " +
+                                                "If you want to specify a word or a sentence, please include them " +
+                                                "in quotation marks. See `%shelp %s` for more information.",
                                         argCleaned, context.getPrefix(), this.getName())));
                             }
 
@@ -110,7 +114,7 @@ public class PruneCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Delete messages (include embeds).")
                 .addArg("@user(s)", "from these users", true)
                 .addArg("\"words\"", "containing these words", true)

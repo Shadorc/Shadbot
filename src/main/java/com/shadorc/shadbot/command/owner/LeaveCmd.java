@@ -12,6 +12,8 @@ import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.http.client.ClientException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -33,16 +35,18 @@ public class LeaveCmd extends BaseCmd {
         }
 
         return context.getClient().getGuildById(Snowflake.of(guildId))
-                .switchIfEmpty(Mono.error(new CommandException("Guild not found.")))
+                .onErrorMap(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
+                        err -> new CommandException("Guild not found."))
                 .flatMap(Guild::leave)
-                .then(context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " Guild left.", channel)))
+                .then(context.getChannel())
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.CHECK_MARK + " Guild with ID **%d** left.", guildId), channel))
                 .then();
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Leave a guild.")
                 .addArg("guildID", false)
                 .build();

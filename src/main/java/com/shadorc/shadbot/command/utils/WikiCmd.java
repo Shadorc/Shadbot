@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.utils;
 
-import com.shadorc.shadbot.api.wikipedia.WikipediaPage;
-import com.shadorc.shadbot.api.wikipedia.WikipediaResponse;
+import com.shadorc.shadbot.api.json.wikipedia.WikipediaPage;
+import com.shadorc.shadbot.api.json.wikipedia.WikipediaResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -44,7 +44,8 @@ public class WikiCmd extends BaseCmd {
                         + "&exsentences=5",
                 NetUtils.encode(arg));
 
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Wikipedia...", context.getUsername()))
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Wikipedia...",
+                context.getUsername()))
                 .send()
                 .then(NetUtils.get(url, WikipediaResponse.class))
                 .map(wikipedia -> {
@@ -53,13 +54,15 @@ public class WikiCmd extends BaseCmd {
                     final WikipediaPage page = pages.get(pageId);
 
                     if ("-1".equals(pageId) || page.getExtract() == null) {
-                        return updatableMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
-                                context.getUsername(), arg));
+                        return updatableMsg.setContent(
+                                String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
+                                        context.getUsername(), arg));
                     }
 
                     if (page.getExtract().endsWith("may refer to:")) {
-                        return updatableMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
-                                + "try with a more precise search.", context.getUsername()));
+                        return updatableMsg.setContent(
+                                String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
+                                        + "try with a more precise search.", context.getUsername()));
                     }
 
                     final String extract = StringUtils.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
@@ -78,9 +81,10 @@ public class WikiCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show Wikipedia description for a search.")
                 .addArg("search", false)
+                .setSource("https://www.wikipedia.org/")
                 .build();
     }
 

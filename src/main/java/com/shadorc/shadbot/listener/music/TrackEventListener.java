@@ -5,7 +5,6 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -38,8 +37,8 @@ public class TrackEventListener extends AudioEventAdapter {
                     return guildMusic.getMessageChannel()
                             .flatMap(channel -> DiscordUtils.sendMessage(message, channel));
                 })
-                .subscribeOn(Schedulers.elastic())
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     @Override
@@ -49,8 +48,8 @@ public class TrackEventListener extends AudioEventAdapter {
                 // Everything seems fine, reset error counter.
                 .doOnNext(ignored -> this.errorCount.set(0))
                 .flatMap(ignored -> this.nextOrEnd())
-                .subscribeOn(Schedulers.elastic())
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     @Override
@@ -65,7 +64,7 @@ public class TrackEventListener extends AudioEventAdapter {
 
                     if (!WARNING_SENT.get() && this.isRateLimitException(exception)) {
                         WARNING_SENT.set(true);
-                        LogUtils.warn(guildMusic.getClient(), "YouTube is rate limited, IP rotation needed.");
+                        LogUtils.warn("YouTube is rate limited, IP rotation needed.");
                     }
 
                     final StringBuilder strBuilder = new StringBuilder();
@@ -86,8 +85,8 @@ public class TrackEventListener extends AudioEventAdapter {
                             .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
                             .then(this.nextOrEnd());
                 })
-                .subscribeOn(Schedulers.elastic())
-                .subscribe(null, thr -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), thr));
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     @Override
@@ -98,14 +97,14 @@ public class TrackEventListener extends AudioEventAdapter {
                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll "
                         + "try to play the next available song.", channel))
                 .then(this.nextOrEnd())
-                .subscribeOn(Schedulers.elastic())
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(Shadbot.getClient(), err));
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     /**
-     * Start the next track or end the guild music if this is the end of the playlist
+     * Start the next track or end the guild music if this is the end of the playlist.
      *
-     * @return A {@link Mono} that completes when a new track has been started or when the guild music ended
+     * @return A {@link Mono} that completes when a new track has been started or when the guild music ended.
      */
     private Mono<Void> nextOrEnd() {
         return Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.guildId))

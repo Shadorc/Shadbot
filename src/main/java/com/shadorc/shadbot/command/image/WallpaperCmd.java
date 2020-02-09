@@ -1,12 +1,12 @@
 package com.shadorc.shadbot.command.image;
 
-import com.shadorc.shadbot.api.image.wallhaven.WallhavenResponse;
-import com.shadorc.shadbot.api.image.wallhaven.Wallpaper;
+import com.shadorc.shadbot.api.json.image.wallhaven.WallhavenResponse;
+import com.shadorc.shadbot.api.json.image.wallhaven.Wallpaper;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -98,7 +98,7 @@ public class WallpaperCmd extends BaseCmd {
                     final boolean isNsfw = tuple.getT2();
 
                     final StringBuilder urlBuilder = new StringBuilder(HOME_URL);
-                    urlBuilder.append(String.format("?apikey=%s", Credentials.get(Credential.WALLHAVEN_API_KEY)));
+                    urlBuilder.append(String.format("?apikey=%s", CredentialManager.getInstance().get(Credential.WALLHAVEN_API_KEY)));
 
                     if (cmdLine.hasOption(PURITY)) {
                         final Purity purity = this.parseEnum(context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
@@ -169,7 +169,7 @@ public class WallpaperCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Search for a wallpaper.")
                 .setUsage(String.format("[-p %s] [-c %s] [-rat %s] [-res %s] [-k %s]", PURITY, CATEGORY, RATIO, RESOLUTION, KEYWORD))
                 .addArg(PURITY, FormatUtils.format(Purity.class, ", "), true)

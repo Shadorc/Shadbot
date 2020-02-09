@@ -28,6 +28,7 @@
         <li><a href="https://github.com/vladimir-bukhtoyarov/bucket4j">Bucket4J</a>
         <li><a href="http://javaluator.sourceforge.net/en/home/">javaluator</a>
         <li><a href="https://github.com/mongodb/mongo-java-driver">MongoDB-java</a>
+        <li><a href="https://github.com/getsentry/sentry-java">Sentry</a></li>
     </ul>
     <hr>
     <h2>Getting Started</h2>

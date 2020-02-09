@@ -33,12 +33,16 @@ public class HelpBuilder {
     private String source;
     private String delimiter;
 
-    public HelpBuilder(BaseCmd cmd, Context context) {
+    private HelpBuilder(BaseCmd cmd, Context context) {
         this.context = context;
         this.cmd = cmd;
         this.args = new ArrayList<>();
         this.fields = new ArrayList<>();
         this.delimiter = Config.COMMAND_DELIMITER;
+    }
+
+    public static HelpBuilder create(BaseCmd cmd, Context context) {
+        return new HelpBuilder(cmd, context);
     }
 
     public HelpBuilder setThumbnail(String thumbnail) {
@@ -131,9 +135,13 @@ public class HelpBuilder {
             return String.format("`%s`", this.usage);
         }
 
-        return String.format("`%s%s %s`",
-                this.context.getPrefix(), this.cmd.getName(),
-                FormatUtils.format(this.args, arg -> String.format(arg.isOptional() ? "[<%s>]" : "<%s>", arg.getName()), this.delimiter));
+        if (this.args.isEmpty()) {
+            return String.format("`%s%s`", this.context.getPrefix(), this.cmd.getName());
+        }
+
+        return String.format("`%s%s %s`", this.context.getPrefix(), this.cmd.getName(),
+                FormatUtils.format(this.args,
+                        arg -> String.format(arg.isOptional() ? "[<%s>]" : "<%s>", arg.getName()), this.delimiter));
     }
 
     private String getArguments() {

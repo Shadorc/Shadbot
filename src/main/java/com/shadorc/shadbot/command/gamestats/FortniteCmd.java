@@ -1,12 +1,12 @@
 package com.shadorc.shadbot.command.gamestats;
 
-import com.shadorc.shadbot.api.gamestats.fortnite.FortniteResponse;
-import com.shadorc.shadbot.api.gamestats.fortnite.Stats;
+import com.shadorc.shadbot.api.json.gamestats.fortnite.FortniteResponse;
+import com.shadorc.shadbot.api.json.gamestats.fortnite.Stats;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -50,7 +50,8 @@ public class FortniteCmd extends BaseCmd {
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        final Consumer<HttpHeaders> headerBuilder = header -> header.add("TRN-Api-Key", Credentials.get(Credential.FORTNITE_API_KEY));
+        final Consumer<HttpHeaders> headerBuilder = header -> header.add("TRN-Api-Key",
+                CredentialManager.getInstance().get(Credential.FORTNITE_API_KEY));
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Fortnite stats...", context.getUsername()))
                 .send()
                 .then(NetUtils.get(headerBuilder, url, FortniteResponse.class))
@@ -66,9 +67,12 @@ public class FortniteCmd extends BaseCmd {
                     final String description = String.format("Stats for user **%s**%n", epicNickname)
                             + "```prolog"
                             + String.format(format, " ", "Solo", "Duo", "Squad")
-                            + String.format(format, "Top 1", stats.getSoloStats().getTop1(), stats.getDuoStats().getTop1(), stats.getSquadStats().getTop1())
-                            + String.format(format, "K/D season", stats.getSeasonSoloStats().getRatio(), stats.getSeasonDuoStats().getRatio(), stats.getSeasonSquadStats().getRatio())
-                            + String.format(format, "K/D lifetime", stats.getSoloStats().getRatio(), stats.getDuoStats().getRatio(), stats.getSquadStats().getRatio())
+                            + String.format(format, "Top 1", stats.getSoloStats().getTop1(),
+                            stats.getDuoStats().getTop1(), stats.getSquadStats().getTop1())
+                            + String.format(format, "K/D season", stats.getSeasonSoloStats().getRatio(),
+                            stats.getSeasonDuoStats().getRatio(), stats.getSeasonSquadStats().getRatio())
+                            + String.format(format, "K/D lifetime", stats.getSoloStats().getRatio(),
+                            stats.getDuoStats().getRatio(), stats.getSquadStats().getRatio())
                             + "```";
 
                     return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
@@ -79,10 +83,13 @@ public class FortniteCmd extends BaseCmd {
                                     .setThumbnail("https://i.imgur.com/8NrvS8e.png")
                                     .setDescription(description)));
                 })
-                .onErrorResume(err -> err.getMessage().contains("HTTP Error 400. The request URL is invalid."),
+                .onErrorResume(err -> err.getMessage().contains("HTTP Error 400. The request URL is invalid.")
+                                || err.getMessage().contains("wrong header"),
                         err -> Mono.just(updatableMsg.setContent(
-                                String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Fortnite on this platform or doesn't exist." +
-                                                " Please make sure your spelling is correct, or follow this guide if you play on Console: <https://fortnitetracker.com/profile/search>",
+                                String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Fortnite " +
+                                                "on this platform or doesn't exist. Please make sure your spelling is" +
+                                                " correct, or follow this guide if you play on Console: " +
+                                                "<https://fortnitetracker.com/profile/search>",
                                         context.getUsername()))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
@@ -91,7 +98,7 @@ public class FortniteCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show player's stats for Fortnite.")
                 .addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")),
                         false)

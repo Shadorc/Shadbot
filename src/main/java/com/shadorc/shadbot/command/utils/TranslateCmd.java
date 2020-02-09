@@ -46,11 +46,13 @@ public class TranslateCmd extends BaseCmd {
 
         final List<String> quotedWords = StringUtils.getQuotedElements(arg);
         if (quotedWords.size() != 1) {
-            return Mono.error(new CommandException("The text to translate cannot be empty and must be enclosed in quotation marks."));
+            return Mono.error(new CommandException(
+                    "The text to translate cannot be empty and must be enclosed in quotation marks."));
         }
         final String sourceText = quotedWords.get(0);
         if (sourceText.length() > CHARACTERS_LIMIT) {
-            return Mono.error(new CommandException(String.format("The text to translate cannot exceed %d characters.", CHARACTERS_LIMIT)));
+            return Mono.error(new CommandException(
+                    String.format("The text to translate cannot exceed %d characters.", CHARACTERS_LIMIT)));
         }
 
         final List<String> languages = StringUtils.split(StringUtils.remove(arg, sourceText, "\""));
@@ -80,7 +82,8 @@ public class TranslateCmd extends BaseCmd {
                 NetUtils.encode(langFrom), NetUtils.encode(langTo), NetUtils.encode(sourceText));
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading translation...", context.getUsername()))
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading translation...",
+                context.getUsername()))
                 .send()
                 .then(NetUtils.get(url))
                 .map(body -> {
@@ -90,7 +93,8 @@ public class TranslateCmd extends BaseCmd {
                             || !body.startsWith("[")
                             || !(new JSONArray(body).get(0) instanceof JSONArray)) {
                         throw new CommandException(String.format("One of the specified language isn't supported. "
-                                + "Use `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
+                                        + "Use `%shelp %s` to see a complete list of supported languages.",
+                                context.getPrefix(), this.getName()));
                     }
 
                     final JSONArray result = new JSONArray(body);
@@ -102,8 +106,10 @@ public class TranslateCmd extends BaseCmd {
 
                     if (translatedText.toString().equalsIgnoreCase(sourceText)) {
                         throw new CommandException(String.format("The text could not been translated."
-                                + "%nCheck that the specified languages are supported and that the text is in the specified language."
-                                + "%nUse `%shelp %s` to see a complete list of supported languages.", context.getPrefix(), this.getName()));
+                                        + "%nCheck that the specified languages are supported,  that the text is in "
+                                        + "the specified language and that the destination language is different from the "
+                                        + "source one. %nUse `%shelp %s` to see a complete list of supported languages.",
+                                context.getPrefix(), this.getName()));
                     }
 
                     return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
@@ -124,13 +130,15 @@ public class TranslateCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Translate a text from a language to another.")
-                .addArg("fromLang", "source language, by leaving it blank the language will be automatically detected", true)
+                .addArg("fromLang", "source language, by leaving it blank the language will "
+                        + "be automatically detected", true)
                 .addArg("toLang", "destination language", false)
                 .addArg("\"text\"", false)
                 .setExample(String.format("`%s%s en fr \"How are you ?\"`", context.getPrefix(), this.getName()))
-                .addField("Documentation", "List of supported languages: https://cloud.google.com/translate/docs/languages", false)
+                .addField("Documentation", "List of supported languages: "
+                        + "https://cloud.google.com/translate/docs/languages", false)
                 .build();
     }
 }

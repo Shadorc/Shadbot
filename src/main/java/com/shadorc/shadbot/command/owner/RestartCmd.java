@@ -26,7 +26,8 @@ public class RestartCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(
-                        String.format(Emoji.QUESTION + " (**%s**) Do you really want to restart ? y/n", context.getUsername()), channel))
+                        String.format(Emoji.QUESTION + " (**%s**) Do you really want to restart ? y/n",
+                                context.getUsername()), channel))
                 .then(Mono.fromRunnable(() -> new ConfirmInputs(context.getClient(), Duration.ofSeconds(15),
                         Shadbot.quit(ExitCode.RESTART))
                         .subscribe()));
@@ -34,7 +35,7 @@ public class RestartCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Restart the bot.")
                 .build();
     }

@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.fun;
 
-import com.shadorc.shadbot.api.pandorabots.ChatBotResponse;
+import com.shadorc.shadbot.api.json.pandorabots.ChatBotResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -25,8 +25,10 @@ import java.util.function.Consumer;
 public class ChatCmd extends BaseCmd {
 
     private static final String HOME_URl = "https://www.pandorabots.com/pandora/talk-xml";
-    private static final Map<String, String> BOTS = Map.of("Marvin", "efc39100ce34d038", "Chomsky", "b0dafd24ee35a477",
-            "R.I.V.K.A", "ea373c261e3458c6", "Lisa", "b0a6a41a5e345c23");
+    private static final Map<String, String> BOTS = Map.of("Marvin", "efc39100ce34d038",
+            "Chomsky", "b0dafd24ee35a477",
+            "R.I.V.K.A", "ea373c261e3458c6",
+            "Lisa", "b0a6a41a5e345c23");
     private static final int MAX_CHARACTERS = 250;
 
     private final Map<Snowflake, String> channelsCustid;
@@ -71,12 +73,13 @@ public class ChatCmd extends BaseCmd {
                 .flatMap(resultObj -> Mono.fromCallable(() -> Utils.MAPPER.readValue(resultObj.toString(), ChatBotResponse.class)))
                 .doOnNext(chat -> this.channelsCustid.put(channelId, chat.getCustId()))
                 .map(ChatBotResponse::getResponse)
-                .onErrorResume(err -> Mono.fromRunnable(() -> LogUtils.info("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botId)));
+                .onErrorResume(err -> Mono.fromRunnable(() ->
+                        LogUtils.info("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botId)));
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Chat with an artificial intelligence.")
                 .addArg("message", String.format("must not exceed %d characters", MAX_CHARACTERS), false)
                 .setSource("https://www.pandorabots.com/"

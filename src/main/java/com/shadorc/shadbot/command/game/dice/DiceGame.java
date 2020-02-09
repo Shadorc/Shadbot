@@ -44,22 +44,22 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
         final int winningNum = ThreadLocalRandom.current().nextInt(1, 7);
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
-                .map(tuple -> {
+                .flatMap(tuple -> {
                     final DicePlayer player = tuple.getT1();
                     final String username = tuple.getT2();
                     if (player.getNumber() == winningNum) {
                         long gains = Math.min((long) (this.bet * (this.getPlayers().size() + DiceCmd.MULTIPLIER)), Config.MAX_COINS);
-                        player.win(gains);
-                        return String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains));
+                        return player.win(gains)
+                                .thenReturn(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains)));
                     } else {
-                        return String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(this.bet));
+                        return Mono.just(String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(this.bet)));
                     }
-
                 })
                 .collectList()
                 .doOnNext(list -> this.results = String.join("\n", list))
                 .then(this.getContext().getChannel())
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), channel))
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), channel))
                 .then(this.show())
                 .then(Mono.fromRunnable(this::stop));
     }
@@ -74,7 +74,8 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                             embed.setAuthor("Dice Game", null, this.getContext().getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/XgOilIW.png")
                                     .setDescription(String.format("**Use `%s%s <num>` to join the game.**%n**Bet:** %s",
-                                            this.getContext().getPrefix(), this.getContext().getCommandName(), FormatUtils.coins(this.bet)))
+                                            this.getContext().getPrefix(), this.getContext().getCommandName(),
+                                            FormatUtils.coins(this.bet)))
                                     .addField("Player", String.join("\n", usernames), true)
                                     .addField("Number", this.getPlayers().values().stream()
                                             .map(DicePlayer::getNumber)
@@ -86,9 +87,11 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                             }
 
                             if (this.isScheduled()) {
-                                final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-                                embed.setFooter(String.format("You have %d seconds to make your bets. Use %scancel to force the stop.",
-                                        remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
+                                final Duration remainingDuration = this.getDuration()
+                                        .minusMillis(TimeUtils.getMillisUntil(this.startTime));
+                                embed.setFooter(
+                                        String.format("You have %d seconds to make your bets. Use %scancel to force the stop.",
+                                                remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
                             } else {
                                 embed.setFooter("Finished.", null);
                             }

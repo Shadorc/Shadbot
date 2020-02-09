@@ -1,9 +1,9 @@
 package com.shadorc.shadbot.object.message;
 
 import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 
 public class UpdatableMessage {
 
-    private final DiscordClient client;
+    private final GatewayDiscordClient client;
     private final Snowflake channelId;
     private final AtomicLong messageId;
 
@@ -25,12 +25,12 @@ public class UpdatableMessage {
     private Consumer<EmbedCreateSpec> embed;
 
     /**
-     * Sends a message that will be deleted each time the {@code send} method is called
+     * Sends a message that will be deleted each time the {@code send} method is called.
      *
-     * @param client    - the Discord client
-     * @param channelId - the Channel ID in which to send the message
+     * @param client    The Discord client.
+     * @param channelId The Channel ID in which to send the message.
      */
-    public UpdatableMessage(DiscordClient client, Snowflake channelId) {
+    public UpdatableMessage(GatewayDiscordClient client, Snowflake channelId) {
         this.client = client;
         this.channelId = channelId;
         this.messageId = new AtomicLong();
@@ -60,8 +60,8 @@ public class UpdatableMessage {
     /**
      * Delete the previous message sent, if present, then send a message with the provided content and embed.
      *
-     * @param content - the content
-     * @param embed   - the embed
+     * @param content The content to send, may be null.
+     * @param embed   The embed to send, may be null.
      */
     private Mono<Message> send(@Nullable String content, @Nullable Consumer<EmbedCreateSpec> embed) {
         final Consumer<MessageCreateSpec> consumer = spec -> {

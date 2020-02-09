@@ -44,7 +44,7 @@ public class EnableCommandCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Enable/disable a command.")
                 .addArg("command", false)
                 .addArg("enabled", "true/false", false)

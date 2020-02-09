@@ -2,7 +2,7 @@ package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.object.Inputs;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
 import reactor.core.publisher.Mono;
@@ -15,7 +15,7 @@ public class ConfirmInputs extends Inputs {
     private final Mono<Void> task;
     private final AtomicBoolean isCancelled;
 
-    public ConfirmInputs(DiscordClient client, Duration timeout, Mono<Void> task) {
+    public ConfirmInputs(GatewayDiscordClient client, Duration timeout, Mono<Void> task) {
         super(client, timeout);
         this.task = task;
         this.isCancelled = new AtomicBoolean(false);

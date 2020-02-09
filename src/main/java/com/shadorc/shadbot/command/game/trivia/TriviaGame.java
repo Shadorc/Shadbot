@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.game.trivia;
 
-import com.shadorc.shadbot.api.trivia.TriviaResponse;
-import com.shadorc.shadbot.api.trivia.TriviaResult;
+import com.shadorc.shadbot.api.json.trivia.TriviaResponse;
+import com.shadorc.shadbot.api.json.trivia.TriviaResult;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
@@ -71,8 +71,9 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
     @Override
     public Mono<Void> end() {
         return this.getContext().getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.",
-                        this.trivia.getCorrectAnswer()), channel))
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.",
+                                this.trivia.getCorrectAnswer()), channel))
                 .then(Mono.fromRunnable(this::stop));
     }
 
@@ -104,10 +105,11 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
         final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
         final long gains = (long) Math.ceil(MIN_GAINS + remainingDuration.toSeconds() * coinsPerSec);
 
-        new Player(this.getContext().getGuildId(), member.getId()).win(gains);
-
         this.stop();
-        return this.getContext().getChannel()
+
+        return new Player(this.getContext().getGuildId(), member.getId())
+                .win(gains)
+                .then(this.getContext().getChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CLAP + " (**%s**) Correct ! You won " +
                         "**%s**.", member.getUsername(), FormatUtils.coins(gains)), channel));
     }

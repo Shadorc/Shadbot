@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.command.gamestats;
 
-import com.shadorc.shadbot.api.gamestats.overwatch.profile.ProfileResponse;
-import com.shadorc.shadbot.api.gamestats.overwatch.stats.Quickplay;
-import com.shadorc.shadbot.api.gamestats.overwatch.stats.StatsResponse;
+import com.shadorc.shadbot.api.json.gamestats.overwatch.profile.ProfileResponse;
+import com.shadorc.shadbot.api.json.gamestats.overwatch.stats.Quickplay;
+import com.shadorc.shadbot.api.json.gamestats.overwatch.stats.StatsResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -32,7 +32,7 @@ public class OverwatchCmd extends BaseCmd {
         XBL("xbl"),
         SWITCH("nintendo-switch");
 
-        private String value;
+        private final String value;
 
         Platform(String value) {
             this.value = value;
@@ -90,6 +90,9 @@ public class OverwatchCmd extends BaseCmd {
                 .then();
     }
 
+    /**
+     * Automatically detects the platform by iterating over all of them.
+     */
     private static Mono<Tuple3<Platform, ProfileResponse, StatsResponse>> getResponse(String battletag) {
         return Flux.fromArray(Platform.values())
                 .flatMap(platform -> OverwatchCmd.getResponse(platform.toString(), battletag))
@@ -122,7 +125,7 @@ public class OverwatchCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show player's stats for Overwatch.")
                 .addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")), true)
                 .addArg("username", "case sensitive", false)

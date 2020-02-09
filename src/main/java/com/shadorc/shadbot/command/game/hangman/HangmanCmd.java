@@ -39,15 +39,17 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
 
         return this.loadWords(difficulty)
                 .then(Mono.defer(() -> {
-                    final HangmanGame hangmanManager = this.getManagers().putIfAbsent(context.getChannelId(), new HangmanGame(this, context, difficulty));
+                    final HangmanGame hangmanManager = this.getManagers()
+                            .putIfAbsent(context.getChannelId(), new HangmanGame(this, context, difficulty));
                     if (hangmanManager == null) {
                         final HangmanGame newHangmanManager = this.getManagers().get(context.getChannelId());
                         return newHangmanManager.start().then(newHangmanManager.show());
                     } else {
                         return context.getChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**."
-                                                + " Please, wait for him to finish.",
-                                        context.getUsername(), hangmanManager.getContext().getUsername()), channel))
+                                .flatMap(channel -> DiscordUtils.sendMessage(
+                                        String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**."
+                                                        + " Please, wait for him to finish.",
+                                                context.getUsername(), hangmanManager.getContext().getUsername()), channel))
                                 .then();
                     }
                 }));
@@ -78,7 +80,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Start a Hangman game.")
                 .addArg("difficulty", String.format("%s. The difficulty of the word to find",
                         FormatUtils.format(Difficulty.class, "/")), true)

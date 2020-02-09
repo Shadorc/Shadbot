@@ -1,12 +1,15 @@
 package com.shadorc.shadbot.command.image;
 
+import com.shadorc.shadbot.api.html.suicidegirl.SuicideGirl;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
@@ -27,7 +30,8 @@ public class SuicideGirlsCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Suicide Girl picture...", context.getUsername()))
+        return updatableMsg.setContent(
+                String.format(Emoji.HOURGLASS + " (**%s**) Loading Suicide Girl picture...", context.getUsername()))
                 .send()
                 .then(context.isChannelNsfw())
                 .flatMap(isNsfw -> {
@@ -37,18 +41,11 @@ public class SuicideGirlsCmd extends BaseCmd {
 
                     return NetUtils.get(HOME_URL)
                             .map(Jsoup::parse)
-                            .map(doc -> doc.getElementsByTag("article"))
-                            .map(Utils::randValue)
-                            .map(girl -> {
-                                final String name = girl.getElementsByTag("a").attr("href").split("/")[2].trim();
-                                final String imageUrl = girl.select("noscript").attr("data-retina");
-                                final String url = girl.getElementsByClass("facebook-share").attr("href");
-
-                                return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                                        .andThen(embed -> embed.setAuthor("SuicideGirls", url, context.getAvatarUrl())
-                                                .setDescription(String.format("Name: **%s**", StringUtils.capitalize(name)))
-                                                .setImage(imageUrl)));
-                            });
+                            .map(SuicideGirl::new)
+                            .map(girl -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                                    .andThen(embed -> embed.setAuthor("SuicideGirls", girl.getUrl(), context.getAvatarUrl())
+                                            .setDescription(String.format("Name: **%s**", girl.getName()))
+                                            .setImage(girl.getImageUrl()))));
                 })
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
@@ -57,7 +54,7 @@ public class SuicideGirlsCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Show a random Suicide Girl image.")
                 .setSource("https://www.suicidegirls.com/")
                 .build();

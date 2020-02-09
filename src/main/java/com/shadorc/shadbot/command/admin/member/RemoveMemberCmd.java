@@ -15,7 +15,7 @@ import discord4j.core.object.audit.AuditLogEntry;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
@@ -81,7 +81,7 @@ public abstract class RemoveMemberCmd extends BaseCmd {
                                 context.getUsername(), this.conjugatedVerb,
                                 String.format("**%s**", tuple.getT4().getUsername())),
                                 tuple.getT2())))
-                .onErrorMap(err -> err instanceof ClientException && ((ClientException) err).getStatus().equals(HttpResponseStatus.FORBIDDEN),
+                .onErrorMap(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
                         err -> new MissingPermissionException(this.permission))
                 .then();
     }
@@ -91,13 +91,15 @@ public abstract class RemoveMemberCmd extends BaseCmd {
                 .flatMap(tuple -> {
                     if (!tuple.getT1()) {
                         return DiscordUtils.sendMessage(
-                                String.format(Emoji.WARNING + " (**%s**) I cannot %s **%s** because he is higher in the role hierarchy than me.",
+                                String.format(Emoji.WARNING + " (**%s**) I cannot %s **%s** because he is higher in " +
+                                                "the role hierarchy than me.",
                                         author.getUsername(), this.getName(), memberToRemove.getUsername()), channel)
                                 .thenReturn(false);
                     }
                     if (!tuple.getT2()) {
                         return DiscordUtils.sendMessage(
-                                String.format(Emoji.WARNING + " (**%s**) You cannot %s **%s** because he is higher in the role hierarchy than you.",
+                                String.format(Emoji.WARNING + " (**%s**) You cannot %s **%s** because he is higher " +
+                                                "in the role hierarchy than you.",
                                         author.getUsername(), this.getName(), memberToRemove.getUsername()), channel)
                                 .thenReturn(false);
                     }

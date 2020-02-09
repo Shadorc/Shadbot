@@ -10,8 +10,8 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
-import discord4j.core.object.entity.Channel;
-import discord4j.core.object.entity.Channel.Type;
+import discord4j.core.object.entity.channel.Channel;
+import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -40,24 +40,29 @@ public class AllowedChannelsSetting extends BaseSetting {
 
         return context.getGuild()
                 .flatMapMany(guild -> DiscordUtils.extractChannels(guild, args.get(2)))
-                .flatMap(channelId -> context.getClient().getChannelById(channelId))
                 .collectList()
-                .map(mentionedChannels -> {
+                .flatMap(mentionedChannels -> {
                     if (mentionedChannels.isEmpty()) {
-                        throw new CommandException(String.format("Channel `%s` not found.", args.get(2)));
+                        return Mono.error(new CommandException(String.format("Channel `%s` not found.", args.get(2))));
                     }
 
-                    final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
+                    return Mono.zip(Mono.just(mentionedChannels),
+                            DatabaseManager.getGuilds().getDBGuild(context.getGuildId()));
+                })
+                .flatMap(tuple -> {
+                    final List<GuildChannel> mentionedChannels = tuple.getT1();
+                    final DBGuild dbGuild = tuple.getT2();
+
                     final List<Snowflake> allowedTextChannelIds = dbGuild.getSettings().getAllowedTextChannelIds();
                     final List<Snowflake> allowedVoiceChannelIds = dbGuild.getSettings().getAllowedVoiceChannelIds();
 
                     final List<Snowflake> mentionedVoiceChannelIds = mentionedChannels.stream()
-                            .filter(channel -> channel.getType() == Type.GUILD_VOICE)
+                            .filter(channel -> channel.getType() == Channel.Type.GUILD_VOICE)
                             .map(Channel::getId)
                             .collect(Collectors.toList());
 
                     final List<Snowflake> mentionedTextChannelIds = mentionedChannels.stream()
-                            .filter(channel -> channel.getType() == Type.GUILD_TEXT)
+                            .filter(channel -> channel.getType() == Channel.Type.GUILD_TEXT)
                             .map(Channel::getId)
                             .collect(Collectors.toList());
 
@@ -71,9 +76,9 @@ public class AllowedChannelsSetting extends BaseSetting {
 
                         for (final Channel channel : mentionedChannels) {
                             final Snowflake channelId = channel.getId();
-                            if (channel.getType() == Type.GUILD_TEXT && !allowedTextChannelIds.contains(channelId)) {
+                            if (channel.getType() == Channel.Type.GUILD_TEXT && !allowedTextChannelIds.contains(channelId)) {
                                 allowedTextChannelIds.add(channelId);
-                            } else if (channel.getType() == Type.GUILD_VOICE && !allowedVoiceChannelIds.contains(channelId)) {
+                            } else if (channel.getType() == Channel.Type.GUILD_VOICE && !allowedVoiceChannelIds.contains(channelId)) {
                                 allowedVoiceChannelIds.add(channelId);
                             }
                         }
@@ -88,18 +93,20 @@ public class AllowedChannelsSetting extends BaseSetting {
                                 FormatUtils.format(mentionedChannels, Channel::getMention, ", ")));
 
                         if (!mentionedTextChannelIds.isEmpty() && allowedTextChannelIds.isEmpty()) {
-                            strBuilder.append("\n" + Emoji.INFO + " There are no more allowed text channels set, I can now speak in all the text channels.");
+                            strBuilder.append("\n" + Emoji.INFO + " There are no more allowed text channels set, "
+                                    + "I can now speak in all the text channels.");
                         }
                         if (!mentionedVoiceChannelIds.isEmpty() && allowedVoiceChannelIds.isEmpty()) {
-                            strBuilder.append("\n" + Emoji.INFO + " There are no more allowed voice channels set, I can now connect to all voice channels.");
+                            strBuilder.append("\n" + Emoji.INFO + " There are no more allowed voice channels set, "
+                                    + "I can now connect to all voice channels.");
                         }
                     }
 
-                    dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds);
-                    dbGuild.setSetting(Setting.ALLOWED_VOICE_CHANNELS, allowedVoiceChannelIds);
-
-                    return strBuilder.toString();
+                    return dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds)
+                            .then(dbGuild.setSetting(Setting.ALLOWED_VOICE_CHANNELS, allowedVoiceChannelIds))
+                            .thenReturn(strBuilder);
                 })
+                .map(StringBuilder::toString)
                 .flatMap(text -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
                 .then();

@@ -1,16 +1,17 @@
 package com.shadorc.shadbot.music;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
-import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
-import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.VoiceChannel;
+import discord4j.core.GatewayDiscordClient;
+import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
@@ -41,28 +42,15 @@ public final class MusicManager {
         this.audioPlayerManager.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         this.guildMusicConnections = new ConcurrentHashMap<>();
-
-        /*
-        //IPv6 rotation config
-        if (Config.IPV6_BLOCK != null && !Config.IPV6_BLOCK.isEmpty()) {
-            LOGGER.info("Configuring YouTube IP rotator.");
-            final List<IpBlock> blocks = Collections.singletonList(new Ipv6Block(Config.IPV6_BLOCK));
-            final AbstractRoutePlanner planner = new RotatingNanoIpRoutePlanner(blocks);
-
-            new YoutubeIpRotatorSetup(planner)
-                    .forSource(this.audioPlayerManager.source(YoutubeAudioSourceManager.class))
-                    .setup();
-        }
-        */
     }
 
     /**
      * Schedules loading a track or playlist with the specified identifier. Items loaded with the same
      * guild ID are handled sequentially in the order of calls to this method.
      *
-     * @return A future for this operation
+     * @return A future for this operation.
      */
-    public Future<Void> loadItemOrdered(Snowflake guildId, String identifier, AudioLoadResultListener listener) {
+    public Future<Void> loadItemOrdered(Snowflake guildId, String identifier, AudioLoadResultHandler listener) {
         return this.audioPlayerManager.loadItemOrdered(guildId, identifier, listener);
     }
 
@@ -71,7 +59,7 @@ public final class MusicManager {
      * a new one is created and a request to join the {@link VoiceChannel} corresponding to the provided
      * {@code voiceChannelId} is sent.
      */
-    public Mono<GuildMusic> getOrCreate(DiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
+    public Mono<GuildMusic> getOrCreate(GatewayDiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
         return Mono.just(this.guildMusicConnections.computeIfAbsent(guildId,
                 ignored -> {
                     LOGGER.debug("{Guild ID: {}} Creating guild music connection.", guildId.asLong());
@@ -80,20 +68,26 @@ public final class MusicManager {
                 .flatMap(guildMusicConnection -> {
                     if (guildMusicConnection.getGuildMusic() == null) {
                         LOGGER.debug("{Guild ID: {}} Creating guild music.", guildId.asLong());
+
                         final AudioPlayer audioPlayer = this.audioPlayerManager.createPlayer();
                         audioPlayer.addListener(new TrackEventListener(guildId));
 
-                        final Settings settings = DatabaseManager.getGuilds().getDBGuild(guildId).getSettings();
-                        final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, settings.getDefaultVol());
-                        final GuildMusic guildMusic = new GuildMusic(client, guildId, trackScheduler);
-                        guildMusicConnection.setGuildMusic(guildMusic);
+                        return DatabaseManager.getGuilds()
+                                .getDBGuild(guildId)
+                                .map(DBGuild::getSettings)
+                                .map(Settings::getDefaultVol)
+                                .flatMap(volume -> {
+                                    final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, volume);
+                                    final GuildMusic guildMusic = new GuildMusic(client, guildId, trackScheduler);
+                                    guildMusicConnection.setGuildMusic(guildMusic);
 
-                        final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
-                        return guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
-                                .thenReturn(guildMusicConnection.getGuildMusic());
+                                    final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
+                                    return guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
+                                            .thenReturn(guildMusicConnection.getGuildMusic());
+                                });
+                    } else {
+                        return Mono.just(guildMusicConnection.getGuildMusic());
                     }
-
-                    return Mono.just(guildMusicConnection.getGuildMusic());
                 });
     }
 
@@ -107,11 +101,9 @@ public final class MusicManager {
         return guildMusicConnection == null ? null : guildMusicConnection.getGuildMusic();
     }
 
-    public void removeConnection(Snowflake guildId) {
-        final GuildMusicConnection guildMusicConnection = this.guildMusicConnections.remove(guildId);
-        if (guildMusicConnection != null) {
-            guildMusicConnection.leaveVoiceChannel();
-        }
+    public Mono<Void> removeConnection(Snowflake guildId) {
+        return Mono.justOrEmpty(this.guildMusicConnections.remove(guildId))
+                .flatMap(GuildMusicConnection::leaveVoiceChannel);
     }
 
     public List<Snowflake> getGuildIdsWithGuildMusics() {

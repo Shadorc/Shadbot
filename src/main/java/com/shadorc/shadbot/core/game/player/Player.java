@@ -2,7 +2,7 @@ package com.shadorc.shadbot.core.game.player;
 
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Mono;
@@ -21,21 +21,24 @@ public class Player {
         return this.userId;
     }
 
-    public Mono<String> getUsername(DiscordClient client) {
+    public Mono<String> getUsername(GatewayDiscordClient client) {
         return client.getUserById(this.userId).map(User::getUsername);
     }
 
-    public DBMember getDBMember() {
+    public Mono<DBMember> getDBMember() {
         return DatabaseManager.getGuilds().getDBMember(this.guildId, this.userId);
     }
 
-    public void win(long coins) {
-        this.getDBMember().addCoins(coins);
+    public Mono<Void> win(long coins) {
+        return this.getDBMember()
+                .flatMap(dbMember -> dbMember.addCoins(coins))
+                .then();
     }
 
-    public void lose(long coins) {
-        this.getDBMember().addCoins(-coins);
-        DatabaseManager.getLottery().addToJackpot(coins);
+    public Mono<Void> lose(long coins) {
+        return this.getDBMember()
+                .flatMap(dbMember -> dbMember.addCoins(-coins))
+                .and(DatabaseManager.getLottery().addToJackpot(coins));
     }
 
 }

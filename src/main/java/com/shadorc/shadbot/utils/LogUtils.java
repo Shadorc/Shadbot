@@ -1,58 +1,85 @@
 package com.shadorc.shadbot.utils;
 
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.object.LogBuilder;
-import com.shadorc.shadbot.object.LogBuilder.LogType;
-import discord4j.core.DiscordClient;
-import discord4j.core.object.entity.MessageChannel;
+import io.sentry.Sentry;
+import io.sentry.event.Event;
+import io.sentry.event.EventBuilder;
+import io.sentry.event.interfaces.ExceptionInterface;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
 public final class LogUtils {
 
+    private static final class TagName {
+
+        public static final String EXCEPTION_CLASS = "exception_class";
+        public static final String EXCEPTION_MESSAGE = "exception_message";
+    }
+
+    private static final class ExtraName {
+
+        public static final String INPUT = "input";
+    }
+
     private static final Logger LOGGER = Loggers.getLogger("shadbot");
 
-    public static void error(DiscordClient client, Throwable error, String message, String input) {
+    public static void error(Throwable error, String message, String input) {
         LOGGER.error(String.format("%s (Input: %s)", message, input), error);
-        LogUtils.sendLog(client, new LogBuilder(LogType.ERROR).setMessage(message).setError(error).setInput(input));
-    }
 
-    public static void error(DiscordClient client, Throwable error, String message) {
-        LOGGER.error(message, error);
-        LogUtils.sendLog(client, new LogBuilder(LogType.ERROR).setMessage(message).setError(error));
-    }
-
-    public static void error(DiscordClient client, String message) {
-        LOGGER.error(message);
-        LogUtils.sendLog(client, new LogBuilder(LogType.ERROR).setMessage(message));
+        if (!Config.IS_SNAPSHOT) {
+            Sentry.capture(new EventBuilder()
+                    .withRelease(Config.VERSION)
+                    .withLevel(Event.Level.ERROR)
+                    .withSentryInterface(new ExceptionInterface(error))
+                    .withMessage(message)
+                    .withTag(TagName.EXCEPTION_CLASS, error.getClass().getSimpleName())
+                    .withTag(TagName.EXCEPTION_MESSAGE, error.getMessage())
+                    .withExtra(ExtraName.INPUT, input)
+                    .build());
+        }
     }
 
     public static void error(Throwable error, String message) {
         LOGGER.error(message, error);
+
+        if (!Config.IS_SNAPSHOT) {
+            Sentry.capture(new EventBuilder()
+                    .withRelease(Config.VERSION)
+                    .withLevel(Event.Level.ERROR)
+                    .withSentryInterface(new ExceptionInterface(error))
+                    .withMessage(message)
+                    .withTag(TagName.EXCEPTION_CLASS, error.getClass().getSimpleName())
+                    .withTag(TagName.EXCEPTION_MESSAGE, error.getMessage())
+                    .build());
+        }
     }
 
     public static void error(String message) {
         LOGGER.error(message);
-    }
 
-    public static void warn(DiscordClient client, String message) {
-        LOGGER.warn(message);
-        LogUtils.sendLog(client, new LogBuilder(LogType.WARN).setMessage(message));
+        if (!Config.IS_SNAPSHOT) {
+            Sentry.capture(new EventBuilder()
+                    .withRelease(Config.VERSION)
+                    .withLevel(Event.Level.ERROR)
+                    .withMessage(message)
+                    .build());
+        }
     }
 
     public static void warn(String format, Object... args) {
         LOGGER.warn(String.format(format, args));
+
+        if (!Config.IS_SNAPSHOT) {
+            Sentry.capture(new EventBuilder()
+                    .withRelease(Config.VERSION)
+                    .withLevel(Event.Level.WARNING)
+                    .withMessage(String.format(format, args))
+                    .build());
+        }
     }
 
     public static void info(String format, Object... args) {
         LOGGER.info(String.format(format, args));
-    }
-
-    private static void sendLog(DiscordClient client, LogBuilder embed) {
-        client.getChannelById(Config.LOGS_CHANNEL_ID)
-                .cast(MessageChannel.class)
-                .flatMap(channel -> DiscordUtils.sendMessage(embed.build(), channel))
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
     }
 
 }

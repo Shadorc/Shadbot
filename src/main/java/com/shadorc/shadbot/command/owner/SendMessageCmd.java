@@ -9,7 +9,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
-import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.http.client.ClientException;
@@ -53,16 +53,17 @@ public class SendMessageCmd extends BaseCmd {
                             .onErrorMap(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
                                     err -> new CommandException("I'm not allowed to send a private message to this user."))
                             .then(context.getChannel())
-                            .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Message \"%s\" sent to **%s** (%s).",
-                                    args.get(1), user.getUsername(), user.getId().asLong()), channel));
+                            .flatMap(channel -> DiscordUtils.sendMessage(
+                                    String.format(Emoji.CHECK_MARK + " Message \"%s\" sent to **%s** (%s).",
+                                            args.get(1), user.getUsername(), user.getId().asLong()), channel));
                 })
                 .then();
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
-                .setDescription("Send a private message to an user.")
+        return HelpBuilder.create(this, context)
+                .setDescription("Send a private message to a user.")
                 .addArg("userID", false)
                 .addArg("message", false)
                 .build();

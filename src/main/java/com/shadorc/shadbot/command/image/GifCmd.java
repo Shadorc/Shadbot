@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.command.image;
 
-import com.shadorc.shadbot.api.image.giphy.GiphyResponse;
+import com.shadorc.shadbot.api.json.image.giphy.GiphyResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
-import com.shadorc.shadbot.data.credential.Credentials;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
@@ -30,15 +30,17 @@ public class GifCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         final String url = String.format("%s?api_key=%s&tag=%s",
-                HOME_URl, Credentials.get(Credential.GIPHY_API_KEY), NetUtils.encode(context.getArg().orElse("")));
+                HOME_URl, CredentialManager.getInstance().get(Credential.GIPHY_API_KEY),
+                NetUtils.encode(context.getArg().orElse("")));
 
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading gif...", context.getUsername()))
                 .send()
                 .then(NetUtils.get(url, GiphyResponse.class))
                 .map(giphy -> {
                     if (giphy.getGifs().isEmpty()) {
-                        return updatableMsg.setContent(String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
-                                context.getUsername(), context.getArg().orElse("random search")));
+                        return updatableMsg.setContent(
+                                String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
+                                        context.getUsername(), context.getArg().orElse("random search")));
                     }
 
                     return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
@@ -51,8 +53,8 @@ public class GifCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
-                .setDescription("Show a random gif")
+        return HelpBuilder.create(this, context)
+                .setDescription("Show a random gif.")
                 .addArg("tag", "the tag to search", true)
                 .setSource("https://www.giphy.com/")
                 .build();

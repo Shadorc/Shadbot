@@ -5,11 +5,8 @@ import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.TextFile;
 import com.shadorc.shadbot.object.Emoji;
-import discord4j.core.object.util.Permission;
 import org.jsoup.Jsoup;
 import reactor.util.annotation.NonNull;
-
-import java.util.List;
 
 public final class TextUtils {
 
@@ -18,32 +15,18 @@ public final class TextUtils {
 
     public static final String PLAYLIST_LIMIT_REACHED =
             String.format(Emoji.LOCK + " You've reached the maximum number of tracks (%d) in a playlist. "
-                            + "You can **remove this limit and gain other advantage** by contributing to Shadbot. More info here: <%s>",
-                    Config.PLAYLIST_SIZE, Config.PATREON_URL);
+                    + "You can **remove this limit and gain other advantage** by contributing to Shadbot. "
+                    + "More info here: <%s>", Config.PLAYLIST_SIZE, Config.PATREON_URL);
 
     public static final TextFile SPAMS = new TextFile("texts/spam.txt");
-
-    public static final List<String> TIP_MESSAGES = List.of(String.format("Check %slottery", Config.DEFAULT_PREFIX),
-            String.format("Add music first: %splayfirst", Config.DEFAULT_PREFIX),
-            String.format("Contribute to Shadbot! %s", Config.PATREON_URL),
-            String.format("Support server: %s", Config.SUPPORT_SERVER_URL),
-            String.format("A feedback? %sfeedback", Config.DEFAULT_PREFIX),
-            String.format("Prefix lost? %sprefix", Config.DEFAULT_PREFIX),
-            "The Baguette is a Lie");
+    public static final TextFile TIPS = new TextFile("texts/tips.txt");
 
     /**
-     * @param err - the exception containing the error message to clean
-     * @return The error message trimmed, without HTML tags nor YouTube links
+     * @param err The exception containing the error message to clean.
+     * @return The error message trimmed, without HTML tags nor YouTube links.
      */
     public static String cleanLavaplayerErr(@NonNull FriendlyException err) {
         return Jsoup.parse(StringUtils.remove(err.getMessage(), "Watch on YouTube")).text().trim();
-    }
-
-    public static String missingPermission(String username, Permission permission) {
-        return String.format(Emoji.ACCESS_DENIED
-                        + " (**%s**) I can't execute this command due to the lack of permission."
-                        + "%nPlease, check my permissions and channel-specific ones to verify that %s is checked.",
-                username, String.format("**%s**", StringUtils.capitalizeEnum(permission)));
     }
 
     public static String mustBeNsfw(String prefix) {

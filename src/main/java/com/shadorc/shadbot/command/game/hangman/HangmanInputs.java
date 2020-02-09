@@ -3,7 +3,7 @@ package com.shadorc.shadbot.command.game.hangman;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.Inputs;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import reactor.core.publisher.Mono;
@@ -16,7 +16,7 @@ public class HangmanInputs extends Inputs {
 
     private final HangmanGame game;
 
-    public HangmanInputs(DiscordClient client, HangmanGame game) {
+    public HangmanInputs(GatewayDiscordClient client, HangmanGame game) {
         super(client, game.getDuration());
         this.game = game;
     }
@@ -62,10 +62,12 @@ public class HangmanInputs extends Inputs {
                     }
 
                     if (content.length() == 1
-                            && !this.game.getRateLimiter().isLimitedAndWarn(this.game.getContext().getChannelId(), this.game.getContext().getMember())) {
+                            && !this.game.getRateLimiter()
+                            .isLimitedAndWarn(this.game.getContext().getChannelId(), this.game.getContext().getMember())) {
                         return this.game.checkLetter(content);
                     } else if (content.length() == this.game.getWord().length()
-                            && !this.game.getRateLimiter().isLimitedAndWarn(this.game.getContext().getChannelId(), this.game.getContext().getMember())) {
+                            && !this.game.getRateLimiter()
+                            .isLimitedAndWarn(this.game.getContext().getChannelId(), this.game.getContext().getMember())) {
                         return this.game.checkWord(content);
                     }
 

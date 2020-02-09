@@ -9,6 +9,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
+import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -24,12 +25,13 @@ public class CoinsCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        return context.getMessage()
-                .getUserMentions()
-                .switchIfEmpty(Mono.just(context.getAuthor()))
-                .next()
-                .map(user -> {
-                    final DBMember dbMember = DatabaseManager.getGuilds().getDBMember(context.getGuildId(), user.getId());
+        return this.getMentionedUser(context)
+                .flatMap(user -> Mono.zip(Mono.just(user),
+                        DatabaseManager.getGuilds().getDBMember(context.getGuildId(), user.getId())))
+                .map(tuple -> {
+                    final User user = tuple.getT1();
+                    final DBMember dbMember = tuple.getT2();
+
                     final String coins = FormatUtils.coins(dbMember.getCoins());
                     if (user.getId().equals(context.getAuthorId())) {
                         return String.format("(**%s**) You have **%s**.", user.getUsername(), coins);
@@ -42,10 +44,19 @@ public class CoinsCmd extends BaseCmd {
                 .then();
     }
 
+    private Mono<User> getMentionedUser(Context context) {
+        return context.getMessage()
+                .getUserMentions()
+                .switchIfEmpty(context.getGuild()
+                        .flatMapMany(guild -> DiscordUtils.extractMembers(guild, context.getContent())))
+                .defaultIfEmpty(context.getAuthor())
+                .next();
+    }
+
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
-                .setDescription("Show how many coins an user has.")
+        return HelpBuilder.create(this, context)
+                .setDescription("Show how many coins a user has.")
                 .addArg("@user", "if not specified, it will show your coins", true)
                 .build();
     }

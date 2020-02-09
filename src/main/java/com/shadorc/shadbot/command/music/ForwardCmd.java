@@ -43,7 +43,8 @@ public class ForwardCmd extends BaseCmd {
                         }
                     }
 
-                    final long newPosition = guildMusic.getTrackScheduler().changePosition(TimeUnit.SECONDS.toMillis(num));
+                    final long newPosition = guildMusic.getTrackScheduler()
+                            .changePosition(TimeUnit.SECONDS.toMillis(num));
                     return String.format(Emoji.CHECK_MARK + " New position set to **%s** by **%s**.",
                             FormatUtils.shortDuration(newPosition), context.getUsername());
                 })
@@ -54,7 +55,7 @@ public class ForwardCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Fast forward current song a specified amount of time.")
                 .addArg("time", "can be seconds or time (e.g. 72 or 1m12s)", false)
                 .build();

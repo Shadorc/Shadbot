@@ -23,14 +23,15 @@ public class ClearCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         context.requireGuildMusic().getTrackScheduler().clearPlaylist();
         return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Playlist cleared by **%s**.",
-                        context.getUsername()), channel))
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        String.format(Emoji.CHECK_MARK + " Playlist cleared by **%s**.",
+                                context.getUsername()), channel))
                 .then();
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Clear current playlist.")
                 .build();
     }

@@ -4,7 +4,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.Inputs;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import reactor.core.publisher.Mono;
@@ -13,7 +13,7 @@ public class TriviaInputs extends Inputs {
 
     private final TriviaGame game;
 
-    public TriviaInputs(DiscordClient client, TriviaGame game) {
+    public TriviaInputs(GatewayDiscordClient client, TriviaGame game) {
         super(client, game.getDuration());
         this.game = game;
     }

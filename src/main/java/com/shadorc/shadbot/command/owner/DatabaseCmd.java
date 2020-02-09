@@ -32,28 +32,32 @@ public class DatabaseCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        final StringBuilder strBuilder = new StringBuilder();
-        try {
-            final Process process = Runtime.getRuntime().exec(new String[]{"mongo", Config.DATABASE_NAME, "--eval", arg});
-            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+        return Mono.fromCallable(() -> {
+            final StringBuilder strBuilder = new StringBuilder();
+            try {
+                final Process process = Runtime.getRuntime().exec(new String[]{"mongo", Config.DATABASE_NAME, "--eval", arg});
+                try (final BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
 
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    strBuilder.append(String.format("%s\n", line));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        strBuilder.append(String.format("%s\n", line));
+                    }
                 }
+            } catch (final IOException err) {
+                strBuilder.append(String.format(Emoji.RED_CROSS + " Error: %s", err.getMessage()));
             }
-        } catch (final IOException err) {
-            strBuilder.append(String.format(Emoji.RED_CROSS + " Error: %s", err.getMessage()));
-        }
 
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(StringUtils.abbreviate(strBuilder.toString(), MAX_WIDTH), channel))
+            return strBuilder.toString();
+        })
+                .flatMap(text -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(StringUtils.abbreviate(text, MAX_WIDTH), channel)))
                 .then();
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Evaluate a query with the MongoDB shell.")
                 .addArg("query", false)
                 .build();

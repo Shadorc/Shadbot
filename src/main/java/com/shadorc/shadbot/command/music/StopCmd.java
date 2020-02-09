@@ -23,16 +23,18 @@ public class StopCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         context.requireGuildMusic();
-        MusicManager.getInstance().getConnection(context.getGuildId()).leaveVoiceChannel();
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO + " Music stopped by **%s**.",
+        return MusicManager.getInstance()
+                .getConnection(context.getGuildId())
+                .leaveVoiceChannel()
+                .then(context.getChannel())
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.STOP_BUTTON + " Music stopped by **%s**.",
                         context.getUsername()), channel))
                 .then();
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return new HelpBuilder(this, context)
+        return HelpBuilder.create(this, context)
                 .setDescription("Stop music.")
                 .build();
     }

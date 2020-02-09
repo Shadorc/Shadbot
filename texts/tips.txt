@@ -1,0 +1,6 @@
+Check {default_prefix}lottery
+A feedback? {default_prefix}feedback
+Prefix lost? {default_prefix}prefix
+Add music first: {default_prefix}playfirst
+Help Shadbot! {patreon_url}
+Support server: {support_server_url}

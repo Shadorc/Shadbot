@@ -65,7 +65,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
     public Mono<Void> end() {
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
-                .map(tuple -> {
+                .flatMap(tuple -> {
                     final BlackjackPlayer player = tuple.getT1();
                     final String username = tuple.getT2();
 
@@ -74,15 +74,16 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
 
                     switch (BlackjackGame.getResult(playerValue, dealerValue)) {
                         case 1:
-                            player.cancelBet();
                             final long coins = Math.min(player.getBet(), Config.MAX_COINS);
-                            player.win(coins);
-                            return String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(coins));
+                            return player.cancelBet()
+                                    .then(player.win(coins))
+                                    .thenReturn(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(coins)));
                         case -1:
-                            return String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(player.getBet()));
+                            return Mono.just(String.format("**%s** (Losses: **%s**)",
+                                    username, FormatUtils.coins(player.getBet())));
                         default:
-                            player.draw();
-                            return String.format("**%s** (Draw)", username);
+                            return player.draw()
+                                    .thenReturn(String.format("**%s** (Draw)", username));
                     }
                 })
                 .collectList()
@@ -111,18 +112,22 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                 .collectList()
                 .map(hands -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
-                            final Hand visibleDealerHand = this.isScheduled() ? new Hand(this.dealerHand.getCards().subList(0, 1)) : this.dealerHand;
+                            final Hand visibleDealerHand = this.isScheduled() ?
+                                    new Hand(this.dealerHand.getCards().subList(0, 1)) : this.dealerHand;
                             embed.setAuthor("Blackjack Game", null, this.getContext().getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/oESeVrU.png")
                                     .setDescription(String.format("**Use `%s%s <bet>` to join the game.**"
-                                                    + "%n%nType `hit` to take another card, `stand` to pass or `double down` to double down.",
+                                                    + "%n%nType `hit` to take another card, `stand` to pass or "
+                                                    + "`double down` to double down.",
                                             this.getContext().getPrefix(), this.getContext().getCommandName()))
                                     .addField("Dealer's hand", visibleDealerHand.format(), true);
 
                             if (this.isScheduled()) {
-                                final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-                                embed.setFooter(String.format("Will automatically stop in %s seconds. Use %scancel to force the stop.",
-                                        remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
+                                final Duration remainingDuration = this.getDuration()
+                                        .minusMillis(TimeUtils.getMillisUntil(this.startTime));
+                                embed.setFooter(
+                                        String.format("Will automatically stop in %s seconds. Use %scancel to force the stop.",
+                                                remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
                             } else {
                                 embed.setFooter("Finished", null);
                             }

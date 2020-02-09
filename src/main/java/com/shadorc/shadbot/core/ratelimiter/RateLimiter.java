@@ -5,7 +5,7 @@ import com.shadorc.shadbot.object.message.TemporaryMessage;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.TextUtils;
-import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.util.Snowflake;
 import io.github.bucket4j.Bandwidth;
@@ -19,19 +19,31 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RateLimiter {
 
     private final Map<Snowflake, LimitedGuild> guildsLimitedMap;
-    private final int max;
-    private final Duration duration;
     private final Bandwidth bandwidth;
 
-    public RateLimiter(int max, Duration duration) {
+    /**
+     * Specifies simple limitation {@code capacity} tokens per {@code period} time window.
+     *
+     * @param capacity Maximum amount of tokens.
+     * @param period   The period within tokens will be fully regenerated.
+     */
+    public RateLimiter(int capacity, Duration period) {
+        this(Bandwidth.classic(capacity, Refill.intervally(capacity, period)));
+    }
+
+    /**
+     * Specifies limitation with the provided bandwidth.
+     *
+     * @param bandwidth The bandwidth.
+     */
+    public RateLimiter(Bandwidth bandwidth) {
         this.guildsLimitedMap = new ConcurrentHashMap<>();
-        this.max = max;
-        this.duration = duration;
-        this.bandwidth = Bandwidth.classic(this.max, Refill.intervally(this.max, this.duration));
+        this.bandwidth = bandwidth;
     }
 
     public boolean isLimitedAndWarn(Snowflake channelId, Member member) {
-        final LimitedUser limitedUser = this.guildsLimitedMap.computeIfAbsent(member.getGuildId(), ignored -> new LimitedGuild(this.bandwidth))
+        final LimitedUser limitedUser = this.guildsLimitedMap.computeIfAbsent(member.getGuildId(),
+                ignored -> new LimitedGuild(this.bandwidth))
                 .getUser(member.getId());
 
         // The token could not been consumed, the user is limited
@@ -48,18 +60,19 @@ public class RateLimiter {
         return false;
     }
 
-    private void sendWarningMessage(DiscordClient client, Snowflake channelId, Snowflake userId) {
+    private void sendWarningMessage(GatewayDiscordClient client, Snowflake channelId, Snowflake userId) {
         client.getUserById(userId)
                 .map(author -> {
                     final String username = author.getUsername();
-                    final String message = TextUtils.SPAMS.getText();
-                    final String maxNum = StringUtils.pluralOf(this.max, "time");
-                    final String durationStr = DurationFormatUtils.formatDurationWords(this.duration.toMillis(), true, true);
+                    final String message = TextUtils.SPAMS.getRandomText();
+                    final String maxNum = StringUtils.pluralOf(this.bandwidth.getCapacity(), "time");
+                    final String durationStr = DurationFormatUtils.formatDurationWords(
+                            this.bandwidth.getRefillPeriodNanos() / 1_000_000, true, true);
                     return String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
                             username, message, maxNum, durationStr);
                 })
                 .flatMap(new TemporaryMessage(client, channelId, Duration.ofSeconds(10))::send)
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(client, err));
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
 }

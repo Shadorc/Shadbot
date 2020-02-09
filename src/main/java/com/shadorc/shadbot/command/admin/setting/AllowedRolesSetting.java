@@ -39,14 +39,19 @@ public class AllowedRolesSetting extends BaseSetting {
 
         return context.getGuild()
                 .flatMapMany(guild -> DiscordUtils.extractRoles(guild, args.get(2)))
-                .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
                 .collectList()
-                .map(mentionedRoles -> {
+                .flatMap(mentionedRoles -> {
                     if (mentionedRoles.isEmpty()) {
-                        throw new CommandException(String.format("Role `%s` not found.", args.get(2)));
+                        return Mono.error(new CommandException(String.format("Role `%s` not found.", args.get(2))));
                     }
 
-                    final DBGuild dbGuild = DatabaseManager.getGuilds().getDBGuild(context.getGuildId());
+                    return Mono.zip(Mono.just(mentionedRoles),
+                            DatabaseManager.getGuilds().getDBGuild(context.getGuildId()));
+                })
+                .flatMap(tuple -> {
+                    final List<Role> mentionedRoles = tuple.getT1();
+                    final DBGuild dbGuild = tuple.getT2();
+
                     final List<Snowflake> allowedRoles = dbGuild.getSettings().getAllowedRoleIds();
                     final List<Snowflake> mentionedRoleIds = mentionedRoles.stream()
                             .map(Role::getId)
@@ -63,13 +68,15 @@ public class AllowedRolesSetting extends BaseSetting {
                                 FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getName()), ", ")));
 
                         if (allowedRoles.isEmpty()) {
-                            strBuilder.append("\n" + Emoji.INFO + " There are no more allowed roles set, everyone can now interact with me.");
+                            strBuilder.append("\n" + Emoji.INFO + " There are no more allowed roles set, everyone "
+                                    + "can now interact with me.");
                         }
                     }
 
-                    dbGuild.setSetting(this.getSetting(), allowedRoles);
-                    return strBuilder.toString();
+                    return dbGuild.setSetting(this.getSetting(), allowedRoles)
+                            .thenReturn(strBuilder);
                 })
+                .map(StringBuilder::toString)
                 .flatMap(text -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
                 .then();
@@ -78,11 +85,14 @@ public class AllowedRolesSetting extends BaseSetting {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <role(s)>`", context.getPrefix(), this.getCommandName()), false)
+                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <role(s)>`",
+                        context.getPrefix(), this.getCommandName()), false)
                         .addField("Argument", String.format("**action** - %s",
                                 FormatUtils.format(Action.class, "/")), false)
-                        .addField("Example", String.format("`%s%s add @role`", context.getPrefix(), this.getCommandName()), false)
-                        .addField("Info", "By default, **server owner** and **administrators** will always be able to interact with Shadbot.", false));
+                        .addField("Example", String.format("`%s%s add @role`",
+                                context.getPrefix(), this.getCommandName()), false)
+                        .addField("Info", "By default, **server owner** and **administrators** "
+                                + "will always be able to interact with Shadbot.", false));
     }
 
 }

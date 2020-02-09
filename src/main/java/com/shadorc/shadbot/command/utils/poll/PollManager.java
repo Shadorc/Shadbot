@@ -1,13 +1,9 @@
 package com.shadorc.shadbot.command.utils.poll;
 
-import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.message.ReactionMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.ExceptionHandler;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.*;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
@@ -43,7 +39,7 @@ public class PollManager {
     public void start() {
         this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration());
         this.show()
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.context.getClient(), err));
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     public void stop() {
@@ -67,7 +63,7 @@ public class PollManager {
                                 "https://i.imgur.com/jcrUDLY.png"));
 
         return this.voteMessage.send(embedConsumer)
-                .flatMap(message -> Mono.delay(this.spec.getDuration(), Schedulers.elastic())
+                .flatMap(message -> Mono.delay(this.spec.getDuration(), Schedulers.boundedElastic())
                         .thenReturn(message.getId()))
                 .flatMap(messageId -> this.context.getClient().getMessageById(this.context.getChannelId(), messageId))
                 .map(Message::getReactions)
@@ -77,9 +73,9 @@ public class PollManager {
 
     private <T> void schedule(Mono<T> mono, Duration duration) {
         this.cancelScheduledTask();
-        this.scheduledTask = Mono.delay(duration, Schedulers.elastic())
+        this.scheduledTask = Mono.delay(duration, Schedulers.boundedElastic())
                 .then(mono)
-                .subscribe(null, err -> ExceptionHandler.handleUnknownError(this.context.getClient(), err));
+                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     private void cancelScheduledTask() {
@@ -94,18 +90,21 @@ public class PollManager {
 
     private Mono<Message> sendResults(Set<Reaction> reactions) {
         // Reactions are not in the same order as they were when added to the message, they need to be ordered
-        final BiMap<ReactionEmoji, String> reactionsChoices = HashBiMap.create(this.spec.getChoices()).inverse();
-        final Map<String, Integer> choicesVotes = new HashMap<>();
+        final Map<ReactionEmoji, String> reactionsChoices = HashBiMap.create(this.spec.getChoices()).inverse();
+        Map<String, Integer> choicesVotes = new HashMap<>(reactions.size());
         for (final Reaction reaction : reactions) {
             // -1 is here to ignore the reaction of the bot itself
             choicesVotes.put(reactionsChoices.get(reaction.getEmoji()), reaction.getCount() - 1);
         }
 
         // Sort votes map by value in the ascending order
+        choicesVotes = Utils.sortByValue(choicesVotes, Collections.reverseOrder(Entry.comparingByValue()));
+
         final StringBuilder representation = new StringBuilder();
         int count = 1;
-        for (final String key : Utils.sortByValue(choicesVotes, Collections.reverseOrder(Entry.comparingByValue())).keySet()) {
-            representation.append(String.format("%n\t**%d.** %s (Votes: %d)", count, key, choicesVotes.get(key)));
+        for (final Entry<String, Integer> entry : choicesVotes.entrySet()) {
+            representation.append(String.format("%n\t**%d.** %s (%s)", count,
+                    entry.getKey(), StringUtils.pluralOf(entry.getValue(), "vote")));
             count++;
         }
 

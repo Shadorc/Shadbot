@@ -8,6 +8,7 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
 import discord4j.core.object.util.Snowflake;
+import reactor.core.publisher.Mono;
 
 import static com.shadorc.shadbot.db.lottery.LotteryCollection.LOGGER;
 
@@ -34,25 +35,27 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
     }
 
     @Override
-    public void insert() {
+    public Mono<Void> insert() {
         LOGGER.debug("[LotteryGambler {} / {}] Insertion", this.getUserId().asLong(), this.getGuildId().asLong());
 
-        DatabaseManager.getLottery()
+        return Mono.from(DatabaseManager.getLottery()
                 .getCollection()
                 .updateOne(Filters.eq("_id", "gamblers"),
                         Updates.push("gamblers", this.toDocument()),
-                        new UpdateOptions().upsert(true));
+                        new UpdateOptions().upsert(true)))
+                .then();
     }
 
     @Override
-    public void delete() {
+    public Mono<Void> delete() {
         LOGGER.debug("[LotteryGambler {} / {}] Deletion", this.getUserId().asLong(), this.getGuildId().asLong());
 
-        DatabaseManager.getLottery()
+        return Mono.from(DatabaseManager.getLottery()
                 .getCollection()
                 .deleteOne(Filters.and(Filters.eq("_id", "gamblers"),
                         Filters.eq("gamblers.guild_id", this.getGuildId().asString()),
-                        Filters.eq("gamblers.user_id", this.getUserId().asString())));
+                        Filters.eq("gamblers.user_id", this.getUserId().asString()))))
+                .then();
     }
 
     @Override
