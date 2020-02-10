@@ -111,7 +111,9 @@ public class MessageProcessor {
                     .then();
         }
 
-        return context.getPermissions()
+        return DatabaseManager.getStats()
+                .logCommand(command)
+                .thenMany(context.getPermissions())
                 .collectList()
                 // The author has the permission to execute this command
                 .filter(userPerms -> userPerms.contains(command.getPermission()))
