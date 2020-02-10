@@ -98,7 +98,7 @@ public class PollManager {
         }
 
         // Sort votes map by value in the ascending order
-        choicesVotes = Utils.sortByValue(choicesVotes, Collections.reverseOrder(Entry.comparingByValue()));
+        choicesVotes = Utils.sortMap(choicesVotes, Collections.reverseOrder(Entry.comparingByValue()));
 
         final StringBuilder representation = new StringBuilder();
         int count = 1;

@@ -97,10 +97,9 @@ public final class Utils {
     /**
      * @param map        The map to sort.
      * @param comparator The {@link Comparator} to be used to compare stream elements.
-     * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted by value using {@code
-     * comparator}.
+     * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted using {@code comparator}.
      */
-    public static <K, V> Map<K, V> sortByValue(Map<K, V> map, Comparator<? super Entry<K, V>> comparator) {
+    public static <K, V> Map<K, V> sortMap(Map<K, V> map, Comparator<? super Entry<K, V>> comparator) {
         return map.entrySet()
                 .stream()
                 .sorted(comparator)
