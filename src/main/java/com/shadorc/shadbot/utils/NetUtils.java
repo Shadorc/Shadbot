@@ -3,7 +3,10 @@ package com.shadorc.shadbot.utils;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.shadorc.shadbot.data.Config;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
@@ -14,7 +17,6 @@ import reactor.netty.http.client.HttpClient.RequestSender;
 import reactor.netty.http.client.HttpClientResponse;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
@@ -49,26 +51,6 @@ public final class NetUtils {
             return str;
         }
         return URLEncoder.encode(str, StandardCharsets.UTF_8);
-    }
-
-    /**
-     * @param url The string representing an URL to check.
-     * @return {@code true} if the string is a valid and reachable URL, {@code false} otherwise.
-     */
-    public static Mono<Boolean> isValidUrl(String url) {
-        try {
-            new URL(url).toURI();
-        } catch (final Exception ignored) {
-            return Mono.just(false);
-        }
-
-        return NetUtils.request(HttpMethod.GET, url)
-                .response()
-                .timeout(Config.TIMEOUT)
-                .map(HttpClientResponse::status)
-                .map(HttpResponseStatus::code)
-                .map(statusCode -> statusCode >= 100 && statusCode < 400)
-                .onErrorResume(ignored -> Mono.just(false));
     }
 
     private static <T> Mono<T> handleResponse(HttpClientResponse resp, ByteBufMono body, JavaType type) {

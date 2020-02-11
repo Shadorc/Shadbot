@@ -12,16 +12,15 @@ import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.util.Permission;
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
+import java.net.URL;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -39,30 +38,24 @@ public class PlayCmd extends BaseCmd {
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.CONNECT, Permission.SPEAK)
                         .then(DiscordUtils.requireSameVoiceChannel(context))
-                        .zipWith(NetUtils.isValidUrl(arg)
-                                .map(isValidUrl -> PlayCmd.getIdentifier(arg, isValidUrl)))
-                        .flatMap(tuple -> {
-                            final Snowflake voiceChannelId = tuple.getT1();
-                            final String identifier = tuple.getT2();
-
-                            return MusicManager.getInstance()
-                                    .getOrCreate(context.getClient(), context.getGuildId(), voiceChannelId)
-                                    .flatMap(guildMusic -> PlayCmd.play(context, channel, guildMusic, identifier));
-                        }));
+                        .flatMap(voiceChannelId -> MusicManager.getInstance()
+                                .getOrCreate(context.getClient(), context.getGuildId(), voiceChannelId)
+                                .flatMap(guildMusic -> PlayCmd.play(context, channel, guildMusic, PlayCmd.getIdentifier(arg)))));
     }
 
-    private static String getIdentifier(String arg, boolean isValidUrl) {
+    private static String getIdentifier(String arg) {
         // If this is a SoundCloud search...
         if (arg.startsWith("soundcloud ")) {
             return AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, "soundcloud ");
-        }
-        // ... else if the argument is an URL...
-        else if (isValidUrl) {
-            return arg;
-        }
-        // ...else, search on YouTube
-        else {
-            return AudioLoadResultListener.YT_SEARCH + arg;
+        } else {
+            try {
+                // ... else if the argument is a valid URL...
+                new URL(arg);
+                return arg;
+            } catch (final Exception ignored) {
+                // ...else, search on YouTube
+                return AudioLoadResultListener.YT_SEARCH + arg;
+            }
         }
     }
 
