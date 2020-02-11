@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 public class Rule34Cmd extends BaseCmd {
 
     private static final String HOME_URL = "https://rule34.xxx/index.php";
-    private static final int MAX_TAGS_PREVIEW = 15;
+    private static final int MAX_TAGS_CHAR = 250;
 
     public Rule34Cmd() {
         super(CommandCategory.IMAGE, List.of("rule34"), "r34");
@@ -68,24 +68,34 @@ public class Rule34Cmd extends BaseCmd {
                                                     context.getUsername()));
                                 }
 
-                                final String formattedTags = FormatUtils.format(
-                                        tags.subList(0, Math.min(tags.size(), MAX_TAGS_PREVIEW)),
-                                        tag -> String.format("`%s`", tag), " ");
+                                final StringBuilder tagsBuilder = new StringBuilder();
+                                for (final String tag : tags) {
+                                    if (tagsBuilder.length() + tag.length() < MAX_TAGS_CHAR) {
+                                        tagsBuilder.append(String.format("`%s` ", tag));
+                                    } else {
+                                        tagsBuilder.append("...");
+                                        break;
+                                    }
+                                }
 
                                 return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                                         .andThen(embed -> {
+                                            if (!post.getSource().isEmpty()) {
+                                                if (post.getSource().startsWith("http")) {
+                                                    embed.setDescription(String.format("%n[**Source**](%s)", post.getSource()));
+                                                } else {
+                                                    embed.addField("Source", post.getSource(), false);
+                                                }
+                                            }
+
                                             embed.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), context.getAvatarUrl())
                                                     .setThumbnail("https://i.imgur.com/t6JJWFN.png")
                                                     .addField("Resolution", String.format("%dx%s",
                                                             post.getWidth(), post.getHeight()), false)
-                                                    .addField(String.format("Tags (%d max.)", MAX_TAGS_PREVIEW), formattedTags, false)
+                                                    .addField("Tags", tagsBuilder.toString(), false)
                                                     .setImage(post.getFileUrl())
                                                     .setFooter("If there is no preview, click on the title to " +
                                                             "see the media (probably a video)", null);
-
-                                            if (!post.getSource().isEmpty()) {
-                                                embed.setDescription(String.format("%n[**Source**](%s)", post.getSource()));
-                                            }
                                         }));
                             });
                 })
