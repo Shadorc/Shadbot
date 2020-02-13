@@ -86,8 +86,8 @@ public class SlotMachineCmd extends BaseCmd {
         return HelpBuilder.create(this, context)
                 .setDescription("Play slot machine.")
                 .addField("Cost", String.format("A game costs **%s**.", FormatUtils.coins(PAID_COST)), false)
-                .addField("Gains", String.format("%s: **%s**, %s: **%s**, %s: **%s**, %s: **%s**. " +
-                                "You also gain a small random bonus.",
+                .addField("Gains", String.format("%s: **%s**, %s: **%s**, %s: **%s**, %s: **%s**." +
+                                "%nYou also gain a small random bonus.",
                         StringUtils.capitalizeEnum(SlotOptions.APPLE), FormatUtils.coins(SlotOptions.APPLE.getGains()),
                         StringUtils.capitalizeEnum(SlotOptions.CHERRIES), FormatUtils.coins(SlotOptions.CHERRIES.getGains()),
                         StringUtils.capitalizeEnum(SlotOptions.BELL), FormatUtils.coins(SlotOptions.BELL.getGains()),

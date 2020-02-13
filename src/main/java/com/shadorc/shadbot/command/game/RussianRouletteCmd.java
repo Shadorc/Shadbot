@@ -67,7 +67,7 @@ public class RussianRouletteCmd extends BaseCmd {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
-                .setDescription("Play Russian roulette.")
+                .setDescription("Play russian roulette.")
                 .addField("Cost", String.format("A game costs **%s**.", FormatUtils.coins(PAID_COST)), false)
                 .addField("Gains", String.format("You have **1/6 chance** to randomly lose between **%s and %s** " +
                                 "and **5/6 chances** to randomly get between **%s and %s**.",
