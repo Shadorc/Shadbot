@@ -135,8 +135,8 @@ public class BotListStats {
     }
 
     /**
-     * WebSite: https://discordbots.org/ <br>
-     * Documentation: https://discordbots.org/api/docs#bots
+     * WebSite: https://top.gg/ <br>
+     * Documentation: https://top.gg/api/docs#bots
      */
     private Flux<String> postOnDiscordBotsDotOrg(Long guildCount) {
         final int shardCount = Shadbot.getClient().getGatewayClientGroup().getShardCount();
@@ -146,8 +146,8 @@ public class BotListStats {
                             .put("shard_id", shardId)
                             .put("shard_count", shardCount)
                             .put("server_count", guildCount / shardCount);
-                    final String url = String.format("https://discordbots.org/api/bots/%d/stats", Shadbot.getSelfId().asLong());
-                    return this.post(url, CredentialManager.getInstance().get(Credential.DISCORD_BOTS_DOT_ORG_TOKEN), content);
+                    final String url = String.format("https://top.gg/api/bots/%d/stats", Shadbot.getSelfId().asLong());
+                    return this.post(url, CredentialManager.getInstance().get(Credential.TOP_DOT_GG_TOKEN), content);
                 });
     }
 
