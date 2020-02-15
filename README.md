@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=271674390">
+    <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=271674454">
         <img align="right" src="https://i.imgur.com/ab9PUtE.png" height="220" width="220">
     </a>
     <h1>Shadbot</h1>
@@ -11,7 +11,7 @@
     <a href="https://discordbots.org/bot/331146243596091403">
         <img src="https://discordbots.org/api/widget/331146243596091403.svg">
     </a>
-    <p><b>Add Shadbot on your own server by clicking on this <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=271674390">link</a> !</b></p>
+    <p><b>Add Shadbot on your own server by clicking on this <a href="https://discordapp.com/oauth2/authorize?client_id=331146243596091403&scope=bot&permissions=271674454">link</a> !</b></p>
     <hr>
     <h2>Support</h2>
     <p><b><a href="https://discord.gg/CKnV4ff">Join</a> the support server if you have any questions, suggestions or if you just want to talk.</b></p>
