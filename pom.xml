@@ -3,13 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>me.shadorc.shadbot</groupId>
+    <groupId>com.shadorc.shadbot</groupId>
     <artifactId>shadbot</artifactId>
     <version>3.3.0-SNAPSHOT</version>
     <name>Shadbot</name>
     <url>https://github.com/Shadorc/Shadbot</url>
-    <description>Discord bot using Discord4J that plays musics, executes useful, admin and fun commands, play games and
-        more.
+    <description>
+        Discord bot using Discord4J that plays musics, executes useful, admin and fun commands, play games and more.
     </description>
     <licenses>
         <license>
@@ -33,11 +33,11 @@
             </resource>
         </resources>
         <plugins>
-            <!-- Specify required Maven version -->
+            <!-- Require specific Maven version -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M2</version>
+                <version>3.0.0-M3</version>
                 <executions>
                     <execution>
                         <id>enforce-maven</id>
@@ -47,7 +47,7 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>3.3.9</version>
+                                    <version>3.6.1</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
@@ -72,7 +72,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
+                <version>3.2.2</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -118,7 +118,7 @@
         <dependency>
             <groupId>com.github.vladimir-bukhtoyarov</groupId>
             <artifactId>bucket4j-core</artifactId>
-            <version>4.8.0</version>
+            <version>4.9.0</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
