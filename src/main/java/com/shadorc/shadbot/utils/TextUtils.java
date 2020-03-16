@@ -26,6 +26,9 @@ public final class TextUtils {
      * @return The error message trimmed, without HTML tags nor YouTube links.
      */
     public static String cleanLavaplayerErr(@NonNull FriendlyException err) {
+        if(err.getMessage() == null) {
+            return "Error not specified.";
+        }
         return Jsoup.parse(StringUtils.remove(err.getMessage(), "Watch on YouTube")).text().trim();
     }
 
