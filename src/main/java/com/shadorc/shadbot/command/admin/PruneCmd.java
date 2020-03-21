@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 public class PruneCmd extends BaseCmd {
 
     private static final int MAX_MESSAGES = 100;
+    private static final int MESSAGES_OFFSET = 2;
 
     public PruneCmd() {
         super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("prune"));
@@ -75,7 +76,8 @@ public class PruneCmd extends BaseCmd {
                                         argCleaned, context.getPrefix(), this.getName())));
                             }
 
-                            count = count == null ? MAX_MESSAGES : Math.min(MAX_MESSAGES, count);
+                            // The count is incremented by MESSAGES_OFFSET to take into account the command
+                            count = count == null ? MAX_MESSAGES : Math.min(MAX_MESSAGES, count + MESSAGES_OFFSET);
 
                             final List<Snowflake> mentionIds = mentions.stream().map(User::getId).collect(Collectors.toList());
 
@@ -93,7 +95,8 @@ public class PruneCmd extends BaseCmd {
                                 .count()
                                 .map(messagesNotDeleted -> messageIds.size() - messagesNotDeleted))
                         .map(deletedMessages -> String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
-                                context.getUsername(), StringUtils.pluralOf(deletedMessages, "message"))))
+                                context.getUsername(),
+                                StringUtils.pluralOf(deletedMessages - MESSAGES_OFFSET, "message"))))
                 .map(updatableMsg::setContent)
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
