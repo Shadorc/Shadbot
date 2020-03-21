@@ -48,7 +48,7 @@ public class RepeatCmd extends BaseCmd {
                         return String.format(Emoji.PLAY + " Repetition disabled by **%s**.", context.getUsername());
                     }
 
-                    final StringBuilder strBuilder = new StringBuilder(Emoji.REPEAT.toString() + " ");
+                    final StringBuilder strBuilder = new StringBuilder(Emoji.REPEAT + " ");
                     if (oldMode == TrackScheduler.RepeatMode.PLAYLIST) {
                         strBuilder.append("Playlist repetition disabled. ");
                     } else if (oldMode == TrackScheduler.RepeatMode.SONG) {

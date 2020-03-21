@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 
 public class UrbanCmd extends BaseCmd {
 
-    private final static String HOME_URL = "http://api.urbandictionary.com/v0/define";
+    private static final String HOME_URL = "http://api.urbandictionary.com/v0/define";
 
     public UrbanCmd() {
         super(CommandCategory.UTILS, List.of("urban"), "ud");

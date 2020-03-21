@@ -40,7 +40,7 @@ public class WeatherCmd extends BaseCmd {
 
         this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy 'at' hh:mm aa", Locale.ENGLISH);
         this.owm = new OWM(CredentialManager.getInstance().get(Credential.OPENWEATHERMAP_API_KEY));
-        owm.setUnit(Unit.METRIC);
+        this.owm.setUnit(Unit.METRIC);
     }
 
     @Override
