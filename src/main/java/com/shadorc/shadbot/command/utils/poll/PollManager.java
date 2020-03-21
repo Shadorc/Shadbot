@@ -105,8 +105,12 @@ public class PollManager {
                     emojiData.name().orElse(null),
                     emojiData.animated().toOptional().orElse(false));
 
-            // -1 is here to ignore the reaction of the bot itself
-            choicesVotes.put(reactionsChoices.get(reactionEmoji), reactionData.count() - 1);
+            final String choice = reactionsChoices.get(reactionEmoji);
+            // Ignore possible reactions added by users
+            if(choice != null) {
+                // -1 is here to ignore the reaction of the bot itself
+                choicesVotes.put(choice, reactionData.count() - 1);
+            }
         }
 
         // Sort votes map by value in the ascending order
