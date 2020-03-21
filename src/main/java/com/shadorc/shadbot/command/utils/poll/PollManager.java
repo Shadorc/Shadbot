@@ -124,6 +124,10 @@ public class PollManager {
             count++;
         }
 
+        if(representation.length() == 0) {
+            representation.append("\nAll choices have been removed.");
+        }
+
         final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor(String.format("Poll results (Author: %s)", this.context.getUsername()),
                         null, this.context.getAvatarUrl())
