@@ -11,8 +11,9 @@ import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
-import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
+import discord4j.discordjson.possible.Possible;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -60,7 +61,7 @@ public class RelicStatusCmd extends BaseCmd {
                     }
                     titleBld.append(String.format("Relic (%s)", relic.isExpired() ? "Expired" : "Activated"));
 
-                    return new EmbedFieldEntity(titleBld.toString(), contentBld.toString(), false);
+                    return ImmutableEmbedFieldData.of(titleBld.toString(), contentBld.toString(), Possible.of(false));
                 })
                 .collectList()
                 .map(fields -> DiscordUtils.getDefaultEmbed()
@@ -68,7 +69,7 @@ public class RelicStatusCmd extends BaseCmd {
                             embed.setAuthor("Contributor Status", null, context.getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/R0N6kW3.png");
 
-                            fields.forEach(field -> embed.addField(field.getName(), field.getValue(), field.isInline()));
+                            fields.forEach(field -> embed.addField(field.name(), field.value(), field.inline().get()));
                         }))
                 .flatMap(embed -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))

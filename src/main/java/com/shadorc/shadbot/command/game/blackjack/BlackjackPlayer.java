@@ -3,9 +3,10 @@ package com.shadorc.shadbot.command.game.blackjack;
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
 import com.shadorc.shadbot.object.casino.Card;
 import com.shadorc.shadbot.object.casino.Hand;
-import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.util.Snowflake;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
+import discord4j.discordjson.possible.Possible;
 import reactor.core.publisher.Mono;
 
 public class BlackjackPlayer extends GamblerPlayer {
@@ -40,7 +41,7 @@ public class BlackjackPlayer extends GamblerPlayer {
         this.stand();
     }
 
-    public Mono<EmbedFieldEntity> format(GatewayDiscordClient client) {
+    public Mono<ImmutableEmbedFieldData> format(GatewayDiscordClient client) {
         return this.getUsername(client)
                 .map(username -> {
                     final StringBuilder name = new StringBuilder(String.format("%s's hand", username));
@@ -51,7 +52,7 @@ public class BlackjackPlayer extends GamblerPlayer {
                         name.append(" (Double down)");
                     }
 
-                    return new EmbedFieldEntity(name.toString(), this.hand.format(), true);
+                    return ImmutableEmbedFieldData.of(name.toString(), this.hand.format(), Possible.of(true));
                 });
     }
 

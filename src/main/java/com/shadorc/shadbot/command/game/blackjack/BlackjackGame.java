@@ -12,7 +12,7 @@ import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
-import discord4j.common.json.EmbedFieldEntity;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -132,8 +132,8 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                                 embed.setFooter("Finished", null);
                             }
 
-                            for (final EmbedFieldEntity field : hands) {
-                                embed.addField(field.getName(), field.getValue(), field.isInline());
+                            for (final ImmutableEmbedFieldData field : hands) {
+                                embed.addField(field.name(), field.value(), field.inline().get());
                             }
                         }))
                 .map(this.updatableMessage::setEmbed)

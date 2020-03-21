@@ -9,8 +9,9 @@ import com.shadorc.shadbot.db.stats.entity.DailyCommandStats;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.Utils;
-import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
+import discord4j.discordjson.possible.Possible;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
@@ -34,14 +35,14 @@ public class StatsCmd extends BaseCmd {
                             if (list.isEmpty()) {
                                 embed.setDescription("There are currently no statistics available.");
                             } else {
-                                final EmbedFieldEntity dailyField = this.getDailyCommandStats(list);
-                                embed.addField(dailyField.getName(), dailyField.getValue(), dailyField.isInline());
+                                final ImmutableEmbedFieldData dailyField = this.getDailyCommandStats(list);
+                                embed.addField(dailyField.name(), dailyField.value(), dailyField.inline().get());
 
-                                final EmbedFieldEntity weeklyField = this.getWeeklyCommandStats(list);
-                                embed.addField(weeklyField.getName(), weeklyField.getValue(), weeklyField.isInline());
+                                final ImmutableEmbedFieldData weeklyField = this.getWeeklyCommandStats(list);
+                                embed.addField(weeklyField.name(), weeklyField.value(), weeklyField.inline().get());
 
-                                final EmbedFieldEntity totalField = this.getTotalCommandStats(list);
-                                embed.addField(totalField.getName(), totalField.getValue(), totalField.isInline());
+                                final ImmutableEmbedFieldData totalField = this.getTotalCommandStats(list);
+                                embed.addField(totalField.name(), totalField.value(), totalField.inline().get());
                             }
                         }))
                 .flatMap(embed -> context.getChannel()
@@ -49,12 +50,12 @@ public class StatsCmd extends BaseCmd {
                 .then();
     }
 
-    private EmbedFieldEntity getDailyCommandStats(List<DailyCommandStats> list) {
+    private ImmutableEmbedFieldData getDailyCommandStats(List<DailyCommandStats> list) {
         final DailyCommandStats daily = list.get(0);
-        return new EmbedFieldEntity("Daily", this.formatMap(daily.getCommandStats()), true);
+        return ImmutableEmbedFieldData.of("Daily", this.formatMap(daily.getCommandStats()), Possible.of(true));
     }
 
-    private EmbedFieldEntity getWeeklyCommandStats(List<DailyCommandStats> list) {
+    private ImmutableEmbedFieldData getWeeklyCommandStats(List<DailyCommandStats> list) {
         final Map<String, Integer> computedMap = new HashMap<>();
         final LocalDate oneWeek = LocalDate.now().plusWeeks(1);
         for (final DailyCommandStats stats : list) {
@@ -66,10 +67,10 @@ public class StatsCmd extends BaseCmd {
             }
         }
 
-        return new EmbedFieldEntity("Weekly", this.formatMap(computedMap), true);
+        return ImmutableEmbedFieldData.of("Weekly", this.formatMap(computedMap), Possible.of(true));
     }
 
-    private EmbedFieldEntity getTotalCommandStats(List<DailyCommandStats> list) {
+    private ImmutableEmbedFieldData getTotalCommandStats(List<DailyCommandStats> list) {
         final Map<String, Integer> computedMap = new HashMap<>();
         for (final DailyCommandStats stats : list) {
             for (final Map.Entry<String, Integer> entry : stats.getCommandStats().entrySet()) {
@@ -78,7 +79,7 @@ public class StatsCmd extends BaseCmd {
             }
         }
 
-        return new EmbedFieldEntity("Total", this.formatMap(computedMap), true);
+        return ImmutableEmbedFieldData.of("Total", this.formatMap(computedMap), Possible.of(true));
     }
 
     private String formatMap(Map<String, Integer> map) {

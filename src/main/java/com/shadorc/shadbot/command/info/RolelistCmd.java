@@ -65,7 +65,7 @@ public class RolelistCmd extends BaseCmd {
                             }
 
                             FormatUtils.createColumns(tuple.getT2(), 25)
-                                    .forEach(field -> embed.addField(field.getName(), field.getValue(), true));
+                                    .forEach(field -> embed.addField(field.name(), field.value(), true));
                         }))
                 .flatMap(embedConsumer -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))

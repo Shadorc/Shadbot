@@ -5,8 +5,9 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
-import discord4j.common.json.EmbedFieldEntity;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
+import discord4j.discordjson.possible.Possible;
 import reactor.util.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class HelpBuilder {
     private final Context context;
     private final BaseCmd cmd;
     private final List<Argument> args;
-    private final List<EmbedFieldEntity> fields;
+    private final List<ImmutableEmbedFieldData> fields;
 
     @Nullable
     private String thumbnail;
@@ -89,7 +90,7 @@ public class HelpBuilder {
     }
 
     public HelpBuilder addField(String name, String value, boolean inline) {
-        this.fields.add(new EmbedFieldEntity(name, value, inline));
+        this.fields.add(ImmutableEmbedFieldData.of(name, value, Possible.of(inline)));
         return this;
     }
 
@@ -120,8 +121,8 @@ public class HelpBuilder {
                         embed.addField("Source", this.source, false);
                     }
 
-                    for (final EmbedFieldEntity field : this.fields) {
-                        embed.addField(field.getName(), field.getValue(), field.isInline());
+                    for (final ImmutableEmbedFieldData field : this.fields) {
+                        embed.addField(field.name(), field.value(), field.inline().get());
                     }
 
                     this.cmd.getAlias()
