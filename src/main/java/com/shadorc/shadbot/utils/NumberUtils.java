@@ -37,7 +37,7 @@ public final class NumberUtils {
     }
 
     /**
-     * @param str The string to parse as an integer between {@code min} and {@code max}, may be null.
+     * @param str The string to parse as an integer between {@code min} and {@code max}, may be {@code null}.
      * @param min The minimum value, inclusive.
      * @param max The maximum value, inclusive.
      * @return The string parsed as an integer or {@code null} if the string is not a valid representation of a positive
@@ -85,7 +85,7 @@ public final class NumberUtils {
     }
 
     /**
-     * @param str The string to check, may be null.
+     * @param str The string to check, may be {@code null}.
      * @return {@code true} if the string is a valid representation of a positive long number, {@code false} otherwise.
      */
     public static boolean isPositiveLong(@Nullable String str) {

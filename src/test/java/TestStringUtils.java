@@ -47,6 +47,7 @@ public class TestStringUtils {
     public void testNormalizeSpace() {
         assertEquals("hello", StringUtils.normalizeSpace("   hello      "));
         assertEquals("he llo", StringUtils.normalizeSpace("   he   llo      "));
+        assertEquals("", StringUtils.normalizeSpace(""));
         assertNull(StringUtils.normalizeSpace(null));
     }
 

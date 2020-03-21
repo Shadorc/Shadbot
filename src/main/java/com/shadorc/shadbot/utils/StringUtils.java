@@ -16,9 +16,10 @@ public final class StringUtils {
     private static final Pattern SPACES_PATTERN = Pattern.compile(" +");
 
     /**
-     * @param str The string to capitalize, may be null.
+     * @param str The string to capitalize, may be {@code null}.
      * @return The capitalized string.
      */
+    @Nullable
     public static String capitalize(@Nullable String str) {
         if (str == null || str.isBlank()) {
             return str;
@@ -27,7 +28,7 @@ public final class StringUtils {
     }
 
     /**
-     * @param enumeration The enumeration to format, may be null.
+     * @param enumeration The enumeration to format, may be {@code null}.
      * @return The enumeration converted as a capitalized string with underscores replaced with spaces.
      */
     @Nullable
@@ -59,9 +60,10 @@ public final class StringUtils {
      * The function returns the argument string with whitespace normalized by using {@link String#trim()} to remove
      * leading and trailing whitespace and then replacing sequences of whitespace characters by a single space.
      *
-     * @param str The source string to normalize whitespaces from, may be null.
+     * @param str The source string to normalize whitespaces from, may be {@code null}.
      * @return The modified string with whitespace normalized or {@code null} if null string input.
      */
+    @Nullable
     public static String normalizeSpace(@Nullable String str) {
         if (str == null || str.isEmpty()) {
             return str;
@@ -71,8 +73,9 @@ public final class StringUtils {
 
     /**
      * @param count The number of elements.
-     * @param str   The string to get plural from, may be null.
-     * @return {@code String.format("%d %ss", count, str)} if count > 1, String.format("%d %s", count, str) otherwise.
+     * @param str   The string to get plural from, may be {@code null}.
+     * @return {@code String.format("%d %ss", count, str)} if count > 1, {@code String.format("%d %s", count, str)}
+     * otherwise.
      */
     @Nullable
     public static String pluralOf(long count, @Nullable String str) {
@@ -86,16 +89,17 @@ public final class StringUtils {
     }
 
     /**
-     * @param str      The string from which to remove patterns, may be null.
+     * @param str      The string from which to remove patterns, may be {@code null}.
      * @param toRemove The strings to be substituted for each match.
      * @return The resulting string.
      */
+    @Nullable
     public static String remove(@Nullable String str, @NonNull List<String> toRemove) {
         return StringUtils.remove(str, toRemove.toArray(new String[0]));
     }
 
     /**
-     * @param str      The string from which to remove patterns, may be null.
+     * @param str      The string from which to remove patterns, may be {@code null}.
      * @param toRemove The strings to be substituted for each match.
      * @return The resulting string.
      */
@@ -111,7 +115,7 @@ public final class StringUtils {
     }
 
     /**
-     * @param str The string to split, may be null.
+     * @param str The string to split, may be {@code null}.
      * @return A list without limits containing all the elements resulting of {@code str} splitted using space excluding
      * empty results.
      */
@@ -120,7 +124,7 @@ public final class StringUtils {
     }
 
     /**
-     * @param str   The string to split, may be null.
+     * @param str   The string to split, may be {@code null}.
      * @param limit The result threshold.
      * @return An endless list containing all the elements resulting of {@code str} splitted using space excluding
      * empty results.
@@ -130,7 +134,7 @@ public final class StringUtils {
     }
 
     /**
-     * @param str       The string to split, may be null.
+     * @param str       The string to split, may be {@code null}.
      * @param limit     The result threshold.
      * @param delimiter The delimiting regular expression.
      * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} splitted
@@ -147,9 +151,9 @@ public final class StringUtils {
     }
 
     /**
-     * @param str       The string to split, may be null.
+     * @param str       The string to split, may be {@code null}.
      * @param delimiter The delimiting regular expression.
-     * @return A endless list all the elements resulting of {@code str} splitted using {@code delimiter} excluding
+     * @return An endless list all the elements resulting of {@code str} splitted using {@code delimiter} excluding
      * empty results.
      */
     public static List<String> split(@Nullable String str, @NonNull String delimiter) {
