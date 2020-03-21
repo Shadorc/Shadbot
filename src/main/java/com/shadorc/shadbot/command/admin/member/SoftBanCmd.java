@@ -3,8 +3,8 @@ package com.shadorc.shadbot.command.admin.member;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.util.Permission;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;

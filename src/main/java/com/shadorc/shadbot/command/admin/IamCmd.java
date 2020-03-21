@@ -21,8 +21,8 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.reaction.ReactionEmoji.Unicode;
-import discord4j.core.object.util.Permission;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Permission;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

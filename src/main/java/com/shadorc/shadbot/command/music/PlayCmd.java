@@ -16,8 +16,8 @@ import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.core.object.util.Permission;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
 
 import java.net.URL;

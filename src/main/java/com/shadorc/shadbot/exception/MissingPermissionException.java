@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.exception;
 
-import discord4j.core.object.util.Permission;
+import discord4j.rest.util.Permission;
 
 public class MissingPermissionException extends RuntimeException {
 

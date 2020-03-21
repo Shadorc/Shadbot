@@ -9,8 +9,8 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.entity.channel.TextChannel;
-import discord4j.core.object.util.Permission;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
 
 import java.util.List;

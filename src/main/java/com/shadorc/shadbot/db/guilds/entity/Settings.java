@@ -6,8 +6,8 @@ import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.guilds.bean.SettingsBean;
 import com.shadorc.shadbot.db.guilds.entity.setting.Iam;
 import discord4j.core.object.entity.Role;
-import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Permission;
 
 import java.util.ArrayList;
 import java.util.List;
