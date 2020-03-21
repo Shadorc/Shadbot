@@ -44,8 +44,8 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
     public Mono<UpdateResult> addCoins(long gains) {
         final long coins = NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS);
 
-        // The user has already exceeded the maximum number of coins, no need to update him
-        if (coins == Config.MAX_COINS) {
+        // If the new coins amount is equal to the current one, no need to request an update
+        if (coins == this.getCoins()) {
             return Mono.empty();
         }
 
@@ -54,11 +54,12 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
-                        Filters.eq("members._id", this.getId().asString()),
+                        Filters.and(Filters.eq("_id", this.getGuildId().asString()),
+                                Filters.eq("members._id", this.getId().asString())),
                         Updates.set("members.$.coins", coins)))
-                .map(UpdateResult::getMatchedCount)
+                .map(UpdateResult::getModifiedCount)
                 .flatMap(matchedCount -> {
-                    // Member was not find, insert it
+                    // Member was not found, insert it
                     if (matchedCount == 0) {
                         return Mono.from(DatabaseManager.getGuilds()
                                 .getCollection()
