@@ -33,7 +33,7 @@ public class AudioLoadResultInputs extends Inputs {
     @Override
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
         return Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.listener.getGuildId()))
-                .map(guildMusic -> event.getMessage().getContent().isPresent()
+                .map(guildMusic -> !event.getMessage().getContent().isBlank()
                         && event.getMessage().getChannelId().equals(guildMusic.getMessageChannelId())
                         && event.getMember().map(User::getId).map(guildMusic.getDjId()::equals).orElse(false));
     }

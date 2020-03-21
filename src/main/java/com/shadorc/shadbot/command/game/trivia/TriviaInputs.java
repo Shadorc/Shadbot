@@ -50,7 +50,7 @@ public class TriviaInputs extends Inputs {
                     }
 
                     // It's a number or a text
-                    final String content = event.getMessage().getContent().orElseThrow();
+                    final String content = event.getMessage().getContent();
                     final Integer choice = NumberUtils.toIntBetweenOrNull(content, 1, this.game.getAnswers().size());
 
                     // Message is a text and doesn't match any answers, ignore it

@@ -73,7 +73,7 @@ public abstract class Game {
             return Mono.just(false);
         }
 
-        final String content = message.getContent().get();
+        final String content = message.getContent();
         final User author = message.getAuthor().get();
         if (content.equals(String.format("%scancel", this.context.getPrefix()))) {
             return message.getChannel()

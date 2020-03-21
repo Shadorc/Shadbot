@@ -81,7 +81,7 @@ public class Context {
     }
 
     public String getContent() {
-        return this.getMessage().getContent().orElseThrow();
+        return this.getMessage().getContent();
     }
 
     public Mono<Guild> getGuild() {

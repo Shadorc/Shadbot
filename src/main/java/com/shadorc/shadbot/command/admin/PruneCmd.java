@@ -84,7 +84,7 @@ public class PruneCmd extends BaseCmd {
                                     .filter(message -> mentions.isEmpty()
                                             || message.getAuthor().map(User::getId).map(mentionIds::contains).orElse(false))
                                     .filter(message -> words == null
-                                            || message.getContent().map(content -> content.contains(words)).orElse(false)
+                                            || message.getContent().contains(words)
                                             || this.getEmbedContent(message).contains(words));
                         })
                         .map(Message::getId)

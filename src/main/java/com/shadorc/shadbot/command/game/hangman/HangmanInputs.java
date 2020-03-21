@@ -54,7 +54,7 @@ public class HangmanInputs extends Inputs {
                                 .then(Mono.fromRunnable(this.game::stop));
                     }
 
-                    final String content = event.getMessage().getContent().orElseThrow().toLowerCase().trim();
+                    final String content = event.getMessage().getContent().toLowerCase().trim();
 
                     // Check only if content is an unique word/letter
                     if (!WORD_PATTERN.matcher(content).matches()) {

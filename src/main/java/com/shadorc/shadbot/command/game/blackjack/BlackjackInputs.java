@@ -34,7 +34,7 @@ public class BlackjackInputs extends Inputs {
         }
 
         final Member member = event.getMember().get();
-        final String content = event.getMessage().getContent().get();
+        final String content = event.getMessage().getContent();
         return this.game.isCancelMessage(event.getMessage())
                 .map(isCancelCmd -> isCancelCmd || this.game.getPlayers().containsKey(member.getId())
                         && this.game.getActions().containsKey(content)
@@ -76,8 +76,7 @@ public class BlackjackInputs extends Inputs {
                             .map(DBGuild::getSettings)
                             .map(Settings::getPrefix)
                             .map(prefix -> event.getMessage().getContent()
-                                    .map(str -> str.replace(prefix, ""))
-                                    .orElse("")
+                                    .replace(prefix, "")
                                     .toLowerCase()
                                     .trim())
                             .flatMap(content -> {

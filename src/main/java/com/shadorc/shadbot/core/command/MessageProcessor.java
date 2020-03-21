@@ -58,7 +58,7 @@ public class MessageProcessor {
                         + "join my support server : %s",
                 Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
 
-        final String content = this.event.getMessage().getContent().orElse("");
+        final String content = this.event.getMessage().getContent();
         if (content.startsWith(String.format("%shelp", Config.DEFAULT_PREFIX))) {
             return CommandManager.getInstance().getCommand("help")
                     .execute(new Context(this.event, Config.DEFAULT_PREFIX));
