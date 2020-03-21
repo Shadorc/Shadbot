@@ -106,7 +106,7 @@ public class TranslateCmd extends BaseCmd {
 
                     if (translatedText.toString().equalsIgnoreCase(sourceText)) {
                         throw new CommandException(String.format("The text could not been translated."
-                                        + "%nCheck that the specified languages are supported,  that the text is in "
+                                        + "%nCheck that the specified languages are supported, that the text is in "
                                         + "the specified language and that the destination language is different from the "
                                         + "source one. %nUse `%shelp %s` to see a complete list of supported languages.",
                                 context.getPrefix(), this.getName()));
