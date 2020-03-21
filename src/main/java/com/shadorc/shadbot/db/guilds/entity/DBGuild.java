@@ -37,7 +37,8 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
             return Collections.emptyList();
         }
 
-        return this.getBean().getMembers()
+        return this.getBean()
+                .getMembers()
                 .stream()
                 .map(memberBean -> new DBMember(this.getId(), memberBean))
                 .collect(Collectors.toUnmodifiableList());
@@ -51,24 +52,26 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
      * {@code value} must be serializable or serialized.
      */
     public <T> Mono<UpdateResult> setSetting(Setting setting, T value) {
-        LOGGER.debug("[DBGuild {}] Updating setting {}: {}", this.getId().asLong(), setting, value);
+        LOGGER.debug("[DBGuild {}] Setting update: {}={}", this.getId().asLong(), setting, value);
 
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
                         Filters.eq("_id", this.getId().asString()),
                         Updates.set(String.format("settings.%s", setting), value),
-                        new UpdateOptions().upsert(true)));
+                        new UpdateOptions().upsert(true)))
+                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Setting update result: {}", this.getId().asLong(), result));
     }
 
     public Mono<UpdateResult> removeSetting(Setting setting) {
-        LOGGER.debug("[DBGuild {}] Removing setting {}", this.getId().asLong(), setting);
+        LOGGER.debug("[DBGuild {}] Setting deletion: {}", this.getId().asLong(), setting);
 
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
                         Filters.eq("_id", this.getId().asString()),
-                        Updates.unset(String.format("settings.%s", setting))));
+                        Updates.unset(String.format("settings.%s", setting))))
+                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Setting deletion result: {}", this.getId().asLong(), result));
     }
 
     @Override
@@ -78,6 +81,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .insertOne(this.toDocument()))
+                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Insertion result: {}", this.getId().asLong(), result))
                 .then();
     }
 
@@ -88,6 +92,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .deleteOne(Filters.eq("_id", this.getId().asString())))
+                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Deletion result: {}", this.getId().asLong(), result))
                 .then();
     }
 

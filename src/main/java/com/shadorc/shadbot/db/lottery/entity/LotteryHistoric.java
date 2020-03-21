@@ -41,6 +41,7 @@ public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> imp
                 .replaceOne(Filters.eq("_id", "historic"),
                         this.toDocument(),
                         new ReplaceOptions().upsert(true)))
+                .doOnNext(result -> LOGGER.trace("[LotteryHistoric] Insertion result: {}", result))
                 .then();
     }
 
@@ -51,6 +52,7 @@ public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> imp
         return Mono.from(DatabaseManager.getLottery()
                 .getCollection()
                 .deleteOne(Filters.eq("_id", "historic")))
+                .doOnNext(result -> LOGGER.trace("[LotteryHistoric] Deletion result: {}", result))
                 .then();
     }
 

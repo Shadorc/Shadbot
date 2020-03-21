@@ -30,7 +30,7 @@ public final class LotteryCollection extends DatabaseCollection {
     }
 
     public Flux<LotteryGambler> getGamblers() {
-        LOGGER.debug("[Lottery gamblers] Request.");
+        LOGGER.debug("[Lottery] Request gamblers");
 
         final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", "gamblers"))
@@ -45,7 +45,7 @@ public final class LotteryCollection extends DatabaseCollection {
     }
 
     public Mono<LotteryHistoric> getHistoric() {
-        LOGGER.debug("[Lottery historic] Request.");
+        LOGGER.debug("[Lottery] Request historic");
 
         final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", "historic"))
@@ -58,7 +58,7 @@ public final class LotteryCollection extends DatabaseCollection {
     }
 
     public Mono<Long> getJackpot() {
-        LOGGER.debug("[Lottery jackpot] Request.");
+        LOGGER.debug("[Lottery] Request jackpot");
 
         final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", "jackpot"))
@@ -70,40 +70,42 @@ public final class LotteryCollection extends DatabaseCollection {
     }
 
     public Mono<Boolean> isGambler(Snowflake userId) {
-        LOGGER.debug("[Gambler {}] Checking if user exist.", userId.asLong());
+        LOGGER.debug("[Gambler {}] Checking if user exist", userId.asLong());
 
         final Publisher<Document> request = this.getCollection()
                 .find(Filters.and(Filters.eq("_id", "gamblers"),
                         Filters.eq("gamblers.user_id", userId.asString())))
                 .first();
 
-        return Mono.from(request)
-                .hasElement();
+        return Mono.from(request).hasElement();
     }
 
     public Mono<DeleteResult> resetGamblers() {
-        LOGGER.debug("[Lottery gamblers] Reset.");
+        LOGGER.debug("[Lottery] Gamblers deletion");
 
         return Mono.from(this.getCollection()
-                .deleteOne(Filters.eq("_id", "gamblers")));
+                .deleteOne(Filters.eq("_id", "gamblers")))
+                .doOnNext(result -> LOGGER.trace("[Lottery] Gamblers deletion result: {}", result));
     }
 
     public Mono<UpdateResult> addToJackpot(long coins) {
         final long value = (long) Math.ceil(coins / 100.0f);
 
-        LOGGER.debug("[Lottery jackpot] Adding {}.", FormatUtils.coins(value));
+        LOGGER.debug("[Lottery] Jackpot update: {} coins", value);
 
         return Mono.from(this.getCollection()
                 .updateOne(Filters.eq("_id", "jackpot"),
                         Updates.inc("jackpot", value),
-                        new UpdateOptions().upsert(true)));
+                        new UpdateOptions().upsert(true)))
+                .doOnNext(result -> LOGGER.trace("[Lottery] Jackpot update result: {}", result));
     }
 
     public Mono<DeleteResult> resetJackpot() {
-        LOGGER.debug("[Lottery jackpot] Reset.");
+        LOGGER.debug("[Lottery] Jackpot deletion");
 
         return Mono.from(this.getCollection()
-                .deleteOne(Filters.eq("_id", "jackpot")));
+                .deleteOne(Filters.eq("_id", "jackpot")))
+                .doOnNext(result -> LOGGER.trace("[Lottery] Jackpot deletion result: {}", result));
     }
 
 }

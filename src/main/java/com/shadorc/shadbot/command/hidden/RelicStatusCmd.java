@@ -30,7 +30,7 @@ public class RelicStatusCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         return DatabaseManager.getPremium()
-                .getRelicsByUser(context.getAuthorId())
+                .getUserRelics(context.getAuthorId())
                 .switchIfEmpty(context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(
                                 String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "

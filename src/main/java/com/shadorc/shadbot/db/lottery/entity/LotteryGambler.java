@@ -43,6 +43,8 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
                 .updateOne(Filters.eq("_id", "gamblers"),
                         Updates.push("gamblers", this.toDocument()),
                         new UpdateOptions().upsert(true)))
+                .doOnNext(result -> LOGGER.trace("[LotteryGambler {} / {}] Insertion result: {}",
+                        this.getUserId().asLong(), this.getGuildId().asLong(), result))
                 .then();
     }
 
@@ -52,9 +54,12 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
 
         return Mono.from(DatabaseManager.getLottery()
                 .getCollection()
-                .deleteOne(Filters.and(Filters.eq("_id", "gamblers"),
+                .deleteOne(Filters.and(
+                        Filters.eq("_id", "gamblers"),
                         Filters.eq("gamblers.guild_id", this.getGuildId().asString()),
                         Filters.eq("gamblers.user_id", this.getUserId().asString()))))
+                .doOnNext(result -> LOGGER.trace("[LotteryGambler {} / {}] Deletion result: {}",
+                        this.getUserId().asLong(), this.getGuildId().asLong(), result))
                 .then();
     }
 

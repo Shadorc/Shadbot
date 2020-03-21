@@ -73,7 +73,8 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
                         Updates.combine(
                                 Updates.set("user_id", userId.asString()),
                                 Updates.set("guild_id", guildId == null ? null : guildId.asString()),
-                                Updates.set("activation", Instant.now().toEpochMilli()))));
+                                Updates.set("activation", Instant.now().toEpochMilli()))))
+                .doOnNext(result -> LOGGER.trace("[Relic {}] Activation result; {}", this.getId(), result));
     }
 
     @Override
@@ -83,6 +84,7 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
         return Mono.from(DatabaseManager.getPremium()
                 .getCollection()
                 .insertOne(this.toDocument()))
+                .doOnNext(result -> LOGGER.trace("[Relic {}] Insertion result: {}", this.getId(), result))
                 .then();
     }
 
@@ -93,6 +95,7 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
         return Mono.from(DatabaseManager.getPremium()
                 .getCollection()
                 .deleteOne(Filters.eq("_id", this.getId())))
+                .doOnNext(result -> LOGGER.trace("[Relic {}] Deletion result: {}", this.getId(), result))
                 .then();
     }
 

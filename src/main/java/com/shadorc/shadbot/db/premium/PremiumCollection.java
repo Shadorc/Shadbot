@@ -33,7 +33,7 @@ public final class PremiumCollection extends DatabaseCollection {
      * @return The {@link Relic} corresponding to the provided {@code relicId}.
      */
     public Mono<Relic> getRelicById(String relicId) {
-        LOGGER.debug("[Relic {}] Request.", relicId);
+        LOGGER.debug("[Relic {}] Request", relicId);
 
         final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", relicId))
@@ -49,14 +49,11 @@ public final class PremiumCollection extends DatabaseCollection {
      * @param userId The {@link Snowflake} ID of the {@link User}.
      * @return A {@link Flux} containing the {@link Relic} possessed by an {@link User}.
      */
-    public Flux<Relic> getRelicsByUser(Snowflake userId) {
-        LOGGER.debug("[Relics by user {}] Request.", userId.asLong());
-        return this.getRelicsBy("user_id", userId);
-    }
+    public Flux<Relic> getUserRelics(Snowflake userId) {
+        LOGGER.debug("[Premium] Request relics for user {}", userId.asLong());
 
-    private Flux<Relic> getRelicsBy(String key, Snowflake id) {
         final Publisher<Document> request = this.getCollection()
-                .find(Filters.eq(key, id.asString()));
+                .find(Filters.eq("user_id", userId.asString()));
 
         return Flux.from(request)
                 .map(document -> document.toJson(Utils.JSON_WRITER_SETTINGS))
@@ -83,7 +80,7 @@ public final class PremiumCollection extends DatabaseCollection {
      * @return {@code true} if the {@link Guild} or the {@link User} is premium, {@code false} otherwise.
      */
     public Mono<Boolean> isPremium(Snowflake guildId, Snowflake userId) {
-        LOGGER.debug("[Is premium {} / {}] Request.", guildId.asLong(), userId.asLong());
+        LOGGER.debug("[Premium] Check if user {} in guild {} is premium", userId.asLong(), guildId.asLong());
 
         final Publisher<Document> request = this.getCollection()
                 .find(Filters.or(

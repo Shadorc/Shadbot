@@ -29,16 +29,17 @@ public class StatsCollection extends DatabaseCollection {
     }
 
     public Mono<UpdateResult> logCommand(BaseCmd cmd) {
-        LOGGER.debug("[Command log] Logging {}.", cmd.getName());
+        LOGGER.debug("[Commands stats] Logging {} usage", cmd.getName());
 
         return Mono.from(this.getCollection()
                 .updateOne(Filters.eq("_id", TimeUnit.MILLISECONDS.toDays(Instant.now().toEpochMilli())),
                         Updates.inc(String.format("command_stats.%s", cmd.getName()), 1),
-                        new UpdateOptions().upsert(true)));
+                        new UpdateOptions().upsert(true)))
+                .doOnNext(result -> LOGGER.debug("[Commands stats] Logging {} usage result: {}", cmd.getName(), result));
     }
 
     public Flux<DailyCommandStats> getCommandStats() {
-        LOGGER.debug("[Command stats] Request.");
+        LOGGER.debug("[Command stats] Request");
 
         final Publisher<Document> request = this.getCollection().find();
 

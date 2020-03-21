@@ -46,26 +46,35 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
 
         // If the new coins amount is equal to the current one, no need to request an update
         if (coins == this.getCoins()) {
+            LOGGER.debug("[DBMember {} / {}] Coins update useless, aborting: {} coins",
+                    this.getId().asLong(), this.getGuildId().asLong(), coins);
             return Mono.empty();
         }
 
-        LOGGER.debug("[DBMember {} / {}] Updating coins {}", this.getId().asLong(), this.getGuildId().asLong(), coins);
+        LOGGER.debug("[DBMember {} / {}] Coins update: {} coins", this.getId().asLong(), this.getGuildId().asLong(), coins);
 
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
-                        Filters.and(Filters.eq("_id", this.getGuildId().asString()),
+                        Filters.and(
+                                Filters.eq("_id", this.getGuildId().asString()),
                                 Filters.eq("members._id", this.getId().asString())),
                         Updates.set("members.$.coins", coins)))
+                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Coins update result: {}",
+                        this.getId().asLong(), this.getGuildId().asLong(), result))
                 .map(UpdateResult::getModifiedCount)
-                .flatMap(matchedCount -> {
+                .flatMap(modifiedCount -> {
                     // Member was not found, insert it
-                    if (matchedCount == 0) {
+                    if (modifiedCount == 0) {
+                        LOGGER.debug("[DBMember {} / {}] Coins not updated. Upsert member: {} coins",
+                                this.getId().asLong(), this.getGuildId().asLong(), coins);
                         return Mono.from(DatabaseManager.getGuilds()
                                 .getCollection()
                                 .updateOne(Filters.eq("_id", this.getGuildId().asString()),
                                         Updates.push("members", this.toDocument().append("coins", coins)),
-                                        new UpdateOptions().upsert(true)));
+                                        new UpdateOptions().upsert(true)))
+                                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Coins upsert result: {}",
+                                        this.getId().asLong(), this.getGuildId().asLong(), result));
                     }
                     return Mono.empty();
                 });
@@ -73,7 +82,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
 
     // Note: If one day, a member contains more data than just coins, this method will need to be updated
     public Mono<Void> resetCoins() {
-        LOGGER.debug("[DBMember {} / {}] Resetting coins.", this.getId().asLong(), this.getGuildId().asLong());
+        LOGGER.debug("[DBMember {} / {}] Coins deletion", this.getId().asLong(), this.getGuildId().asLong());
         return this.delete();
     }
 
@@ -86,6 +95,8 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                 .updateOne(Filters.eq("_id", this.getGuildId().asString()),
                         Updates.push("members", this.toDocument()),
                         new UpdateOptions().upsert(true)))
+                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Insertion result: {}",
+                        this.getId().asLong(), this.getGuildId().asLong(), result))
                 .then();
     }
 
@@ -97,6 +108,8 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                 .getCollection()
                 .updateOne(Filters.eq("_id", this.getGuildId().asString()),
                         Updates.pull("members", Filters.eq("_id", this.getId().asString()))))
+                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Deletion result: {}",
+                        this.getId().asLong(), this.getGuildId().asLong(), result))
                 .then();
     }
 
