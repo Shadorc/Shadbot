@@ -11,13 +11,13 @@ import java.util.Properties;
 
 public final class CredentialManager {
 
+    private static final Logger LOGGER = Loggers.getLogger("shadbot.credentials");
+
     private static CredentialManager instance;
 
     static {
         CredentialManager.instance = new CredentialManager();
     }
-
-    private static final Logger LOGGER = Loggers.getLogger("shadbot.credentials");
 
     private final Properties properties;
 
