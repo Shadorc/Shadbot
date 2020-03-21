@@ -21,6 +21,8 @@ import discord4j.core.object.entity.channel.PrivateChannel;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
+import discord4j.discordjson.json.ImmutableEmbedData;
+import discord4j.discordjson.possible.Possible;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.Permission;
 import io.netty.channel.unix.Errors;
@@ -247,6 +249,14 @@ public final class DiscordUtils {
      */
     public static Consumer<EmbedCreateSpec> getDefaultEmbed() {
         return spec -> spec.setColor(Config.BOT_COLOR);
+    }
+
+    /**
+     * @return A default {@link ImmutableEmbedData} with the default color set.
+     */
+    public static ImmutableEmbedData.Builder getDefaultEmbedData() {
+        return ImmutableEmbedData.builder()
+                .color(Possible.of(Config.BOT_COLOR.getRGB() & 0xFFFFFF));
     }
 
 }

@@ -10,14 +10,15 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.core.object.util.Snowflake;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.*;
+import discord4j.discordjson.possible.Possible;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class HangmanGame extends Game {
@@ -94,36 +95,65 @@ public class HangmanGame extends Game {
                 .map(String::toUpperCase)
                 .collect(Collectors.toList());
 
-        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> {
-                    embed.setAuthor("Hangman Game", null, this.getContext().getAvatarUrl())
-                            .setThumbnail("https://i.imgur.com/Vh9WyaU.png")
-                            .setDescription("Type letters or enter a word if you think you've guessed it.")
-                            .addField("Word", this.getRepresentation(this.word), false);
+        final ImmutableEmbedData.Builder embedData = DiscordUtils.getDefaultEmbedData();
 
-                    if (!missedLetters.isEmpty()) {
-                        embed.addField("Misses", String.join(", ", missedLetters), false);
-                    }
+        final ImmutableEmbedAuthorData authorData = ImmutableEmbedAuthorData.builder()
+                .name(Possible.of("Hangman Game"))
+                .iconUrl(Possible.of(this.getContext().getAvatarUrl()))
+                .build();
 
-                    if (this.isScheduled()) {
-                        final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-                        embed.setFooter(String.format("Will automatically stop in %s seconds. Use %scancel to force the stop.",
-                                remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
-                    } else {
-                        embed.setFooter("Finished.", null);
-                    }
+        final ImmutableEmbedThumbnailData thumbnaildata = ImmutableEmbedThumbnailData.builder()
+                .url(Possible.of("https://i.imgur.com/Vh9WyaU.png"))
+                .build();
 
-                    if (this.failCount > 0) {
-                        embed.setImage(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failCount) - 1));
-                    }
-                });
+        final List<EmbedFieldData> fieldDataList = new ArrayList<>();
+        fieldDataList.add(
+                ImmutableEmbedFieldData.of("Word", this.getRepresentation(this.word), Possible.of(false)));
 
-        return this.getContext().getClient()
+        embedData.author(Possible.of(authorData))
+                .thumbnail(Possible.of(thumbnaildata))
+                .description(Possible.of("Type letters or enter a word if you think you've guessed it."));
+
+        if (!missedLetters.isEmpty()) {
+            fieldDataList.add(
+                    ImmutableEmbedFieldData.of("Misses", String.join(", ", missedLetters), Possible.of(false)));
+        }
+
+        embedData.fields(Possible.of(fieldDataList));
+
+        if (this.isScheduled()) {
+            final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
+            final ImmutableEmbedFooterData footerData = ImmutableEmbedFooterData.builder()
+                    .text(String.format("Will automatically stop in %s seconds. Use %scancel to force the stop.",
+                            remainingDuration.toSeconds(), this.getContext().getPrefix()))
+                    .build();
+            embedData.footer(Possible.of(footerData));
+        } else {
+            final ImmutableEmbedFooterData footerData = ImmutableEmbedFooterData.builder()
+                    .text("Finished.")
+                    .build();
+            embedData.footer(Possible.of(footerData));
+        }
+
+        if (this.failCount > 0) {
+            final ImmutableEmbedImageData imageData = ImmutableEmbedImageData.builder()
+                    .url(Possible.of(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failCount) - 1)))
+                    .build();
+            embedData.image(Possible.of(imageData));
+        }
+
+        return this.getContext()
+                .getClient()
+                .rest()
                 .getMessageById(this.getContext().getChannelId(), Snowflake.of(this.messageId.get()))
-                .flatMap(message -> message.edit(spec -> spec.setEmbed(embedConsumer)))
-                .onErrorResume(err -> this.getContext().getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
-                .doOnNext(message -> this.messageId.set(message.getId().asLong()))
+                .edit(ImmutableMessageEditRequest.builder().embed(Possible.of(Optional.of(embedData.build()))).build())
+                .onErrorResume(err -> this.getContext()
+                        .getChannel()
+                        .flatMap(channel -> channel.getRestChannel()
+                                .createMessage(ImmutableMessageCreateRequest.builder()
+                                        .embed(Possible.of(embedData.build()))
+                                        .build())))
+                .doOnNext(message -> this.messageId.set(Long.parseLong(message.id())))
                 .then();
     }
 

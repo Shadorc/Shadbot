@@ -86,7 +86,7 @@ public class UpdatableMessage {
     public Mono<Void> deleteMessage() {
         return Mono.just(Snowflake.of(this.messageId.get()))
                 .filter(messageId -> messageId.asLong() != 0)
-                .flatMap(messageId -> this.client.getMessageById(this.channelId, messageId))
-                .flatMap(Message::delete);
+                .map(messageId -> this.client.rest().getMessageById(this.channelId, messageId))
+                .flatMap(message -> message.delete(null));
     }
 }

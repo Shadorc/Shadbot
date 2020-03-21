@@ -2,7 +2,8 @@ package com.shadorc.shadbot.utils;
 
 import com.google.common.collect.Lists;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import discord4j.common.json.EmbedFieldEntity;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
+import discord4j.discordjson.possible.Possible;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.text.NumberFormat;
@@ -30,10 +31,13 @@ public final class FormatUtils {
         return String.format("%s coin%s", FormatUtils.number(coins), Math.abs(coins) > 1 ? "s" : "");
     }
 
-    public static List<EmbedFieldEntity> createColumns(List<String> list, int rowSize) {
+    public static List<ImmutableEmbedFieldData> createColumns(List<String> list, int rowSize) {
         return Lists.partition(list, rowSize)
                 .stream()
-                .map(sublist -> new EmbedFieldEntity("\u200C", String.join("\n", sublist), true))
+                .map(sublist -> ImmutableEmbedFieldData.of(
+                        "\u200C",
+                        String.join("\n", sublist),
+                        Possible.of(true)))
                 .collect(Collectors.toList());
     }
 

@@ -14,12 +14,12 @@ import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
-import discord4j.core.object.data.stored.MessageBean;
 import discord4j.core.object.entity.ApplicationInfo;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
+import discord4j.discordjson.json.MessageData;
 import discord4j.rest.response.ResponseFunction;
 import discord4j.store.api.mapping.MappingStoreService;
 import discord4j.store.api.noop.NoOpStoreService;
@@ -70,7 +70,7 @@ public final class Shadbot {
                 .gateway()
                 .setStoreService(MappingStoreService.create()
                         // Do not store messages
-                        .setMapping(new NoOpStoreService(), MessageBean.class)
+                        .setMapping(new NoOpStoreService(), MessageData.class)
                         .setFallback(new JdkStoreService()))
                 .setInitialPresence(shardInfo -> Presence.idle(Activity.playing("Connecting...")))
                 .connect()
