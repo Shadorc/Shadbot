@@ -22,7 +22,8 @@ public class Quickplay {
 
     public String getEliminationsPerLife() {
         return FormatUtils.numberedList(RANKING_SIZE, this.eliminationsPerLife.size(), count -> String.format(FORMAT,
-                count, this.eliminationsPerLife.get(count - 1).getHero(), this.eliminationsPerLife.get(count - 1).getEliminationsPerLife()));
+                count, this.eliminationsPerLife.get(count - 1).getHero(),
+                this.eliminationsPerLife.get(count - 1).getEliminationsPerLife()));
     }
 
 }

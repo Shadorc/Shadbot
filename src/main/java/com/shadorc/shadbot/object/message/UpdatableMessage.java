@@ -27,7 +27,7 @@ public class UpdatableMessage {
     /**
      * Sends a message that will be deleted each time the {@code send} method is called.
      *
-     * @param client    The Discord client.
+     * @param client The Discord client.
      * @param channelId The Channel ID in which to send the message.
      */
     public UpdatableMessage(GatewayDiscordClient client, Snowflake channelId) {
@@ -61,7 +61,7 @@ public class UpdatableMessage {
      * Delete the previous message sent, if present, then send a message with the provided content and embed.
      *
      * @param content The content to send, may be null.
-     * @param embed   The embed to send, may be null.
+     * @param embed The embed to send, may be null.
      */
     private Mono<Message> send(@Nullable String content, @Nullable Consumer<EmbedCreateSpec> embed) {
         final Consumer<MessageCreateSpec> consumer = spec -> {

@@ -60,8 +60,7 @@ public class PollCmd extends BaseCmd {
                         final PollManager newPollManager = this.createPoll(context);
                         this.managers.put(context.getChannelId(), newPollManager);
                         return newPollManager.start();
-                    }
-                    else if (PollCmd.isCancelMsg(context, permissions, oldPollManager)) {
+                    } else if (PollCmd.isCancelMsg(context, permissions, oldPollManager)) {
                         oldPollManager.stop();
                         return context.getChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(

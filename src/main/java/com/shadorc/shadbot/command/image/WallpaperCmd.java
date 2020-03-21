@@ -101,7 +101,8 @@ public class WallpaperCmd extends BaseCmd {
                     urlBuilder.append(String.format("?apikey=%s", CredentialManager.getInstance().get(Credential.WALLHAVEN_API_KEY)));
 
                     if (cmdLine.hasOption(PURITY)) {
-                        final Purity purity = this.parseEnum(context, Purity.class, PURITY, cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
+                        final Purity purity = this.parseEnum(context, Purity.class, PURITY,
+                                cmdLine.getOptionValue(PURITY, Purity.SFW.toString()));
                         if ((purity == Purity.NSFW || purity == Purity.SKETCHY) && !isNsfw) {
                             return Mono.error(new CommandException("Must be NSFW"));
                         }

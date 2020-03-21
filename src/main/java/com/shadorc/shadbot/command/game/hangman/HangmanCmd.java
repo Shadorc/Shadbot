@@ -27,8 +27,10 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
     public HangmanCmd() {
         super(List.of("hangman"));
 
-        this.easyWords = new WordsList("https://gist.githubusercontent.com/deekayen/4148741/raw/01c6252ccc5b5fb307c1bb899c95989a8a284616/1-1000.txt");
-        this.hardWords = new WordsList("https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt");
+        this.easyWords = new WordsList("https://gist.githubusercontent.com/" +
+                "deekayen/4148741/raw/01c6252ccc5b5fb307c1bb899c95989a8a284616/1-1000.txt");
+        this.hardWords = new WordsList("https://raw.githubusercontent.com/" +
+                "dwyl/english-words/master/words_alpha.txt");
     }
 
     @Override

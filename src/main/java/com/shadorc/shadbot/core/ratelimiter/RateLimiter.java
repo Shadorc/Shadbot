@@ -25,7 +25,7 @@ public class RateLimiter {
      * Specifies simple limitation {@code capacity} tokens per {@code period} time window.
      *
      * @param capacity Maximum amount of tokens.
-     * @param period   The period within tokens will be fully regenerated.
+     * @param period The period within tokens will be fully regenerated.
      */
     public RateLimiter(int capacity, Duration period) {
         this(Bandwidth.classic(capacity, Refill.intervally(capacity, period)));

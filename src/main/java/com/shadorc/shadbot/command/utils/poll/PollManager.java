@@ -107,7 +107,7 @@ public class PollManager {
 
             final String choice = reactionsChoices.get(reactionEmoji);
             // Ignore possible reactions added by users
-            if(choice != null) {
+            if (choice != null) {
                 // -1 is here to ignore the reaction of the bot itself
                 choicesVotes.put(choice, reactionData.count() - 1);
             }
@@ -124,7 +124,7 @@ public class PollManager {
             count++;
         }
 
-        if(representation.length() == 0) {
+        if (representation.length() == 0) {
             representation.append("\nAll choices have been removed.");
         }
 

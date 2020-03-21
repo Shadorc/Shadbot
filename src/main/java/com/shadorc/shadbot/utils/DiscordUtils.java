@@ -51,7 +51,7 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param embed   The {@link EmbedCreateSpec} consumer used to attach rich content when creating a message.
+     * @param embed The {@link EmbedCreateSpec} consumer used to attach rich content when creating a message.
      * @param channel The {@link MessageChannel} in which to send the message.
      * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
      * it is emitted through the Mono.
@@ -62,7 +62,7 @@ public final class DiscordUtils {
 
     /**
      * @param content The string to send.
-     * @param embed   The {@link EmbedCreateSpec} consumer used to attach rich content when creating a message.
+     * @param embed The {@link EmbedCreateSpec} consumer used to attach rich content when creating a message.
      * @param channel The {@link MessageChannel} in which to send the message.
      * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
      * it is emitted through the Mono.
@@ -72,8 +72,8 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param spec     A {@link Consumer} that provides a "blank" {@link MessageCreateSpec} to be operated on.
-     * @param channel  The {@link MessageChannel} in which to send the message.
+     * @param spec A {@link Consumer} that provides a "blank" {@link MessageCreateSpec} to be operated on.
+     * @param channel The {@link MessageChannel} in which to send the message.
      * @param hasEmbed Whether or not the spec contains an embed.
      * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
      * it is emitted through the Mono.
@@ -113,7 +113,7 @@ public final class DiscordUtils {
 
     /**
      * @param guild The {@link Guild} containing the members to extract.
-     * @param str   The string containing members mentions and / or names.
+     * @param str The string containing members mentions and / or names.
      * @return A {@link Member} {@link Flux} containing the extracted members.
      */
     public static Flux<Member> extractMembers(Guild guild, String str) {
@@ -129,7 +129,7 @@ public final class DiscordUtils {
 
     /**
      * @param guild The {@link Guild} containing the channels to extract.
-     * @param str   The string containing channels mentions and / or names.
+     * @param str The string containing channels mentions and / or names.
      * @return A {@link GuildChannel} {@link Flux} containing the extracted channels.
      */
     public static Flux<GuildChannel> extractChannels(Guild guild, String str) {
@@ -142,7 +142,7 @@ public final class DiscordUtils {
 
     /**
      * @param guild The {@link Guild} containing the roles to extract.
-     * @param str   The string containing role mentions and / or names.
+     * @param str The string containing role mentions and / or names.
      * @return A {@link Role} {@link Flux} containing the extracted roles.
      */
     public static Flux<Role> extractRoles(Guild guild, String str) {
@@ -168,8 +168,8 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param channel    The channel in which the permission has to be checked.
-     * @param userId     The ID of the user to check permissions for.
+     * @param channel The channel in which the permission has to be checked.
+     * @param userId The ID of the user to check permissions for.
      * @param permission The permission to check.
      * @return {@code true} if the user has the permission in the provided channel, {@code false} otherwise.
      */
@@ -183,7 +183,7 @@ public final class DiscordUtils {
     }
 
     /**
-     * @param channel     The channel in which the permissions have to be checked.
+     * @param channel The channel in which the permissions have to be checked.
      * @param permissions The permissions to check.
      * @return A {@link Mono} containing a {@link MissingPermissionException} if the bot does not have the provided
      * permissions in the provided channel or an empty Mono otherwise.
