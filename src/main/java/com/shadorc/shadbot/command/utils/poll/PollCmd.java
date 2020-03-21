@@ -5,6 +5,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.exception.CommandException;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class PollCmd extends BaseCmd {
@@ -36,7 +36,6 @@ public class PollCmd extends BaseCmd {
     private static final int MAX_CHOICES_NUM = 10;
     private static final int MIN_DURATION = 10;
     private static final int MAX_DURATION = 3600;
-    private static final Pattern CANCEL_PATTERN = Pattern.compile("stop|cancel");
 
     private final Map<Snowflake, PollManager> managers;
 
@@ -55,17 +54,21 @@ public class PollCmd extends BaseCmd {
                 .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.ADD_REACTIONS))
                 .thenMany(context.getPermissions())
                 .collectList()
-                .doOnNext(permissions -> {
-                    final PollManager pollManager = this.managers.computeIfAbsent(context.getChannelId(),
-                            channelId -> {
-                                final PollManager game = this.createPoll(context);
-                                game.start();
-                                return game;
-                            });
-
-                    if (PollCmd.isCancelMsg(context, permissions, pollManager)) {
-                        pollManager.stop();
+                .flatMap(permissions -> {
+                    final PollManager oldPollManager = this.managers.get(context.getChannelId());
+                    if (oldPollManager == null) {
+                        final PollManager newPollManager = this.createPoll(context);
+                        this.managers.put(context.getChannelId(), newPollManager);
+                        return newPollManager.start();
                     }
+                    else if (PollCmd.isCancelMsg(context, permissions, oldPollManager)) {
+                        oldPollManager.stop();
+                        return context.getChannel()
+                                .flatMap(channel -> DiscordUtils.sendMessage(
+                                        String.format(Emoji.CHECK_MARK + " Poll cancelled by **%s**.",
+                                                context.getUsername()), channel));
+                    }
+                    return Mono.empty();
                 })
                 .then();
     }
@@ -73,7 +76,9 @@ public class PollCmd extends BaseCmd {
     private static boolean isCancelMsg(Context context, List<CommandPermission> permissions, PollManager pollManager) {
         final boolean isAuthor = context.getAuthorId().equals(pollManager.getContext().getAuthorId());
         final boolean isAdmin = permissions.contains(CommandPermission.ADMIN);
-        final boolean isCancelMsg = context.getArg().map(arg -> CANCEL_PATTERN.matcher(arg).matches()).orElse(false);
+        final boolean isCancelMsg = context.getArg()
+                .map("cancel"::equalsIgnoreCase)
+                .orElse(false);
         return isCancelMsg && (isAuthor || isAdmin);
     }
 

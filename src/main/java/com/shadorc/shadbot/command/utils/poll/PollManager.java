@@ -39,10 +39,9 @@ public class PollManager {
         this.scheduledTask = null;
     }
 
-    public void start() {
+    public Mono<Void> start() {
         this.schedule(Mono.fromRunnable(this::stop), this.spec.getDuration());
-        this.show()
-                .subscribe(null, ExceptionHandler::handleUnknownError);
+        return this.show();
     }
 
     public void stop() {
@@ -61,8 +60,8 @@ public class PollManager {
                         null, this.context.getAvatarUrl())
                         .setDescription(String.format("Vote by clicking on the corresponding number.%n%n__**%s**__%s",
                                 this.spec.getQuestion(), representation))
-                        .setFooter(String.format("You have %s to vote.",
-                                FormatUtils.shortDuration(this.spec.getDuration().toMillis())),
+                        .setFooter(String.format("You have %s to vote. Use %spoll cancel to cancel.",
+                                FormatUtils.shortDuration(this.spec.getDuration().toMillis()), this.context.getPrefix()),
                                 "https://i.imgur.com/jcrUDLY.png"));
 
         return this.voteMessage.send(embedConsumer)
