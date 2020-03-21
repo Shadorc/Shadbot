@@ -93,6 +93,14 @@
         </plugins>
     </build>
     <repositories>
+        <!-- Discord4J snapshot -->
+        <repository>
+            <id>oss.sonatype.org-snapshot</id>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
         <!-- lavaplayer repository -->
         <repository>
             <id>jcenter</id>
