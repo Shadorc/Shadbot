@@ -77,9 +77,8 @@ public abstract class RemoveMemberCmd extends BaseCmd {
                 .filterWhen(tuple -> this.canInteract(tuple.getT2(), tuple.getT3(), context.getMember(), tuple.getT4()))
                 .flatMap(tuple -> this.sendMessage(tuple.getT1(), tuple.getT2(), context.getMember(), tuple.getT4(), reason.toString())
                         .then(this.action(tuple.getT4(), reason.toString()))
-                        .then(DiscordUtils.sendMessage(String.format(Emoji.INFO + " **%s** %s %s.",
-                                context.getUsername(), this.conjugatedVerb,
-                                String.format("**%s**", tuple.getT4().getUsername())),
+                        .then(DiscordUtils.sendMessage(String.format(Emoji.INFO + " **%s** %s **%s**. Reason: `%s`",
+                                context.getUsername(), this.conjugatedVerb, tuple.getT4().getUsername(), reason),
                                 tuple.getT2())))
                 .onErrorMap(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
                         err -> new MissingPermissionException(this.permission))
