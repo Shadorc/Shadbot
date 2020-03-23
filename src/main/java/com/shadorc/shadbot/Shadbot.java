@@ -72,7 +72,7 @@ public final class Shadbot {
                         // Do not store messages
                         .setMapping(new NoOpStoreService(), MessageData.class)
                         .setFallback(new JdkStoreService()))
-                .setInitialPresence(shardInfo -> Presence.idle(Activity.playing("Connecting...")))
+                .setInitialStatus(shardInfo -> Presence.idle(Activity.playing("Connecting...")))
                 .connect()
                 .blockOptional()
                 .orElseThrow(RuntimeException::new);
@@ -144,10 +144,12 @@ public final class Shadbot {
                         .elapsed()
                         .doOnNext(tuple -> {
                             if (LOGGER.isTraceEnabled()) {
-                                LOGGER.trace("{} took {}ms to be processed.", tuple.getT2(), tuple.getT1());
+                                LOGGER.trace("{} took {}ms to be processed: {}",
+                                        eventListener.getEventType().getSimpleName(), tuple.getT1(), tuple.getT2());
                             }
-                            if (tuple.getT1() > Duration.ofMinutes(1).toMillis()) {
-                                LOGGER.warn("{} took a long time to be processed ({}ms).", tuple.getT2(), tuple.getT1());
+                            else if (tuple.getT1() > Duration.ofMinutes(1).toMillis()) {
+                                LOGGER.warn("{} took {}ms to be processed.",
+                                        eventListener.getEventType().getSimpleName(), tuple.getT1());
                             }
                         })
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
