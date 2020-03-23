@@ -146,8 +146,7 @@ public final class Shadbot {
                             if (LOGGER.isTraceEnabled()) {
                                 LOGGER.trace("{} took {}ms to be processed: {}",
                                         eventListener.getEventType().getSimpleName(), tuple.getT1(), tuple.getT2());
-                            }
-                            else if (tuple.getT1() > Duration.ofMinutes(1).toMillis()) {
+                            } else if (tuple.getT1() > Duration.ofMinutes(1).toMillis()) {
                                 LOGGER.warn("{} took {}ms to be processed.",
                                         eventListener.getEventType().getSimpleName(), tuple.getT1());
                             }
