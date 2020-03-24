@@ -61,7 +61,7 @@ public final class FormatUtils {
             strBuilder.append(StringUtils.pluralOf(minutes, "minute"));
         }
 
-        return strBuilder.toString();
+        return strBuilder.toString().trim();
     }
 
     /**
@@ -72,7 +72,7 @@ public final class FormatUtils {
         final Period period = Period.between(TimeUtils.toLocalDate(instant).toLocalDate(), LocalDate.now());
         final String str = period.getUnits().stream()
                 .filter(unit -> period.get(unit) != 0)
-                .map(unit -> String.format("%d %s", period.get(unit), unit.toString().toLowerCase()))
+                .map(unit -> String.format("%s %s", FormatUtils.number(period.get(unit)), unit.toString().toLowerCase()))
                 .collect(Collectors.joining(", "));
         return str.isEmpty() ? FormatUtils.shortDuration(instant.toEpochMilli()) : str;
     }
@@ -120,7 +120,16 @@ public final class FormatUtils {
                 .collect(Collectors.joining("\n"));
     }
 
+    /**
+     * @param enumClass The Enum class to get constants from.
+     * @param <E> An enumeration.
+     * @return {@code Options: `option_1`, `option_2`, ...}
+     * @throws java.lang.IllegalArgumentException If the enumeration contains less than 2 constants.
+     */
     public static <E extends Enum<E>> String options(Class<E> enumClass) {
+        if (enumClass.getEnumConstants().length < 2) {
+            throw new IllegalArgumentException("Enum constants is empty.");
+        }
         return String.format("Options: %s",
                 FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`",
                         value.toString().toLowerCase()), ", "));
@@ -133,9 +142,9 @@ public final class FormatUtils {
     public static String trackName(AudioTrackInfo info) {
         final StringBuilder strBuilder = new StringBuilder();
         if ("Unknown artist".equals(info.author)) {
-            strBuilder.append(info.title);
+            strBuilder.append(info.title.trim());
         } else {
-            strBuilder.append(String.format("%s - %s", info.author, info.title));
+            strBuilder.append(String.format("%s - %s", info.author.trim(), info.title.trim()));
         }
 
         if (info.isStream) {
