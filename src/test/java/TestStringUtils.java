@@ -53,11 +53,12 @@ public class TestStringUtils {
 
     @Test
     public void testPluralOf() {
-        assertEquals("-2 coin", StringUtils.pluralOf(-2, "coin"));
+        assertEquals("-2 coins", StringUtils.pluralOf(-2, "coin"));
         assertEquals("-1 coin", StringUtils.pluralOf(-1, "coin"));
         assertEquals("0 coin", StringUtils.pluralOf(0, "coin"));
         assertEquals("1 coin", StringUtils.pluralOf(1, "coin"));
         assertEquals("2 coins", StringUtils.pluralOf(2, "coin"));
+        assertEquals("1,000 coins", StringUtils.pluralOf(1000, "coin"));
         assertNull(StringUtils.pluralOf(1, "   "));
         assertNull(StringUtils.pluralOf(2, "   "));
         assertNull(StringUtils.pluralOf(2, null));

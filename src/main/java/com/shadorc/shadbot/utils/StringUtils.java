@@ -74,18 +74,17 @@ public final class StringUtils {
     /**
      * @param count The number of elements.
      * @param str The string to get plural from, may be {@code null}.
-     * @return {@code String.format("%d %ss", count, str)} if count > 1, {@code String.format("%d %s", count, str)}
-     * otherwise.
+     * @return {@code count str(s)} with {@code count} formatted using English locale.
      */
     @Nullable
     public static String pluralOf(long count, @Nullable String str) {
         if (str == null || str.isBlank()) {
             return null;
         }
-        if (count > 1) {
-            return String.format("%d %ss", count, str);
+        if (Math.abs(count) > 1) {
+            return String.format("%s %ss", FormatUtils.number(count), str);
         }
-        return String.format("%d %s", count, str);
+        return String.format("%s %s", FormatUtils.number(count), str);
     }
 
     /**
