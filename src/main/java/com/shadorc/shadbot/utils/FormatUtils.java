@@ -128,7 +128,7 @@ public final class FormatUtils {
      */
     public static <E extends Enum<E>> String options(Class<E> enumClass) {
         if (enumClass.getEnumConstants().length < 2) {
-            throw new IllegalArgumentException("Enum constants is empty.");
+            throw new IllegalArgumentException("There must be at least two enum constants.");
         }
         return String.format("Options: %s",
                 FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`",
