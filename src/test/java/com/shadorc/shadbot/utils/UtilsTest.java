@@ -1,3 +1,5 @@
+package com.shadorc.shadbot.utils;
+
 import com.shadorc.shadbot.utils.Utils;
 import org.junit.jupiter.api.Test;
 

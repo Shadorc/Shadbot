@@ -1,3 +1,5 @@
+package com.shadorc.shadbot.utils;
+
 import com.shadorc.shadbot.utils.NumberUtils;
 import org.junit.jupiter.api.Test;
 

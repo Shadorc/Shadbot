@@ -15,6 +15,7 @@ import reactor.netty.ByteBufMono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.http.client.HttpClient.RequestSender;
 import reactor.netty.http.client.HttpClientResponse;
+import reactor.util.annotation.Nullable;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -26,10 +27,11 @@ public final class NetUtils {
     private static final HttpClient HTTP_CLIENT = HttpClient.create();
 
     /**
-     * @param html The HTML to convert to text with new lines preserved.
-     * @return The provided HTML converted to text with new lines preserved.
+     * @param html The HTML to convert to text with new lines preserved, may be {@code null}.
+     * @return The provided HTML converted to text with new lines preserved or {@code null} if null string input.
      */
-    public static String cleanWithLinebreaks(String html) {
+    @Nullable
+    public static String cleanWithLinebreaks(@Nullable String html) {
         if (html == null || html.isBlank()) {
             return html;
         }
@@ -43,10 +45,11 @@ public final class NetUtils {
     }
 
     /**
-     * @param str The string to encode as UTF-8.
-     * @return The string encoded as UTF-8.
+     * @param str The string to encode as UTF-8, may be {@code null}.
+     * @return The string encoded as UTF-8 or {@code null} if null string input.
      */
-    public static String encode(String str) {
+    @Nullable
+    public static String encode(@Nullable String str) {
         if (str == null || str.isEmpty()) {
             return str;
         }
