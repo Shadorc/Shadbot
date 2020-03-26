@@ -57,6 +57,8 @@ public class TestFormatUtils {
         assertEquals("-1", FormatUtils.number(-1));
         assertEquals("1,000", FormatUtils.number(1000));
         assertEquals("-1,000", FormatUtils.number(-1000));
+        assertEquals("1.5", FormatUtils.number(1.5));
+        assertEquals("1,500.5", FormatUtils.number(1500.5));
     }
 
     @Test
@@ -67,6 +69,7 @@ public class TestFormatUtils {
         assertEquals("", FormatUtils.numberedList(0, 2, i -> Integer.toString(i)));
         assertEquals("", FormatUtils.numberedList(2, 0, i -> Integer.toString(i)));
         assertEquals("", FormatUtils.numberedList(0, 0, i -> Integer.toString(i)));
+        assertEquals("", FormatUtils.numberedList(-1, 0, i -> Integer.toString(i)));
     }
 
     private enum FakeEnum1 {VALUE_1, VALUE_2, VALUE_3;}

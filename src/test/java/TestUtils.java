@@ -3,10 +3,29 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestUtils {
+
+    private enum FakeEnum {
+        VALUE_1;
+    }
+
+    @Test
+    public void testParseEnum() {
+        assertEquals(FakeEnum.VALUE_1, Utils.parseEnum(FakeEnum.class, "VALUE_1"));
+        assertEquals(FakeEnum.VALUE_1, Utils.parseEnum(FakeEnum.class, "value_1"));
+        assertNull(Utils.parseEnum(FakeEnum.class, null));
+        assertNull(Utils.parseEnum(FakeEnum.class, "alue_1"));
+    }
+
+    @Test
+    public void testParseEnumException() {
+        assertEquals(FakeEnum.VALUE_1, Utils.parseEnum(FakeEnum.class, "VALUE_1"));
+        assertEquals(FakeEnum.VALUE_1, Utils.parseEnum(FakeEnum.class, "value_1"));
+        assertThrows(Exception.class, () -> Utils.parseEnum(FakeEnum.class, "alue_1", new Exception("Enum not found.")));
+        assertThrows(Exception.class, () -> Utils.parseEnum(FakeEnum.class, null, new Exception("Enum not found.")));
+    }
 
     @Test
     public void testRandValueList() {
