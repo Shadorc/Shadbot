@@ -32,36 +32,40 @@ public class DtcCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-
-        final String url = String.format("%s?key=%s&format=json",
-                HOME_URL, CredentialManager.getInstance().get(Credential.DTC_API_KEY));
-
-        final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading quote...", context.getUsername()))
                 .send()
-                .<List<Quote>>then(NetUtils.get(url, valueType))
-                .map(quotes -> {
-                    Quote quote;
-                    do {
-                        quote = Utils.randValue(quotes);
-                    } while (quote.getContent().length() > 1000);
-
-                    final String content = quote.getContent().replace("*", "\\*");
-                    final String id = quote.getId();
-
-                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor("Quote DansTonChat",
-                                    String.format("https://danstonchat.com/%s.html", id),
-                                    context.getAvatarUrl())
-                                    .setThumbnail("https://i.imgur.com/5YvTlAA.png")
-                                    .setDescription(FormatUtils.format(content.split("\n"), DtcCmd::format, "\n"))));
-                })
+                .then(this.getRandomQuote())
+                .map(quote -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                        .andThen(embed -> embed.setAuthor("Quote DansTonChat",
+                                String.format("https://danstonchat.com/%s.html", quote.getId()), context.getAvatarUrl())
+                                .setThumbnail("https://i.imgur.com/5YvTlAA.png")
+                                .setDescription(this.formatContent(quote.getContent())))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 
-    private static String format(String line) {
+    private Mono<Quote> getRandomQuote() {
+        final String url = String.format("%s?key=%s&format=json",
+                HOME_URL, CredentialManager.getInstance().get(Credential.DTC_API_KEY));
+        final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
+        return NetUtils
+                .<List<Quote>>get(url, valueType)
+                .map(quotes -> {
+                    Quote quote;
+                    do {
+                        quote = Utils.randValue(quotes);
+                    } while (quote.getContent().length() > 1000);
+                    return quote;
+                });
+    }
+
+    private String formatContent(String content) {
+        final String formattedContent = content.replace("*", "\\*");
+        return FormatUtils.format(content.split("\n"), this::formatLine, "\n");
+    }
+
+    private String formatLine(String line) {
         // Set the user name as bold
         if (line.contains(" ")) {
             final int index = line.indexOf(' ');

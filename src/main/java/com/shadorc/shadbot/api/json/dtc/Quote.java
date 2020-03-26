@@ -17,4 +17,11 @@ public class Quote {
         return this.content;
     }
 
+    @Override
+    public String toString() {
+        return "Quote{" +
+                "id='" + this.id + '\'' +
+                ", content='" + this.content + '\'' +
+                '}';
+    }
 }

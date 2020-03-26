@@ -33,17 +33,21 @@ public class ThisDayCmd extends BaseCmd {
 
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading events...", context.getUsername()))
                 .send()
-                .then(NetUtils.get(HOME_URL))
-                .map(Jsoup::parse)
-                .map(ThisDay::new)
+                .then(this.getThisDay())
                 .map(thisDay -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                        .andThen(embed -> embed.setAuthor(String.format("On This Day: %s", thisDay.getDate()),
-                                HOME_URL, context.getAvatarUrl())
+                        .andThen(embed -> embed.setAuthor(String.format("On This Day: %s",
+                                thisDay.getDate()), HOME_URL, context.getAvatarUrl())
                                 .setThumbnail("https://i.imgur.com/FdfyJDD.png")
                                 .setDescription(StringUtils.abbreviate(thisDay.getEvents(), Embed.MAX_DESCRIPTION_LENGTH)))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
+    }
+
+    private Mono<ThisDay> getThisDay() {
+        return NetUtils.get(HOME_URL)
+                .map(Jsoup::parse)
+                .map(ThisDay::new);
     }
 
     @Override

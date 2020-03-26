@@ -31,14 +31,18 @@ public class JokeCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading joke...", context.getUsername()))
                 .send()
-                .then(NetUtils.get(header -> header.add(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON),
-                        HOME_URL, JokeResponse.class))
-                .map(response -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                .then(this.getRandomJoke())
+                .map(joke -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Joke", HOME_URL, context.getAvatarUrl())
-                                .setDescription(response.getJoke()))))
+                                .setDescription(joke))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
+    }
+
+    private Mono<String> getRandomJoke() {
+        return NetUtils.get(header -> header.add(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON), HOME_URL, JokeResponse.class)
+                .map(JokeResponse::getJoke);
     }
 
     @Override
