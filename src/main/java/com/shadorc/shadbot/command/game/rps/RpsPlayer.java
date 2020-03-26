@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.game.rps;
 
 import com.shadorc.shadbot.core.game.player.Player;
-import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Snowflake;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

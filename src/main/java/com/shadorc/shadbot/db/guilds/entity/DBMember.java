@@ -10,7 +10,7 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.guilds.bean.DBMemberBean;
 import com.shadorc.shadbot.utils.NumberUtils;
-import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import static com.shadorc.shadbot.db.guilds.GuildsCollection.LOGGER;

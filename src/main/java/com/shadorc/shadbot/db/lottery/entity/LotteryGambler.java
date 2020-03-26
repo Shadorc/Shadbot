@@ -7,7 +7,7 @@ import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
-import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import static com.shadorc.shadbot.db.lottery.LotteryCollection.LOGGER;

@@ -2,7 +2,7 @@ package com.shadorc.shadbot.core.game;
 
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.player.Player;
-import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Snowflake;
 
 import java.time.Duration;
 import java.util.Collections;

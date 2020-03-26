@@ -7,7 +7,7 @@ import com.shadorc.shadbot.db.guilds.bean.DBGuildBean;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.utils.Utils;
-import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Snowflake;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;

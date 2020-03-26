@@ -9,9 +9,9 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
-import discord4j.core.object.util.Snowflake;
 import discord4j.discordjson.json.*;
 import discord4j.discordjson.possible.Possible;
+import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;

@@ -11,9 +11,9 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.core.object.reaction.ReactionEmoji;
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Permission;
+import discord4j.rest.util.Snowflake;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 

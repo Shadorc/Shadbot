@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.db.codec;
 
-import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Snowflake;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;

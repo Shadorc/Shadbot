@@ -10,8 +10,8 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
-import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;

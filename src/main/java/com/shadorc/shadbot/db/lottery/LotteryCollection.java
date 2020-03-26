@@ -12,7 +12,7 @@ import com.shadorc.shadbot.db.lottery.bean.LotteryHistoricBean;
 import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
 import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
 import com.shadorc.shadbot.utils.Utils;
-import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Snowflake;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;

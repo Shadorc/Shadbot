@@ -2,7 +2,7 @@ package com.shadorc.shadbot.core.game;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
-import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Snowflake;
 
 import java.util.List;
 import java.util.Map;

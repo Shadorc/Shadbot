@@ -2,7 +2,7 @@ package com.shadorc.shadbot.db.guilds.entity.setting;
 
 import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.guilds.bean.setting.IamBean;
-import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Snowflake;
 
 public class Iam extends SerializableEntity<IamBean> {
 
