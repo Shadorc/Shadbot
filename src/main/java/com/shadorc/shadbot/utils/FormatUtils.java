@@ -112,10 +112,17 @@ public final class FormatUtils {
         return NumberFormat.getNumberInstance(Locale.ENGLISH).format(number);
     }
 
-    public static String numberedList(int count, int limit, Function<Integer, String> mapper) {
-        return IntStream.rangeClosed(1, count)
+    /**
+     * @param limit The inclusive upper bound.
+     * @param count The number of elements the stream should be limited to.
+     * @param mapper A function to apply to each element.
+     * @return A string consisting of the elements returned by the mapper applied to a stream of numbers from 1 to the minimum value
+     * between {@code limit} and {@code count} and joined with new lines.
+     */
+    public static String numberedList(int limit, int count, Function<Integer, String> mapper) {
+        return IntStream.rangeClosed(1, limit)
                 .boxed()
-                .limit(limit)
+                .limit(count)
                 .map(mapper)
                 .collect(Collectors.joining("\n"));
     }

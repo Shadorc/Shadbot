@@ -78,7 +78,7 @@ public class TestFormatUtils {
     @Test
     public void testOptions() {
         assertEquals("Options: `value_1`, `value_2`, `value_3`", FormatUtils.options(FakeEnum1.class));
-        assertThrows(IllegalArgumentException.class,() -> FormatUtils.options(FakeEnum2.class));
+        assertThrows(IllegalArgumentException.class, () -> FormatUtils.options(FakeEnum2.class));
         assertThrows(IllegalArgumentException.class, () -> FormatUtils.options(FakeEnum3.class));
     }
 
