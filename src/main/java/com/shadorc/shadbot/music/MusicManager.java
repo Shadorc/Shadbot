@@ -12,7 +12,7 @@ import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.VoiceChannel;
-import discord4j.core.object.util.Snowflake;
+import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
