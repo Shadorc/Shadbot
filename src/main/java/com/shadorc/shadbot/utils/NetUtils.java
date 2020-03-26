@@ -26,10 +26,10 @@ public final class NetUtils {
     private static final HttpClient HTTP_CLIENT = HttpClient.create();
 
     /**
-     * @param html The HTML to convert to text.
+     * @param html The HTML to convert to text with new lines preserved.
      * @return The provided HTML converted to text with new lines preserved.
      */
-    public static String br2nl(String html) {
+    public static String cleanWithLinebreaks(String html) {
         if (html == null || html.isBlank()) {
             return html;
         }

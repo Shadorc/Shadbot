@@ -30,7 +30,7 @@ public class Musixmatch {
 
     public String getLyrics() {
         return StringUtils.abbreviate(
-                NetUtils.br2nl(this.document.getElementsByClass("mxm-lyrics__content ").html()), MAX_LYRICS_LENGTH);
+                NetUtils.cleanWithLinebreaks(this.document.getElementsByClass("mxm-lyrics__content ").html()), MAX_LYRICS_LENGTH);
     }
 
 }
