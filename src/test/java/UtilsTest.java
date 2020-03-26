@@ -5,7 +5,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestUtils {
+public class UtilsTest {
 
     private enum FakeEnum {
         VALUE_1;

@@ -8,7 +8,7 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestTimeUtils {
+public class TimeUtilsTest {
 
     @Test
     public void testGetMillisUntilInstant() {

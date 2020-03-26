@@ -6,7 +6,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestStringUtils {
+public class StringUtilsTest {
 
     private enum TestEnum {
         TEST_ONE, test_Two, testThree;
