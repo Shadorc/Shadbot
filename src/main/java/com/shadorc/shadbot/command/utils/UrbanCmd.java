@@ -34,20 +34,11 @@ public class UrbanCmd extends BaseCmd {
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        final String url = String.format("%s?term=%s", HOME_URL, NetUtils.encode(arg));
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Urban Dictionary definition...",
                 context.getUsername()))
                 .send()
-                .then(NetUtils.get(url, UrbanDictionaryResponse.class))
-                .map(urbanDictionary -> {
-                    if (urbanDictionary.getDefinitions().isEmpty()) {
-                        return updatableMsg.setContent(
-                                String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Urban Dictionary definition found for `%s`",
-                                        context.getUsername(), arg));
-                    }
-
-                    final UrbanDefinition urbanDefinition = urbanDictionary.getDefinitions().get(0);
-
+                .then(this.getUrbanDefinition(arg))
+                .map(urbanDefinition -> {
                     final String definition = StringUtils.abbreviate(urbanDefinition.getDefinition(), Embed.MAX_DESCRIPTION_LENGTH);
                     final String example = StringUtils.abbreviate(urbanDefinition.getExample(), Field.MAX_VALUE_LENGTH);
 
@@ -63,9 +54,20 @@ public class UrbanCmd extends BaseCmd {
                                 }
                             }));
                 })
+                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(
+                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Urban Dictionary definition found for `%s`",
+                                context.getUsername(), arg)))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
+    }
+
+    private Mono<UrbanDefinition> getUrbanDefinition(String search) {
+        final String url = String.format("%s?term=%s", HOME_URL, NetUtils.encode(search));
+        return NetUtils.get(url, UrbanDictionaryResponse.class)
+                .filter(response -> !response.getDefinitions().isEmpty())
+                .map(UrbanDictionaryResponse::getDefinitions)
+                .map(list -> list.get(0));
     }
 
     @Override

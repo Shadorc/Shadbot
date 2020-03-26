@@ -11,4 +11,10 @@ public class Author {
         return this.username;
     }
 
+    @Override
+    public String toString() {
+        return "Author{" +
+                "username='" + this.username + '\'' +
+                '}';
+    }
 }

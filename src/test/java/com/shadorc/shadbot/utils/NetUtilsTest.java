@@ -1,12 +1,12 @@
 package com.shadorc.shadbot.utils;
 
-import com.shadorc.shadbot.utils.NetUtils;
 import org.junit.jupiter.api.Test;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class NetUtilsTest {
 

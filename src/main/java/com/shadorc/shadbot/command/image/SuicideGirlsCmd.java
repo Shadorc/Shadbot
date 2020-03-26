@@ -39,9 +39,7 @@ public class SuicideGirlsCmd extends BaseCmd {
                         return Mono.just(updatableMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix())));
                     }
 
-                    return NetUtils.get(HOME_URL)
-                            .map(Jsoup::parse)
-                            .map(SuicideGirl::new)
+                    return this.getRandomSuicideGirl()
                             .map(girl -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                                     .andThen(embed -> embed.setAuthor("SuicideGirls", girl.getUrl(), context.getAvatarUrl())
                                             .setDescription(String.format("Name: **%s**", girl.getName()))
@@ -50,6 +48,12 @@ public class SuicideGirlsCmd extends BaseCmd {
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
+    }
+
+    private Mono<SuicideGirl> getRandomSuicideGirl() {
+        return NetUtils.get(HOME_URL)
+                .map(Jsoup::parse)
+                .map(SuicideGirl::new);
     }
 
     @Override

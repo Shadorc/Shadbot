@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.command.image;
 
+import com.shadorc.shadbot.api.json.image.giphy.GiphyGif;
 import com.shadorc.shadbot.api.json.image.giphy.GiphyResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
@@ -12,6 +13,7 @@ import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -29,26 +31,29 @@ public class GifCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-        final String url = String.format("%s?api_key=%s&tag=%s",
-                HOME_URl, CredentialManager.getInstance().get(Credential.GIPHY_API_KEY),
-                NetUtils.encode(context.getArg().orElse("")));
 
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading gif...", context.getUsername()))
                 .send()
-                .then(NetUtils.get(url, GiphyResponse.class))
-                .map(giphy -> {
-                    if (giphy.getGifs().isEmpty()) {
-                        return updatableMsg.setContent(
-                                String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
-                                        context.getUsername(), context.getArg().orElse("random search")));
-                    }
-
-                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setImage(giphy.getGifs().get(0).getImageUrl())));
-                })
+                .then(this.getGif(NetUtils.encode(context.getArg().orElse(""))))
+                .map(gifUrl -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                        .andThen(embed -> embed.setImage(gifUrl))))
+                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(
+                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
+                                context.getUsername(), context.getArg().orElse("random search"))))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
+    }
+
+    private Mono<String> getGif(String search) {
+        final String url = String.format("%s?api_key=%s&tag=%s",
+                HOME_URl, CredentialManager.getInstance().get(Credential.GIPHY_API_KEY), NetUtils.encode(search));
+
+        return NetUtils.get(url, GiphyResponse.class)
+                .map(GiphyResponse::getGifs)
+                .flatMapMany(Flux::fromIterable)
+                .next()
+                .map(GiphyGif::getImageUrl);
     }
 
     @Override

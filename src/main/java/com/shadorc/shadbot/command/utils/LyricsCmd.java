@@ -54,32 +54,28 @@ public class LyricsCmd extends BaseCmd {
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading lyrics...",
                 context.getUsername()))
                 .send()
-                .then(this.getCorrectedUrl(search))
-                .flatMap(url -> Mono.zip(this.getLyricsDocument(url)
-                        .map(doc -> doc.outputSettings(PRESERVE_FORMAT)), Mono.just(url)))
-                .flatMap(tuple -> {
-                    final Document doc = tuple.getT1();
-                    final String url = tuple.getT2();
-
-                    final Musixmatch musixmatch = new Musixmatch(doc);
-                    if (musixmatch.getLyrics().isBlank()) {
-                        return Mono.empty();
-                    }
-
-                    return Mono.just(updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
-                                    musixmatch.getArtist(), musixmatch.getTitle()), url, context.getAvatarUrl())
-                                    .setThumbnail(musixmatch.getImageUrl())
-                                    .setDescription(musixmatch.getLyrics())
-                                    .setFooter("Click on the title to see the full version",
-                                            "https://i.imgur.com/G7q6Hmq.png"))));
-                })
+                .then(this.getMusixmatch(search))
+                .map(musixmatch -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                        .andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
+                                musixmatch.getArtist(), musixmatch.getTitle()), musixmatch.getUrl(), context.getAvatarUrl())
+                                .setThumbnail(musixmatch.getImageUrl())
+                                .setDescription(musixmatch.getLyrics())
+                                .setFooter("Click on the title to see the full version",
+                                        "https://i.imgur.com/G7q6Hmq.png"))))
                 .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
                                 context.getUsername(), search)))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
+    }
+
+    private Mono<Musixmatch> getMusixmatch(String search) {
+        return this.getCorrectedUrl(search)
+                .flatMap(url -> this.getLyricsDocument(url)
+                        .map(doc -> doc.outputSettings(PRESERVE_FORMAT))
+                        .map(doc -> new Musixmatch(doc, url)))
+                .filter(musixmatch -> !musixmatch.getLyrics().isBlank());
     }
 
     /**

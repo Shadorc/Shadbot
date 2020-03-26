@@ -41,27 +41,12 @@ public class Rule34Cmd extends BaseCmd {
                         return Mono.just(updatableMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix())));
                     }
 
-                    final String url = String.format("%s?page=dapi&s=post&q=index&tags=%s",
-                            HOME_URL, NetUtils.encode(arg.replace(" ", "_")));
-
-                    return NetUtils.get(url)
-                            .map(XML::toJSONObject)
-                            .map(JSONObject::toString)
-                            .flatMap(value -> Mono.fromCallable(() -> Utils.MAPPER.readValue(value, R34Response.class)))
-                            .map(r34 -> {
-                                if (!r34.getPosts().map(R34Posts::getCount).map(count -> count != 0).orElse(false)) {
-                                    return updatableMsg.setContent(
-                                            String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found " +
-                                                    "for the search `%s`", context.getUsername(), arg));
-                                }
-
-                                final R34Post post = Utils.randValue(r34.getPosts().map(R34Posts::getPosts).get());
-
+                    return this.getR34Post(arg)
+                            .map(post -> {
                                 final List<String> tags = StringUtils.split(post.getTags(), " ");
 
                                 // Don't post images containing children
-                                if (post.hasChildren() || tags.stream()
-                                        .anyMatch(tag -> tag.contains("loli") || tag.contains("shota"))) {
+                                if (post.hasChildren() || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"))) {
                                     return updatableMsg.setContent(
                                             String.format(Emoji.WARNING + " (**%s**) I don't display images " +
                                                             "containing children or tagged with `loli` or `shota`.",
@@ -99,9 +84,27 @@ public class Rule34Cmd extends BaseCmd {
                                         }));
                             });
                 })
+                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(
+                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
+                                context.getUsername(), arg)))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
+    }
+
+    private Mono<R34Post> getR34Post(String search) {
+        final String url = String.format("%s?page=dapi&s=post&q=index&tags=%s",
+                HOME_URL, NetUtils.encode(search.replace(" ", "_")));
+
+        return NetUtils.get(url)
+                .map(XML::toJSONObject)
+                .map(JSONObject::toString)
+                .flatMap(value -> Mono.fromCallable(() -> Utils.MAPPER.readValue(value, R34Response.class)))
+                .map(R34Response::getPosts)
+                .flatMap(Mono::justOrEmpty)
+                .map(R34Posts::getPosts)
+                .flatMap(Mono::justOrEmpty)
+                .map(Utils::randValue);
     }
 
     @Override

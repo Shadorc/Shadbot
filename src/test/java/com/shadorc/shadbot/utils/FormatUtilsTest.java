@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.utils;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import com.shadorc.shadbot.utils.FormatUtils;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;

@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.utils;
 
-import com.shadorc.shadbot.utils.StringUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;

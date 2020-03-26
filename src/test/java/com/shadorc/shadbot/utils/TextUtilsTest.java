@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.utils;
 
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.shadorc.shadbot.utils.TextUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

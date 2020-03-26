@@ -30,4 +30,13 @@ public class UrbanDefinition {
         return this.permalink;
     }
 
+    @Override
+    public String toString() {
+        return "UrbanDefinition{" +
+                "definition='" + this.definition + '\'' +
+                ", example='" + this.example + '\'' +
+                ", word='" + this.word + '\'' +
+                ", permalink='" + this.permalink + '\'' +
+                '}';
+    }
 }

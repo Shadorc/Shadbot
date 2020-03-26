@@ -156,16 +156,10 @@ public class WallpaperCmd extends BaseCmd {
     }
 
     private <T extends Enum<T>> T parseEnum(Context context, Class<T> enumClass, String name, String value) {
-        final T enumObj = Utils.parseEnum(enumClass, value);
-        if (enumObj == null) {
-            this.throwInvalidArg(context, name);
-        }
-        return enumObj;
-    }
-
-    private void throwInvalidArg(Context context, String name) {
-        throw new CommandException(String.format("`%s` value is not valid. Use `%shelp %s` for more information.",
-                name, context.getPrefix(), this.getName()));
+        final CommandException exception = new CommandException(
+                String.format("`%s` value is not valid. Use `%shelp %s` for more information.",
+                        name, context.getPrefix(), this.getName()));
+        return Utils.parseEnum(enumClass, value, exception);
     }
 
     @Override

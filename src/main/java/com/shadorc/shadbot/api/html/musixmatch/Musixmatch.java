@@ -10,9 +10,15 @@ public class Musixmatch {
     private static final int MAX_LYRICS_LENGTH = Embed.MAX_DESCRIPTION_LENGTH / 3;
 
     private final Document document;
+    private final String url;
 
-    public Musixmatch(Document document) {
+    public Musixmatch(Document document, String url) {
         this.document = document;
+        this.url = url;
+    }
+
+    public String getUrl() {
+        return this.url;
     }
 
     public String getArtist() {

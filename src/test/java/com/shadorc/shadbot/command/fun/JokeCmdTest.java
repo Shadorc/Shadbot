@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.command.fun;
 
-import com.shadorc.shadbot.api.json.dtc.Quote;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;

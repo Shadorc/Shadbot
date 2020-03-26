@@ -18,6 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -46,30 +47,24 @@ public class ImageCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading image...", context.getUsername()))
                 .send()
-                .thenMany(this.getPopularImages(NetUtils.encode(arg)))
-                .collectList()
-                .map(images -> {
-                    if (images.isEmpty()) {
-                        return updatableMsg.setContent(String.format(
-                                Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
-                                context.getUsername(), arg));
-                    }
-                    final Image image = Utils.randValue(images);
-                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor(
-                                    String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
-                                    .setThumbnail("https://i.imgur.com/gT4hHUB.png")
-                                    .addField("Title", image.getTitle(), false)
-                                    .addField("Author", image.getAuthor().getUsername(), false)
-                                    .addField("Category", image.getCategoryPath(), false)
-                                    .setImage(image.getContent().map(Content::getSource).get())));
-                })
+                .then(this.getPopularImage(NetUtils.encode(arg)))
+                .map(image -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                        .andThen(embed -> embed.setAuthor(
+                                String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
+                                .setThumbnail("https://i.imgur.com/gT4hHUB.png")
+                                .addField("Title", image.getTitle(), false)
+                                .addField("Author", image.getAuthor().getUsername(), false)
+                                .addField("Category", image.getCategoryPath(), false)
+                                .setImage(image.getContent().map(Content::getSource).get()))))
+                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(String.format(
+                        Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
+                        context.getUsername(), arg)))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 
-    private Flux<Image> getPopularImages(String encodedSearch) {
+    private Mono<Image> getPopularImage(String encodedSearch) {
         return this.requestAccessToken()
                 .then(Mono.defer(() -> Mono.just(String.format("%s?"
                                 + "q=%s"
@@ -82,7 +77,10 @@ public class ImageCmd extends BaseCmd {
                 .flatMap(url -> NetUtils.get(url, DeviantArtResponse.class))
                 .map(DeviantArtResponse::getResults)
                 .flatMapMany(Flux::fromIterable)
-                .filter(image -> image.getContent().isPresent());
+                .filter(image -> image.getContent().isPresent())
+                .collectList()
+                .map(list -> Optional.ofNullable(Utils.randValue(list)))
+                .flatMap(Mono::justOrEmpty);
     }
 
     private Mono<Void> requestAccessToken() {

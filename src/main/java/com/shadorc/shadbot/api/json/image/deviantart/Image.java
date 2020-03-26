@@ -39,4 +39,14 @@ public class Image {
         return this.categoryPath;
     }
 
+    @Override
+    public String toString() {
+        return "Image{" +
+                "content=" + this.content +
+                ", author=" + this.author +
+                ", url='" + this.url + '\'' +
+                ", title='" + this.title + '\'' +
+                ", categoryPath='" + this.categoryPath + '\'' +
+                '}';
+    }
 }

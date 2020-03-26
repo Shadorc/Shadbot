@@ -11,4 +11,10 @@ public class Content {
         return this.source;
     }
 
+    @Override
+    public String toString() {
+        return "Content{" +
+                "source='" + this.source + '\'' +
+                '}';
+    }
 }
