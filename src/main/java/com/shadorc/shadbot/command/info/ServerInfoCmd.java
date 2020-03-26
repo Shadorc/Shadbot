@@ -13,8 +13,8 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.object.entity.channel.VoiceChannel;
-import discord4j.core.object.util.Image.Format;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Image.Format;
 import reactor.core.publisher.Mono;
 
 import java.time.format.DateTimeFormatter;
