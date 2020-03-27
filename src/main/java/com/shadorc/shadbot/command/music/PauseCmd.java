@@ -25,7 +25,7 @@ public class PauseCmd extends BaseCmd {
         final AudioPlayer audioPlayer = context.requireGuildMusic().getTrackScheduler().getAudioPlayer();
 
         return DiscordUtils.requireVoiceChannel(context)
-                .map(voiceChannelId -> {
+                .map(ignored -> {
                     audioPlayer.setPaused(!audioPlayer.isPaused());
                     if (audioPlayer.isPaused()) {
                         return String.format(Emoji.PAUSE + " Music paused by **%s**.", context.getUsername());

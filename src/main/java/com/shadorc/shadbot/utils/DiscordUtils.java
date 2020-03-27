@@ -199,7 +199,7 @@ public class DiscordUtils {
      * <b>OR</b> if the user and the bot are in the same voice channel) <b>AND</b> the bot is able to view the voice channel,
      * connect and speak.
      */
-    public static Mono<Snowflake> requireVoiceChannel(Context context) {
+    public static Mono<VoiceChannel> requireVoiceChannel(Context context) {
         final Mono<Optional<Snowflake>> getBotVoiceChannelId = context.getSelfAsMember()
                 .flatMap(Member::getVoiceState)
                 .map(VoiceState::getChannelId)
@@ -240,11 +240,10 @@ public class DiscordUtils {
 
                     return userVoiceChannelId.get();
                 })
-                .flatMap(voiceChannelId -> context.getClient().getChannelById(voiceChannelId)
-                        .cast(VoiceChannel.class)
-                        .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.CONNECT, Permission.SPEAK,
-                                Permission.VIEW_CHANNEL))
-                        .thenReturn(voiceChannelId));
+                .flatMap(context.getClient()::getChannelById)
+                .cast(VoiceChannel.class)
+                .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.CONNECT, Permission.SPEAK, Permission.VIEW_CHANNEL)
+                        .thenReturn(channel));
     }
 
     /**

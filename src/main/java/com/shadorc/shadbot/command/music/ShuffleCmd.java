@@ -25,7 +25,7 @@ public class ShuffleCmd extends BaseCmd {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
         return DiscordUtils.requireVoiceChannel(context)
-                .map(voiceChannelId -> {
+                .map(ignored -> {
                     guildMusic.getTrackScheduler().shufflePlaylist();
                     return String.format(Emoji.CHECK_MARK + " Playlist shuffled by **%s**.", context.getUsername());
                 })

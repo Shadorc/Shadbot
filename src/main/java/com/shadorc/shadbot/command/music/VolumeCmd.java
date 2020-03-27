@@ -29,7 +29,7 @@ public class VolumeCmd extends BaseCmd {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
         return DiscordUtils.requireVoiceChannel(context)
-                .flatMap(voiceChannelId -> {
+                .flatMap(ignored -> {
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
                     if (context.getArg().isEmpty()) {
                         return context.getChannel()

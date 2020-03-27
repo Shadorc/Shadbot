@@ -31,7 +31,7 @@ public class BackwardCmd extends BaseCmd {
         final String arg = context.requireArg();
 
         return DiscordUtils.requireVoiceChannel(context)
-                .map(voiceChannelId -> {
+                .map(ignored -> {
                     // If the argument is a number of seconds...
                     Long num = NumberUtils.toPositiveLongOrNull(arg);
                     if (num == null) {
