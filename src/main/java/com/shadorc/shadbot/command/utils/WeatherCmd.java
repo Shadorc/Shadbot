@@ -75,7 +75,7 @@ public class WeatherCmd extends BaseCmd {
                     final String lastUpdated = this.dateFormatter.format(currentWeather.getDateTime());
                     final String clouds = StringUtils.capitalize(weather.getDescription());
                     final double windSpeed = currentWeather.getWindData().getSpeed() * 3.6;
-                    final String windDesc = WeatherCmd.getWindDesc(windSpeed);
+                    final String windDesc = this.getWindDesc(windSpeed);
                     final String wind = String.format("%s%n%.1f km/h", windDesc, windSpeed);
                     final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ?
                             String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
@@ -108,7 +108,7 @@ public class WeatherCmd extends BaseCmd {
                 .then();
     }
 
-    private static String getWindDesc(double windSpeed) {
+    private String getWindDesc(double windSpeed) {
         if (windSpeed < 1) {
             return "Calm";
         } else if (NumberUtils.isBetween(windSpeed, 1, 6)) {
