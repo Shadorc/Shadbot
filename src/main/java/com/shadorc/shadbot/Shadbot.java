@@ -8,7 +8,6 @@ import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.utils.ExceptionHandler;
-import com.shadorc.shadbot.utils.ExitCode;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.core.DiscordClient;
@@ -182,16 +181,13 @@ public class Shadbot {
         return Shadbot.client;
     }
 
-    public static Mono<Void> quit(ExitCode exitCode) {
+    public static Mono<Void> quit() {
         if (Shadbot.botListStats != null) {
             Shadbot.botListStats.stop();
         }
 
         return Shadbot.client.logout()
-                .then(Mono.fromRunnable(() -> {
-                    DatabaseManager.getInstance().close();
-                    System.exit(exitCode.getValue());
-                }));
+                .then(Mono.fromRunnable(() -> DatabaseManager.getInstance().close()));
     }
 
 }

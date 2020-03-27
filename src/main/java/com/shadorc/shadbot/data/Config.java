@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.data;
 
-import com.shadorc.shadbot.utils.ExitCode;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
@@ -42,12 +41,13 @@ public class Config {
         final Properties properties = new Properties();
         try (final InputStream inputStream = Thread.currentThread().getContextClassLoader()
                 .getResourceAsStream("project.properties")) {
-            if (inputStream != null) {
-                properties.load(inputStream);
+            if (inputStream == null) {
+                throw new RuntimeException("Configuration file not found. Exiting.");
             }
+            properties.load(inputStream);
         } catch (final IOException err) {
             LOGGER.error("An error occurred while loading configuration file. Exiting.", err);
-            System.exit(ExitCode.FATAL_ERROR.getValue());
+            throw new RuntimeException(err);
         }
         return properties;
     }
