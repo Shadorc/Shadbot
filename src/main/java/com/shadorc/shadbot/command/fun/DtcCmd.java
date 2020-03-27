@@ -23,6 +23,8 @@ import java.util.function.Consumer;
 public class DtcCmd extends BaseCmd {
 
     private static final String HOME_URL = "https://api.danstonchat.com/0.3/view/random";
+    private static final String RANDOM_QUOTE_URL = String.format("%s?key=%s&format=json",
+            HOME_URL, CredentialManager.getInstance().get(Credential.DTC_API_KEY));
 
     public DtcCmd() {
         super(CommandCategory.FUN, List.of("dtc"));
@@ -46,11 +48,9 @@ public class DtcCmd extends BaseCmd {
     }
 
     private Mono<Quote> getRandomQuote() {
-        final String url = String.format("%s?key=%s&format=json",
-                HOME_URL, CredentialManager.getInstance().get(Credential.DTC_API_KEY));
         final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
         return NetUtils
-                .<List<Quote>>get(url, valueType)
+                .<List<Quote>>get(RANDOM_QUOTE_URL, valueType)
                 .map(quotes -> {
                     Quote quote;
                     do {

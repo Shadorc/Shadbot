@@ -53,16 +53,6 @@ public class Rule34Cmd extends BaseCmd {
                                                     context.getUsername()));
                                 }
 
-                                final StringBuilder tagsBuilder = new StringBuilder();
-                                for (final String tag : tags) {
-                                    if (tagsBuilder.length() + tag.length() < MAX_TAGS_CHAR) {
-                                        tagsBuilder.append(String.format("`%s` ", tag));
-                                    } else {
-                                        tagsBuilder.append("...");
-                                        break;
-                                    }
-                                }
-
                                 return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                                         .andThen(embed -> {
                                             if (!post.getSource().isEmpty()) {
@@ -77,7 +67,7 @@ public class Rule34Cmd extends BaseCmd {
                                                     .setThumbnail("https://i.imgur.com/t6JJWFN.png")
                                                     .addField("Resolution", String.format("%dx%s",
                                                             post.getWidth(), post.getHeight()), false)
-                                                    .addField("Tags", tagsBuilder.toString(), false)
+                                                    .addField("Tags", this.formatTags(tags), false)
                                                     .setImage(post.getFileUrl())
                                                     .setFooter("If there is no preview, click on the title to " +
                                                             "see the media (probably a video)", null);
@@ -105,6 +95,19 @@ public class Rule34Cmd extends BaseCmd {
                 .map(R34Posts::getPosts)
                 .flatMap(Mono::justOrEmpty)
                 .map(Utils::randValue);
+    }
+
+    private String formatTags(List<String> tags) {
+        final StringBuilder tagsBuilder = new StringBuilder();
+        for (final String tag : tags) {
+            if (tagsBuilder.length() + tag.length() < MAX_TAGS_CHAR) {
+                tagsBuilder.append(String.format("`%s` ", tag));
+            } else {
+                tagsBuilder.append("...");
+                break;
+            }
+        }
+        return tagsBuilder.toString();
     }
 
     @Override
