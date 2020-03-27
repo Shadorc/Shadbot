@@ -14,10 +14,7 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
-import discord4j.core.object.entity.channel.Channel;
-import discord4j.core.object.entity.channel.GuildChannel;
-import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.core.object.entity.channel.PrivateChannel;
+import discord4j.core.object.entity.channel.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedData;
@@ -198,10 +195,11 @@ public class DiscordUtils {
 
     /**
      * @param context The context.
-     * @return The user voice channel ID if the user is in a voice channel <b>AND</b> the bot is allowed to join
-     * <b>OR</b> if the user and the bot are in the same voice channel.
+     * @return The user voice channel ID if the user is in a voice channel <b>AND</b> (the bot is allowed to join
+     * <b>OR</b> if the user and the bot are in the same voice channel) <b>AND</b> the bot is able to view the voice channel,
+     * connect and speak.
      */
-    public static Mono<Snowflake> requireSameVoiceChannel(Context context) {
+    public static Mono<Snowflake> requireVoiceChannel(Context context) {
         final Mono<Optional<Snowflake>> getBotVoiceChannelId = context.getSelfAsMember()
                 .flatMap(Member::getVoiceState)
                 .map(VoiceState::getChannelId)
@@ -235,13 +233,18 @@ public class DiscordUtils {
 
                     // If the user and the bot are not in the same voice channel
                     if (botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
-                        throw new CommandException(String.format("I'm currently playing music in voice channel <#%d>"
+                        throw new CommandException(String.format("I'm currently playing music in voice channel **<#%d>**"
                                         + ", join me before using this command.",
                                 botVoiceChannelId.map(Snowflake::asLong).get()));
                     }
 
                     return userVoiceChannelId.get();
-                });
+                })
+                .flatMap(voiceChannelId -> context.getClient().getChannelById(voiceChannelId)
+                        .cast(VoiceChannel.class)
+                        .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.CONNECT, Permission.SPEAK,
+                                Permission.VIEW_CHANNEL))
+                        .thenReturn(voiceChannelId));
     }
 
     /**

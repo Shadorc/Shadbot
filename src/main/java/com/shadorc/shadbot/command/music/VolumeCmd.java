@@ -28,7 +28,7 @@ public class VolumeCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
-        return DiscordUtils.requireSameVoiceChannel(context)
+        return DiscordUtils.requireVoiceChannel(context)
                 .flatMap(voiceChannelId -> {
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
                     if (context.getArg().isEmpty()) {

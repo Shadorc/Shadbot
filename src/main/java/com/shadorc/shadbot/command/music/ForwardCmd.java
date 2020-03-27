@@ -30,7 +30,7 @@ public class ForwardCmd extends BaseCmd {
         final GuildMusic guildMusic = context.requireGuildMusic();
         final String arg = context.requireArg();
 
-        return DiscordUtils.requireSameVoiceChannel(context)
+        return DiscordUtils.requireVoiceChannel(context)
                 .map(voiceChannelId -> {
                     // If the argument is a number of seconds...
                     Long num = NumberUtils.toPositiveLongOrNull(arg);

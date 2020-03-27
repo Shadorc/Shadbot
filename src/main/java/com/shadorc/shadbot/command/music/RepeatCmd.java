@@ -27,7 +27,7 @@ public class RepeatCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
-        return DiscordUtils.requireSameVoiceChannel(context)
+        return DiscordUtils.requireVoiceChannel(context)
                 .map(voiceChannelId -> {
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
                     final TrackScheduler.RepeatMode oldMode = scheduler.getRepeatMode();

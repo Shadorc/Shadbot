@@ -17,7 +17,6 @@ import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
 
 import java.net.URL;
@@ -35,10 +34,9 @@ public class PlayCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.CONNECT, Permission.SPEAK)
-                        .then(DiscordUtils.requireSameVoiceChannel(context))
-                        .flatMap(voiceChannelId -> MusicManager.getInstance()
+        return DiscordUtils.requireVoiceChannel(context)
+                .flatMap(voiceChannelId -> context.getChannel()
+                        .flatMap(channel -> MusicManager.getInstance()
                                 .getOrCreate(context.getClient(), context.getGuildId(), voiceChannelId)
                                 .flatMap(guildMusic -> PlayCmd.play(context, channel, guildMusic, PlayCmd.getIdentifier(arg)))));
     }

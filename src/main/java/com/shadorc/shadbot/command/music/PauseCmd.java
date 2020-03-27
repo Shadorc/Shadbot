@@ -24,7 +24,7 @@ public class PauseCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final AudioPlayer audioPlayer = context.requireGuildMusic().getTrackScheduler().getAudioPlayer();
 
-        return DiscordUtils.requireSameVoiceChannel(context)
+        return DiscordUtils.requireVoiceChannel(context)
                 .map(voiceChannelId -> {
                     audioPlayer.setPaused(!audioPlayer.isPaused());
                     if (audioPlayer.isPaused()) {
