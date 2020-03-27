@@ -9,6 +9,7 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.ExitCode;
+import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -145,10 +146,10 @@ public class Shadbot {
                         .doOnNext(tuple -> {
                             if (LOGGER.isTraceEnabled()) {
                                 LOGGER.trace("{} took {}ms to be processed: {}",
-                                        eventListener.getEventType().getSimpleName(), tuple.getT1(), tuple.getT2());
+                                        eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()), tuple.getT2());
                             } else if (tuple.getT1() > Duration.ofMinutes(1).toMillis()) {
                                 LOGGER.warn("{} took {}ms to be processed.",
-                                        eventListener.getEventType().getSimpleName(), tuple.getT1());
+                                        eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()));
                             }
                         })
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
