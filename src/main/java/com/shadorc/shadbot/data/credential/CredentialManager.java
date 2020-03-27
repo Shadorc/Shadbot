@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Properties;
 
-public final class CredentialManager {
+public class CredentialManager {
 
     private static final Logger LOGGER = Loggers.getLogger("shadbot.credentials");
 

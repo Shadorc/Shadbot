@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-public final class ExceptionHandler {
+public class ExceptionHandler {
 
     public static Mono<Void> handleCommandError(Throwable err, BaseCmd cmd, Context context) {
         if (err instanceof CommandException) {

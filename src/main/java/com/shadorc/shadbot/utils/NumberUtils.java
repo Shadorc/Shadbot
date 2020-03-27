@@ -2,7 +2,7 @@ package com.shadorc.shadbot.utils;
 
 import reactor.util.annotation.Nullable;
 
-public final class NumberUtils {
+public class NumberUtils {
 
     /**
      * @param str The string to parse as an integer, may be {@code null}.

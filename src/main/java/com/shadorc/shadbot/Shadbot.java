@@ -37,7 +37,7 @@ import java.time.Instant;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
-public final class Shadbot {
+public class Shadbot {
 
     private static final Logger LOGGER = Loggers.getLogger("shadbot");
 

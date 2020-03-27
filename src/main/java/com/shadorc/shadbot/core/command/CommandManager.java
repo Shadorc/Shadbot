@@ -37,7 +37,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public final class CommandManager {
+public class CommandManager {
 
     private static CommandManager instance;
 

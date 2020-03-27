@@ -22,7 +22,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-public final class NetUtils {
+public class NetUtils {
 
     private static final HttpClient HTTP_CLIENT = HttpClient.create();
 

@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public final class StringUtils {
+public class StringUtils {
 
     private static final Pattern SPACES_PATTERN = Pattern.compile(" +");
 

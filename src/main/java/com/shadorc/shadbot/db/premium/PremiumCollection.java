@@ -20,7 +20,7 @@ import reactor.util.Loggers;
 import java.time.Duration;
 import java.util.UUID;
 
-public final class PremiumCollection extends DatabaseCollection {
+public class PremiumCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = Loggers.getLogger("shadbot.database.premium");
 

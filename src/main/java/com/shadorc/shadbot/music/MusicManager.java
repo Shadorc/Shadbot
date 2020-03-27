@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-public final class MusicManager {
+public class MusicManager {
 
     private static MusicManager instance;
 

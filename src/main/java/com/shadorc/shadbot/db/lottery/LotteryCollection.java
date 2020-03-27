@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
-public final class LotteryCollection extends DatabaseCollection {
+public class LotteryCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = Loggers.getLogger("shadbot.database.lottery");
 

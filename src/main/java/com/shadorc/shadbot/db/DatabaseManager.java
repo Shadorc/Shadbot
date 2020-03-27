@@ -11,7 +11,7 @@ import com.shadorc.shadbot.db.premium.PremiumCollection;
 import com.shadorc.shadbot.db.stats.StatsCollection;
 import com.shadorc.shadbot.utils.Utils;
 
-public final class DatabaseManager {
+public class DatabaseManager {
 
     private static DatabaseManager instance;
 

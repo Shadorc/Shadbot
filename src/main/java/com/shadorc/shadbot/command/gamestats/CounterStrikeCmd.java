@@ -129,7 +129,6 @@ public class CounterStrikeCmd extends BaseCmd {
         } else {
             return arg;
         }
-
     }
 
     /**

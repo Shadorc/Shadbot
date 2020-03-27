@@ -8,7 +8,7 @@ import com.shadorc.shadbot.object.Emoji;
 import org.jsoup.Jsoup;
 import reactor.util.annotation.NonNull;
 
-public final class TextUtils {
+public class TextUtils {
 
     public static final String NOT_ENOUGH_COINS =
             "You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";

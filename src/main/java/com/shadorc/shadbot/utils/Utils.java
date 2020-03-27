@@ -25,7 +25,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-public final class Utils {
+public class Utils {
 
     public static final JsonWriterSettings JSON_WRITER_SETTINGS = JsonWriterSettings.builder()
             .int64Converter((value, writer) -> writer.writeNumber(value.toString()))

@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public final class FormatUtils {
+public class FormatUtils {
 
     /**
      * @param coins The number of coins to format.

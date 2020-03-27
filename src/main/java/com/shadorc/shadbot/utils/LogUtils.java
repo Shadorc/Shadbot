@@ -3,7 +3,7 @@ package com.shadorc.shadbot.utils;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
-public final class LogUtils {
+public class LogUtils {
 
     private static final Logger LOGGER = Loggers.getLogger("shadbot");
 
