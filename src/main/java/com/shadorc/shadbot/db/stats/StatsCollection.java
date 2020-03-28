@@ -57,7 +57,7 @@ public class StatsCollection extends DatabaseCollection {
                 .append("timestamp", Instant.now().toEpochMilli());
         return Mono.from(this.getCollection()
                 .updateOne(Filters.eq("_id", "system_resources"),
-                        Updates.pushEach("system_resources", List.of(doc), new PushOptions().slice(slice)),
+                        Updates.pushEach("system_resources", List.of(doc), new PushOptions().slice(-slice)),
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.debug("[System stats] Logging system resources stats result: {}", result));
     }
