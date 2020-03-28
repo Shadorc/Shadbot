@@ -133,6 +133,12 @@ public class Shadbot {
         Shadbot.register(Shadbot.client, new ReactionListener.ReactionRemoveListener());
 
         LOGGER.info("Shadbot is fully connected!");
+
+        Flux.interval(Duration.ZERO, Duration.ofSeconds(5), Schedulers.boundedElastic())
+                .flatMap(ignored -> DatabaseManager.getStats().logSystemResources())
+                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
+                .subscribe(null, ExceptionHandler::handleUnknownError);
+
         Shadbot.client.onDisconnect().block();
     }
 

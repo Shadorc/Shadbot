@@ -1,7 +1,7 @@
-package com.shadorc.shadbot.db.stats.entity;
+package com.shadorc.shadbot.db.stats.entity.command;
 
 import com.shadorc.shadbot.db.SerializableEntity;
-import com.shadorc.shadbot.db.stats.bean.DailyCommandStatsBean;
+import com.shadorc.shadbot.db.stats.bean.command.DailyCommandStatsBean;
 
 import java.time.Instant;
 import java.time.LocalDate;

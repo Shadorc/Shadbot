@@ -12,7 +12,7 @@ import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
-import com.sun.management.OperatingSystemMXBean;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.GitProperties;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
@@ -20,7 +20,6 @@ import discord4j.core.spec.EmbedCreateSpec;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import reactor.core.publisher.Mono;
 
-import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -32,7 +31,6 @@ public class InfoCmd extends BaseCmd {
     private static final String D4J_NAME = D4J_PROPERTIES.getProperty(GitProperties.APPLICATION_NAME);
     private static final String D4J_VERSION = D4J_PROPERTIES.getProperty(GitProperties.APPLICATION_VERSION);
     private static final String LAVAPLAYER_VERSION = PlayerLibrary.VERSION;
-    private static final int MB_UNIT = 1024 << 10;
 
     public InfoCmd() {
         super(CommandCategory.INFO, List.of("info"));
@@ -73,14 +71,9 @@ public class InfoCmd extends BaseCmd {
     }
 
     private String getPerformanceSection() {
-        final Runtime runtime = Runtime.getRuntime();
-        final long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / MB_UNIT;
-        final long maxMemory = runtime.maxMemory() / MB_UNIT;
-        final double cpuLoad = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getProcessCpuLoad();
-
         return String.format("%n%n-= Performance =-")
-                + String.format("%nMemory: %s/%s MB", FormatUtils.number(usedMemory), FormatUtils.number(maxMemory))
-                + String.format("%nCPU (Process): %.1f%%", cpuLoad * 100.0d)
+                + String.format("%nMemory: %s/%s MB", FormatUtils.number(Utils.getMemoryUsed()), FormatUtils.number(Utils.getMaxMemory()))
+                + String.format("%nCPU (Process): %.1f%%", Utils.getCpuUsage())
                 + String.format("%nThreads: %s", FormatUtils.number(Thread.activeCount()));
     }
 

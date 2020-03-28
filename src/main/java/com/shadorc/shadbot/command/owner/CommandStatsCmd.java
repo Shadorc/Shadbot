@@ -5,7 +5,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.stats.entity.DailyCommandStats;
+import com.shadorc.shadbot.db.stats.entity.command.DailyCommandStats;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.Utils;
@@ -18,10 +18,10 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class StatsCmd extends BaseCmd {
+public class CommandStatsCmd extends BaseCmd {
 
-    public StatsCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("stats"));
+    public CommandStatsCmd() {
+        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("command_stats", "command-stats", "commandstats"), "cmd_stats");
     }
 
     @Override

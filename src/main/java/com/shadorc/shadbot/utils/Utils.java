@@ -11,6 +11,7 @@ import com.shadorc.shadbot.db.codec.LongCodec;
 import com.shadorc.shadbot.db.codec.SnowflakeCodec;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.exception.CommandException;
+import com.sun.management.OperatingSystemMXBean;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
 import discord4j.rest.util.Snowflake;
@@ -20,12 +21,15 @@ import org.bson.json.JsonWriterSettings;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
+import java.lang.management.ManagementFactory;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class Utils {
+
+    private static final int MB_UNIT = 1024 << 10;
 
     public static final JsonWriterSettings JSON_WRITER_SETTINGS = JsonWriterSettings.builder()
             .int64Converter((value, writer) -> writer.writeNumber(value.toString()))
@@ -41,6 +45,29 @@ public class Utils {
             .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
             .enable(SerializationFeature.INDENT_OUTPUT)
             .setSerializationInclusion(Include.NON_EMPTY);
+
+    /**
+     * @return CPU utilisation in percentage.
+     */
+    public static double getCpuUsage() {
+        return ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getProcessCpuLoad() * 100.0d;
+    }
+
+    /**
+     * @return The amount of memory used in Mb.
+     */
+    public static long getMemoryUsed() {
+        final Runtime runtime = Runtime.getRuntime();
+        return (runtime.totalMemory() - runtime.freeMemory()) / MB_UNIT;
+    }
+
+    /**
+     * @return The maximum amount of memory allocated in Mb.
+     */
+    public static long getMaxMemory() {
+        final Runtime runtime = Runtime.getRuntime();
+        return runtime.maxMemory() / MB_UNIT;
+    }
 
     /**
      * @param enumClass The {@link Enum} class.

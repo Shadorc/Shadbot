@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.db.stats.bean;
+package com.shadorc.shadbot.db.stats.bean.command;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.shadorc.shadbot.db.Bean;
