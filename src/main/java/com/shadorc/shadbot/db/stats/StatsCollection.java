@@ -46,18 +46,20 @@ public class StatsCollection extends DatabaseCollection {
     public Mono<UpdateResult> logSystemResources() {
         final double cpuUsage = Utils.getCpuUsage();
         final long memoryUsed = Utils.getMemoryUsed();
-        LOGGER.debug("[System stats] Logging CPU={}, RAM={}", cpuUsage, memoryUsed);
+        final int threadCount = Thread.activeCount();
+        LOGGER.debug("[System stats] Logging CPU={}, RAM={}, Threads={}", cpuUsage, memoryUsed, threadCount);
 
         final int slice = (int) (ResourceStatsCmd.MAX_DURATION.toSeconds() / ResourceStatsCmd.UPDATE_INTERVAL.toSeconds());
         final Document doc = new Document()
                 .append("cpu_usage", cpuUsage)
                 .append("ram_usage", memoryUsed)
+                .append("thread_count", threadCount)
                 .append("timestamp", Instant.now().toEpochMilli());
         return Mono.from(this.getCollection()
                 .updateOne(Filters.eq("_id", "system_resources"),
                         Updates.pushEach("system_resources", List.of(doc), new PushOptions().slice(slice)),
                         new UpdateOptions().upsert(true)))
-                .doOnNext(result -> LOGGER.debug("[System stats] Logging CPU and RAM result: {}", result));
+                .doOnNext(result -> LOGGER.debug("[System stats] Logging system resources stats result: {}", result));
     }
 
     public Mono<TotalCommandStats> getCommandStats() {

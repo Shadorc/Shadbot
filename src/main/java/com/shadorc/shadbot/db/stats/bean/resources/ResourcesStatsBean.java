@@ -9,6 +9,8 @@ public class ResourcesStatsBean implements Bean {
     private double cpuUsage;
     @JsonProperty("ram_usage")
     private int ramUsage;
+    @JsonProperty("thread_count")
+    private int threadCount;
     @JsonProperty("timestamp")
     private long timestamp;
 
@@ -20,6 +22,10 @@ public class ResourcesStatsBean implements Bean {
         return this.ramUsage;
     }
 
+    public int getThreadCount() {
+        return this.threadCount;
+    }
+
     public long getTimestamp() {
         return this.timestamp;
     }
@@ -29,6 +35,7 @@ public class ResourcesStatsBean implements Bean {
         return "SystemResourcesStatsBean{" +
                 "cpuUsage=" + this.cpuUsage +
                 ", ramUsage=" + this.ramUsage +
+                ", threadCount=" + this.threadCount +
                 ", timestamp=" + this.timestamp +
                 '}';
     }

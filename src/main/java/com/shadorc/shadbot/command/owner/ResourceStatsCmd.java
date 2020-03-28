@@ -38,7 +38,7 @@ public class ResourceStatsCmd extends BaseCmd {
     public static final Duration MAX_DURATION = Duration.ofHours(1);
 
     public ResourceStatsCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("resource_stats", "resource-stats", "resourcestats"), "res_stats");
+        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("resource_stats", "resource-stats"), "res_stats");
     }
 
     @Override
@@ -49,15 +49,18 @@ public class ResourceStatsCmd extends BaseCmd {
                     // Create dataset
                     final TimeSeries cpuUsageSeries = new TimeSeries("CPU usage");
                     final TimeSeries ramUsageSeries = new TimeSeries("RAM usage");
+                    final TimeSeries threadUsageSeries = new TimeSeries("Thread count");
                     for (final ResourceStats bean : dailyResources.getResourcesUsage()) {
                         cpuUsageSeries.add(new FixedMillisecond(bean.getTimestamp().toEpochMilli()), bean.getCpuUsage());
                         ramUsageSeries.add(new FixedMillisecond(bean.getTimestamp().toEpochMilli()), bean.getRamUsage());
+                        threadUsageSeries.add(new FixedMillisecond(bean.getTimestamp().toEpochMilli()), bean.getThreadCount());
                     }
 
                     // Set dataset
                     final XYPlot plot = new XYPlot();
                     plot.setDataset(0, new TimeSeriesCollection(cpuUsageSeries));
                     plot.setDataset(1, new TimeSeriesCollection(ramUsageSeries));
+                    plot.setDataset(2, new TimeSeriesCollection(threadUsageSeries));
 
                     // Set axis
                     final DateAxis xAxis = new DateAxis("timestamp");
@@ -68,8 +71,10 @@ public class ResourceStatsCmd extends BaseCmd {
                     plot.setRangeAxis(0, cpuAxis);
 
                     final NumberAxis ramAxis = new NumberAxis("Mb (RAM)");
-                    ramAxis.setAutoRange(true);
                     plot.setRangeAxis(1, ramAxis);
+
+                    final NumberAxis threadAxis = new NumberAxis("Count");
+                    plot.setRangeAxis(2, threadAxis);
 
                     // Set renderer
                     final XYSplineRenderer cpuRenderer = new XYSplineRenderer();
@@ -83,9 +88,16 @@ public class ResourceStatsCmd extends BaseCmd {
                     ramRenderer.setSeriesFillPaint(0, Color.BLUE);
                     plot.setRenderer(1, ramRenderer);
 
+                    final XYSplineRenderer threadRenderer = new XYSplineRenderer();
+                    threadRenderer.setPrecision(7);
+                    threadRenderer.setSeriesShapesVisible(0, false);
+                    threadRenderer.setSeriesFillPaint(0, Color.GREEN);
+                    plot.setRenderer(2, threadRenderer);
+
                     //Map the data to the appropriate axis
                     plot.mapDatasetToRangeAxis(0, 0);
                     plot.mapDatasetToRangeAxis(1, 1);
+                    plot.mapDatasetToRangeAxis(2, 2);
 
                     // Create chart
                     final JFreeChart chart = new JFreeChart("System resources utilisation",

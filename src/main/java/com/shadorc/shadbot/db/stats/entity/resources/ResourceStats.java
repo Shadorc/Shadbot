@@ -19,6 +19,10 @@ public class ResourceStats extends SerializableEntity<ResourcesStatsBean> {
         return this.getBean().getRamUsage();
     }
 
+    public int getThreadCount() {
+        return this.getBean().getThreadCount();
+    }
+
     public Instant getTimestamp() {
         return Instant.ofEpochMilli(this.getBean().getTimestamp());
     }

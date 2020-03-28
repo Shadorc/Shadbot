@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 public class CommandStatsCmd extends BaseCmd {
 
     public CommandStatsCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("command_stats", "command-stats", "commandstats"), "cmd_stats");
+        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("command_stats", "command-stats"), "cmd_stats");
     }
 
     @Override
