@@ -5,9 +5,9 @@ import com.shadorc.shadbot.db.stats.bean.resources.ResourcesStatsBean;
 
 import java.time.Instant;
 
-public class ResourcesStats extends SerializableEntity<ResourcesStatsBean> {
+public class ResourceStats extends SerializableEntity<ResourcesStatsBean> {
 
-    public ResourcesStats(ResourcesStatsBean bean) {
+    public ResourceStats(ResourcesStatsBean bean) {
         super(bean);
     }
 

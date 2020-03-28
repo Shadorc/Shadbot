@@ -5,7 +5,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.stats.entity.resources.ResourcesStats;
+import com.shadorc.shadbot.db.stats.entity.resources.ResourceStats;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -49,7 +49,7 @@ public class ResourceStatsCmd extends BaseCmd {
                     // Create dataset
                     final TimeSeries cpuUsageSeries = new TimeSeries("CPU usage");
                     final TimeSeries ramUsageSeries = new TimeSeries("RAM usage");
-                    for (final ResourcesStats bean : dailyResources.getResourcesUsage()) {
+                    for (final ResourceStats bean : dailyResources.getResourcesUsage()) {
                         cpuUsageSeries.add(new FixedMillisecond(bean.getTimestamp().toEpochMilli()), bean.getCpuUsage());
                         ramUsageSeries.add(new FixedMillisecond(bean.getTimestamp().toEpochMilli()), bean.getRamUsage());
                     }
