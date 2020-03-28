@@ -2,6 +2,7 @@ package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
+import com.shadorc.shadbot.command.owner.ResourceStatsCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
@@ -134,7 +135,7 @@ public class Shadbot {
 
         LOGGER.info("Shadbot is fully connected!");
 
-        Flux.interval(Duration.ZERO, Duration.ofSeconds(5), Schedulers.boundedElastic())
+        Flux.interval(Duration.ZERO, ResourceStatsCmd.UPDATE_INTERVAL, Schedulers.boundedElastic())
                 .flatMap(ignored -> DatabaseManager.getStats().logSystemResources())
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);

@@ -6,6 +6,7 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoDatabase;
+import com.shadorc.shadbot.command.owner.ResourceStatsCmd;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.stats.bean.command.DailyCommandStatsBean;
@@ -47,13 +48,14 @@ public class StatsCollection extends DatabaseCollection {
         final long memoryUsed = Utils.getMemoryUsed();
         LOGGER.debug("[System stats] Logging CPU={}, RAM={}", cpuUsage, memoryUsed);
 
+        final int slice = (int) (ResourceStatsCmd.MAX_DURATION.toSeconds() / ResourceStatsCmd.UPDATE_INTERVAL.toSeconds());
         final Document doc = new Document()
                 .append("cpu_usage", cpuUsage)
                 .append("ram_usage", memoryUsed)
                 .append("timestamp", Instant.now().toEpochMilli());
         return Mono.from(this.getCollection()
                 .updateOne(Filters.eq("_id", "system_resources"),
-                        Updates.pushEach("system_resources", List.of(doc), new PushOptions().slice(2_500)),
+                        Updates.pushEach("system_resources", List.of(doc), new PushOptions().slice(slice)),
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.debug("[System stats] Logging CPU and RAM result: {}", result));
     }

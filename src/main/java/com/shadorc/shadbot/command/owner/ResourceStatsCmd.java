@@ -28,10 +28,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class ResourceStatsCmd extends BaseCmd {
+
+    public static final Duration UPDATE_INTERVAL = Duration.ofSeconds(5);
+    public static final Duration MAX_DURATION = Duration.ofHours(1);
 
     public ResourceStatsCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("resource_stats", "resource-stats", "resourcestats"), "res_stats");
