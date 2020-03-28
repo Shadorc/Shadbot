@@ -5,7 +5,8 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.stats.entity.DailyCommandStats;
+import com.shadorc.shadbot.db.stats.entity.command.DailyCommandStats;
+import com.shadorc.shadbot.db.stats.entity.command.TotalCommandStats;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.Utils;
@@ -18,30 +19,29 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class StatsCmd extends BaseCmd {
+public class CommandStatsCmd extends BaseCmd {
 
-    public StatsCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("stats"));
+    public CommandStatsCmd() {
+        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("command_stats", "command-stats"), "cmd_stats");
     }
 
     @Override
     public Mono<Void> execute(Context context) {
         return DatabaseManager.getStats()
                 .getCommandStats()
-                .collectList()
-                .map(list -> DiscordUtils.getDefaultEmbed()
+                .map(totalStats -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Command stats", null, context.getAvatarUrl());
-                            if (list.isEmpty()) {
+                            if (totalStats.getDailyCommandStats().isEmpty()) {
                                 embed.setDescription("There are currently no statistics available.");
                             } else {
-                                final ImmutableEmbedFieldData dailyField = this.getDailyCommandStats(list);
+                                final ImmutableEmbedFieldData dailyField = this.getDailyCommandStats(totalStats);
                                 embed.addField(dailyField.name(), dailyField.value(), dailyField.inline().get());
 
-                                final ImmutableEmbedFieldData weeklyField = this.getWeeklyCommandStats(list);
+                                final ImmutableEmbedFieldData weeklyField = this.getWeeklyCommandStats(totalStats);
                                 embed.addField(weeklyField.name(), weeklyField.value(), weeklyField.inline().get());
 
-                                final ImmutableEmbedFieldData totalField = this.getTotalCommandStats(list);
+                                final ImmutableEmbedFieldData totalField = this.getTotalCommandStats(totalStats);
                                 embed.addField(totalField.name(), totalField.value(), totalField.inline().get());
                             }
                         }))
@@ -50,17 +50,17 @@ public class StatsCmd extends BaseCmd {
                 .then();
     }
 
-    private ImmutableEmbedFieldData getDailyCommandStats(List<DailyCommandStats> list) {
-        final DailyCommandStats daily = list.get(0);
-        return ImmutableEmbedFieldData.of("Daily", this.formatMap(daily.getCommandStats()), Possible.of(true));
+    private ImmutableEmbedFieldData getDailyCommandStats(TotalCommandStats totalStats) {
+        final Map<String, Integer> daily = totalStats.getDailyCommandStats().get(0).getCommandStats();
+        return ImmutableEmbedFieldData.of("Daily", this.formatMap(daily), Possible.of(true));
     }
 
-    private ImmutableEmbedFieldData getWeeklyCommandStats(List<DailyCommandStats> list) {
+    private ImmutableEmbedFieldData getWeeklyCommandStats(TotalCommandStats totalStats) {
         final Map<String, Integer> computedMap = new HashMap<>();
         final LocalDate oneWeek = LocalDate.now().plusWeeks(1);
-        for (final DailyCommandStats stats : list) {
-            if (stats.getDate().isBefore(oneWeek)) {
-                for (final Map.Entry<String, Integer> entry : stats.getCommandStats().entrySet()) {
+        for (final DailyCommandStats dailyStats : totalStats.getDailyCommandStats()) {
+            if (dailyStats.getDate().isBefore(oneWeek)) {
+                for (final Map.Entry<String, Integer> entry : dailyStats.getCommandStats().entrySet()) {
                     computedMap.compute(entry.getKey(),
                             (key, value) -> value == null ? entry.getValue() : value + entry.getValue());
                 }
@@ -70,10 +70,10 @@ public class StatsCmd extends BaseCmd {
         return ImmutableEmbedFieldData.of("Weekly", this.formatMap(computedMap), Possible.of(true));
     }
 
-    private ImmutableEmbedFieldData getTotalCommandStats(List<DailyCommandStats> list) {
+    private ImmutableEmbedFieldData getTotalCommandStats(TotalCommandStats totalStats) {
         final Map<String, Integer> computedMap = new HashMap<>();
-        for (final DailyCommandStats stats : list) {
-            for (final Map.Entry<String, Integer> entry : stats.getCommandStats().entrySet()) {
+        for (final DailyCommandStats dailyStats : totalStats.getDailyCommandStats()) {
+            for (final Map.Entry<String, Integer> entry : dailyStats.getCommandStats().entrySet()) {
                 computedMap.compute(entry.getKey(),
                         (key, value) -> value == null ? entry.getValue() : value + entry.getValue());
             }
