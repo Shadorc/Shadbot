@@ -2,8 +2,8 @@ package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.giphy.Data;
 import com.shadorc.shadbot.api.json.image.giphy.GiphyResponse;
-import com.shadorc.shadbot.api.json.image.giphy.Original;
 import com.shadorc.shadbot.api.json.image.giphy.Images;
+import com.shadorc.shadbot.api.json.image.giphy.Original;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
