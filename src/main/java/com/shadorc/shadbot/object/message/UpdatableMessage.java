@@ -49,7 +49,7 @@ public class UpdatableMessage {
     /**
      * Delete the previous message sent, if present, then send a message with the current content and embed set.
      */
-    public Mono<Message> send() {
+    public Mono<Void> send() {
         return this.send(this.content, this.embed)
                 .then(Mono.fromRunnable(() -> {
                     this.content = null;

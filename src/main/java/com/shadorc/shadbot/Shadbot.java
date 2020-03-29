@@ -151,11 +151,11 @@ public class Shadbot {
                         .elapsed()
                         .doOnNext(tuple -> {
                             if (LOGGER.isTraceEnabled()) {
-                                LOGGER.trace("{} took {}ms to be processed: {}",
+                                LOGGER.trace("{} took {} to be processed: {}",
                                         eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()),
                                         tuple.getT2());
                             } else if (tuple.getT1() > Duration.ofMinutes(1).toMillis()) {
-                                LOGGER.warn("{} took {}ms to be processed.",
+                                LOGGER.warn("{} took {} to be processed.",
                                         eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()));
                             }
                         })
