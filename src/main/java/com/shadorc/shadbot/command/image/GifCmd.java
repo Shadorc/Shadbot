@@ -59,8 +59,6 @@ public class GifCmd extends BaseCmd {
                     SEARCH_ENDPOINT, apiKey, encodedSearch, ThreadLocalRandom.current().nextInt(50));
         }
 
-        System.err.println(url);
-
         return NetUtils.get(url, GiphyResponse.class)
                 .map(GiphyResponse::getData)
                 .flatMapMany(Flux::fromIterable)
