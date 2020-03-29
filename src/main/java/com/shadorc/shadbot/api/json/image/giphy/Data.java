@@ -13,7 +13,7 @@ public class Data {
 
     @Override
     public String toString() {
-        return "GiphyGif{" +
+        return "Data{" +
                 "images=" + this.images +
                 '}';
     }
