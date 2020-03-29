@@ -13,8 +13,8 @@ public class Original {
 
     @Override
     public String toString() {
-        return "Preview{" +
-                "mp4Url='" + this.url + '\'' +
+        return "Original{" +
+                "url='" + this.url + '\'' +
                 '}';
     }
 }

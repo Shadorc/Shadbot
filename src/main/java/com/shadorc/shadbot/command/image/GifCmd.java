@@ -2,8 +2,8 @@ package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.giphy.Data;
 import com.shadorc.shadbot.api.json.image.giphy.GiphyResponse;
-import com.shadorc.shadbot.api.json.image.giphy.Images;
 import com.shadorc.shadbot.api.json.image.giphy.Original;
+import com.shadorc.shadbot.api.json.image.giphy.Images;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -55,8 +55,8 @@ public class GifCmd extends BaseCmd {
         if (encodedSearch.isBlank()) {
             url = String.format("%s?api_key=%s", RENDOM_ENDPOINT, apiKey);
         } else {
-            url = String.format("%s?api_key=%s&q=%s&offset=%d",
-                    SEARCH_ENDPOINT, apiKey, encodedSearch, ThreadLocalRandom.current().nextInt(50));
+            url = String.format("%s?api_key=%s&q=%s&limit=1&offset=%d",
+                    SEARCH_ENDPOINT, apiKey, encodedSearch, ThreadLocalRandom.current().nextInt(25));
         }
 
         return NetUtils.get(url, GiphyResponse.class)

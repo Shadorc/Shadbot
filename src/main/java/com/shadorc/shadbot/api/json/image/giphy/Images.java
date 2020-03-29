@@ -14,7 +14,7 @@ public class Images {
     @Override
     public String toString() {
         return "Images{" +
-                "preview=" + this.original +
+                "original=" + this.original +
                 '}';
     }
 }
