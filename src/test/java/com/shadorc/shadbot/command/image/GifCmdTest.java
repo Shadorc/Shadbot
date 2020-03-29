@@ -28,16 +28,23 @@ public class GifCmdTest {
     }
 
     @Test
-    public void testGetGif() throws InvocationTargetException, IllegalAccessException {
-        final String result = ((Mono<String>) method.invoke(cmd, "dab")).block();
-        logger.info("testGetGif: {}", result);
+    public void testGetGifRandom() throws InvocationTargetException, IllegalAccessException {
+        final String result = ((Mono<String>) method.invoke(cmd, "")).block();
+        logger.info("testGetGifRandom: {}", result);
         assertNotNull(result);
     }
 
     @Test
-    public void testGetGifNotFound() throws InvocationTargetException, IllegalAccessException {
+    public void testGetGifSearch() throws InvocationTargetException, IllegalAccessException {
+        final String result = ((Mono<String>) method.invoke(cmd, "doom")).block();
+        logger.info("testGetGifSearch: {}", result);
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testGetGifSearchNotFound() throws InvocationTargetException, IllegalAccessException {
         final String result = ((Mono<String>) method.invoke(cmd, "azertyuiopqsdfghjklmwxcvbn")).block();
-        logger.info("testGetGifNotFound: {}", result);
+        logger.info("testGetGifSearchNotFound: {}", result);
         assertNull(result);
     }
 

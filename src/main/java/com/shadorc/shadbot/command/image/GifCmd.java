@@ -1,7 +1,9 @@
 package com.shadorc.shadbot.command.image;
 
-import com.shadorc.shadbot.api.json.image.giphy.GiphyGif;
+import com.shadorc.shadbot.api.json.image.giphy.Data;
 import com.shadorc.shadbot.api.json.image.giphy.GiphyResponse;
+import com.shadorc.shadbot.api.json.image.giphy.Original;
+import com.shadorc.shadbot.api.json.image.giphy.Images;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -17,11 +19,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 public class GifCmd extends BaseCmd {
 
-    private static final String HOME_URl = "https://api.giphy.com/v1/gifs/random";
+    private static final String RENDOM_ENDPOINT = "https://api.giphy.com/v1/gifs/random";
+    private static final String SEARCH_ENDPOINT = "https://api.giphy.com/v1/gifs/search";
 
     public GifCmd() {
         super(CommandCategory.IMAGE, List.of("gif"));
@@ -45,15 +49,23 @@ public class GifCmd extends BaseCmd {
                 .then();
     }
 
-    private Mono<String> getGif(String search) {
-        final String url = String.format("%s?api_key=%s&tag=%s",
-                HOME_URl, CredentialManager.getInstance().get(Credential.GIPHY_API_KEY), NetUtils.encode(search));
+    private Mono<String> getGif(String encodedSearch) {
+        final String apiKey = CredentialManager.getInstance().get(Credential.GIPHY_API_KEY);
+        final String url;
+        if (encodedSearch.isBlank()) {
+            url = String.format("%s?api_key=%s", RENDOM_ENDPOINT, apiKey);
+        } else {
+            url = String.format("%s?api_key=%s&q=%s&limit=1&offset=%d",
+                    SEARCH_ENDPOINT, apiKey, encodedSearch, ThreadLocalRandom.current().nextInt(25));
+        }
 
         return NetUtils.get(url, GiphyResponse.class)
-                .map(GiphyResponse::getGifs)
+                .map(GiphyResponse::getData)
                 .flatMapMany(Flux::fromIterable)
                 .next()
-                .map(GiphyGif::getImageUrl);
+                .map(Data::getImages)
+                .map(Images::getOriginal)
+                .map(Original::getUrl);
     }
 
     @Override

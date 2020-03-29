@@ -8,10 +8,10 @@ import java.util.List;
 public class GiphyResponse {
 
     @JsonProperty("data")
-    private List<GiphyGif> gifs;
+    private List<Data> data;
 
-    public List<GiphyGif> getGifs() {
-        return Collections.unmodifiableList(this.gifs);
+    public List<Data> getData() {
+        return Collections.unmodifiableList(this.data);
     }
 
 }
