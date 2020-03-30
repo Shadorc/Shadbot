@@ -11,7 +11,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class UrbanCmdTest {
 
@@ -39,10 +38,11 @@ public class UrbanCmdTest {
     }
 
     @Test
-    public void testGetUrbanDefinitionNotFound() throws InvocationTargetException, IllegalAccessException {
-        final UrbanDefinition result = ((Mono<UrbanDefinition>) method.invoke(cmd, "ThisShouldNotExistç_è5")).block();
-        logger.info("testGetUrbanDefinitionNotFound: {}", result);
-        assertNull(result);
+    public void testGetUrbanDefinitionSpecial() throws InvocationTargetException, IllegalAccessException {
+        final UrbanDefinition result =
+                ((Mono<UrbanDefinition>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/")).block();
+        logger.info("testGetUrbanDefinitionSpecial: {}", result);
+        assertNotNull(result);
     }
 
 }

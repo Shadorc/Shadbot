@@ -39,9 +39,9 @@ public class Rule34CmdTest {
     }
 
     @Test
-    public void testGetR34PostNotFound() throws InvocationTargetException, IllegalAccessException {
-        final R34Post result = ((Mono<R34Post>) method.invoke(cmd, "azertyuiopqsdfghjklmwxcvbn")).block();
-        logger.info("testGetR34PostNotFound: {}", result);
+    public void testGetR34PostSpecial() throws InvocationTargetException, IllegalAccessException {
+        final R34Post result = ((Mono<R34Post>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/")).block();
+        logger.info("testGetR34PostSpecial: {}", result);
         assertNull(result);
     }
 

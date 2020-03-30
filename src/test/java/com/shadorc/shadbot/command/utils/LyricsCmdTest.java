@@ -41,9 +41,9 @@ public class LyricsCmdTest {
     }
 
     @Test
-    public void testGetMusixmatchNotFound() throws InvocationTargetException, IllegalAccessException {
-        final Musixmatch result = ((Mono<Musixmatch>) method.invoke(cmd, "azertyuiopqsdfghjklmwxcvbn")).block();
-        logger.info("testGetMusixmatchNotFound: {}", result);
+    public void testGetMusixmatchSpecial() throws InvocationTargetException, IllegalAccessException {
+        final Musixmatch result = ((Mono<Musixmatch>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/")).block();
+        logger.info("testGetMusixmatchSpecial: {}", result);
         assertNull(result);
     }
 

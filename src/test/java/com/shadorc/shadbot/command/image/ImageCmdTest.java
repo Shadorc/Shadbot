@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.deviantart.Image;
+import com.shadorc.shadbot.utils.NetUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -40,9 +41,10 @@ public class ImageCmdTest {
     }
 
     @Test
-    public void testGetPopularImageNotFound() throws InvocationTargetException, IllegalAccessException {
-        final Image result = ((Mono<Image>) method.invoke(cmd, "azertyuiopqsdfghjklmwxcvbn")).block();
-        logger.info("testGetPopularImageNotFound: {}", result);
+    public void testGetPopularImageSpecial() throws InvocationTargetException, IllegalAccessException {
+        final Image result = ((Mono<Image>) method.invoke(cmd,
+                NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/"))).block();
+        logger.info("testGetPopularImageSpecial: {}", result);
         assertNull(result);
     }
 

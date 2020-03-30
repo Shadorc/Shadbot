@@ -16,19 +16,29 @@ public class ChatCmdTest {
 
     private static Logger logger;
     private static ChatCmd cmd;
+    private static Method method;
 
     @BeforeAll
-    public static void init() {
+    public static void init() throws NoSuchMethodException {
         logger = Loggers.getLogger(ChatCmdTest.class);
         cmd = new ChatCmd();
+
+        method = ChatCmd.class.getDeclaredMethod("getResponse", Snowflake.class, String.class);
+        method.setAccessible(true);
     }
 
     @Test
-    public void testGetResponse() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        final Method method = ChatCmd.class.getDeclaredMethod("getResponse", Snowflake.class, String.class);
-        method.setAccessible(true);
+    public void testGetResponse() throws InvocationTargetException, IllegalAccessException {
         final String result = ((Mono<String>) method.invoke(cmd, Snowflake.of(1234L), "Hello World!")).block();
         logger.info("testGetResponse: {}", result);
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testGetResponseSpecial() throws InvocationTargetException, IllegalAccessException {
+        final String result =
+                ((Mono<String>) method.invoke(cmd, Snowflake.of(1234L), "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/")).block();
+        logger.info("testGetResponseSpecial: {}", result);
         assertNotNull(result);
     }
 
