@@ -10,8 +10,8 @@ import reactor.util.Loggers;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class GifCmdTest {
 
@@ -44,10 +44,11 @@ public class GifCmdTest {
 
     @Test
     public void testGetGifSearchSpecial() throws InvocationTargetException, IllegalAccessException {
-        final String result = ((Mono<String>) method.invoke(cmd,
-                NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/"))).block();
-        logger.info("testGetGifSearchSpecial: {}", result);
-        assertNull(result);
+        assertDoesNotThrow(() -> {
+            final String result = ((Mono<String>) method.invoke(cmd,
+                    NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/"))).block();
+            logger.info("testGetGifSearchSpecial: {}", result);
+        });
     }
 
 }
