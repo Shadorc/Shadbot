@@ -50,13 +50,13 @@ public class Shadbot {
     private static BotListStats botListStats;
 
     public static void main(String[] args) {
+        // Set default to Locale US
+        Locale.setDefault(Locale.US);
+
         LOGGER.info("Starting Shadbot V{}", Config.VERSION);
 
         LOGGER.info("Initializing Sentry...");
         Sentry.init(CredentialManager.getInstance().get(Credential.SENTRY_DSN));
-
-        // Set default to Locale US
-        Locale.setDefault(Locale.US);
 
         // BlockHound is used to detect blocking actions in non-blocking threads
         LOGGER.info("Initializing BlockHound...");
@@ -69,16 +69,17 @@ public class Shadbot {
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
                 .build()
                 .gateway()
+                .setAwaitConnections(false)
                 .setStoreService(MappingStoreService.create()
                         // Do not store messages
                         .setMapping(new NoOpStoreService(), MessageData.class)
                         .setFallback(new JdkStoreService()))
-                .setInitialStatus(shardInfo -> Presence.idle(Activity.playing("Connecting...")))
+                .setInitialStatus(shardInfo -> Presence.online(Activity.playing(String.format("%shelp | %s", Config.DEFAULT_PREFIX,
+                        TextUtils.TIPS.getRandomTextFormatted()))))
                 .connect()
-                .blockOptional()
-                .orElseThrow(RuntimeException::new);
+                .block();
 
-        LOGGER.info("Next lottery draw in: {}", LotteryCmd.getDelay().toString());
+        LOGGER.info("Starting lottery... Next lottery draw in {}", LotteryCmd.getDelay());
         Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), Schedulers.boundedElastic())
                 .flatMap(ignored -> LotteryCmd.draw(client))
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
@@ -94,34 +95,29 @@ public class Shadbot {
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
-        LOGGER.info("Starting bot list stats scheduler...");
-        Shadbot.botListStats = new BotListStats();
-
         final Mono<Long> getOwnerId = Shadbot.client.getApplicationInfo()
                 .map(ApplicationInfo::getOwnerId)
-                .map(Snowflake::asLong);
+                .map(Snowflake::asLong)
+                .doOnNext(ownerId -> {
+                    LOGGER.info("Owner ID acquired: {}", ownerId);
+                    Shadbot.OWNER_ID.set(ownerId);
+                });
 
         final Mono<Long> getSelfId = Shadbot.client.getEventDispatcher()
                 .on(ReadyEvent.class)
                 .next()
                 .map(ReadyEvent::getSelf)
                 .map(User::getId)
-                .map(Snowflake::asLong);
-
-        Mono.zip(getOwnerId, getSelfId)
-                .doOnNext(tuple -> {
-                    final Long ownerId = tuple.getT1();
-                    final Long selfId = tuple.getT2();
-
-                    LOGGER.info("Owner ID acquired: {}", ownerId);
-                    Shadbot.OWNER_ID.set(ownerId);
-
+                .map(Snowflake::asLong)
+                .doOnNext(selfId -> {
                     LOGGER.info("Self ID acquired: {}", selfId);
                     Shadbot.SELF_ID.set(selfId);
-                })
-                .block();
+                });
 
-        LOGGER.info("Registering listeners....");
+        LOGGER.info("Acquiring owner ID and self ID...");
+        Mono.when(getOwnerId, getSelfId).block();
+
+        LOGGER.info("Registering listeners...");
         Shadbot.register(Shadbot.client, new TextChannelDeleteListener());
         Shadbot.register(Shadbot.client, new GuildCreateListener());
         Shadbot.register(Shadbot.client, new GuildDeleteListener());
@@ -133,12 +129,16 @@ public class Shadbot {
         Shadbot.register(Shadbot.client, new ReactionListener.ReactionAddListener());
         Shadbot.register(Shadbot.client, new ReactionListener.ReactionRemoveListener());
 
-        LOGGER.info("Shadbot is fully connected!");
+        LOGGER.info("Starting bot list stats scheduler...");
+        Shadbot.botListStats = new BotListStats();
 
+        LOGGER.info("Scheduling system resources log...");
         Flux.interval(Duration.ZERO, ResourceStatsCmd.UPDATE_INTERVAL, Schedulers.boundedElastic())
                 .flatMap(ignored -> DatabaseManager.getStats().logSystemResources())
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
+
+        LOGGER.info("Shadbot is fully connected!");
 
         Shadbot.client.onDisconnect().block();
     }

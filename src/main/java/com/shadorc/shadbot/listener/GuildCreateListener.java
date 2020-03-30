@@ -16,7 +16,7 @@ public class GuildCreateListener implements EventListener<GuildCreateEvent> {
         return Mono.fromRunnable(() -> {
             final long guildId = event.getGuild().getId().asLong();
             final int memberCount = event.getGuild().getMemberCount();
-            LogUtils.info("{Guild ID: %d} Connected (%d users).", guildId, memberCount);
+            LogUtils.debug("{Guild ID: %d} Connected (%d users).", guildId, memberCount);
         });
     }
 
