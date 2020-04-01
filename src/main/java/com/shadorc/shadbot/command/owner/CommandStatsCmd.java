@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.stats.entity.command.DailyCommandStats;
 import com.shadorc.shadbot.db.stats.entity.command.TotalCommandStats;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.Utils;
@@ -14,6 +15,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -27,6 +29,14 @@ public class CommandStatsCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
+        if (context.getArg().map("drop"::equals).orElse(false)) {
+            return DatabaseManager.getStats()
+                    .dropCommandStats()
+                    .then(context.getChannel())
+                    .flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " Command stats collection dropped.", channel))
+                    .then();
+        }
+
         return DatabaseManager.getStats()
                 .getCommandStats()
                 .map(totalStats -> DiscordUtils.getDefaultEmbed()
@@ -47,6 +57,7 @@ public class CommandStatsCmd extends BaseCmd {
                         }))
                 .flatMap(embed -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+                .subscribeOn(Schedulers.boundedElastic())
                 .then();
     }
 
@@ -98,6 +109,7 @@ public class CommandStatsCmd extends BaseCmd {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
                 .setDescription("Display command usage statistics.")
+                .addArg("drop", "drop the collection", true)
                 .build();
     }
 }

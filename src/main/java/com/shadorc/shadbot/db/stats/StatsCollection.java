@@ -4,6 +4,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.PushOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoDatabase;
 import com.shadorc.shadbot.command.owner.ResourceStatsCmd;
@@ -82,5 +83,15 @@ public class StatsCollection extends DatabaseCollection {
                 .map(document -> document.toJson(Utils.JSON_WRITER_SETTINGS))
                 .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, DailyResourceStatsBean.class)))
                 .map(DailyResourceStats::new);
+    }
+
+    public Mono<DeleteResult> dropCommandStats() {
+        LOGGER.debug("[Command stats] Drop");
+        return Mono.from(this.getCollection().deleteOne(new Document().append("_id", "command_stats")));
+    }
+
+    public Mono<DeleteResult> dropSystemStats() {
+        LOGGER.debug("[System stats] Drop");
+        return Mono.from(this.getCollection().deleteOne(new Document().append("_id", "system_resources")));
     }
 }

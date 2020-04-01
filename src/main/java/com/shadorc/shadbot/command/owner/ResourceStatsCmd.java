@@ -6,6 +6,7 @@ import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.stats.entity.resources.ResourceStats;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -19,6 +20,7 @@ import org.jfree.data.time.FixedMillisecond;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
@@ -43,6 +45,14 @@ public class ResourceStatsCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
+        if (context.getArg().map("drop"::equals).orElse(false)) {
+            return DatabaseManager.getStats()
+                    .dropSystemStats()
+                    .then(context.getChannel())
+                    .flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " System stats collection dropped.", channel))
+                    .then();
+        }
+
         return DatabaseManager.getStats()
                 .getResourcesStats()
                 .map(dailyResources -> {
@@ -125,13 +135,15 @@ public class ResourceStatsCmd extends BaseCmd {
                     } catch (final IOException err) {
                         return Mono.error(err);
                     }
-                });
+                })
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
                 .setDescription("Display resources utilisation statistics.")
+                .addArg("drop", "drop the collection", true)
                 .build();
     }
 
