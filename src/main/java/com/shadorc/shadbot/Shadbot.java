@@ -11,6 +11,7 @@ import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TextUtils;
+import discord4j.common.ReactorResources;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
@@ -67,6 +68,9 @@ public class Shadbot {
         LOGGER.info("Connecting to Discord...");
         Shadbot.client = DiscordClient.builder(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN))
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
+                .setReactorResources(ReactorResources.builder()
+                        .timerTaskScheduler(Schedulers.boundedElastic())
+                        .build())
                 .build()
                 .gateway()
                 .setAwaitConnections(false)
@@ -78,22 +82,6 @@ public class Shadbot {
                         TextUtils.TIPS.getRandomTextFormatted()))))
                 .connect()
                 .block();
-
-        LOGGER.info("Starting lottery... Next lottery draw in {}", LotteryCmd.getDelay());
-        Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), Schedulers.boundedElastic())
-                .flatMap(ignored -> LotteryCmd.draw(client))
-                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
-                .subscribe(null, ExceptionHandler::handleUnknownError);
-
-        LOGGER.info("Scheduling presence updates...");
-        Flux.interval(Duration.ZERO, Duration.ofMinutes(30), Schedulers.boundedElastic())
-                .flatMap(ignored -> {
-                    final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX,
-                            TextUtils.TIPS.getRandomTextFormatted());
-                    return client.updatePresence(Presence.online(Activity.playing(presence)));
-                })
-                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
-                .subscribe(null, ExceptionHandler::handleUnknownError);
 
         final Mono<Long> getOwnerId = Shadbot.client.getApplicationInfo()
                 .map(ApplicationInfo::getOwnerId)
@@ -117,6 +105,31 @@ public class Shadbot {
         LOGGER.info("Acquiring owner ID and self ID...");
         Mono.when(getOwnerId, getSelfId).block();
 
+        LOGGER.info("Scheduling presence updates...");
+        Flux.interval(Duration.ZERO, Duration.ofMinutes(30), Schedulers.boundedElastic())
+                .flatMap(ignored -> {
+                    final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX,
+                            TextUtils.TIPS.getRandomTextFormatted());
+                    return client.updatePresence(Presence.online(Activity.playing(presence)));
+                })
+                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
+                .subscribe(null, ExceptionHandler::handleUnknownError);
+
+        LOGGER.info("Starting lottery... Next lottery draw in {}", LotteryCmd.getDelay());
+        Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), Schedulers.boundedElastic())
+                .flatMap(ignored -> LotteryCmd.draw(client))
+                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
+                .subscribe(null, ExceptionHandler::handleUnknownError);
+
+        LOGGER.info("Starting bot list stats scheduler...");
+        Shadbot.botListStats = new BotListStats();
+
+        LOGGER.info("Scheduling system resources log...");
+        Flux.interval(Duration.ZERO, ResourceStatsCmd.UPDATE_INTERVAL, Schedulers.boundedElastic())
+                .flatMap(ignored -> DatabaseManager.getStats().logSystemResources())
+                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
+                .subscribe(null, ExceptionHandler::handleUnknownError);
+
         LOGGER.info("Registering listeners...");
         Shadbot.register(Shadbot.client, new TextChannelDeleteListener());
         Shadbot.register(Shadbot.client, new GuildCreateListener());
@@ -128,15 +141,6 @@ public class Shadbot {
         Shadbot.register(Shadbot.client, new VoiceStateUpdateListener());
         Shadbot.register(Shadbot.client, new ReactionListener.ReactionAddListener());
         Shadbot.register(Shadbot.client, new ReactionListener.ReactionRemoveListener());
-
-        LOGGER.info("Starting bot list stats scheduler...");
-        Shadbot.botListStats = new BotListStats();
-
-        LOGGER.info("Scheduling system resources log...");
-        Flux.interval(Duration.ZERO, ResourceStatsCmd.UPDATE_INTERVAL, Schedulers.boundedElastic())
-                .flatMap(ignored -> DatabaseManager.getStats().logSystemResources())
-                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
-                .subscribe(null, ExceptionHandler::handleUnknownError);
 
         LOGGER.info("Shadbot is fully connected!");
 
