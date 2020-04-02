@@ -1,5 +1,8 @@
 package com.shadorc.shadbot.music;
 
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.VoiceChannel;
@@ -7,6 +10,9 @@ import discord4j.rest.util.Snowflake;
 import discord4j.voice.AudioProvider;
 import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
+import java.util.concurrent.TimeoutException;
 
 import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 
@@ -27,8 +33,8 @@ public class GuildMusicConnection {
      * Requests to join a voice channel.
      */
     public Mono<Void> joinVoiceChannel(Snowflake voiceChannelId, AudioProvider audioProvider) {
-        // Do not join a voice channel if a voice connection already exists and is not disconnected
-        if (this.voiceConnection != null && this.voiceConnection.getState() != VoiceConnection.State.DISCONNECTED) {
+        // Do not join a voice channel if a voice connection already exists and is connected
+        if (this.voiceConnection != null && this.voiceConnection.isConnected()) {
             return Mono.empty();
         }
 
@@ -36,7 +42,9 @@ public class GuildMusicConnection {
 
         return this.client.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
-                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
+                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider))
+                        .publishOn(Schedulers.boundedElastic()))
+                .timeout(Config.TIMEOUT)
                 .flatMap(voiceConnection -> {
                     LogUtils.info("{Guild ID: %d} Voice channel joined.", this.guildId.asLong());
 
@@ -44,12 +52,23 @@ public class GuildMusicConnection {
 
                     // If the voice connection has been disconnected or if an error occurred while loading a track
                     // (guild music being null), the voice channel can be joined after the guild music is destroyed.
-                    if (this.voiceConnection.getState() == VoiceConnection.State.DISCONNECTED || this.guildMusic == null) {
+                    if (!this.voiceConnection.isConnected() || this.guildMusic == null) {
                         return this.leaveVoiceChannel();
                     }
                     return Mono.empty();
                 })
-                .then();
+                .then()
+                .onErrorResume(TimeoutException.class, err -> this.onVoiceConnectionTimeout());
+    }
+
+    private Mono<Void> onVoiceConnectionTimeout() {
+        LogUtils.info("{Guild ID: %d} Voice connection timed out.", this.guildId.asLong());
+        return Mono.justOrEmpty(this.getGuildMusic())
+                .flatMap(GuildMusic::getMessageChannel)
+                .flatMap(channel -> DiscordUtils.sendMessage(
+                        Emoji.WARNING + " Sorry, I can't join this voice channel right now. "
+                                + "Please, try again in a few seconds or with another voice channel.", channel))
+                .and(this.leaveVoiceChannel());
     }
 
     /**
