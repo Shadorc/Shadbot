@@ -14,13 +14,13 @@ import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.common.ReactorResources;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.EventDispatcher;
 import discord4j.core.event.domain.Event;
-import discord4j.core.event.domain.lifecycle.ReadyEvent;
-import discord4j.core.object.entity.ApplicationInfo;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
+import discord4j.discordjson.json.ApplicationInfoData;
 import discord4j.discordjson.json.MessageData;
+import discord4j.discordjson.json.UserData;
 import discord4j.rest.response.ResponseFunction;
 import discord4j.rest.util.Snowflake;
 import discord4j.store.api.mapping.MappingStoreService;
@@ -36,6 +36,7 @@ import reactor.util.Loggers;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -47,7 +48,7 @@ public class Shadbot {
     private static final AtomicLong OWNER_ID = new AtomicLong();
     private static final AtomicLong SELF_ID = new AtomicLong();
 
-    private static GatewayDiscordClient client;
+    private static GatewayDiscordClient gateway;
     private static BotListStats botListStats;
 
     public static void main(String[] args) {
@@ -65,59 +66,60 @@ public class Shadbot {
                 .allowBlockingCallsInside("java.io.FileInputStream", "readBytes")
                 .install();
 
-        LOGGER.info("Connecting to Discord...");
-        Shadbot.client = DiscordClient.builder(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN))
+        final DiscordClient client = DiscordClient.builder(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN))
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
                 .setReactorResources(ReactorResources.builder()
                         .timerTaskScheduler(Schedulers.boundedElastic())
                         .build())
-                .build()
-                .gateway()
-                .setAwaitConnections(false)
-                .setStoreService(MappingStoreService.create()
-                        // Do not store messages
-                        .setMapping(new NoOpStoreService(), MessageData.class)
-                        .setFallback(new JdkStoreService()))
-                .setInitialStatus(shardInfo -> Presence.online(Activity.playing(String.format("%shelp | %s", Config.DEFAULT_PREFIX,
-                        TextUtils.TIPS.getRandomTextFormatted()))))
-                .connect()
-                .block();
+                .build();
 
-        final Mono<Long> getOwnerId = Shadbot.client.getApplicationInfo()
-                .map(ApplicationInfo::getOwnerId)
+        LOGGER.info("Acquiring owner ID...");
+        client.getApplicationInfo()
+                .map(ApplicationInfoData::owner)
+                .map(UserData::id)
                 .map(Snowflake::asLong)
                 .doOnNext(ownerId -> {
                     LOGGER.info("Owner ID acquired: {}", ownerId);
                     Shadbot.OWNER_ID.set(ownerId);
-                });
+                })
+                .block();
 
-        final Mono<Long> getSelfId = Shadbot.client.getEventDispatcher()
-                .on(ReadyEvent.class)
-                .next()
-                .map(ReadyEvent::getSelf)
-                .map(User::getId)
-                .map(Snowflake::asLong)
+        LOGGER.info("Acquiring self ID...");
+        Mono.just(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN))
+                .map(str -> str.split("\\.")[0])
+                .flatMap(str -> Mono.fromCallable(() -> Base64.getDecoder().decode(str)))
+                .map(String::new)
+                .map(Long::parseLong)
                 .doOnNext(selfId -> {
                     LOGGER.info("Self ID acquired: {}", selfId);
                     Shadbot.SELF_ID.set(selfId);
-                });
+                })
+                .block();
 
-        LOGGER.info("Acquiring owner ID and self ID...");
-        Mono.when(getOwnerId, getSelfId).block();
+        LOGGER.info("Connecting to Discord...");
+        Shadbot.gateway = client.gateway()
+                .setEventDispatcher(EventDispatcher.replayingWithSize(0))
+                .setStoreService(MappingStoreService.create()
+                        // Do not store messages
+                        .setMapping(new NoOpStoreService(), MessageData.class)
+                        .setFallback(new JdkStoreService()))
+                .setInitialStatus(shardInfo -> Presence.idle(Activity.playing("Connecting...")))
+                .connect()
+                .block();
 
         LOGGER.info("Scheduling presence updates...");
         Flux.interval(Duration.ZERO, Duration.ofMinutes(30), Schedulers.boundedElastic())
                 .flatMap(ignored -> {
                     final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX,
                             TextUtils.TIPS.getRandomTextFormatted());
-                    return client.updatePresence(Presence.online(Activity.playing(presence)));
+                    return Shadbot.gateway.updatePresence(Presence.online(Activity.playing(presence)));
                 })
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
         LOGGER.info("Starting lottery... Next lottery draw in {}", LotteryCmd.getDelay());
         Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), Schedulers.boundedElastic())
-                .flatMap(ignored -> LotteryCmd.draw(client))
+                .flatMap(ignored -> LotteryCmd.draw(Shadbot.gateway))
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
@@ -131,20 +133,20 @@ public class Shadbot {
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
         LOGGER.info("Registering listeners...");
-        Shadbot.register(Shadbot.client, new TextChannelDeleteListener());
-        Shadbot.register(Shadbot.client, new GuildCreateListener());
-        Shadbot.register(Shadbot.client, new GuildDeleteListener());
-        Shadbot.register(Shadbot.client, new MemberListener.MemberJoinListener());
-        Shadbot.register(Shadbot.client, new MemberListener.MemberLeaveListener());
-        Shadbot.register(Shadbot.client, new MessageCreateListener());
-        Shadbot.register(Shadbot.client, new MessageUpdateListener());
-        Shadbot.register(Shadbot.client, new VoiceStateUpdateListener());
-        Shadbot.register(Shadbot.client, new ReactionListener.ReactionAddListener());
-        Shadbot.register(Shadbot.client, new ReactionListener.ReactionRemoveListener());
+        Shadbot.register(Shadbot.gateway, new TextChannelDeleteListener());
+        Shadbot.register(Shadbot.gateway, new GuildCreateListener());
+        Shadbot.register(Shadbot.gateway, new GuildDeleteListener());
+        Shadbot.register(Shadbot.gateway, new MemberListener.MemberJoinListener());
+        Shadbot.register(Shadbot.gateway, new MemberListener.MemberLeaveListener());
+        Shadbot.register(Shadbot.gateway, new MessageCreateListener());
+        Shadbot.register(Shadbot.gateway, new MessageUpdateListener());
+        Shadbot.register(Shadbot.gateway, new VoiceStateUpdateListener());
+        Shadbot.register(Shadbot.gateway, new ReactionListener.ReactionAddListener());
+        Shadbot.register(Shadbot.gateway, new ReactionListener.ReactionRemoveListener());
 
         LOGGER.info("Shadbot is fully connected!");
 
-        Shadbot.client.onDisconnect().block();
+        Shadbot.gateway.onDisconnect().block();
     }
 
     private static <T extends Event> void register(GatewayDiscordClient client, EventListener<T> eventListener) {
@@ -189,7 +191,7 @@ public class Shadbot {
     }
 
     public static GatewayDiscordClient getClient() {
-        return Shadbot.client;
+        return Shadbot.gateway;
     }
 
     public static Mono<Void> quit() {
@@ -197,7 +199,7 @@ public class Shadbot {
             Shadbot.botListStats.stop();
         }
 
-        return Shadbot.client.logout()
+        return Shadbot.gateway.logout()
                 .then(Mono.fromRunnable(() -> DatabaseManager.getInstance().close()));
     }
 

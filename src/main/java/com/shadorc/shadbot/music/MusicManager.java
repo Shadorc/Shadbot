@@ -55,7 +55,7 @@ public class MusicManager {
     }
 
     /**
-     * Get the {@link GuildMusic} corresponding to the provided {@code guildId}. If there is none,
+     * Gets the {@link GuildMusic} corresponding to the provided {@code guildId}. If there is none,
      * a new one is created and a request to join the {@link VoiceChannel} corresponding to the provided
      * {@code voiceChannelId} is sent.
      */
