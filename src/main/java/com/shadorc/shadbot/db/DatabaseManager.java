@@ -29,6 +29,7 @@ public class DatabaseManager {
     private DatabaseManager() {
         final MongoClientSettings settings = MongoClientSettings.builder()
                 .codecRegistry(Utils.CODEC_REGISTRY)
+                .applicationName(String.format("Shadbot V%s", Config.VERSION))
                 .build();
 
         this.client = MongoClients.create(settings);
