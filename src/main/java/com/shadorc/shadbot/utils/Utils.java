@@ -22,7 +22,6 @@ import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
 import java.lang.management.ManagementFactory;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
@@ -46,14 +45,6 @@ public class Utils {
             .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
             .enable(SerializationFeature.INDENT_OUTPUT)
             .setSerializationInclusion(Include.NON_EMPTY);
-
-    /**
-     * @param token Discord's token.
-     * @return The extracted self ID from the Discord token.
-     */
-    public static Long extractSelfId(String token) {
-        return Long.parseLong(new String(Base64.getDecoder().decode(token.split("\\.")[0]), StandardCharsets.UTF_8));
-    }
 
     /**
      * @return CPU utilisation in percentage.

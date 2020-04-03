@@ -29,13 +29,23 @@ import reactor.core.publisher.Mono;
 import reactor.netty.http.client.PrematureCloseException;
 import reactor.retry.Retry;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 public class DiscordUtils {
+
+    /**
+     * @param token Discord's token.
+     * @return The extracted self ID from the Discord token.
+     */
+    public static Long extractSelfId(String token) {
+        return Long.parseLong(new String(Base64.getDecoder().decode(token.split("\\.")[0]), StandardCharsets.UTF_8));
+    }
 
     /**
      * @param content The string to send.
