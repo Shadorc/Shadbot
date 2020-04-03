@@ -11,6 +11,7 @@ import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TextUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.ReactorResources;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -36,7 +37,6 @@ import reactor.util.Loggers;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -73,7 +73,7 @@ public class Shadbot {
                         .build())
                 .build();
 
-        LOGGER.info("Acquiring owner ID...");
+        LOGGER.info("Acquiring owner ID and self ID...");
         client.getApplicationInfo()
                 .map(ApplicationInfoData::owner)
                 .map(UserData::id)
@@ -84,17 +84,9 @@ public class Shadbot {
                 })
                 .block();
 
-        LOGGER.info("Acquiring self ID...");
-        Mono.just(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN))
-                .map(str -> str.split("\\.")[0])
-                .flatMap(str -> Mono.fromCallable(() -> Base64.getDecoder().decode(str)))
-                .map(String::new)
-                .map(Long::parseLong)
-                .doOnNext(selfId -> {
-                    LOGGER.info("Self ID acquired: {}", selfId);
-                    Shadbot.SELF_ID.set(selfId);
-                })
-                .block();
+        final long selfId = Utils.extractSelfId(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN));
+        LOGGER.info("Self ID acquired: {}", selfId);
+        Shadbot.SELF_ID.set(selfId);
 
         LOGGER.info("Connecting to Discord...");
         Shadbot.gateway = client.gateway()
