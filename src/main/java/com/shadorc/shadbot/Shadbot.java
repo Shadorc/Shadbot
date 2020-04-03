@@ -8,10 +8,10 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
+import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TextUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.ReactorResources;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -84,7 +84,7 @@ public class Shadbot {
                 })
                 .block();
 
-        final long selfId = Utils.extractSelfId(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN));
+        final long selfId = DiscordUtils.extractSelfId(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN));
         LOGGER.info("Self ID acquired: {}", selfId);
         Shadbot.SELF_ID.set(selfId);
 
