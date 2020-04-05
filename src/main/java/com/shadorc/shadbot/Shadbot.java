@@ -15,7 +15,6 @@ import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.common.ReactorResources;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.EventDispatcher;
 import discord4j.core.event.domain.Event;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
@@ -90,7 +89,6 @@ public class Shadbot {
 
         LOGGER.info("Connecting to Discord...");
         Shadbot.gateway = client.gateway()
-                .setEventDispatcher(EventDispatcher.replayingWithSize(0))
                 .setStoreService(MappingStoreService.create()
                         // Do not store messages
                         .setMapping(new NoOpStoreService(), MessageData.class)
