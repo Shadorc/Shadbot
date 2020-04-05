@@ -48,4 +48,13 @@ public class PlayerSummary {
         }
     }
 
+    @Override
+    public String toString() {
+        return "PlayerSummary{" +
+                "steamId='" + this.steamId + '\'' +
+                ", communityVisibilityState=" + this.communityVisibilityState +
+                ", avatarFull='" + this.avatarFull + '\'' +
+                ", personaName='" + this.personaName + '\'' +
+                '}';
+    }
 }

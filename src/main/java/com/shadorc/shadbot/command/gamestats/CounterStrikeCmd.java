@@ -8,6 +8,7 @@ import com.shadorc.shadbot.api.json.gamestats.steam.resolver.Response;
 import com.shadorc.shadbot.api.json.gamestats.steam.stats.PlayerStats;
 import com.shadorc.shadbot.api.json.gamestats.steam.stats.Stats;
 import com.shadorc.shadbot.api.json.gamestats.steam.stats.UserStatsForGameResponse;
+import com.shadorc.shadbot.command.MissingArgumentException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -47,20 +48,62 @@ public class CounterStrikeCmd extends BaseCmd {
                 .send()
                 .thenReturn(this.getIdentificator(arg))
                 .flatMap(this::getSteamId)
-                .map(steamId -> String.format("%s?key=%s&steamids=%s",
-                        PLAYER_SUMMARIES_URL, CredentialManager.getInstance().get(Credential.STEAM_API_KEY), steamId))
-                .flatMap(url -> NetUtils.get(url, PlayerSummariesResponse.class))
-                .map(PlayerSummariesResponse::getResponse)
-                // Search users matching the steamId
-                .map(PlayerSummaries::getPlayers)
-                .flatMapMany(Flux::fromIterable)
-                .next()
+                .flatMap(this::getPlayerSummary)
                 .flatMap(player -> this.getStats(context, updatableMsg, player))
                 .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Steam player not found.", context.getUsername())))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
+    }
+
+    /**
+     * @return The identificator, either directly provided or extracted from an URL.
+     */
+    private String getIdentificator(String arg) {
+        // The user provided an URL that can contains a pseudo or an ID
+        if (arg.contains("/")) {
+            final List<String> splittedUrl = StringUtils.split(arg, "/");
+            if(splittedUrl.isEmpty()) {
+                throw new MissingArgumentException();
+            }
+            return splittedUrl.get(splittedUrl.size() - 1);
+        } else {
+            return arg;
+        }
+    }
+
+    /**
+     * @return The identificator converted as an ID or empty if not found.
+     */
+    private Mono<String> getSteamId(String identificator) {
+        // The user directly provided the ID
+        if (NumberUtils.isPositiveLong(identificator)) {
+            return Mono.just(identificator);
+        }
+        // The user provided a pseudo
+        else {
+            final String url = String.format("%s?key=%s&vanityurl=%s",
+                    RESOLVE_VANITY_URL, CredentialManager.getInstance().get(Credential.STEAM_API_KEY), NetUtils.encode(identificator));
+            return NetUtils.get(url, ResolveVanityUrlResponse.class)
+                    .map(ResolveVanityUrlResponse::getResponse)
+                    .map(Response::getSteamId)
+                    .flatMap(Mono::justOrEmpty);
+        }
+    }
+
+    /**
+     * @return The {@link PlayerSummary} corresponding to the provided steam ID.
+     */
+    private Mono<PlayerSummary> getPlayerSummary(String steamId) {
+        final String url = String.format("%s?key=%s&steamids=%s",
+                PLAYER_SUMMARIES_URL, CredentialManager.getInstance().get(Credential.STEAM_API_KEY), steamId);
+        return NetUtils.get(url, PlayerSummariesResponse.class)
+                .map(PlayerSummariesResponse::getResponse)
+                // Users matching the steamId
+                .map(PlayerSummaries::getPlayers)
+                .flatMapMany(Flux::fromIterable)
+                .next();
     }
 
     private Mono<UpdatableMessage> getStats(Context context, UpdatableMessage updatableMsg, PlayerSummary player) {
@@ -116,38 +159,6 @@ public class CounterStrikeCmd extends BaseCmd {
                                                 .addField("Total MVP", FormatUtils.number(mvps), true)));
                             });
                 });
-    }
-
-    /**
-     * @return The identificator, either directly provided or extracted from an URL.
-     */
-    private String getIdentificator(String arg) {
-        // The user provided an URL that can contains a pseudo or an ID
-        if (arg.contains("/")) {
-            final List<String> splittedUrl = StringUtils.split(arg, "/");
-            return splittedUrl.get(splittedUrl.size() - 1);
-        } else {
-            return arg;
-        }
-    }
-
-    /**
-     * @return The identificator converted as an ID or empty if not found.
-     */
-    private Mono<String> getSteamId(String identificator) {
-        // The user directly provided the ID
-        if (NumberUtils.isPositiveLong(identificator)) {
-            return Mono.just(identificator);
-        }
-        // The user provided a pseudo
-        else {
-            final String url = String.format("%s?key=%s&vanityurl=%s",
-                    RESOLVE_VANITY_URL, CredentialManager.getInstance().get(Credential.STEAM_API_KEY), NetUtils.encode(identificator));
-            return NetUtils.get(url, ResolveVanityUrlResponse.class)
-                    .map(ResolveVanityUrlResponse::getResponse)
-                    .map(Response::getSteamId)
-                    .flatMap(Mono::justOrEmpty);
-        }
     }
 
     @Override
