@@ -138,7 +138,7 @@ public class LotteryCmd extends BaseCmd {
                     LogUtils.info("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",
                             winningNum, winners.size(), jackpot);
 
-                    final long coins = Math.min(jackpot / winners.size(), Config.MAX_COINS);
+                    final Long coins = winners.isEmpty() ? null : Math.min(jackpot / winners.size(), Config.MAX_COINS);
 
                     return Flux.fromIterable(winners)
                             .flatMap(winner -> DatabaseManager.getGuilds()
@@ -153,10 +153,10 @@ public class LotteryCmd extends BaseCmd {
                             .then(new LotteryHistoric(jackpot, winners.size(), winningNum).insert())
                             .then(DatabaseManager.getLottery().resetGamblers())
                             .then(Mono.defer(() -> {
-                                if (!winners.isEmpty()) {
-                                    return DatabaseManager.getLottery().resetJackpot();
+                                if (winners.isEmpty()) {
+                                    return Mono.empty();
                                 }
-                                return Mono.empty();
+                                return DatabaseManager.getLottery().resetJackpot();
                             }));
                 })
                 .then();
