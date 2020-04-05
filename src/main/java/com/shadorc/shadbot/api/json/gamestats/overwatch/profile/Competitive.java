@@ -22,4 +22,13 @@ public class Competitive {
     public CompetitiveRank getSupport() {
         return this.support;
     }
+
+    @Override
+    public String toString() {
+        return "Competitive{" +
+                "tank=" + this.tank +
+                ", damage=" + this.damage +
+                ", support=" + this.support +
+                '}';
+    }
 }

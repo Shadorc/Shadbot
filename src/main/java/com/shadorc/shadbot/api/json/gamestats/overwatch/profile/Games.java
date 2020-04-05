@@ -13,4 +13,10 @@ public class Games {
         return this.quickplay.get("won");
     }
 
+    @Override
+    public String toString() {
+        return "Games{" +
+                "quickplay=" + this.quickplay +
+                '}';
+    }
 }

@@ -17,4 +17,11 @@ public class CompetitiveRank {
                 .map(OptionalInt::of)
                 .orElse(OptionalInt.empty());
     }
+
+    @Override
+    public String toString() {
+        return "CompetitiveRank{" +
+                "rank=" + this.rank +
+                '}';
+    }
 }
