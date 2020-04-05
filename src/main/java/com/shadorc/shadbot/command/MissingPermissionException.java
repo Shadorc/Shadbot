@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.exception;
+package com.shadorc.shadbot.command;
 
 import discord4j.rest.util.Permission;
 

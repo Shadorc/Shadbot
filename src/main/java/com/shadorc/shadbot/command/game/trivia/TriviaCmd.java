@@ -1,9 +1,9 @@
 package com.shadorc.shadbot.command.game.trivia;
 
 import com.shadorc.shadbot.api.json.trivia.category.TriviaCategoriesResponse;
+import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
-import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.*;

@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.utils;
 
+import com.shadorc.shadbot.command.CommandException;
+import com.shadorc.shadbot.command.MissingArgumentException;
+import com.shadorc.shadbot.command.MissingPermissionException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.exception.CommandException;
-import com.shadorc.shadbot.exception.MissingArgumentException;
-import com.shadorc.shadbot.exception.MissingPermissionException;
-import com.shadorc.shadbot.exception.NoMusicException;
+import com.shadorc.shadbot.music.NoMusicException;
 import com.shadorc.shadbot.object.Emoji;
 import reactor.core.publisher.Mono;
 

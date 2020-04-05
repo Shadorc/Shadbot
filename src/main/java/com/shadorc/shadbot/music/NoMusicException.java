@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.exception;
+package com.shadorc.shadbot.music;
 
 public class NoMusicException extends RuntimeException {
 

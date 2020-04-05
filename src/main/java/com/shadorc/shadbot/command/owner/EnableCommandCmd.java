@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.owner;
 
+import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.*;
-import com.shadorc.shadbot.exception.CommandException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;

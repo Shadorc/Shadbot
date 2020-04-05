@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.Shadbot;
+import com.shadorc.shadbot.command.MissingArgumentException;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.exception.MissingArgumentException;
-import com.shadorc.shadbot.exception.NoMusicException;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
+import com.shadorc.shadbot.music.NoMusicException;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.StringUtils;
