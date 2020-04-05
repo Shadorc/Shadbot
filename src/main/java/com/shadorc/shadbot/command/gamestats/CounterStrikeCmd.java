@@ -9,7 +9,6 @@ import com.shadorc.shadbot.api.json.gamestats.steam.stats.PlayerStats;
 import com.shadorc.shadbot.api.json.gamestats.steam.stats.Stats;
 import com.shadorc.shadbot.api.json.gamestats.steam.stats.UserStatsForGameResponse;
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.command.MissingArgumentException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;

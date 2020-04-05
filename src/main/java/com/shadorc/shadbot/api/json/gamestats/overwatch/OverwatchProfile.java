@@ -11,7 +11,7 @@ public class OverwatchProfile {
     private final ProfileResponse profile;
     private final StatsResponse stats;
 
-    public OverwatchProfile(OverwatchCmd.Platform platform, ProfileResponse profile, StatsResponse stats)  {
+    public OverwatchProfile(OverwatchCmd.Platform platform, ProfileResponse profile, StatsResponse stats) {
         this.platform = platform;
         this.profile = profile;
         this.stats = stats;
