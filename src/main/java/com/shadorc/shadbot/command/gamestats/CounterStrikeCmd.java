@@ -64,7 +64,7 @@ public class CounterStrikeCmd extends BaseCmd {
         // The user provided an URL that can contains a pseudo or an ID
         if (arg.contains("/")) {
             final List<String> splittedUrl = StringUtils.split(arg, "/");
-            if(splittedUrl.isEmpty()) {
+            if (splittedUrl.isEmpty()) {
                 throw new MissingArgumentException();
             }
             return splittedUrl.get(splittedUrl.size() - 1);

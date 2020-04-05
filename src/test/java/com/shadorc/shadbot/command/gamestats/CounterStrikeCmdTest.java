@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.steam.player.PlayerSummary;
-import com.shadorc.shadbot.command.MissingArgumentException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
