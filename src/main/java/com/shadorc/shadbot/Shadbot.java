@@ -119,9 +119,10 @@ public class Shadbot {
         Shadbot.botListStats = new BotListStats();
 
         LOGGER.info("Scheduling system resources log...");
-        Flux.interval(Duration.ZERO, ResourceStatsCmd.UPDATE_INTERVAL, Schedulers.boundedElastic())
-                .flatMap(ignored -> DatabaseManager.getStats().logSystemResources())
-                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
+        DatabaseManager.getStats().dropSystemStats()
+                .thenMany(Flux.interval(Duration.ZERO, ResourceStatsCmd.UPDATE_INTERVAL, Schedulers.boundedElastic())
+                        .flatMap(ignored -> DatabaseManager.getStats().logSystemResources())
+                        .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err)))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
         LOGGER.info("Registering listeners...");
