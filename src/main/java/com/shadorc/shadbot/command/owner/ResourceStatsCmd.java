@@ -37,7 +37,7 @@ import java.util.function.Consumer;
 
 public class ResourceStatsCmd extends BaseCmd {
 
-    public static final Duration UPDATE_INTERVAL = Duration.ofSeconds(5);
+    public static final Duration UPDATE_INTERVAL = Duration.ofMillis(2_500);
     public static final Duration MAX_DURATION = Duration.ofHours(1);
 
     public ResourceStatsCmd() {
@@ -75,7 +75,7 @@ public class ResourceStatsCmd extends BaseCmd {
                             plot.setDataset(2, new TimeSeriesCollection(threadUsageSeries));
 
                             // Set axis
-                            final DateAxis xAxis = new DateAxis("timestamp");
+                            final DateAxis xAxis = new DateAxis("time");
                             plot.setDomainAxis(xAxis);
 
                             final NumberAxis cpuAxis = new NumberAxis("% (CPU)");
