@@ -17,4 +17,11 @@ public class HeroPlayed {
         return this.played;
     }
 
+    @Override
+    public String toString() {
+        return "HeroPlayed{" +
+                "hero='" + this.hero + '\'' +
+                ", played='" + this.played + '\'' +
+                '}';
+    }
 }

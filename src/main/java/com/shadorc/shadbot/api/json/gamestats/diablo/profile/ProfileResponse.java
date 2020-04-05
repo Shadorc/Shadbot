@@ -59,4 +59,17 @@ public class ProfileResponse {
         return Collections.unmodifiableList(this.heroIds);
     }
 
+    @Override
+    public String toString() {
+        return "ProfileResponse{" +
+                "code='" + this.code + '\'' +
+                ", battleTag='" + this.battleTag + '\'' +
+                ", paragonLevel=" + this.paragonLevel +
+                ", paragonLevelHardcore=" + this.paragonLevelHardcore +
+                ", paragonLevelSeason=" + this.paragonLevelSeason +
+                ", paragonLevelSeasonHardcore=" + this.paragonLevelSeasonHardcore +
+                ", guildName='" + this.guildName + '\'' +
+                ", heroIds=" + this.heroIds +
+                '}';
+    }
 }

@@ -8,6 +8,7 @@ import com.shadorc.shadbot.api.json.gamestats.steam.resolver.Response;
 import com.shadorc.shadbot.api.json.gamestats.steam.stats.PlayerStats;
 import com.shadorc.shadbot.api.json.gamestats.steam.stats.Stats;
 import com.shadorc.shadbot.api.json.gamestats.steam.stats.UserStatsForGameResponse;
+import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.command.MissingArgumentException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
@@ -65,7 +66,7 @@ public class CounterStrikeCmd extends BaseCmd {
         if (arg.contains("/")) {
             final List<String> splittedUrl = StringUtils.split(arg, "/");
             if (splittedUrl.isEmpty()) {
-                throw new MissingArgumentException();
+                throw new CommandException("Invalid steam ID.");
             }
             return splittedUrl.get(splittedUrl.size() - 1);
         } else {

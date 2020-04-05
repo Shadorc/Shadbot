@@ -11,4 +11,10 @@ public class Stats {
         return this.topHeroes;
     }
 
+    @Override
+    public String toString() {
+        return "Stats{" +
+                "topHeroes=" + this.topHeroes +
+                '}';
+    }
 }

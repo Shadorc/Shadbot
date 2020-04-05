@@ -11,4 +11,10 @@ public class TopHeroes {
         return this.quickplay;
     }
 
+    @Override
+    public String toString() {
+        return "TopHeroes{" +
+                "quickplay=" + this.quickplay +
+                '}';
+    }
 }

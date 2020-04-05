@@ -26,4 +26,11 @@ public class Quickplay {
                 this.eliminationsPerLife.get(count - 1).getEliminationsPerLife()));
     }
 
+    @Override
+    public String toString() {
+        return "Quickplay{" +
+                "played=" + this.played +
+                ", eliminationsPerLife=" + this.eliminationsPerLife +
+                '}';
+    }
 }

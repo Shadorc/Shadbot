@@ -17,4 +17,11 @@ public class HeroEliminations {
         return this.eliminationsPerLife;
     }
 
+    @Override
+    public String toString() {
+        return "HeroEliminations{" +
+                "hero='" + this.hero + '\'' +
+                ", eliminationsPerLife='" + this.eliminationsPerLife + '\'' +
+                '}';
+    }
 }
