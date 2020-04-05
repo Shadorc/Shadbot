@@ -4,38 +4,32 @@ import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
-import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.LogUtils;
+import discord4j.core.GatewayDiscordClient;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import org.json.JSONObject;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import reactor.netty.http.client.HttpClient;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.IntStream;
 
 public class BotListStats {
 
+    private final GatewayDiscordClient gateway;
     private final HttpClient httpClient;
-    private final Disposable postingTask;
 
-    public BotListStats() {
+    public BotListStats(GatewayDiscordClient gateway) {
+        this.gateway = gateway;
         this.httpClient = HttpClient.create();
-        this.postingTask = Flux.interval(Duration.ofHours(3), Duration.ofHours(3), Schedulers.boundedElastic())
-                .flatMap(ignored -> this.postStats())
-                .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
-    private Mono<Void> postStats() {
+    public Mono<Void> postStats() {
         LogUtils.info("Posting statistics...");
-        return Shadbot.getClient()
-                .getGuilds()
+        return this.gateway.getGuilds()
                 .count()
                 .flatMap(guildCount -> this.postOnBotListDotSpace(guildCount)
                         .and(this.postOnBotsOnDiscordXyz(guildCount))
@@ -104,7 +98,7 @@ public class BotListStats {
      * Documentation: https://discordbotlist.com/api-docs
      */
     private Flux<String> postOnDiscordBotListDotCom(Long guildCount) {
-        final int shardCount = Shadbot.getClient().getGatewayClientGroup().getShardCount();
+        final int shardCount = this.gateway.getGatewayClientGroup().getShardCount();
         return Flux.fromStream(IntStream.range(0, shardCount).boxed())
                 .flatMap(shardId -> {
                     final JSONObject content = new JSONObject()
@@ -122,7 +116,7 @@ public class BotListStats {
      * Documentation: https://discord.bots.gg/docs/endpoints
      */
     private Flux<String> postOnDiscordBotsDotGg(Long guildCount) {
-        final int shardCount = Shadbot.getClient().getGatewayClientGroup().getShardCount();
+        final int shardCount = this.gateway.getGatewayClientGroup().getShardCount();
         return Flux.fromStream(IntStream.range(0, shardCount).boxed())
                 .flatMap(shardId -> {
                     final JSONObject content = new JSONObject()
@@ -139,7 +133,7 @@ public class BotListStats {
      * Documentation: https://top.gg/api/docs#bots
      */
     private Flux<String> postOnDiscordBotsDotOrg(Long guildCount) {
-        final int shardCount = Shadbot.getClient().getGatewayClientGroup().getShardCount();
+        final int shardCount = this.gateway.getGatewayClientGroup().getShardCount();
         return Flux.fromStream(IntStream.range(0, shardCount).boxed())
                 .flatMap(shardId -> {
                     final JSONObject content = new JSONObject()
@@ -149,10 +143,6 @@ public class BotListStats {
                     final String url = String.format("https://top.gg/api/bots/%d/stats", Shadbot.getSelfId().asLong());
                     return this.post(url, CredentialManager.getInstance().get(Credential.TOP_DOT_GG_TOKEN), content);
                 });
-    }
-
-    public void stop() {
-        this.postingTask.dispose();
     }
 
 }

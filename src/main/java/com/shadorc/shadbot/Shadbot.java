@@ -1,8 +1,5 @@
 package com.shadorc.shadbot;
 
-import com.shadorc.shadbot.api.BotListStats;
-import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
-import com.shadorc.shadbot.command.owner.ResourceStatsCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
@@ -11,7 +8,6 @@ import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.common.ReactorResources;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -48,7 +44,7 @@ public class Shadbot {
     private static final AtomicLong SELF_ID = new AtomicLong();
 
     private static GatewayDiscordClient gateway;
-    private static BotListStats botListStats;
+    private static TaskManager taskManager;
 
     public static void main(String[] args) {
         // Set default to Locale US
@@ -97,31 +93,11 @@ public class Shadbot {
                 .connect()
                 .block();
 
-        LOGGER.info("Scheduling presence updates...");
-        Flux.interval(Duration.ZERO, Duration.ofMinutes(30), Schedulers.boundedElastic())
-                .flatMap(ignored -> {
-                    final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX,
-                            TextUtils.TIPS.getRandomTextFormatted());
-                    return Shadbot.gateway.updatePresence(Presence.online(Activity.playing(presence)));
-                })
-                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
-                .subscribe(null, ExceptionHandler::handleUnknownError);
-
-        LOGGER.info("Starting lottery... Next lottery draw in {}", LotteryCmd.getDelay());
-        Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), Schedulers.boundedElastic())
-                .flatMap(ignored -> LotteryCmd.draw(Shadbot.gateway))
-                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
-                .subscribe(null, ExceptionHandler::handleUnknownError);
-
-        LOGGER.info("Starting bot list stats scheduler...");
-        Shadbot.botListStats = new BotListStats();
-
-        LOGGER.info("Scheduling system resources log...");
-        DatabaseManager.getStats().dropSystemStats()
-                .thenMany(Flux.interval(Duration.ZERO, ResourceStatsCmd.UPDATE_INTERVAL, Schedulers.boundedElastic())
-                        .flatMap(ignored -> DatabaseManager.getStats().logSystemResources())
-                        .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err)))
-                .subscribe(null, ExceptionHandler::handleUnknownError);
+        Shadbot.taskManager = new TaskManager(gateway);
+        Shadbot.taskManager.schedulesPresenceUpdates();
+        Shadbot.taskManager.schedulesLottery();
+        Shadbot.taskManager.schedulesPostStats();
+        Shadbot.taskManager.schedulesSystemResourcesLog();
 
         LOGGER.info("Registering listeners...");
         Shadbot.register(Shadbot.gateway, new TextChannelDeleteListener());
@@ -181,13 +157,9 @@ public class Shadbot {
         return Snowflake.of(Shadbot.SELF_ID.get());
     }
 
-    public static GatewayDiscordClient getClient() {
-        return Shadbot.gateway;
-    }
-
     public static Mono<Void> quit() {
-        if (Shadbot.botListStats != null) {
-            Shadbot.botListStats.stop();
+        if (Shadbot.taskManager != null) {
+            Shadbot.taskManager.stop();
         }
 
         return Shadbot.gateway.logout()
