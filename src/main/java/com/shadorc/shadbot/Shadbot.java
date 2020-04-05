@@ -8,7 +8,6 @@ import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
-import discord4j.common.ReactorResources;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
@@ -24,9 +23,7 @@ import discord4j.store.api.noop.NoOpStoreService;
 import discord4j.store.jdk.JdkStoreService;
 import io.sentry.Sentry;
 import reactor.blockhound.BlockHound;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
@@ -63,9 +60,6 @@ public class Shadbot {
 
         final DiscordClient client = DiscordClient.builder(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN))
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
-                .setReactorResources(ReactorResources.builder()
-                        .timerTaskScheduler(Schedulers.boundedElastic())
-                        .build())
                 .build();
 
         LOGGER.info("Acquiring owner ID and self ID...");

@@ -136,8 +136,8 @@ public class ResourceStatsCmd extends BaseCmd {
                                 return Mono.error(err);
                             }
                         }))
-                .then()
-                .subscribeOn(Schedulers.boundedElastic());
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
 
     @Override
