@@ -98,14 +98,6 @@
         </plugins>
     </build>
     <repositories>
-        <!-- Discord4J snapshot -->
-        <repository>
-            <id>oss.sonatype.org-snapshot</id>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
         <!-- lavaplayer repository -->
         <repository>
             <id>jcenter</id>
@@ -116,7 +108,7 @@
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>3.1.0-SNAPSHOT</version>
+            <version>3.1.0.M1</version>
         </dependency>
         <dependency>
             <groupId>com.sedmelluq</groupId>
