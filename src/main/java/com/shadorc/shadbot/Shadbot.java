@@ -13,6 +13,7 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
+import discord4j.core.retriever.EntityRetrievalStrategy;
 import discord4j.discordjson.json.ApplicationInfoData;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.UserData;
@@ -79,12 +80,13 @@ public class Shadbot {
 
         LOGGER.info("Connecting to Discord...");
         Shadbot.gateway = client.gateway()
+                .setEntityRetrievalStrategy(EntityRetrievalStrategy.STORE_FALLBACK_REST)
                 .setStoreService(MappingStoreService.create()
                         // Do not store messages
                         .setMapping(new NoOpStoreService(), MessageData.class)
                         .setFallback(new JdkStoreService()))
                 .setInitialStatus(shardInfo -> Presence.idle(Activity.playing("Connecting...")))
-                .connect()
+                .login()
                 .block();
 
         Shadbot.taskManager = new TaskManager(gateway);
