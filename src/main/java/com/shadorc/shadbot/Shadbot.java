@@ -110,6 +110,7 @@ public class Shadbot {
         LOGGER.info("Shadbot is fully connected!");
 
         Shadbot.gateway.onDisconnect().block();
+        System.exit(0);
     }
 
     private static <T extends Event> void register(GatewayDiscordClient client, EventListener<T> eventListener) {
