@@ -28,7 +28,7 @@ public class SuicideGirlsCmdTest {
         final Method method = SuicideGirlsCmd.class.getDeclaredMethod("getRandomSuicideGirl");
         method.setAccessible(true);
         final SuicideGirl result = ((Mono<SuicideGirl>) method.invoke(cmd)).block();
-        logger.info("testGetRandomSuicideGirl: name={}, url={}, imageUrl={}", result.getName(), result.getUrl(), result.getImageUrl());
+        logger.debug("testGetRandomSuicideGirl: name={}, url={}, imageUrl={}", result.getName(), result.getUrl(), result.getImageUrl());
         assertNotNull(result.getName());
         assertNotNull(result.getImageUrl());
         assertNotNull(result.getUrl());

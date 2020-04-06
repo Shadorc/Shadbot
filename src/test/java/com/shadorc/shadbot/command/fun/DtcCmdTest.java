@@ -28,7 +28,7 @@ public class DtcCmdTest {
         final Method method = DtcCmd.class.getDeclaredMethod("getRandomQuote");
         method.setAccessible(true);
         final Quote result = ((Mono<Quote>) method.invoke(cmd)).block();
-        logger.info("testGetRandomQuote: {}", result);
+        logger.debug("testGetRandomQuote: {}", result);
         assertNotNull(result.getContent());
         assertNotNull(result.getId());
     }

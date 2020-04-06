@@ -31,14 +31,14 @@ public class GifCmdTest {
     @Test
     public void testGetGifRandom() throws InvocationTargetException, IllegalAccessException {
         final String result = ((Mono<String>) method.invoke(cmd, "")).block();
-        logger.info("testGetGifRandom: {}", result);
+        logger.debug("testGetGifRandom: {}", result);
         assertNotNull(result);
     }
 
     @Test
     public void testGetGifSearch() throws InvocationTargetException, IllegalAccessException {
         final String result = ((Mono<String>) method.invoke(cmd, "doom")).block();
-        logger.info("testGetGifSearch: {}", result);
+        logger.debug("testGetGifSearch: {}", result);
         assertNotNull(result);
     }
 
@@ -47,7 +47,7 @@ public class GifCmdTest {
         assertDoesNotThrow(() -> {
             final String result = ((Mono<String>) method.invoke(cmd,
                     NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/"))).block();
-            logger.info("testGetGifSearchSpecial: {}", result);
+            logger.debug("testGetGifSearchSpecial: {}", result);
         });
     }
 

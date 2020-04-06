@@ -59,7 +59,7 @@ public class CounterStrikeCmdTest {
         method.setAccessible(true);
 
         final PlayerSummary result = ((Mono<PlayerSummary>) method.invoke(cmd, "76561198040113951")).block();
-        logger.info("testGetPlayerSummary: {}", result);
+        logger.debug("testGetPlayerSummary: {}", result);
         assertEquals("76561198040113951", result.getSteamId());
         assertNotNull(result.getAvatarFull());
         assertNotNull(result.getPersonaName());

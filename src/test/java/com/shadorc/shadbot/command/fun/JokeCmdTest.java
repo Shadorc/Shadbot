@@ -27,7 +27,7 @@ public class JokeCmdTest {
         final Method method = JokeCmd.class.getDeclaredMethod("getRandomJoke");
         method.setAccessible(true);
         final String result = ((Mono<String>) method.invoke(cmd)).block();
-        logger.info("testGetRandomJoke: {}", result);
+        logger.debug("testGetRandomJoke: {}", result);
         assertNotNull(result);
     }
 }

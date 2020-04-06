@@ -30,7 +30,7 @@ public class ChatCmdTest {
     @Test
     public void testGetResponse() throws InvocationTargetException, IllegalAccessException {
         final String result = ((Mono<String>) method.invoke(cmd, Snowflake.of(1234L), "Hello World!")).block();
-        logger.info("testGetResponse: {}", result);
+        logger.debug("testGetResponse: {}", result);
         assertNotNull(result);
     }
 
@@ -38,7 +38,7 @@ public class ChatCmdTest {
     public void testGetResponseSpecial() throws InvocationTargetException, IllegalAccessException {
         final String result =
                 ((Mono<String>) method.invoke(cmd, Snowflake.of(1234L), "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/")).block();
-        logger.info("testGetResponseSpecial: {}", result);
+        logger.debug("testGetResponseSpecial: {}", result);
         assertNotNull(result);
     }
 

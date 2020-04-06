@@ -30,7 +30,7 @@ public class Rule34CmdTest {
     @Test
     public void testGetR34Post() throws InvocationTargetException, IllegalAccessException {
         final R34Post result = ((Mono<R34Post>) method.invoke(cmd, "dab")).block();
-        logger.info("testGetR34Post: {}", result);
+        logger.debug("testGetR34Post: {}", result);
         assertNotNull(result.getSource());
         assertNotNull(result.getFileUrl());
         assertNotNull(result.getTags());
@@ -41,7 +41,7 @@ public class Rule34CmdTest {
     @Test
     public void testGetR34PostSpecial() throws InvocationTargetException, IllegalAccessException {
         final R34Post result = ((Mono<R34Post>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/")).block();
-        logger.info("testGetR34PostSpecial: {}", result);
+        logger.debug("testGetR34PostSpecial: {}", result);
         assertNull(result);
     }
 

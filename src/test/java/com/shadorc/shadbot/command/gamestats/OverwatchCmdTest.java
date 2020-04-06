@@ -29,7 +29,7 @@ public class OverwatchCmdTest {
         method.setAccessible(true);
 
         final OverwatchProfile result = ((Mono<OverwatchProfile>) method.invoke(cmd, "Shadorc#2503", OverwatchCmd.Platform.PC)).block();
-        logger.info("testGetResponse: {}", result);
+        logger.debug("testGetResponse: {}", result);
         assertEquals(OverwatchCmd.Platform.PC, result.getPlatform());
         assertNull(result.getProfile().getMessage().orElse(null));
         assertFalse(result.getProfile().isPrivate());

@@ -32,7 +32,7 @@ public class ImageCmdTest {
     @Test
     public void testGetPopularImage() throws InvocationTargetException, IllegalAccessException {
         final Image result = ((Mono<Image>) method.invoke(cmd, "dab")).block();
-        logger.info("testGetPopularImage: {}", result);
+        logger.debug("testGetPopularImage: {}", result);
         assertNotNull(result.getContent());
         assertNotNull(result.getAuthor());
         assertNotNull(result.getCategoryPath());
@@ -44,7 +44,7 @@ public class ImageCmdTest {
     public void testGetPopularImageSpecial() throws InvocationTargetException, IllegalAccessException {
         final Image result = ((Mono<Image>) method.invoke(cmd,
                 NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/"))).block();
-        logger.info("testGetPopularImageSpecial: {}", result);
+        logger.debug("testGetPopularImageSpecial: {}", result);
         assertNull(result);
     }
 

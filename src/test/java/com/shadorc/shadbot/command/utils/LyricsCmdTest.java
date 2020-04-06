@@ -31,7 +31,7 @@ public class LyricsCmdTest {
     @Test
     public void testGetMusixmatch() throws InvocationTargetException, IllegalAccessException {
         final Musixmatch result = ((Mono<Musixmatch>) method.invoke(cmd, "21 guns")).block();
-        logger.info("testGetMusixmatch: {\n\turl={},\n\ttitle={},\n\tartist={},\n\timageUrl={},\n\tlyrics={}\n}",
+        logger.debug("testGetMusixmatch: {\n\turl={},\n\ttitle={},\n\tartist={},\n\timageUrl={},\n\tlyrics={}\n}",
                 result.getUrl(), result.getTitle(), result.getArtist(), result.getImageUrl(), result.getLyrics());
         assertNotNull(result.getLyrics());
         assertNotNull(result.getArtist());
@@ -43,7 +43,7 @@ public class LyricsCmdTest {
     @Test
     public void testGetMusixmatchSpecial() throws InvocationTargetException, IllegalAccessException {
         final Musixmatch result = ((Mono<Musixmatch>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/")).block();
-        logger.info("testGetMusixmatchSpecial: {}", result);
+        logger.debug("testGetMusixmatchSpecial: {}", result);
         assertNull(result);
     }
 
