@@ -26,6 +26,7 @@ import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.select.Elements;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
+import reactor.util.retry.Retry;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -112,7 +113,8 @@ public class LyricsCmd extends BaseCmd {
                     }
                     return Mono.error(new IOException("Musixmatch redirected to wrong page."));
                 })
-                .retry(MAX_RETRY, err -> "Musixmatch redirected to wrong page.".equals(err.getMessage()))
+                .retryWhen(Retry.max(MAX_RETRY)
+                        .filter(err -> "Musixmatch redirected to wrong page.".equals(err.getMessage())))
                 .onErrorMap(IOException.class, err -> {
                     LogUtils.warn("[%s] Too many retries, abort attempt to reload page.", this.getClass().getSimpleName());
                     return new HttpStatusException("Musixmatch does not redirect to the correct page.",

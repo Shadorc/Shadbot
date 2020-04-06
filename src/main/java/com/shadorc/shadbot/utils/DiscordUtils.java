@@ -27,7 +27,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.PrematureCloseException;
-import reactor.retry.Retry;
+import reactor.util.retry.Retry;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -112,10 +112,8 @@ public class DiscordUtils {
                 })
                 // 403 Forbidden means that the bot is not in the guild
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
-                .retryWhen(Retry.onlyIf(err ->
-                        err.exception() instanceof PrematureCloseException || err.exception() instanceof Errors.NativeIoException)
-                        .exponentialBackoff(Duration.ofSeconds(1), Duration.ofSeconds(5))
-                        .retryMax(3));
+                .retryWhen(Retry.backoff(3, Duration.ofSeconds(1))
+                        .filter(err -> err instanceof PrematureCloseException || err instanceof Errors.NativeIoException));
     }
 
     /**
