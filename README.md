@@ -29,6 +29,8 @@
         <li><a href="http://javaluator.sourceforge.net/en/home/">javaluator</a>
         <li><a href="https://github.com/mongodb/mongo-java-driver">MongoDB-java</a>
         <li><a href="https://github.com/getsentry/sentry-java">Sentry</a></li>
+        <li><a href="https://github.com/jfree/jfreechart">JFreeChart</a></li>
+        <li>And <a href="pom.xml">many others...</a></li>
     </ul>
     <hr>
     <h2>Getting Started</h2>
@@ -59,6 +61,6 @@ along with this program.  If not, see http://www.gnu.org/licenses/
         </pre>
         <a href="https://github.com/Shadorc/Shadbot/blob/master/LICENSE">The full licence can be found here.</a>
         <hr>
-        <p><i>Bot inspired by <a href="https://github.com/Mantaro/MantaroBot">MantaroBot</i></a>
+        <p><i>Bot originally inspired by <a href="https://github.com/Mantaro/MantaroBot">MantaroBot</i></a>
 </body>
 </html>
