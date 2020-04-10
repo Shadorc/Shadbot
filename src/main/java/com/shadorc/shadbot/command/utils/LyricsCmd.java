@@ -85,10 +85,9 @@ public class LyricsCmd extends BaseCmd {
     private String getSearch(Context context) {
         return context.getArg()
                 .orElseGet(() -> {
-                    final GuildMusic guildMusic = MusicManager.getInstance().getMusic(context.getGuildId());
-                    if (guildMusic == null) {
-                        throw new MissingArgumentException();
-                    }
+                    final GuildMusic guildMusic = MusicManager.getInstance()
+                            .getMusic(context.getGuildId())
+                            .orElseThrow(MissingArgumentException::new);
 
                     final AudioTrack track = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack();
                     if (track == null) {

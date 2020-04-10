@@ -16,7 +16,6 @@ import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
-import reactor.util.annotation.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -96,11 +95,9 @@ public class MusicManager {
         return Optional.ofNullable(this.guildMusicConnections.get(guildId));
     }
 
-    @Nullable
-    public GuildMusic getMusic(Snowflake guildId) {
+    public Optional<GuildMusic> getMusic(Snowflake guildId) {
         return this.getConnection(guildId)
-                .flatMap(GuildMusicConnection::getGuildMusic)
-                .orElse(null);
+                .flatMap(GuildMusicConnection::getGuildMusic);
     }
 
     public Mono<Void> removeConnection(Snowflake guildId) {
