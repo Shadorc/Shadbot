@@ -20,6 +20,7 @@ import reactor.util.annotation.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -66,7 +67,7 @@ public class MusicManager {
                     return new GuildMusicConnection(client, guildId);
                 }))
                 .flatMap(guildMusicConnection -> {
-                    if (guildMusicConnection.getGuildMusic() == null) {
+                    if (guildMusicConnection.getGuildMusic().isEmpty()) {
                         LOGGER.debug("{Guild ID: {}} Creating guild music.", guildId.asLong());
 
                         final AudioPlayer audioPlayer = this.audioPlayerManager.createPlayer();
@@ -83,22 +84,24 @@ public class MusicManager {
 
                                     final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
                                     return guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
-                                            .thenReturn(guildMusicConnection.getGuildMusic());
+                                            .then(Mono.justOrEmpty(guildMusicConnection.getGuildMusic()));
                                 });
                     } else {
-                        return Mono.just(guildMusicConnection.getGuildMusic());
+                        return Mono.justOrEmpty(guildMusicConnection.getGuildMusic());
                     }
                 });
     }
 
+    @Nullable
     public GuildMusicConnection getConnection(Snowflake guildId) {
         return this.guildMusicConnections.get(guildId);
     }
 
     @Nullable
     public GuildMusic getMusic(Snowflake guildId) {
-        final GuildMusicConnection guildMusicConnection = this.getConnection(guildId);
-        return guildMusicConnection == null ? null : guildMusicConnection.getGuildMusic();
+        return Optional.ofNullable(this.getConnection(guildId))
+                .flatMap(GuildMusicConnection::getGuildMusic)
+                .orElse(null);
     }
 
     public Mono<Void> removeConnection(Snowflake guildId) {
@@ -108,7 +111,7 @@ public class MusicManager {
 
     public List<Snowflake> getGuildIdsWithGuildMusics() {
         return this.guildMusicConnections.keySet().stream()
-                .filter(guildId -> this.getConnection(guildId).getGuildMusic() != null)
+                .filter(guildId -> this.getConnection(guildId).getGuildMusic().isPresent())
                 .collect(Collectors.toList());
     }
 

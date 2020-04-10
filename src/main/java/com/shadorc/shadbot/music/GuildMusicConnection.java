@@ -49,7 +49,7 @@ public class GuildMusicConnection {
 
                     // If the voice connection has been disconnected or if an error occurred while loading a track
                     // (guild music being null), the voice channel can be joined after the guild music is destroyed.
-                    if (!voiceConnection.isConnected() || this.getGuildMusic() == null) {
+                    if (!voiceConnection.isConnected() || this.getGuildMusic().isEmpty()) {
                         return this.leaveVoiceChannel();
                     }
                     return Mono.empty();
@@ -69,8 +69,8 @@ public class GuildMusicConnection {
                         LOGGER.info("{Guild ID: {}} Voice channel left.", this.guildId.asLong());
                     }
 
-                    if (this.getGuildMusic() != null) {
-                        this.getGuildMusic().destroy();
+                    if (this.getGuildMusic().isPresent()) {
+                        this.getGuildMusic().ifPresent(GuildMusic::destroy);
                         this.setGuildMusic(null);
                         LOGGER.debug("{Guild ID: {}} Guild music destroyed.", this.guildId.asLong());
                     }
@@ -81,9 +81,8 @@ public class GuildMusicConnection {
         return Optional.ofNullable(this.voiceConnection);
     }
 
-    @Nullable
-    public GuildMusic getGuildMusic() {
-        return this.guildMusic;
+    public Optional<GuildMusic> getGuildMusic() {
+        return Optional.ofNullable(this.guildMusic);
     }
 
     public void setGuildMusic(GuildMusic guildMusic) {
