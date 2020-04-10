@@ -7,6 +7,7 @@ import discord4j.rest.util.Snowflake;
 import discord4j.voice.AudioProvider;
 import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
+import reactor.util.annotation.Nullable;
 
 import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 
@@ -15,7 +16,9 @@ public class GuildMusicConnection {
     private final GatewayDiscordClient client;
     private final Snowflake guildId;
 
+    @Nullable
     private VoiceConnection voiceConnection;
+    @Nullable
     private GuildMusic guildMusic;
 
     public GuildMusicConnection(GatewayDiscordClient client, Snowflake guildId) {
@@ -28,7 +31,7 @@ public class GuildMusicConnection {
      */
     public Mono<Void> joinVoiceChannel(Snowflake voiceChannelId, AudioProvider audioProvider) {
         // Do not join a voice channel if a voice connection already exists and is connected
-        if (this.voiceConnection != null && this.voiceConnection.isConnected()) {
+        if (this.getVoiceConnection() != null && this.getVoiceConnection().isConnected()) {
             return Mono.empty();
         }
 
@@ -40,11 +43,11 @@ public class GuildMusicConnection {
                 .flatMap(voiceConnection -> {
                     LogUtils.info("{Guild ID: %d} Voice channel joined.", this.guildId.asLong());
 
-                    this.voiceConnection = voiceConnection;
+                    this.setVoiceConnection(voiceConnection);
 
                     // If the voice connection has been disconnected or if an error occurred while loading a track
                     // (guild music being null), the voice channel can be joined after the guild music is destroyed.
-                    if (!this.voiceConnection.isConnected() || this.guildMusic == null) {
+                    if (!this.getVoiceConnection().isConnected() || this.getGuildMusic() == null) {
                         return this.leaveVoiceChannel();
                     }
                     return Mono.empty();
@@ -56,32 +59,38 @@ public class GuildMusicConnection {
      * Leave the voice channel and destroy the {@link GuildMusic}.
      */
     public Mono<Void> leaveVoiceChannel() {
-        return Mono.justOrEmpty(this.voiceConnection)
+        return Mono.justOrEmpty(this.getVoiceConnection())
                 .flatMap(VoiceConnection::disconnect)
                 .doOnTerminate(() -> {
-                    if (this.voiceConnection != null) {
-                        this.voiceConnection = null;
+                    if (this.getVoiceConnection() != null) {
+                        this.setVoiceConnection(null);
                         LOGGER.info("{Guild ID: {}} Voice channel left.", this.guildId.asLong());
                     }
 
-                    if (this.guildMusic != null) {
-                        this.guildMusic.destroy();
-                        this.guildMusic = null;
+                    if (this.getGuildMusic() != null) {
+                        this.getGuildMusic().destroy();
+                        this.setGuildMusic(null);
                         LOGGER.debug("{Guild ID: {}} Guild music destroyed.", this.guildId.asLong());
                     }
                 });
     }
 
+    @Nullable
     public VoiceConnection getVoiceConnection() {
         return this.voiceConnection;
     }
 
+    @Nullable
     public GuildMusic getGuildMusic() {
         return this.guildMusic;
     }
 
     public void setGuildMusic(GuildMusic guildMusic) {
         this.guildMusic = guildMusic;
+    }
+
+    public void setVoiceConnection(VoiceConnection voiceConnection) {
+        this.voiceConnection = voiceConnection;
     }
 
 }
