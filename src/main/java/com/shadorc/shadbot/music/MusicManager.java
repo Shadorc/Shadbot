@@ -114,7 +114,7 @@ public class MusicManager {
 
     public List<Snowflake> getGuildIdsWithVoice() {
         return this.guildMusicConnections.keySet().stream()
-                .filter(guildId -> this.getConnection(guildId).getVoiceConnection() != null)
+                .filter(guildId -> this.getConnection(guildId).getVoiceConnection().isPresent())
                 .collect(Collectors.toList());
     }
 
