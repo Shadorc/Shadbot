@@ -62,6 +62,7 @@ public class Shadbot {
                 .install();
 
         final DiscordClient client = DiscordClient.builder(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN))
+                .setDebugMode(false)
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
                 .build();
 
