@@ -56,13 +56,15 @@ public class Shadbot {
         Sentry.init(CredentialManager.getInstance().get(Credential.SENTRY_DSN));
 
         // BlockHound is used to detect blocking actions in non-blocking threads
-        LOGGER.info("Initializing BlockHound...");
-        BlockHound.builder()
-                .allowBlockingCallsInside("java.io.FileInputStream", "readBytes")
-                .install();
+        if (Config.IS_SNAPSHOT) {
+            LOGGER.info("Initializing BlockHound...");
+            BlockHound.builder()
+                    .allowBlockingCallsInside("java.io.FileInputStream", "readBytes")
+                    .install();
+        }
 
         final DiscordClient client = DiscordClient.builder(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN))
-                .setDebugMode(false)
+                .setDebugMode(Config.IS_SNAPSHOT)
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
                 .build();
 
