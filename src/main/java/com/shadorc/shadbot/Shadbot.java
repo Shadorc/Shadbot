@@ -17,6 +17,8 @@ import discord4j.core.retriever.EntityRetrievalStrategy;
 import discord4j.discordjson.json.ApplicationInfoData;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.UserData;
+import discord4j.gateway.intent.Intent;
+import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.response.ResponseFunction;
 import discord4j.rest.util.Snowflake;
 import discord4j.store.api.mapping.MappingStoreService;
@@ -81,6 +83,13 @@ public class Shadbot {
         LOGGER.info("Connecting to Discord...");
         Shadbot.gateway = client.gateway()
                 .setEntityRetrievalStrategy(EntityRetrievalStrategy.STORE_FALLBACK_REST)
+                .setEnabledIntents(IntentSet.of(
+                        Intent.GUILDS,
+                        Intent.GUILD_MEMBERS,
+                        Intent.GUILD_VOICE_STATES,
+                        Intent.GUILD_MESSAGES,
+                        Intent.GUILD_MESSAGE_REACTIONS,
+                        Intent.DIRECT_MESSAGES))
                 .setStoreService(MappingStoreService.create()
                         // Do not store messages
                         .setMapping(new NoOpStoreService(), MessageData.class)
