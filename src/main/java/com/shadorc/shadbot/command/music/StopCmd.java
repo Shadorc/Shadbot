@@ -3,7 +3,6 @@ package com.shadorc.shadbot.command.music;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.music.GuildMusicConnection;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -24,9 +23,9 @@ public class StopCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         context.requireGuildMusic();
-        return Mono.justOrEmpty(MusicManager.getInstance()
-                .getConnection(context.getGuildId()))
-                .flatMap(GuildMusicConnection::leaveVoiceChannel)
+        return MusicManager.getInstance()
+                .getConnection(context.getGuildId())
+                .leaveVoiceChannel()
                 .then(context.getChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.STOP_BUTTON + " Music stopped by **%s**.",
                         context.getUsername()), channel))

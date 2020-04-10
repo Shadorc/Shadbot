@@ -8,6 +8,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -83,18 +84,20 @@ public class LyricsCmd extends BaseCmd {
      */
     private String getSearch(Context context) {
         return context.getArg()
-                .orElseGet(() -> MusicManager.getInstance()
-                        .getMusic(context.getGuildId())
-                        .map(guildMusic -> {
-                            final AudioTrack track = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack();
-                            if (track == null) {
-                                throw new MissingArgumentException();
-                            }
-                            final AudioTrackInfo info = track.getInfo();
-                            // Remove from title (case insensitive): official, video, music, [, ], (, )
-                            return PATTERN.matcher(info.title).replaceAll("").trim();
-                        })
-                        .orElseThrow(MissingArgumentException::new));
+                .orElseGet(() -> {
+                    final GuildMusic guildMusic = MusicManager.getInstance().getMusic(context.getGuildId());
+                    if (guildMusic == null) {
+                        throw new MissingArgumentException();
+                    }
+
+                    final AudioTrack track = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack();
+                    if (track == null) {
+                        throw new MissingArgumentException();
+                    }
+                    final AudioTrackInfo info = track.getInfo();
+                    // Remove from title (case insensitive): official, video, music, [, ], (, )
+                    return PATTERN.matcher(info.title).replaceAll("").trim();
+                });
     }
 
     private Mono<Document> getLyricsDocument(String url) {
