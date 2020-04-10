@@ -172,11 +172,10 @@ public class Context {
     }
 
     public GuildMusic requireGuildMusic() {
-        final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.getGuildId());
-        if (guildMusic == null || guildMusic.getTrackScheduler().isStopped()) {
-            throw new NoMusicException();
-        }
-        return guildMusic;
+        return MusicManager.getInstance()
+                .getMusic(this.getGuildId())
+                .filter(guildMusic -> !guildMusic.getTrackScheduler().isStopped())
+                .orElseThrow(NoMusicException::new);
     }
 
 }

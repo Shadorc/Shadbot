@@ -92,8 +92,10 @@ public class AudioLoadResultInputs extends Inputs {
 
     @Override
     public boolean takeEventWile(MessageCreateEvent event) {
-        final GuildMusic guildMusic = MusicManager.getInstance().getMusic(this.listener.getGuildId());
-        return guildMusic != null && guildMusic.isWaitingForChoice();
+        return MusicManager.getInstance()
+                .getMusic(this.listener.getGuildId())
+                .map(GuildMusic::isWaitingForChoice)
+                .orElse(false);
     }
 
 }
