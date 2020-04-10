@@ -51,9 +51,9 @@ public class GuildMusic {
         LOGGER.debug("{Guild ID: {}} Scheduling auto-leave.", this.guildId.asLong());
         this.leavingTask.set(Mono.delay(Duration.ofMinutes(1), Schedulers.boundedElastic())
                 .filter(ignored -> this.isLeavingScheduled())
-                .flatMap(ignored -> MusicManager.getInstance()
-                        .getConnection(this.guildId)
-                        .leaveVoiceChannel())
+                .map(ignored -> MusicManager.getInstance().getConnection(this.guildId))
+                .flatMap(Mono::justOrEmpty)
+                .flatMap(GuildMusicConnection::leaveVoiceChannel)
                 .subscribe(null, ExceptionHandler::handleUnknownError));
     }
 
@@ -66,9 +66,9 @@ public class GuildMusic {
 
     public Mono<Void> end() {
         LOGGER.debug("{Guild ID: {}} Ending guild music.", this.guildId.asLong());
-        return MusicManager.getInstance()
-                .getConnection(this.guildId)
-                .leaveVoiceChannel()
+        return Mono.justOrEmpty(MusicManager.getInstance()
+                .getConnection(this.guildId))
+                .flatMap(GuildMusicConnection::leaveVoiceChannel)
                 .then(this.getMessageChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel))
                 .then();
@@ -125,9 +125,9 @@ public class GuildMusic {
         this.listeners.remove(listener);
         // If there is no music playing and nothing is loading, leave the voice channel
         if (this.trackScheduler.isStopped() && this.listeners.values().stream().allMatch(Future::isDone)) {
-            return MusicManager.getInstance()
-                    .getConnection(this.guildId)
-                    .leaveVoiceChannel();
+            return Mono.justOrEmpty(MusicManager.getInstance()
+                    .getConnection(this.guildId))
+                    .flatMap(GuildMusicConnection::leaveVoiceChannel);
         }
         return Mono.empty();
     }

@@ -92,14 +92,13 @@ public class MusicManager {
                 });
     }
 
-    @Nullable
-    public GuildMusicConnection getConnection(Snowflake guildId) {
-        return this.guildMusicConnections.get(guildId);
+    public Optional<GuildMusicConnection> getConnection(Snowflake guildId) {
+        return Optional.ofNullable(this.guildMusicConnections.get(guildId));
     }
 
     @Nullable
     public GuildMusic getMusic(Snowflake guildId) {
-        return Optional.ofNullable(this.getConnection(guildId))
+        return this.getConnection(guildId)
                 .flatMap(GuildMusicConnection::getGuildMusic)
                 .orElse(null);
     }
@@ -111,13 +110,13 @@ public class MusicManager {
 
     public List<Snowflake> getGuildIdsWithGuildMusics() {
         return this.guildMusicConnections.keySet().stream()
-                .filter(guildId -> this.getConnection(guildId).getGuildMusic().isPresent())
+                .filter(guildId -> this.getConnection(guildId).flatMap(GuildMusicConnection::getGuildMusic).isPresent())
                 .collect(Collectors.toList());
     }
 
     public List<Snowflake> getGuildIdsWithVoice() {
         return this.guildMusicConnections.keySet().stream()
-                .filter(guildId -> this.getConnection(guildId).getVoiceConnection().isPresent())
+                .filter(guildId -> this.getConnection(guildId).flatMap(GuildMusicConnection::getVoiceConnection).isPresent())
                 .collect(Collectors.toList());
     }
 
