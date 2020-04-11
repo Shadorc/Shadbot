@@ -25,6 +25,8 @@ import java.util.function.Consumer;
 
 public class PlayCmd extends BaseCmd {
 
+    private static final String SC_QUERY = "soundcloud ";
+
     public PlayCmd() {
         super(CommandCategory.MUSIC, List.of("play", "add", "queue", "playfirst", "addfirst", "queuefirst"));
         this.setDefaultRateLimiter();
@@ -38,13 +40,13 @@ public class PlayCmd extends BaseCmd {
                 .flatMap(voiceChannel -> context.getChannel()
                         .flatMap(channel -> MusicManager.getInstance()
                                 .getOrCreate(context.getClient(), context.getGuildId(), voiceChannel.getId())
-                                .flatMap(guildMusic -> PlayCmd.play(context, channel, guildMusic, PlayCmd.getIdentifier(arg)))));
+                                .flatMap(guildMusic -> this.play(context, channel, guildMusic, this.getIdentifier(arg)))));
     }
 
-    private static String getIdentifier(String arg) {
+    private String getIdentifier(String arg) {
         // If this is a SoundCloud search...
-        if (arg.startsWith("soundcloud ")) {
-            return AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, "soundcloud ");
+        if (arg.startsWith(SC_QUERY)) {
+            return AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, SC_QUERY);
         } else {
             try {
                 // ... else if the argument is a valid URL...
@@ -57,7 +59,7 @@ public class PlayCmd extends BaseCmd {
         }
     }
 
-    private static Mono<Void> play(Context context, MessageChannel channel, GuildMusic guildMusic, String identifier) {
+    private Mono<Void> play(Context context, MessageChannel channel, GuildMusic guildMusic, String identifier) {
         // Someone is already selecting a music...
         if (guildMusic.isWaitingForChoice()) {
             if (guildMusic.getDjId().equals(context.getAuthorId())) {
@@ -76,22 +78,20 @@ public class PlayCmd extends BaseCmd {
             }
         }
 
-        return DatabaseManager.getPremium().isPremium(context.getGuildId(), context.getAuthorId())
-                .flatMap(isPremium -> {
-                    if (guildMusic.getTrackScheduler().getPlaylist().size() >= Config.PLAYLIST_SIZE - 1 && !isPremium) {
-                        return DiscordUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, channel).then();
-                    }
-
-                    guildMusic.setMessageChannel(context.getChannelId());
-
+        return DatabaseManager.getPremium()
+                .isPremium(context.getGuildId(), context.getAuthorId())
+                .filter(isPremium -> guildMusic.getTrackScheduler().getPlaylist().size() < Config.PLAYLIST_SIZE - 1 || isPremium)
+                .doOnNext(ignored -> {
                     final boolean insertFirst = context.getCommandName().endsWith("first");
                     final AudioLoadResultListener resultListener = new AudioLoadResultListener(
                             context.getGuildId(), context.getAuthorId(), identifier, insertFirst);
 
+                    guildMusic.setMessageChannelId(context.getChannelId());
                     guildMusic.addAudioLoadResultListener(resultListener, identifier);
-
-                    return Mono.empty();
-                });
+                })
+                .switchIfEmpty(DiscordUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, channel)
+                        .then(Mono.empty()))
+                .then();
     }
 
     @Override

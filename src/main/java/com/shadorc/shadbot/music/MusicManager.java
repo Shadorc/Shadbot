@@ -10,19 +10,21 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
+import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.rest.util.Snowflake;
+import discord4j.voice.AudioProvider;
+import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MusicManager {
 
@@ -35,13 +37,15 @@ public class MusicManager {
     }
 
     private final AudioPlayerManager audioPlayerManager;
-    private final Map<Snowflake, GuildMusicConnection> guildMusicConnections;
+    private final Map<Snowflake, GuildMusic> guildMusics;
+    private final Map<Snowflake, AtomicBoolean> guildJoining;
 
     private MusicManager() {
         this.audioPlayerManager = new DefaultAudioPlayerManager();
         this.audioPlayerManager.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
-        this.guildMusicConnections = new ConcurrentHashMap<>();
+        this.guildMusics = new ConcurrentHashMap<>();
+        this.guildJoining = new ConcurrentHashMap<>();
     }
 
     /**
@@ -60,65 +64,76 @@ public class MusicManager {
      * {@code voiceChannelId} is sent.
      */
     public Mono<GuildMusic> getOrCreate(GatewayDiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
-        return Mono.just(this.guildMusicConnections.computeIfAbsent(guildId,
-                ignored -> {
-                    LOGGER.debug("{Guild ID: {}} Creating guild music connection.", guildId.asLong());
-                    return new GuildMusicConnection(client, guildId);
-                }))
-                .flatMap(guildMusicConnection -> {
-                    if (guildMusicConnection.getGuildMusic().isEmpty()) {
-                        LOGGER.debug("{Guild ID: {}} Creating guild music.", guildId.asLong());
+        return Mono.justOrEmpty(this.getGuildMusic(guildId))
+                .switchIfEmpty(Mono.defer(() -> {
+                    final AudioPlayer audioPlayer = this.audioPlayerManager.createPlayer();
+                    audioPlayer.addListener(new TrackEventListener(guildId));
+                    final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
 
-                        final AudioPlayer audioPlayer = this.audioPlayerManager.createPlayer();
-                        audioPlayer.addListener(new TrackEventListener(guildId));
+                    return this.joinVoiceChannel(client, guildId, voiceChannelId, audioProvider)
+                            .zipWith(DatabaseManager.getGuilds()
+                                    .getDBGuild(guildId)
+                                    .map(DBGuild::getSettings)
+                                    .map(Settings::getDefaultVol)
+                                    .map(volume -> new TrackScheduler(audioPlayer, volume)))
+                            .map(tuple -> {
+                                final GuildMusic guildMusic = new GuildMusic(client, guildId, tuple.getT1(), tuple.getT2());
+                                this.guildMusics.put(guildId, guildMusic);
+                                return guildMusic;
+                            })
+                            .doOnNext(guildMusic -> LOGGER.debug("{Guild ID: {}} Guild music created.", guildId.asLong()));
+                }));
+    }
 
-                        return DatabaseManager.getGuilds()
-                                .getDBGuild(guildId)
-                                .map(DBGuild::getSettings)
-                                .map(Settings::getDefaultVol)
-                                .flatMap(volume -> {
-                                    final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer, volume);
-                                    final GuildMusic guildMusic = new GuildMusic(client, guildId, trackScheduler);
-                                    guildMusicConnection.setGuildMusic(guildMusic);
+    public Mono<Void> destroyConnection(Snowflake guildId) {
+        this.guildJoining.remove(guildId);
+        final GuildMusic guildMusic = this.guildMusics.remove(guildId);
+        if (guildMusic != null) {
+            guildMusic.destroy();
+            LOGGER.debug("{Guild ID: {}} Guild music destroyed.", guildId.asLong());
+        }
 
-                                    final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
-                                    return guildMusicConnection.joinVoiceChannel(voiceChannelId, audioProvider)
-                                            .then(Mono.justOrEmpty(guildMusicConnection.getGuildMusic()));
-                                });
-                    } else {
-                        return Mono.justOrEmpty(guildMusicConnection.getGuildMusic());
-                    }
+        return Mono.justOrEmpty(guildMusic)
+                .map(GuildMusic::getVoiceConnection)
+                .filter(VoiceConnection::isConnected)
+                .flatMap(VoiceConnection::disconnect);
+    }
+
+    /**
+     * Requests to join a voice channel.
+     */
+    private Mono<VoiceConnection> joinVoiceChannel(GatewayDiscordClient client, Snowflake guildId, Snowflake voiceChannelId,
+                                                   AudioProvider audioProvider) {
+        // Do not join a voice channel if a voice connection is already established
+        if (this.guildJoining.getOrDefault(guildId, new AtomicBoolean(false)).get()) {
+            return Mono.empty();
+        }
+
+        this.guildJoining.computeIfAbsent(guildId, id -> new AtomicBoolean()).set(true);
+        LOGGER.debug("{Guild ID: {}} Joining voice channel...", guildId.asLong());
+
+        return client.getChannelById(voiceChannelId)
+                .cast(VoiceChannel.class)
+                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
+                .doOnNext(voiceConnection -> {
+                    LogUtils.info("{Guild ID: %d} Voice channel joined.", guildId.asLong());
+                    this.guildJoining.getOrDefault(guildId, new AtomicBoolean()).set(false);
                 });
     }
 
-    public Optional<GuildMusicConnection> getConnection(Snowflake guildId) {
-        return Optional.ofNullable(this.guildMusicConnections.get(guildId));
+    public Optional<GuildMusic> getGuildMusic(Snowflake guildId) {
+        final GuildMusic guildMusic = this.guildMusics.get(guildId);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("{Guild ID: {}} Guild music request: {}", guildId.asLong(), guildMusic);
+        }
+        return Optional.ofNullable(guildMusic);
     }
 
-    public Optional<GuildMusic> getMusic(Snowflake guildId) {
-        return this.getConnection(guildId)
-                .flatMap(GuildMusicConnection::getGuildMusic);
-    }
-
-    public Mono<Void> removeConnection(Snowflake guildId) {
-        return Mono.justOrEmpty(this.guildMusicConnections.remove(guildId))
-                .flatMap(GuildMusicConnection::leaveVoiceChannel);
-    }
-
-    public List<Snowflake> getGuildIdsWithGuildMusics() {
-        return this.guildMusicConnections.keySet().stream()
-                .filter(guildId -> this.getConnection(guildId).flatMap(GuildMusicConnection::getGuildMusic).isPresent())
-                .collect(Collectors.toList());
-    }
-
-    public List<Snowflake> getGuildIdsWithVoice() {
-        return this.guildMusicConnections.keySet().stream()
-                .filter(guildId -> this.getConnection(guildId).flatMap(GuildMusicConnection::getVoiceConnection).isPresent())
-                .collect(Collectors.toList());
+    public long getGuildMusicCount() {
+        return this.guildMusics.size();
     }
 
     public static MusicManager getInstance() {
         return MusicManager.instance;
     }
-
 }
