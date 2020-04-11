@@ -117,7 +117,7 @@ public class ResourceStatsCmd extends BaseCmd {
                             final ChartPanel chartPanel = new ChartPanel(chart, false);
 
                             // Draw jpeg
-                            final int width = 512;
+                            final int width = 640;
                             final int height = 360;
                             final BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
                             final Graphics graphics = bufferedImage.getGraphics();
