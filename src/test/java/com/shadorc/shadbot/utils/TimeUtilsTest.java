@@ -3,6 +3,7 @@ package com.shadorc.shadbot.utils;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Random;
@@ -10,6 +11,15 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TimeUtilsTest {
+
+    @Test
+    public void testIsLocalDateInTheSameWeek() {
+        assertTrue(TimeUtils.isLocalDateInTheSameWeek(LocalDate.now(), LocalDate.now()));
+        assertTrue(TimeUtils.isLocalDateInTheSameWeek(
+                LocalDate.of(2020, 04, 11), LocalDate.of(2020, 04, 6)));
+        assertFalse(TimeUtils.isLocalDateInTheSameWeek(
+                LocalDate.of(2020, 04, 11), LocalDate.of(2020, 04, 13)));
+    }
 
     @Test
     public void testGetMillisUntilInstant() {
