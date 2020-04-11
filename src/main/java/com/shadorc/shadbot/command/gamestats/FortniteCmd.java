@@ -44,7 +44,7 @@ public class FortniteCmd extends BaseCmd {
                         args.get(0), FormatUtils.options(Platform.class))));
 
         final String epicNickname = args.get(1);
-        final String encodedNickname = epicNickname.replace(" ", "%20");
+        final String encodedNickname = NetUtils.encode(epicNickname.replace(" ", "%20"));
         final String url = String.format("https://api.fortnitetracker.com/v1/profile/%s/%s",
                 platform.toString().toLowerCase(), encodedNickname);
 
