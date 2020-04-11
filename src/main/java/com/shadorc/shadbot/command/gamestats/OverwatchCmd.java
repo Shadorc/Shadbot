@@ -15,10 +15,8 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
-import reactor.util.annotation.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -52,25 +50,18 @@ public class OverwatchCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final List<String> args = context.requireArgs(1, 2);
+        final List<String> args = context.requireArgs(2);
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        final Platform platform;
-        final String username;
-        if (args.size() == 2) {
-            platform = Utils.parseEnum(Platform.class, args.get(0),
-                    new CommandException(String.format("`%s` is not a valid Platform. %s",
-                            args.get(0), FormatUtils.options(Platform.class))));
-            username = args.get(1);
-        } else {
-            platform = null;
-            username = args.get(0);
-        }
+        final Platform platform = Utils.parseEnum(Platform.class, args.get(0),
+                new CommandException(String.format("`%s` is not a valid Platform. %s",
+                        args.get(0), FormatUtils.options(Platform.class))));
+        final String battletag = args.get(1);
 
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Overwatch stats...", context.getUsername()))
                 .send()
-                .then(this.getOverwatchProfile(username, platform))
+                .then(this.getOverwatchProfile(battletag, platform))
                 .map(profile -> {
                     if (profile.getProfile().isPrivate()) {
                         return updatableMsg.setContent(
@@ -96,32 +87,22 @@ public class OverwatchCmd extends BaseCmd {
                 .then();
     }
 
-    /**
-     * Automatically detects the platform by iterating over all of them if {@code platform} is null.
-     */
-    private Mono<OverwatchProfile> getOverwatchProfile(String battletag, @Nullable Platform platform) {
+    private Mono<OverwatchProfile> getOverwatchProfile(String battletag, Platform platform) {
         final String username = battletag.replace("#", "-");
-        final List<Platform> platforms = platform == null ? List.of(Platform.values()) : List.of(platform);
 
-        return Flux.fromIterable(platforms)
-                .flatMap(platformItr -> {
-                    final Mono<ProfileResponse> getProfile = NetUtils.get(
-                            this.getUrl("profile", platformItr, username), ProfileResponse.class)
-                            .map(profile -> {
-                                if (profile.getMessage().map("Error: Profile not found"::equals).orElse(false)) {
-                                    throw new CommandException("Profile not found.");
-                                }
-                                return profile;
-                            });
-                    final Mono<StatsResponse> getStats = NetUtils.get(
-                            this.getUrl("stats", platformItr, username), StatsResponse.class);
-                    return Mono.zip(Mono.just(platformItr), getProfile, getStats);
-                })
-                .onErrorResume(err -> Mono.empty())
-                .next()
-                .map(TupleUtils.function(OverwatchProfile::new))
-                .switchIfEmpty(Mono.error(new CommandException(String.format("Platform not found. Try again specifying it. %s",
-                        FormatUtils.options(Platform.class)))));
+        final Mono<ProfileResponse> getProfile =
+                NetUtils.get(this.getUrl("profile", platform, username), ProfileResponse.class)
+                        .map(profile -> {
+                            if (profile.getMessage().map("Error: Profile not found"::equals).orElse(false)) {
+                                throw new CommandException("Profile not found. The specified platform may be incorrect.");
+                            }
+                            return profile;
+                        });
+        final Mono<StatsResponse> getStats =
+                NetUtils.get(this.getUrl("stats", platform, username), StatsResponse.class);
+
+        return Mono.zip(Mono.just(platform), getProfile, getStats)
+                .map(TupleUtils.function(OverwatchProfile::new));
     }
 
     private String getUrl(String endpoint, Platform platform, String username) {
@@ -132,9 +113,8 @@ public class OverwatchCmd extends BaseCmd {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
                 .setDescription("Show player's stats for Overwatch.")
-                .addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")), true)
+                .addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")), false)
                 .addArg("username", "case sensitive", false)
-                .addField("Info", "**platform** is automatically detected if nothing is specified.", false)
                 .setExample(String.format("%s%s pc Shadorc#2503", context.getPrefix(), this.getName()))
                 .build();
     }
