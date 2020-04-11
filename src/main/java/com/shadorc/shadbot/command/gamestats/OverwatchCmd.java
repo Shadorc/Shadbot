@@ -57,17 +57,20 @@ public class OverwatchCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
         final Platform platform;
+        final String username;
         if (args.size() == 2) {
-            platform = Utils.parseEnum(Platform.class, args.get(1),
+            platform = Utils.parseEnum(Platform.class, args.get(0),
                     new CommandException(String.format("`%s` is not a valid Platform. %s",
-                            args.get(1), FormatUtils.options(Platform.class))));
+                            args.get(0), FormatUtils.options(Platform.class))));
+            username = args.get(1);
         } else {
             platform = null;
+            username = args.get(0);
         }
 
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Overwatch stats...", context.getUsername()))
                 .send()
-                .then(this.getOverwatchProfile(args.get(0), platform))
+                .then(this.getOverwatchProfile(username, platform))
                 .map(profile -> {
                     if (profile.getProfile().isPrivate()) {
                         return updatableMsg.setContent(
