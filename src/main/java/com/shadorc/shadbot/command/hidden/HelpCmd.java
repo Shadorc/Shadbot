@@ -46,8 +46,9 @@ public class HelpCmd extends BaseCmd {
                             embed.setAuthor("Shadbot Help", Config.SUPPORT_SERVER_URL, context.getAvatarUrl())
                                     .setDescription(String.format("Any issues, questions or suggestions ?"
                                                     + " Join the [support server.](%s)"
-                                                    + "%nGet more information by using `%s%s <command>`.",
-                                            Config.SUPPORT_SERVER_URL, context.getPrefix(), this.getName()));
+                                                    + "%nI need your help to [keep Shadbot alive!](%s)"
+                                                    + "%nGet more information for a specific command by using `%s%s <command>`.",
+                                            Config.SUPPORT_SERVER_URL, Config.PATREON_URL, context.getPrefix(), this.getName()));
 
                             for (final CommandCategory category : CommandCategory.values()) {
                                 if (!map.getOrDefault(category, Collections.emptyList()).isEmpty()
