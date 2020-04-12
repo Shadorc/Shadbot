@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 public class InviteCmd extends BaseCmd {
 
     public InviteCmd() {
-        super(CommandCategory.INFO, List.of("invite", "link", "support"));
+        super(CommandCategory.INFO, List.of("invite", "support", "donate", "donation", "link", "links"));
         this.setDefaultRateLimiter();
     }
 
