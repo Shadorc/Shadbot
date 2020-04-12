@@ -115,10 +115,8 @@ public class MusicManager {
         return client.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
-                .doOnNext(voiceConnection -> {
-                    LogUtils.info("{Guild ID: %d} Voice channel joined.", guildId.asLong());
-                    this.guildJoining.getOrDefault(guildId, new AtomicBoolean()).set(false);
-                });
+                .doOnNext(voiceConnection -> LogUtils.info("{Guild ID: %d} Voice channel joined.", guildId.asLong()))
+                .doOnTerminate(() -> this.guildJoining.getOrDefault(guildId, new AtomicBoolean()).set(false));
     }
 
     public Optional<GuildMusic> getGuildMusic(Snowflake guildId) {

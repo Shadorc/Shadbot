@@ -106,10 +106,6 @@ public class GuildMusic {
         return this.trackScheduler;
     }
 
-    public boolean isWaitingForChoice() {
-        return this.isWaitingForChoice.get();
-    }
-
     public Snowflake getMessageChannelId() {
         return this.messageChannelId.get();
     }
@@ -123,6 +119,14 @@ public class GuildMusic {
         return this.djId.get();
     }
 
+    public boolean isWaitingForChoice() {
+        return this.isWaitingForChoice.get();
+    }
+
+    public boolean isLeavingScheduled() {
+        return this.leavingTask.get() != null && !this.leavingTask.get().isDisposed();
+    }
+
     public void setWaitingForChoice(boolean isWaitingForChoice) {
         this.isWaitingForChoice.set(isWaitingForChoice);
     }
@@ -133,10 +137,6 @@ public class GuildMusic {
 
     public void setDjId(Snowflake djId) {
         this.djId.set(djId);
-    }
-
-    public boolean isLeavingScheduled() {
-        return this.leavingTask.get() != null && !this.leavingTask.get().isDisposed();
     }
 
     public void destroy() {
