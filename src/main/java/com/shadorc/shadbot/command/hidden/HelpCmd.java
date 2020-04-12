@@ -40,10 +40,10 @@ public class HelpCmd extends BaseCmd {
 
         return context.getPermissions()
                 .collectList()
-                .flatMap(authorPermissions -> getMultiMap(context, authorPermissions))
+                .flatMap(authorPermissions -> this.getMultiMap(context, authorPermissions))
                 .map(map -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
-                            embed.setAuthor("Shadbot Help", null, context.getAvatarUrl())
+                            embed.setAuthor("Shadbot Help", Config.SUPPORT_SERVER_URL, context.getAvatarUrl())
                                     .setDescription(String.format("Any issues, questions or suggestions ?"
                                                     + " Join the [support server.](%s)"
                                                     + "%nGet more information by using `%s%s <command>`.",
@@ -62,8 +62,7 @@ public class HelpCmd extends BaseCmd {
                 .then();
     }
 
-    private static Mono<Map<CommandCategory, Collection<String>>> getMultiMap(Context context,
-                                                                              List<CommandPermission> authorPermissions) {
+    private Mono<Map<CommandCategory, Collection<String>>> getMultiMap(Context context, List<CommandPermission> authorPermissions) {
         final Mono<Boolean> getIsDm = context.getChannel()
                 .map(Channel::getType)
                 .map(Channel.Type.DM::equals)
