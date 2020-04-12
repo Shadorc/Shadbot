@@ -37,8 +37,8 @@ import java.util.function.Consumer;
 
 public class ResourceStatsCmd extends BaseCmd {
 
-    public static final Duration UPDATE_INTERVAL = Duration.ofMillis(2_500);
-    public static final Duration MAX_DURATION = Duration.ofHours(1);
+    public static final Duration UPDATE_INTERVAL = Duration.ofSeconds(5);
+    public static final Duration MAX_DURATION = Duration.ofHours(2);
 
     public ResourceStatsCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("resource_stats", "resource-stats"), "res_stats");
