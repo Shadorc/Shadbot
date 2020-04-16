@@ -2,10 +2,9 @@ package com.shadorc.shadbot.utils;
 
 import reactor.util.annotation.NonNull;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +15,18 @@ public class TimeUtils {
 
     private static final Pattern LETTER_PATTERN = Pattern.compile("[a-z]");
     private static final Pattern NUMBER_PATTERN = Pattern.compile("[0-9]");
+
+    /**
+     * @param date1 The first date.
+     * @param date2 The second date.
+     * @return {@code true} if the two dates are within the same week, {@code false} otherwise.
+     */
+    public static boolean isLocalDateInTheSameWeek(LocalDate date1, LocalDate date2) {
+        final LocalDate weekStart = date1.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        final LocalDate weekEnd = date1.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        return ((date2.isEqual(weekStart) || date2.isAfter(weekStart))
+                && (date2.isEqual(weekEnd) || date2.isBefore(weekEnd)));
+    }
 
     /**
      * @param instant The instant to get milliseconds from.

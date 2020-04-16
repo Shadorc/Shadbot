@@ -10,6 +10,7 @@ import com.shadorc.shadbot.db.stats.entity.command.TotalCommandStats;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.TimeUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
@@ -68,9 +69,8 @@ public class CommandStatsCmd extends BaseCmd {
 
     private ImmutableEmbedFieldData getWeeklyCommandStats(TotalCommandStats totalStats) {
         final Map<String, Integer> computedMap = new HashMap<>();
-        final LocalDate oneWeek = LocalDate.now().plusWeeks(1);
         for (final DailyCommandStats dailyStats : totalStats.getDailyCommandStats()) {
-            if (dailyStats.getDate().isBefore(oneWeek)) {
+            if (TimeUtils.isLocalDateInTheSameWeek(LocalDate.now(), dailyStats.getDate())) {
                 for (final Map.Entry<String, Integer> entry : dailyStats.getCommandStats().entrySet()) {
                     computedMap.compute(entry.getKey(),
                             (key, value) -> value == null ? entry.getValue() : value + entry.getValue());
