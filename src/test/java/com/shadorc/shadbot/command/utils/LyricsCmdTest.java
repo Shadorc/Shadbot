@@ -42,7 +42,7 @@ public class LyricsCmdTest {
 
     @Test
     public void testGetMusixmatchSpecial() throws InvocationTargetException, IllegalAccessException {
-        final Musixmatch result = ((Mono<Musixmatch>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/")).block();
+        final Musixmatch result = ((Mono<Musixmatch>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block();
         logger.debug("testGetMusixmatchSpecial: {}", result);
         assertNull(result);
     }

@@ -40,7 +40,7 @@ public class UrbanCmdTest {
     @Test
     public void testGetUrbanDefinitionSpecial() throws InvocationTargetException, IllegalAccessException {
         final UrbanDefinition result =
-                ((Mono<UrbanDefinition>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/")).block();
+                ((Mono<UrbanDefinition>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block();
         logger.debug("testGetUrbanDefinitionSpecial: {}", result);
         assertNotNull(result);
     }

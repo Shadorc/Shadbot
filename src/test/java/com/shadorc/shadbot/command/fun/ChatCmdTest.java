@@ -37,7 +37,7 @@ public class ChatCmdTest {
     @Test
     public void testGetResponseSpecial() throws InvocationTargetException, IllegalAccessException {
         final String result =
-                ((Mono<String>) method.invoke(cmd, Snowflake.of(1234L), "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/")).block();
+                ((Mono<String>) method.invoke(cmd, Snowflake.of(1234L), "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block();
         logger.debug("testGetResponseSpecial: {}", result);
         assertNotNull(result);
     }
