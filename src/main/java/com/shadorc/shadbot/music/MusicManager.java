@@ -5,7 +5,15 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.playback.NonAllocatingAudioFrameBuffer;
+import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup;
+import com.sedmelluq.lava.extensions.youtuberotator.planner.AbstractRoutePlanner;
+import com.sedmelluq.lava.extensions.youtuberotator.planner.RotatingNanoIpRoutePlanner;
+import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.IpBlock;
+import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
+import com.shadorc.shadbot.data.credential.Credential;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
@@ -20,6 +28,8 @@ import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,6 +56,18 @@ public class MusicManager {
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         this.guildMusics = new ConcurrentHashMap<>();
         this.guildJoining = new ConcurrentHashMap<>();
+
+        //IPv6 rotation config
+        final String ipv6Block = CredentialManager.getInstance().get(Credential.IPV6_BLOCK);
+        if (ipv6Block != null && !ipv6Block.isBlank()) {
+            LOGGER.info("Configuring YouTube IP rotator.");
+            final List<IpBlock> blocks = Collections.singletonList(new Ipv6Block(ipv6Block));
+            final AbstractRoutePlanner planner = new RotatingNanoIpRoutePlanner(blocks);
+
+            new YoutubeIpRotatorSetup(planner)
+                    .forSource(this.audioPlayerManager.source(YoutubeAudioSourceManager.class))
+                    .setup();
+        }
     }
 
     /**
