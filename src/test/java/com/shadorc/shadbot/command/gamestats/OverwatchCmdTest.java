@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.overwatch.OverwatchProfile;
+import com.shadorc.shadbot.command.CommandException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -40,6 +41,15 @@ public class OverwatchCmdTest {
         assertNotNull(result.getProfile().getQuickplayPlaytime());
         assertNotNull(result.getQuickplay().getEliminationsPerLife());
         assertNotNull(result.getQuickplay().getPlayed());
+    }
+
+    @Test
+    public void testGetResponseWrongBattletag() throws NoSuchMethodException {
+        final Method method = OverwatchCmd.class.getDeclaredMethod("getOverwatchProfile", String.class, OverwatchCmd.Platform.class);
+        method.setAccessible(true);
+
+        assertThrows(CommandException.class, () -> ((Mono<OverwatchProfile>) method.invoke(cmd,
+                "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%* µ,?;.:/!§<>+-*/", OverwatchCmd.Platform.PC)).block());
     }
 
 }

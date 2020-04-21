@@ -43,7 +43,7 @@ public class ImageCmdTest {
     @Test
     public void testGetPopularImageSpecial() throws InvocationTargetException, IllegalAccessException {
         final Image result = ((Mono<Image>) method.invoke(cmd,
-                NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/"))).block();
+                NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/"))).block();
         logger.debug("testGetPopularImageSpecial: {}", result);
         assertNull(result);
     }

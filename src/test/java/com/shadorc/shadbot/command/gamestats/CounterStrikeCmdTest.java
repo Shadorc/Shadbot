@@ -49,7 +49,7 @@ public class CounterStrikeCmdTest {
         assertEquals("76561198040113951", ((Mono<String>) method.invoke(cmd, "shadorc")).block());
         assertNull(((Mono<String>) method.invoke(cmd, "-76561198040113951")).block());
         assertNull(((Mono<String>) method.invoke(cmd, "thisuser_does_not_exist")).block());
-        assertNull(((Mono<String>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/")).block());
+        assertNull(((Mono<String>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block());
         assertNull(((Mono<String>) method.invoke(cmd, "*")).block());
     }
 

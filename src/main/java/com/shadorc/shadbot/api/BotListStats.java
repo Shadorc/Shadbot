@@ -33,7 +33,6 @@ public class BotListStats {
                 .count()
                 .flatMap(guildCount -> this.postOnBotListDotSpace(guildCount)
                         .and(this.postOnBotsOnDiscordXyz(guildCount))
-                        .and(this.postOnDivineDiscordBotsDotCom(guildCount))
                         .and(this.postOnDiscordBotListDotCom(guildCount))
                         .and(this.postOnDiscordBotsDotGg(guildCount))
                         .and(this.postOnDiscordBotsDotOrg(guildCount)))
@@ -80,17 +79,6 @@ public class BotListStats {
                 .put("guildCount", guildCount);
         final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", Shadbot.getSelfId().asLong());
         return this.post(url, CredentialManager.getInstance().get(Credential.BOTS_ONDISCORD_DOT_XYZ), content);
-    }
-
-    /**
-     * WebSite: https://divinediscordbots.com/ <br>
-     * Documentation: https://divinediscordbots.com/api
-     */
-    private Mono<String> postOnDivineDiscordBotsDotCom(Long guildCount) {
-        final JSONObject content = new JSONObject()
-                .put("server_count", guildCount);
-        final String url = String.format("https://divinediscordbots.com/bot/%d/stats", Shadbot.getSelfId().asLong());
-        return this.post(url, CredentialManager.getInstance().get(Credential.DIVINE_DISCORD_BOTS_DOT_COM_TOKEN), content);
     }
 
     /**

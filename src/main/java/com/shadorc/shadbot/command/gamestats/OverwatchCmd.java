@@ -88,7 +88,7 @@ public class OverwatchCmd extends BaseCmd {
     }
 
     private Mono<OverwatchProfile> getOverwatchProfile(String battletag, Platform platform) {
-        final String username = battletag.replace("#", "-");
+        final String username = NetUtils.encode(battletag.replace("#", "-"));
 
         final Mono<ProfileResponse> getProfile =
                 NetUtils.get(this.getUrl("profile", platform, username), ProfileResponse.class)

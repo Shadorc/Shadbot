@@ -38,7 +38,7 @@ public class WikipediaCmdTest {
 
     @Test
     public void testGetWikipediaPageSpecial() throws InvocationTargetException, IllegalAccessException {
-        final WikipediaPage result = ((Mono<WikipediaPage>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%*µ,?;.:/!§<>+-*/")).block();
+        final WikipediaPage result = ((Mono<WikipediaPage>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block();
         logger.debug("testGetWikipediaPageSpecial: {}", result);
         assertNull(result);
     }
