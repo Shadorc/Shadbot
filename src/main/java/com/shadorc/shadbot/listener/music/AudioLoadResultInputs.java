@@ -32,7 +32,7 @@ public class AudioLoadResultInputs extends Inputs {
 
     @Override
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
-        return Mono.justOrEmpty(MusicManager.getInstance().getMusic(this.listener.getGuildId()))
+        return Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.listener.getGuildId()))
                 .map(guildMusic -> !event.getMessage().getContent().isBlank()
                         && event.getMessage().getChannelId().equals(guildMusic.getMessageChannelId())
                         && event.getMember().map(User::getId).map(guildMusic.getDjId()::equals).orElse(false));
@@ -41,7 +41,7 @@ public class AudioLoadResultInputs extends Inputs {
     @Override
     public Mono<Void> processEvent(MessageCreateEvent event) {
         final Mono<GuildMusic> getGuildMusic = Mono.justOrEmpty(MusicManager.getInstance()
-                .getMusic(this.listener.getGuildId()));
+                .getGuildMusic(this.listener.getGuildId()));
 
         final Mono<String> getPrefix = DatabaseManager.getGuilds()
                 .getDBGuild(this.listener.getGuildId())
@@ -93,7 +93,7 @@ public class AudioLoadResultInputs extends Inputs {
     @Override
     public boolean takeEventWile(MessageCreateEvent event) {
         return MusicManager.getInstance()
-                .getMusic(this.listener.getGuildId())
+                .getGuildMusic(this.listener.getGuildId())
                 .map(GuildMusic::isWaitingForChoice)
                 .orElse(false);
     }
