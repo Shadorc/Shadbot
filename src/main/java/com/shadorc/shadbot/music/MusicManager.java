@@ -107,20 +107,6 @@ public class MusicManager {
                 }));
     }
 
-    public Mono<Void> destroyConnection(Snowflake guildId) {
-        this.guildJoining.remove(guildId);
-        final GuildMusic guildMusic = this.guildMusics.remove(guildId);
-        if (guildMusic != null) {
-            guildMusic.destroy();
-            LOGGER.debug("{Guild ID: {}} Guild music destroyed.", guildId.asLong());
-        }
-
-        return Mono.justOrEmpty(guildMusic)
-                .map(GuildMusic::getVoiceConnection)
-                .filter(VoiceConnection::isConnected)
-                .flatMap(VoiceConnection::disconnect);
-    }
-
     /**
      * Requests to join a voice channel.
      */
@@ -139,6 +125,20 @@ public class MusicManager {
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
                 .doOnNext(voiceConnection -> LogUtils.info("{Guild ID: %d} Voice channel joined.", guildId.asLong()))
                 .doOnTerminate(() -> this.guildJoining.getOrDefault(guildId, new AtomicBoolean()).set(false));
+    }
+
+    public Mono<Void> destroyConnection(Snowflake guildId) {
+        this.guildJoining.remove(guildId);
+        final GuildMusic guildMusic = this.guildMusics.remove(guildId);
+        if (guildMusic != null) {
+            guildMusic.destroy();
+            LOGGER.debug("{Guild ID: {}} Guild music destroyed.", guildId.asLong());
+        }
+
+        return Mono.justOrEmpty(guildMusic)
+                .map(GuildMusic::getVoiceConnection)
+                .filter(VoiceConnection::isConnected)
+                .flatMap(VoiceConnection::disconnect);
     }
 
     public Optional<GuildMusic> getGuildMusic(Snowflake guildId) {
