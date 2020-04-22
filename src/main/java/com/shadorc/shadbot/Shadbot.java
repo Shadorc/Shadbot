@@ -14,6 +14,7 @@ import discord4j.core.event.domain.Event;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.retriever.EntityRetrievalStrategy;
+import discord4j.core.shard.MemberRequestFilter;
 import discord4j.discordjson.json.ApplicationInfoData;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.UserData;
@@ -87,8 +88,6 @@ public class Shadbot {
         Shadbot.gateway = client.gateway()
                 .setEntityRetrievalStrategy(EntityRetrievalStrategy.STORE_FALLBACK_REST)
                 .setEnabledIntents(IntentSet.of(
-                        // TODO: Remove once members are correctly cached
-                        Intent.GUILD_PRESENCES,
                         Intent.GUILDS,
                         Intent.GUILD_MEMBERS,
                         Intent.GUILD_VOICE_STATES,
@@ -100,8 +99,7 @@ public class Shadbot {
                         .setMapping(new NoOpStoreService(), MessageData.class)
                         .setFallback(new JdkStoreService()))
                 .setInitialStatus(shardInfo -> Presence.idle(Activity.playing("Connecting...")))
-                // TODO: Change to MemberRequestFilter
-                .setMemberRequest(false)
+                .setMemberRequestFilter(MemberRequestFilter.none())
                 .login()
                 .block();
 
