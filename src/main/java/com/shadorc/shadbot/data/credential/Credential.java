@@ -17,5 +17,6 @@ public enum Credential {
     OPENWEATHERMAP_API_KEY,
     STEAM_API_KEY,
     WALLHAVEN_API_KEY,
-    SENTRY_DSN;
+    SENTRY_DSN,
+    IPV6_BLOCK;
 }

@@ -14,6 +14,8 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.GitProperties;
+import discord4j.core.object.VoiceState;
+import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -92,8 +94,14 @@ public class InfoCmd extends BaseCmd {
     private String getShadbotSection(Context context, User owner, long guildCount, long memberCount) {
         final String uptime = DurationFormatUtils.formatDuration(TimeUtils.getMillisUntil(Shadbot.getLaunchTime()),
                 "d 'day(s),' HH 'hour(s) and' mm 'minute(s)'", true);
-        final long voiceChannelCount = MusicManager.getInstance().getGuildIdsWithVoice().size();
-        final long guildManagerCount = MusicManager.getInstance().getGuildIdsWithGuildMusics().size();
+        final long voiceChannelCount = context.getClient()
+                .getGuilds()
+                .flatMap(Guild::getVoiceStates)
+                .flatMap(VoiceState::getUser)
+                .filter(user -> user.getId().equals(Shadbot.getSelfId()))
+                .count()
+                .block();
+        final long guildManagerCount = MusicManager.getInstance().getGuildMusicCount();
 
         return String.format("%n%n-= Shadbot =-")
                 + String.format("%nUptime: %s", uptime)

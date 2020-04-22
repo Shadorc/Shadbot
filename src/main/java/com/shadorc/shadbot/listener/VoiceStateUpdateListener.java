@@ -21,16 +21,22 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
 
     @Override
     public Mono<Void> execute(VoiceStateUpdateEvent event) {
-        return event.getClient().getSelfId()
-                // Ignore voice state updates from the bot
-                .filter(selfId -> !event.getCurrent().getUserId().equals(selfId))
-                .flatMap(selfId -> VoiceStateUpdateListener.onUserEvent(event));
+        // If the voice state update does not come from the bot...
+        if (!event.getCurrent().getUserId().equals(Shadbot.getSelfId())) {
+            return VoiceStateUpdateListener.onUserEvent(event);
+        }
+        // ... else, if the voice state update comes from the bot disconnection
+        else if (event.getCurrent().getChannelId().isEmpty()) {
+            MusicManager.getInstance().destroyConnection(event.getCurrent().getGuildId());
+        }
+
+        return Mono.empty();
     }
 
     private static Mono<Void> onUserEvent(VoiceStateUpdateEvent event) {
         final Snowflake guildId = event.getCurrent().getGuildId();
 
-        final GuildMusic guildMusic = MusicManager.getInstance().getMusic(guildId).orElse(null);
+        final GuildMusic guildMusic = MusicManager.getInstance().getGuildMusic(guildId).orElse(null);
         // The bot is not playing music, ignore the event
         if (guildMusic == null) {
             return Mono.empty();

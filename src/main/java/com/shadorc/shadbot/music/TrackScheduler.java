@@ -103,8 +103,8 @@ public class TrackScheduler {
     }
 
     /**
-     * @param track The {@link AudioTrack} to clone.
-     * @return A clone of the provided track or null if null input track.
+     * @param track The {@link com.sedmelluq.discord.lavaplayer.track.AudioTrack} to clone.
+     * @return A clone of the provided track or {@code null} if null input track.
      */
     @Nullable
     private AudioTrack makeClone(AudioTrack track) {
