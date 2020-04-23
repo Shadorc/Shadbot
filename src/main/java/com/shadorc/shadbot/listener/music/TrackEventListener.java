@@ -13,12 +13,9 @@ import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TrackEventListener extends AudioEventAdapter {
-
-    private static final AtomicBoolean WARNING_SENT = new AtomicBoolean(false);
 
     private final Snowflake guildId;
     private final AtomicInteger errorCount;
@@ -61,11 +58,6 @@ public class TrackEventListener extends AudioEventAdapter {
                     final String errMessage = TextUtils.cleanLavaplayerErr(exception);
                     LogUtils.info("{Guild ID: %d} %sTrack exception: %s", this.guildId.asLong(),
                             this.errorCount.get() > 3 ? "(Ignored) " : "", errMessage);
-
-                    if (!WARNING_SENT.get() && this.isRateLimitException(exception)) {
-                        WARNING_SENT.set(true);
-                        LogUtils.warn("YouTube is rate limited, IP rotation needed.");
-                    }
 
                     final StringBuilder strBuilder = new StringBuilder();
                     if (this.errorCount.get() <= 3) {
@@ -113,13 +105,4 @@ public class TrackEventListener extends AudioEventAdapter {
                 .flatMap(GuildMusic::end);
     }
 
-    private boolean isRateLimitException(Throwable err) {
-        // YouTube returned captcha HTML page
-        if (err.getMessage().contains("Received unexpected response from YouTube")) {
-            return true;
-        }
-        // YouTube has explicitly rate limited the IP
-        return err.getCause() != null
-                && err.getCause().getMessage().contains("Invalid status code for video page response: 429");
-    }
 }
