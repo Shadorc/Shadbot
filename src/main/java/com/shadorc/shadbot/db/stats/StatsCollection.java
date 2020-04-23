@@ -50,7 +50,7 @@ public class StatsCollection extends DatabaseCollection {
         final int threadCount = Thread.activeCount();
         LOGGER.debug("[System stats] Logging CPU={}, RAM={}, Threads={}", cpuUsage, memoryUsed, threadCount);
 
-        final int slice = (int) (ResourceStatsCmd.MAX_DURATION.toSeconds() / ResourceStatsCmd.UPDATE_INTERVAL.toSeconds());
+        final int slice = (int) (ResourceStatsCmd.MAX_DURATION.toMillis() / ResourceStatsCmd.UPDATE_INTERVAL.toMillis());
         final Document doc = new Document()
                 .append("cpu_usage", cpuUsage)
                 .append("ram_usage", memoryUsed)
