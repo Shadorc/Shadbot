@@ -8,7 +8,6 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -21,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class ChatCmd extends BaseCmd {
 
@@ -74,7 +75,8 @@ public class ChatCmd extends BaseCmd {
                 .doOnNext(chat -> this.channelsCustid.put(channelId, chat.getCustId()))
                 .map(ChatBotResponse::getResponse)
                 .onErrorResume(err -> Mono.fromRunnable(() ->
-                        LogUtils.info("{%s} %s is not reachable, trying another one.", this.getClass().getSimpleName(), botId)));
+                        DEFAULT_LOGGER.info("[{}] {} is not reachable, trying another one.",
+                                this.getClass().getSimpleName(), botId)));
     }
 
     @Override

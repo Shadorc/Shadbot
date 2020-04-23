@@ -14,7 +14,6 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.netty.handler.codec.http.HttpMethod;
@@ -33,6 +32,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
+
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class LyricsCmd extends BaseCmd {
 
@@ -115,7 +116,7 @@ public class LyricsCmd extends BaseCmd {
                 .retryWhen(Retry.max(MAX_RETRY)
                         .filter(err -> "Musixmatch redirected to wrong page.".equals(err.getMessage())))
                 .onErrorMap(IOException.class, err -> {
-                    LogUtils.warn("[%s] Too many retries, abort attempt to reload page.", this.getClass().getSimpleName());
+                    DEFAULT_LOGGER.warn("[{}] Too many retries, abort attempt to reload page", this.getClass().getSimpleName());
                     return new HttpStatusException("Musixmatch does not redirect to the correct page.",
                             HttpStatus.SC_SERVICE_UNAVAILABLE, url);
                 });

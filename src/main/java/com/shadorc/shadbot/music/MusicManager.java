@@ -18,7 +18,6 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
-import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.rest.util.Snowflake;
@@ -123,7 +122,7 @@ public class MusicManager {
         return client.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
-                .doOnNext(voiceConnection -> LogUtils.info("{Guild ID: %d} Voice channel joined.", guildId.asLong()))
+                .doOnNext(ignored -> LOGGER.info("{Guild ID: {}} Voice channel joined.", guildId.asLong()))
                 .doOnTerminate(() -> this.guildJoining.getOrDefault(guildId, new AtomicBoolean()).set(false));
     }
 

@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.data;
 
-import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 
 import java.io.File;
@@ -10,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class TextFile {
 
@@ -23,10 +24,10 @@ public class TextFile {
             try {
                 this.texts.addAll(Arrays.asList(Files.readString(file.toPath()).split("\n")));
             } catch (final IOException err) {
-                LogUtils.error(err, String.format("An error occurred while reading text file: %s", file.getPath()));
+                DEFAULT_LOGGER.error(String.format("An error occurred while reading text file: %s", file.getPath()), err);
             }
         } else {
-            LogUtils.error(String.format("An error occurred while reading %s, this text file does not exist.", file.getPath()));
+            DEFAULT_LOGGER.error("An error occurred while reading {}, this text file does not exist.", file.getPath());
         }
     }
 

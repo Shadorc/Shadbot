@@ -170,7 +170,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .flatMap(guildMusic -> {
                     final String errMessage = TextUtils.cleanLavaplayerErr(err);
-                    LogUtils.info("{Guild ID: %d} Load failed: %s", this.guildId.asLong(), errMessage);
+                    LOGGER.info("{Guild ID: {}} Load failed: {}", this.guildId.asLong(), errMessage);
                     return guildMusic.getMessageChannel()
                             .flatMap(channel -> DiscordUtils.sendMessage(
                                     String.format(Emoji.RED_CROSS + " Something went wrong while loading the track: %s",

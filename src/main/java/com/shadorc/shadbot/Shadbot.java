@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class Shadbot {
 
-    private static final Logger LOGGER = Loggers.getLogger("shadbot");
+    public static final Logger DEFAULT_LOGGER = Loggers.getLogger("shadbot");
 
     private static final Instant LAUNCH_TIME = Instant.now();
     private static final AtomicLong OWNER_ID = new AtomicLong();
@@ -51,14 +51,14 @@ public class Shadbot {
         // Set default to Locale US
         Locale.setDefault(Locale.US);
 
-        LOGGER.info("Starting Shadbot V{}", Config.VERSION);
+        DEFAULT_LOGGER.info("Starting Shadbot V{}", Config.VERSION);
 
-        LOGGER.info("Initializing Sentry...");
+        DEFAULT_LOGGER.info("Initializing Sentry...");
         Sentry.init(CredentialManager.getInstance().get(Credential.SENTRY_DSN));
 
         // BlockHound is used to detect blocking actions in non-blocking threads
         if (Config.IS_SNAPSHOT) {
-            LOGGER.info("Initializing BlockHound...");
+            DEFAULT_LOGGER.info("Initializing BlockHound...");
             BlockHound.builder()
                     .allowBlockingCallsInside("java.io.FileInputStream", "readBytes")
                     .install();
@@ -69,22 +69,22 @@ public class Shadbot {
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
                 .build();
 
-        LOGGER.info("Acquiring owner ID and self ID...");
+        DEFAULT_LOGGER.info("Acquiring owner ID and self ID...");
         client.getApplicationInfo()
                 .map(ApplicationInfoData::owner)
                 .map(UserData::id)
                 .map(Snowflake::asLong)
                 .doOnNext(ownerId -> {
-                    LOGGER.info("Owner ID acquired: {}", ownerId);
+                    DEFAULT_LOGGER.info("Owner ID acquired: {}", ownerId);
                     Shadbot.OWNER_ID.set(ownerId);
                 })
                 .block();
 
         final long selfId = DiscordUtils.extractSelfId(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN));
-        LOGGER.info("Self ID acquired: {}", selfId);
+        DEFAULT_LOGGER.info("Self ID acquired: {}", selfId);
         Shadbot.SELF_ID.set(selfId);
 
-        LOGGER.info("Connecting to Discord...");
+        DEFAULT_LOGGER.info("Connecting to Discord...");
         Shadbot.gateway = client.gateway()
                 .setEntityRetrievalStrategy(EntityRetrievalStrategy.STORE_FALLBACK_REST)
                 .setEnabledIntents(IntentSet.of(
@@ -109,7 +109,7 @@ public class Shadbot {
         Shadbot.taskManager.schedulesPostStats();
         Shadbot.taskManager.schedulesSystemResourcesLog();
 
-        LOGGER.info("Registering listeners...");
+        DEFAULT_LOGGER.info("Registering listeners...");
         Shadbot.register(Shadbot.gateway, new TextChannelDeleteListener());
         Shadbot.register(Shadbot.gateway, new GuildCreateListener());
         Shadbot.register(Shadbot.gateway, new GuildDeleteListener());
@@ -121,7 +121,7 @@ public class Shadbot {
         Shadbot.register(Shadbot.gateway, new ReactionListener.ReactionAddListener());
         Shadbot.register(Shadbot.gateway, new ReactionListener.ReactionRemoveListener());
 
-        LOGGER.info("Shadbot is fully connected!");
+        DEFAULT_LOGGER.info("Shadbot is fully connected!");
 
         Shadbot.gateway.onDisconnect().block();
         System.exit(0);
@@ -134,12 +134,12 @@ public class Shadbot {
                         .thenReturn(event.toString())
                         .elapsed()
                         .doOnNext(tuple -> {
-                            if (LOGGER.isTraceEnabled()) {
-                                LOGGER.trace("{} took {} to be processed: {}",
+                            if (DEFAULT_LOGGER.isTraceEnabled()) {
+                                DEFAULT_LOGGER.trace("{} took {} to be processed: {}",
                                         eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()),
                                         tuple.getT2());
                             } else if (tuple.getT1() > Duration.ofMinutes(1).toMillis()) {
-                                LOGGER.warn("{} took {} to be processed.",
+                                DEFAULT_LOGGER.warn("{} took {} to be processed.",
                                         eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()));
                             }
                         })

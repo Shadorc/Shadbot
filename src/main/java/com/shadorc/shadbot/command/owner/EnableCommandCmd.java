@@ -5,12 +5,13 @@ import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.function.Consumer;
+
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class EnableCommandCmd extends BaseCmd {
 
@@ -34,7 +35,7 @@ public class EnableCommandCmd extends BaseCmd {
         final boolean enabled = Boolean.parseBoolean(args.get(1));
         cmd.setEnabled(enabled);
 
-        LogUtils.info("Command %s %s.", cmd.getName(), enabled ? "enabled" : "disabled");
+        DEFAULT_LOGGER.info("Command {} {}.", cmd.getName(), enabled ? "enabled" : "disabled");
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command `%s` %s.",

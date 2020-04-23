@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
+
 public class DiabloCmd extends BaseCmd {
 
     private static final String ACCESS_TOKEN_URL = String.format(
@@ -126,7 +128,7 @@ public class DiabloCmd extends BaseCmd {
                 .doOnNext(token -> {
                     this.token = token;
                     this.lastTokenGeneration.set(System.currentTimeMillis());
-                    LogUtils.info("Blizzard token generated: %s", this.token.getAccessToken());
+                    DEFAULT_LOGGER.info("Blizzard token generated: {}", this.token.getAccessToken());
                 });
 
         return Mono.justOrEmpty(this.token)

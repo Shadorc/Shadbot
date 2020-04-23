@@ -8,12 +8,17 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.ExceptionHandler;
+import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 
 public class TrackEventListener extends AudioEventAdapter {
 
@@ -56,7 +61,7 @@ public class TrackEventListener extends AudioEventAdapter {
                     this.errorCount.incrementAndGet();
 
                     final String errMessage = TextUtils.cleanLavaplayerErr(exception);
-                    LogUtils.info("{Guild ID: %d} %sTrack exception: %s", this.guildId.asLong(),
+                    LOGGER.info("{Guild ID: {}} {}Track exception: {}", this.guildId.asLong(),
                             this.errorCount.get() > 3 ? "(Ignored) " : "", errMessage);
 
                     final StringBuilder strBuilder = new StringBuilder();
@@ -66,7 +71,7 @@ public class TrackEventListener extends AudioEventAdapter {
                     }
 
                     if (this.errorCount.get() == 3) {
-                        LogUtils.info("{Guild ID: %d} Too many errors in a row. They will be ignored until"
+                        LOGGER.info("{Guild ID: {}} Too many errors in a row. They will be ignored until"
                                 + " a music can be played.", this.guildId.asLong());
                         strBuilder.append("\n" + Emoji.RED_FLAG + " Too many errors in a row, I will ignore"
                                 + " them until I find a music that can be played.");
@@ -83,7 +88,7 @@ public class TrackEventListener extends AudioEventAdapter {
 
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-        LogUtils.info("{Guild ID: %d} Music stuck, skipping it.", this.guildId.asLong());
+        LOGGER.info("{Guild ID: {}} Music stuck, skipping it.", this.guildId.asLong());
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .flatMap(GuildMusic::getMessageChannel)
                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll "

@@ -16,7 +16,6 @@ import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.channel.Channel;
@@ -29,6 +28,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class SettingsCmd extends BaseCmd {
 
@@ -47,8 +48,8 @@ public class SettingsCmd extends BaseCmd {
     private void add(BaseSetting... settings) {
         for (final BaseSetting setting : settings) {
             if (this.settingsMap.putIfAbsent(setting.getSetting(), setting) != null) {
-                LogUtils.error(String.format("Command name collision between %s and %s",
-                        setting.getName(), this.settingsMap.get(setting.getSetting()).getClass().getSimpleName()));
+                DEFAULT_LOGGER.error("Command name collision between {} and {}",
+                        setting.getName(), this.settingsMap.get(setting.getSetting()).getClass().getSimpleName());
             }
         }
     }

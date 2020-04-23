@@ -29,6 +29,8 @@ import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
+
 public class LotteryCmd extends BaseCmd {
 
     private static final int PAID_COST = 100;
@@ -122,7 +124,7 @@ public class LotteryCmd extends BaseCmd {
     }
 
     public static Mono<Void> draw(GatewayDiscordClient client) {
-        LogUtils.info("Lottery draw started...");
+        DEFAULT_LOGGER.info("Lottery draw started...");
         final int winningNum = ThreadLocalRandom.current().nextInt(MIN_NUM, MAX_NUM + 1);
 
         return DatabaseManager.getLottery()
@@ -135,7 +137,7 @@ public class LotteryCmd extends BaseCmd {
                     final List<Member> winners = tuple.getT1();
                     final long jackpot = tuple.getT2();
 
-                    LogUtils.info("Lottery draw done (Winning number: %d | %d winner(s) | Prize pool: %d)",
+                    DEFAULT_LOGGER.info("Lottery draw done (Winning number: {} | {} winner(s) | Prize pool: {})",
                             winningNum, winners.size(), jackpot);
 
                     final Long coins = winners.isEmpty() ? null : Math.min(jackpot / winners.size(), Config.MAX_COINS);

@@ -8,13 +8,14 @@ import com.shadorc.shadbot.db.premium.RelicType;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.function.Consumer;
+
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class ActivateRelicCmd extends BaseCmd {
 
@@ -41,7 +42,7 @@ public class ActivateRelicCmd extends BaseCmd {
                                                 context.getUsername()), channel));
                     }
 
-                    LogUtils.info("{User ID: %d} Relic activated. ID: %s", context.getAuthorId().asLong(), arg);
+                    DEFAULT_LOGGER.info("{User ID: {}} Relic activated. ID: {}", context.getAuthorId().asLong(), arg);
 
                     final Snowflake guildId = relic.getType() == RelicType.GUILD ? context.getGuildId() : null;
                     return relic.activate(context.getAuthorId(), guildId)

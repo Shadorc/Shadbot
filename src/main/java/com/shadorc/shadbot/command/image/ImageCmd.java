@@ -12,7 +12,10 @@ import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,6 +26,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class ImageCmd extends BaseCmd {
 
@@ -92,7 +97,7 @@ public class ImageCmd extends BaseCmd {
                 .doOnNext(token -> {
                     this.token = token;
                     this.lastTokenGeneration.set(System.currentTimeMillis());
-                    LogUtils.info("DeviantArt token generated: %s", this.token.getAccessToken());
+                    DEFAULT_LOGGER.info("DeviantArt token generated: {}", this.token.getAccessToken());
                 })
                 .then();
     }

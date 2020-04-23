@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
+
 public class DiscordUtils {
 
     /**
@@ -94,13 +96,13 @@ public class DiscordUtils {
                     final boolean canSendEmbed = tuple.getT2();
 
                     if (!canSendMessage) {
-                        LogUtils.info("{Channel ID: %d} Missing permission: %s",
+                        DEFAULT_LOGGER.info("{Channel ID: {}} Missing permission: {}",
                                 channel.getId().asLong(), StringUtils.capitalizeEnum(Permission.SEND_MESSAGES));
                         return Mono.empty();
                     }
 
                     if (!canSendEmbed && hasEmbed) {
-                        LogUtils.info("{Channel ID: %d} Missing permission: %s",
+                        DEFAULT_LOGGER.info("{Channel ID: {}} Missing permission: {}",
                                 channel.getId().asLong(), StringUtils.capitalizeEnum(Permission.EMBED_LINKS));
                         return DiscordUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed" +
                                         " links.%nPlease, check my permissions "

@@ -31,11 +31,12 @@ import com.shadorc.shadbot.command.music.*;
 import com.shadorc.shadbot.command.owner.*;
 import com.shadorc.shadbot.command.utils.*;
 import com.shadorc.shadbot.command.utils.poll.PollCmd;
-import com.shadorc.shadbot.utils.LogUtils;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class CommandManager {
 
@@ -87,12 +88,12 @@ public class CommandManager {
         for (final BaseCmd cmd : cmds) {
             for (final String name : cmd.getNames()) {
                 if (this.commandsMap.putIfAbsent(name, cmd) != null) {
-                    LogUtils.error(String.format("Command name collision between %s and %s.",
-                            name, this.commandsMap.get(name).getClass().getSimpleName()));
+                    DEFAULT_LOGGER.error("Command name collision between {} and {}",
+                            name, this.commandsMap.get(name).getClass().getSimpleName());
                 }
             }
         }
-        LogUtils.info("%d commands initialized.", cmds.length);
+        DEFAULT_LOGGER.info("{} commands initialized.", cmds.length);
     }
 
     public Map<String, BaseCmd> getCommands() {

@@ -6,12 +6,17 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.function.Consumer;
+
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class TriviaCmd extends GameCmd<TriviaGame> {
 
@@ -75,7 +80,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
         final Mono<TriviaCategoriesResponse> getCategories = NetUtils.get(CATEGORY_URL, TriviaCategoriesResponse.class)
                 .doOnNext(categories -> {
                     this.categories = categories;
-                    LogUtils.info("Open Trivia DB categories obtained.");
+                    DEFAULT_LOGGER.info("Open Trivia DB categories obtained.");
                 });
 
         return Mono.justOrEmpty(this.categories)

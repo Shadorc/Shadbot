@@ -4,7 +4,6 @@ import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
-import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.core.GatewayDiscordClient;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
@@ -17,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.IntStream;
 
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
+
 public class BotListStats {
 
     private final GatewayDiscordClient gateway;
@@ -28,7 +29,7 @@ public class BotListStats {
     }
 
     public Mono<Void> postStats() {
-        LogUtils.info("Posting statistics...");
+        DEFAULT_LOGGER.info("Posting statistics...");
         return this.gateway.getGuilds()
                 .count()
                 .flatMap(guildCount -> this.postOnBotListDotSpace(guildCount)
@@ -36,7 +37,7 @@ public class BotListStats {
                         .and(this.postOnDiscordBotListDotCom(guildCount))
                         .and(this.postOnDiscordBotsDotGg(guildCount))
                         .and(this.postOnDiscordBotsDotOrg(guildCount)))
-                .doOnSuccess(ignored -> LogUtils.info("Statistics posted."));
+                .doOnSuccess(ignored -> DEFAULT_LOGGER.info("Statistics posted."));
     }
 
     private Mono<String> post(String url, String authorization, JSONObject content) {
@@ -51,11 +52,11 @@ public class BotListStats {
                 .onErrorResume(err -> {
                     if (err instanceof TimeoutException) {
                         return Mono.fromRunnable(() ->
-                                LogUtils.warn("A timeout occurred while posting statistics on %s", url));
+                                DEFAULT_LOGGER.warn("A timeout occurred while posting statistics on {}", url));
 
                     }
                     return Mono.fromRunnable(() ->
-                            LogUtils.warn("An error occurred while posting statistics on %s: %s", url, err.getMessage()));
+                            DEFAULT_LOGGER.warn("An error occurred while posting statistics on {}: {}", url, err.getMessage()));
                 });
     }
 

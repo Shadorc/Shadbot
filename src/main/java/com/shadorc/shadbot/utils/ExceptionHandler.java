@@ -12,6 +12,8 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
+
 public class ExceptionHandler {
 
     public static Mono<Void> handleCommandError(Throwable err, BaseCmd cmd, Context context) {
@@ -42,7 +44,7 @@ public class ExceptionHandler {
 
     private static Mono<Void> onMissingPermissionException(MissingPermissionException err, Context context) {
         final String missingPerm = StringUtils.capitalizeEnum(err.getPermission());
-        LogUtils.info("{Guild ID: %d} Missing permission: %s", context.getGuildId().asLong(), missingPerm);
+        DEFAULT_LOGGER.info("{Guild ID: {}} Missing permission: {}", context.getGuildId().asLong(), missingPerm);
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of "
@@ -70,7 +72,7 @@ public class ExceptionHandler {
 
     private static Mono<Void> onServerAccessError(Throwable err, BaseCmd cmd, Context context) {
         final Throwable cause = err.getCause() != null ? err.getCause() : err;
-        LogUtils.warn("{Guild ID: %d} [%s] Server access error on input '%s'. %s: %s",
+        DEFAULT_LOGGER.warn("{Guild ID: {}} [{}] Server access error on input '{}'. {}: {}",
                 context.getGuildId().asLong(), cmd.getClass().getSimpleName(), context.getContent(),
                 cause.getClass().getName(), cause.getMessage());
         return context.getChannel()
@@ -83,8 +85,9 @@ public class ExceptionHandler {
     }
 
     private static Mono<Void> onUnknown(Throwable err, BaseCmd cmd, Context context) {
-        LogUtils.error(err, String.format("{Guild ID: %d} [%s] An unknown error occurred.",
-                context.getGuildId().asLong(), cmd.getClass().getSimpleName()), context.getContent());
+        DEFAULT_LOGGER.error(String.format("{Guild ID: {}} [{}] An unknown error occurred. (Input: {})",
+                context.getGuildId().asLong(), cmd.getClass().getSimpleName(), context.getContent()), err);
+
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         String.format(Emoji.RED_FLAG + " (**%s**) Sorry, something went wrong while " +
@@ -94,7 +97,7 @@ public class ExceptionHandler {
     }
 
     public static void handleUnknownError(Throwable err) {
-        LogUtils.error(err, "An unknown error occurred.");
+        DEFAULT_LOGGER.error("An unknown error occurred.", err);
     }
 
 }

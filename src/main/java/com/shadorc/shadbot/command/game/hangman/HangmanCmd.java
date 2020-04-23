@@ -7,13 +7,14 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.function.Consumer;
+
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class HangmanCmd extends GameCmd<HangmanGame> {
 
@@ -61,10 +62,10 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
     private Mono<Void> loadWords(Difficulty difficulty) {
         if (difficulty == Difficulty.EASY && !this.easyWords.isLoaded()) {
             return this.easyWords.load()
-                    .then(Mono.fromRunnable(() -> LogUtils.info("Hangman word list (difficulty: easy) obtained.")));
+                    .doOnSuccess(ignored -> DEFAULT_LOGGER.info("Hangman word list (difficulty: easy) obtained."));
         } else if (difficulty == Difficulty.HARD && !this.hardWords.isLoaded()) {
             return this.hardWords.load()
-                    .then(Mono.fromRunnable(() -> LogUtils.info("Hangman word list (difficulty: hard) obtained.")));
+                    .doOnSuccess(ignored -> DEFAULT_LOGGER.info("Hangman word list (difficulty: hard) obtained."));
         }
         return Mono.empty();
     }
