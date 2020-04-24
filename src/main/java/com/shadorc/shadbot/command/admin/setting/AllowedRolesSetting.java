@@ -91,7 +91,7 @@ public class AllowedRolesSetting extends BaseSetting {
                                 FormatUtils.format(Action.class, "/")), false)
                         .addField("Example", String.format("`%s%s add @role`",
                                 context.getPrefix(), this.getCommandName()), false)
-                        .addField("Info", "By default, **server owner** and **administrators** "
+                        .addField("Info", "**server owner** and **administrators** "
                                 + "will always be able to interact with Shadbot.", false));
     }
 
