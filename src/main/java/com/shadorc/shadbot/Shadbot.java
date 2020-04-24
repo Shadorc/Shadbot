@@ -23,7 +23,7 @@ import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.response.ResponseFunction;
 import discord4j.rest.util.Snowflake;
 import discord4j.store.api.mapping.MappingStoreService;
-import discord4j.store.api.noop.NoOpStoreService;
+import discord4j.store.caffeine.CaffeineStoreService;
 import discord4j.store.jdk.JdkStoreService;
 import io.sentry.Sentry;
 import reactor.blockhound.BlockHound;
@@ -95,8 +95,9 @@ public class Shadbot {
                         Intent.GUILD_MESSAGE_REACTIONS,
                         Intent.DIRECT_MESSAGES))
                 .setStoreService(MappingStoreService.create()
-                        // Do not store messages
-                        .setMapping(new NoOpStoreService(), MessageData.class)
+                        // Stores messages during 1 hour
+                        .setMapping(new CaffeineStoreService(
+                                builder -> builder.expireAfterWrite(Duration.ofHours(1))), MessageData.class)
                         .setFallback(new JdkStoreService()))
                 .setInitialStatus(shardInfo -> Presence.idle(Activity.playing("Connecting...")))
                 .setMemberRequestFilter(MemberRequestFilter.none())
