@@ -43,7 +43,7 @@ public class GifCmdTest {
     }
 
     @Test
-    public void testGetGifSearchSpecial() throws InvocationTargetException, IllegalAccessException {
+    public void testGetGifSearchSpecial() {
         assertDoesNotThrow(() -> {
             final String result = ((Mono<String>) method.invoke(cmd,
                     NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/"))).block();
