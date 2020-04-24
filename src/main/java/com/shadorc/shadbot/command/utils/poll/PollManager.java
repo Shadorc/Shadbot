@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class PollManager {
 
@@ -103,7 +104,7 @@ public class PollManager {
             final ReactionEmoji reactionEmoji = ReactionEmoji.of(
                     emojiData.id().map(Long::parseLong).orElse(null),
                     emojiData.name().orElse(null),
-                    emojiData.animated().toOptional().orElse(false));
+                    emojiData.animated().toOptional().<Boolean>map(Function.identity()).orElse(false));
 
             final String choice = reactionsChoices.get(reactionEmoji);
             // Ignore possible reactions added by users
