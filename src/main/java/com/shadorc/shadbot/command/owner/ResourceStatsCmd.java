@@ -5,6 +5,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.stats.entity.resources.DailyResourceStats;
 import com.shadorc.shadbot.db.stats.entity.resources.ResourceStats;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -57,80 +58,12 @@ public class ResourceStatsCmd extends BaseCmd {
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.ATTACH_FILES)
                         .then(DatabaseManager.getStats().getResourcesStats())
-                        .map(dailyResources -> {
-                            // Create dataset
-                            final TimeSeries cpuUsageSeries = new TimeSeries("CPU usage");
-                            final TimeSeries ramUsageSeries = new TimeSeries("RAM usage");
-                            final TimeSeries threadUsageSeries = new TimeSeries("Thread count");
-                            for (final ResourceStats bean : dailyResources.getResourcesUsage()) {
-                                cpuUsageSeries.add(new FixedMillisecond(bean.getTimestamp().toEpochMilli()), bean.getCpuUsage());
-                                ramUsageSeries.add(new FixedMillisecond(bean.getTimestamp().toEpochMilli()), bean.getRamUsage());
-                                threadUsageSeries.add(new FixedMillisecond(bean.getTimestamp().toEpochMilli()), bean.getThreadCount());
-                            }
-
-                            // Set dataset
-                            final XYPlot plot = new XYPlot();
-                            plot.setDataset(0, new TimeSeriesCollection(cpuUsageSeries));
-                            plot.setDataset(1, new TimeSeriesCollection(ramUsageSeries));
-                            plot.setDataset(2, new TimeSeriesCollection(threadUsageSeries));
-
-                            // Set axis
-                            final DateAxis xAxis = new DateAxis("time");
-                            plot.setDomainAxis(xAxis);
-
-                            final NumberAxis cpuAxis = new NumberAxis("% (CPU)");
-                            cpuAxis.setRange(0, 100);
-                            plot.setRangeAxis(0, cpuAxis);
-
-                            final NumberAxis ramAxis = new NumberAxis("Mb (RAM)");
-                            plot.setRangeAxis(1, ramAxis);
-
-                            final NumberAxis threadAxis = new NumberAxis("Count");
-                            plot.setRangeAxis(2, threadAxis);
-
-                            // Set renderer
-                            final XYSplineRenderer cpuRenderer = new XYSplineRenderer();
-                            cpuRenderer.setPrecision(7);
-                            cpuRenderer.setSeriesShapesVisible(0, false);
-                            plot.setRenderer(0, cpuRenderer);
-
-                            final XYSplineRenderer ramRenderer = new XYSplineRenderer();
-                            ramRenderer.setPrecision(7);
-                            ramRenderer.setSeriesShapesVisible(0, false);
-                            ramRenderer.setSeriesFillPaint(0, Color.BLUE);
-                            plot.setRenderer(1, ramRenderer);
-
-                            final XYSplineRenderer threadRenderer = new XYSplineRenderer();
-                            threadRenderer.setPrecision(7);
-                            threadRenderer.setSeriesShapesVisible(0, false);
-                            threadRenderer.setSeriesFillPaint(0, Color.GREEN);
-                            plot.setRenderer(2, threadRenderer);
-
-                            //Map the data to the appropriate axis
-                            plot.mapDatasetToRangeAxis(0, 0);
-                            plot.mapDatasetToRangeAxis(1, 1);
-                            plot.mapDatasetToRangeAxis(2, 2);
-
-                            // Create chart
-                            final JFreeChart chart = new JFreeChart("System resources utilisation",
-                                    JFreeChart.DEFAULT_TITLE_FONT, plot, true);
-                            final ChartPanel chartPanel = new ChartPanel(chart, false);
-
-                            // Draw jpeg
-                            final int width = 640;
-                            final int height = 360;
-                            final BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
-                            final Graphics graphics = bufferedImage.getGraphics();
-                            chartPanel.setBounds(0, 0, width, height);
-                            chartPanel.paint(graphics);
-
-                            return bufferedImage;
-                        })
+                        .map(this::generateGraph)
                         .flatMap(bufferedImage -> {
-                            try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-                                ImageIO.write(bufferedImage, "jpeg", os);
-                                try (final InputStream is = new ByteArrayInputStream(os.toByteArray())) {
-                                    return DiscordUtils.sendMessage(spec -> spec.addFile("chart.jpeg", is), channel, false);
+                            try (final ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                                ImageIO.write(bufferedImage, "jpeg", out);
+                                try (final InputStream in = new ByteArrayInputStream(out.toByteArray())) {
+                                    return DiscordUtils.sendMessage(spec -> spec.addFile("chart.jpeg", in), channel, false);
                                 }
                             } catch (final IOException err) {
                                 return Mono.error(err);
@@ -138,6 +71,75 @@ public class ResourceStatsCmd extends BaseCmd {
                         }))
                 .subscribeOn(Schedulers.boundedElastic())
                 .then();
+    }
+
+    private BufferedImage generateGraph(DailyResourceStats dailyResourceStats) {
+        // Create dataset
+        final TimeSeries cpuUsageSeries = new TimeSeries("CPU usage");
+        final TimeSeries ramUsageSeries = new TimeSeries("RAM usage");
+        final TimeSeries threadUsageSeries = new TimeSeries("Thread count");
+        for (final ResourceStats bean : dailyResourceStats.getResourcesUsage()) {
+            cpuUsageSeries.add(new FixedMillisecond(bean.getTimestamp().toEpochMilli()), bean.getCpuUsage());
+            ramUsageSeries.add(new FixedMillisecond(bean.getTimestamp().toEpochMilli()), bean.getRamUsage());
+            threadUsageSeries.add(new FixedMillisecond(bean.getTimestamp().toEpochMilli()), bean.getThreadCount());
+        }
+
+        // Set dataset
+        final XYPlot plot = new XYPlot();
+        plot.setDataset(0, new TimeSeriesCollection(cpuUsageSeries));
+        plot.setDataset(1, new TimeSeriesCollection(ramUsageSeries));
+        plot.setDataset(2, new TimeSeriesCollection(threadUsageSeries));
+
+        // Set axis
+        final DateAxis xAxis = new DateAxis("time");
+        plot.setDomainAxis(xAxis);
+
+        final NumberAxis cpuAxis = new NumberAxis("% (CPU)");
+        plot.setRangeAxis(0, cpuAxis);
+
+        final NumberAxis ramAxis = new NumberAxis("Mb (RAM)");
+        plot.setRangeAxis(1, ramAxis);
+
+        final NumberAxis threadAxis = new NumberAxis("Count");
+        plot.setRangeAxis(2, threadAxis);
+
+        // Set renderer
+        final XYSplineRenderer cpuRenderer = new XYSplineRenderer();
+        cpuRenderer.setPrecision(7);
+        cpuRenderer.setSeriesShapesVisible(0, false);
+        plot.setRenderer(0, cpuRenderer);
+
+        final XYSplineRenderer ramRenderer = new XYSplineRenderer();
+        ramRenderer.setPrecision(7);
+        ramRenderer.setSeriesShapesVisible(0, false);
+        ramRenderer.setSeriesFillPaint(0, Color.BLUE);
+        plot.setRenderer(1, ramRenderer);
+
+        final XYSplineRenderer threadRenderer = new XYSplineRenderer();
+        threadRenderer.setPrecision(7);
+        threadRenderer.setSeriesShapesVisible(0, false);
+        threadRenderer.setSeriesFillPaint(0, Color.GREEN);
+        plot.setRenderer(2, threadRenderer);
+
+        //Map the data to the appropriate axis
+        plot.mapDatasetToRangeAxis(0, 0);
+        plot.mapDatasetToRangeAxis(1, 1);
+        plot.mapDatasetToRangeAxis(2, 2);
+
+        // Create chart
+        final JFreeChart chart = new JFreeChart("System resources utilisation",
+                JFreeChart.DEFAULT_TITLE_FONT, plot, true);
+        final ChartPanel chartPanel = new ChartPanel(chart, false);
+
+        // Draw jpeg
+        final int width = 640;
+        final int height = 360;
+        final BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
+        final Graphics graphics = bufferedImage.getGraphics();
+        chartPanel.setBounds(0, 0, width, height);
+        chartPanel.paint(graphics);
+
+        return bufferedImage;
     }
 
     @Override
