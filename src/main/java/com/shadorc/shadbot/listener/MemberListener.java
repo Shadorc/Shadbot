@@ -7,6 +7,7 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
+import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
@@ -39,8 +40,8 @@ public class MemberListener {
                             tuple.getT1(), tuple.getT2()));
 
             // Add auto-roles when a user joins if they are configured
-            final Flux<Void> addAutoRoles = Mono.zip(event.getGuild(), event.getClient().getSelfId())
-                    .flatMap(tuple -> tuple.getT1().getMemberById(tuple.getT2()))
+            final Flux<Void> addAutoRoles = event.getGuild()
+                    .flatMap(Guild::getSelfMember)
                     .flatMapMany(self -> self.getBasePermissions()
                             .filter(permissions -> permissions.contains(Permission.MANAGE_ROLES))
                             .flatMap(ignored -> DatabaseManager.getGuilds()

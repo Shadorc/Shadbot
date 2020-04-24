@@ -116,8 +116,7 @@ public class ReactionListener {
             return Mono.empty();
         }
 
-        return message.getClient()
-                .getSelfId()
+        return Mono.just(Shadbot.getSelfId())
                 // It wasn't the bot that reacted
                 .filter(selfId -> !userId.equals(selfId))
                 // If the bot is not the author of the message, this is not an Iam message
