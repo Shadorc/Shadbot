@@ -12,11 +12,11 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Permission;
 import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -47,23 +47,7 @@ public class AutoRolesSetting extends BaseSetting {
                     }
                     return mentionedRoles;
                 })
-                .flatMap(mentionedRoles -> {
-                    if (action != Action.ADD) {
-                        return Mono.just(mentionedRoles);
-                    }
-
-                    final Set<Snowflake> roleIds = mentionedRoles.stream()
-                            .map(Role::getId)
-                            .collect(Collectors.toSet());
-                    return context.getSelfAsMember()
-                            .filterWhen(self -> self.hasHigherRoles(roleIds))
-                            .switchIfEmpty(context.getChannel()
-                                    .flatMap(channel -> DiscordUtils.sendMessage(Emoji.WARNING +
-                                            " I can't automatically add this role because I'm lower or " +
-                                            "at the same level in the role hierarchy.", channel))
-                                    .then(Mono.empty()))
-                            .map(ignored -> mentionedRoles);
-                })
+                .flatMap(mentionedRoles -> this.checkPermissions(context, mentionedRoles, action))
                 .zipWith(DatabaseManager.getGuilds()
                         .getDBGuild(context.getGuildId()))
                 .flatMap(tuple -> {
@@ -92,6 +76,22 @@ public class AutoRolesSetting extends BaseSetting {
                 .flatMap(text -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
                 .then();
+    }
+
+    private Mono<List<Role>> checkPermissions(Context context, List<Role> roles, Action action) {
+        if (action == Action.ADD) {
+            return context.getChannel()
+                    .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_ROLES)
+                            .thenReturn(roles.stream().map(Role::getId).collect(Collectors.toSet()))
+                            .flatMap(roleIds -> context.getSelfAsMember()
+                                    .filterWhen(self -> self.hasHigherRoles(roleIds))
+                                    .switchIfEmpty(DiscordUtils.sendMessage(Emoji.WARNING +
+                                            " I can't automatically add this role because I'm lower or " +
+                                            "at the same level in the role hierarchy.", channel)
+                                            .then(Mono.empty()))
+                                    .map(ignored -> roles)));
+        }
+        return Mono.just(roles);
     }
 
     @Override
