@@ -37,7 +37,7 @@ public class CredentialManager {
         // Check if all API keys are present
         for (final Credential credential : Credential.values()) {
             if (this.get(credential) == null) {
-                LOGGER.warn("Credential {} not found, the associated command/service may not work properly.",
+                LOGGER.warn("Credential {} not found, the associated command/service may not work properly",
                         credential);
             }
         }

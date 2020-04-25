@@ -17,7 +17,7 @@ public class GuildDeleteListener implements EventListener<GuildDeleteEvent> {
 
     @Override
     public Mono<Void> execute(GuildDeleteEvent event) {
-        DEFAULT_LOGGER.info("{Guild ID: {}} Disconnected.", event.getGuildId().asLong());
+        DEFAULT_LOGGER.info("{Guild ID: {}} Disconnected", event.getGuildId().asLong());
         return MusicManager.getInstance()
                 .destroyConnection(event.getGuildId())
                 .then(DatabaseManager.getGuilds()

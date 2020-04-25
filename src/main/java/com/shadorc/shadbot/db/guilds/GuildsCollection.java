@@ -39,7 +39,7 @@ public class GuildsCollection extends DatabaseCollection {
                         new DBGuild(Utils.MAPPER.readValue(document.toJson(Utils.JSON_WRITER_SETTINGS), DBGuildBean.class))))
                 .doOnSuccess(consumer -> {
                     if (consumer == null) {
-                        LOGGER.debug("[DBGuild {}] Not found.", guildId.asLong());
+                        LOGGER.debug("[DBGuild {}] Not found", guildId.asLong());
                     }
                 })
                 .defaultIfEmpty(new DBGuild(guildId));
@@ -52,7 +52,7 @@ public class GuildsCollection extends DatabaseCollection {
     }
 
     public Flux<DBMember> getDBMembers(Snowflake guildId, Snowflake... memberIds) {
-        LOGGER.debug("[DBMember {} / {}] Request.", Arrays.toString(memberIds), guildId.asLong());
+        LOGGER.debug("[DBMember {} / {}] Request", Arrays.toString(memberIds), guildId.asLong());
 
         return this.getDBGuild(guildId)
                 .map(DBGuild::getMembers)

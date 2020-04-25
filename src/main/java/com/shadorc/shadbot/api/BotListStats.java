@@ -37,7 +37,7 @@ public class BotListStats {
                         .and(this.postOnDiscordBotListDotCom(guildCount))
                         .and(this.postOnDiscordBotsDotGg(guildCount))
                         .and(this.postOnDiscordBotsDotOrg(guildCount)))
-                .doOnSuccess(ignored -> DEFAULT_LOGGER.info("Statistics posted."));
+                .doOnSuccess(ignored -> DEFAULT_LOGGER.info("Statistics posted"));
     }
 
     private Mono<String> post(String url, String authorization, JSONObject content) {

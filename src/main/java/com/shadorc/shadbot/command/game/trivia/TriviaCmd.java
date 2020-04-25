@@ -80,7 +80,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
         final Mono<TriviaCategoriesResponse> getCategories = NetUtils.get(CATEGORY_URL, TriviaCategoriesResponse.class)
                 .doOnNext(categories -> {
                     this.categories = categories;
-                    DEFAULT_LOGGER.info("Open Trivia DB categories obtained.");
+                    DEFAULT_LOGGER.info("Open Trivia DB categories obtained");
                 });
 
         return Mono.justOrEmpty(this.categories)

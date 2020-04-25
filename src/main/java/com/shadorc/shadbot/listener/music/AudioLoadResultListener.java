@@ -67,22 +67,22 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
         LOGGER.debug("{Guild ID: {}} Playlist loaded: {}", this.guildId.asLong(), audioPlaylist);
         // SoundCloud returns an empty playlist when no results where found
         if (audioPlaylist.getTracks().isEmpty()) {
-            LOGGER.debug("{Guild ID: {}} Empty playlist.", this.guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Empty playlist", this.guildId.asLong());
             this.onNoMatches();
         }
         // If a track is specifically selected
         else if (audioPlaylist.getSelectedTrack() != null) {
-            LOGGER.debug("{Guild ID: {}} Playlist loaded, track selected.", this.guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Playlist loaded, track selected", this.guildId.asLong());
             this.trackLoaded(audioPlaylist.getSelectedTrack());
         }
         // The user is searching something
         else if (audioPlaylist.isSearchResult()) {
-            LOGGER.debug("{Guild ID: {}} Playlist loaded, search results.", this.guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Playlist loaded, search results", this.guildId.asLong());
             this.onSearchResult(audioPlaylist);
         }
         // The user loads a full playlist
         else {
-            LOGGER.debug("{Guild ID: {}} Playlist loaded, full playlist.", this.guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Playlist loaded, full playlist", this.guildId.asLong());
             this.onPlaylistLoaded(audioPlaylist);
         }
     }

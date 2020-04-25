@@ -88,7 +88,7 @@ public class TrackEventListener extends AudioEventAdapter {
 
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-        LOGGER.info("{Guild ID: {}} Music stuck, skipping it.", this.guildId.asLong());
+        LOGGER.info("{Guild ID: {}} Music stuck, skipping it", this.guildId.asLong());
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .flatMap(GuildMusic::getMessageChannel)
                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll "

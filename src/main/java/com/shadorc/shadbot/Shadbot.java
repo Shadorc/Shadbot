@@ -126,7 +126,7 @@ public class Shadbot {
         Shadbot.register(Shadbot.gateway, new ReactionListener.ReactionAddListener());
         Shadbot.register(Shadbot.gateway, new ReactionListener.ReactionRemoveListener());
 
-        DEFAULT_LOGGER.info("Shadbot is fully connected!");
+        DEFAULT_LOGGER.info("Shadbot is fully connected");
 
         Shadbot.gateway.onDisconnect().block();
         System.exit(0);
@@ -144,7 +144,7 @@ public class Shadbot {
                                         eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()),
                                         tuple.getT2());
                             } else if (tuple.getT1() > Duration.ofMinutes(1).toMillis()) {
-                                DEFAULT_LOGGER.warn("{} took {} to be processed.",
+                                DEFAULT_LOGGER.warn("{} took {} to be processed",
                                         eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()));
                             }
                         })

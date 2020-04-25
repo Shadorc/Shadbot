@@ -35,10 +35,10 @@ public class EnableCommandCmd extends BaseCmd {
         final boolean enabled = Boolean.parseBoolean(args.get(1));
         cmd.setEnabled(enabled);
 
-        DEFAULT_LOGGER.info("Command {} {}.", cmd.getName(), enabled ? "enabled" : "disabled");
+        DEFAULT_LOGGER.info("Command {} {}", cmd.getName(), enabled ? "enabled" : "disabled");
 
         return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command `%s` %s.",
+                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Command `%s` %s",
                         cmd.getName(), enabled ? "enabled" : "disabled"), channel))
                 .then();
     }

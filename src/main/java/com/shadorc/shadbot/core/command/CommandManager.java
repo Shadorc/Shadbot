@@ -93,7 +93,7 @@ public class CommandManager {
                 }
             }
         }
-        DEFAULT_LOGGER.info("{} commands initialized.", cmds.length);
+        DEFAULT_LOGGER.info("{} commands initialized", cmds.length);
     }
 
     public Map<String, BaseCmd> getCommands() {

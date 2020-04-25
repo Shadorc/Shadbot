@@ -51,7 +51,7 @@ public class GuildMusic {
      * Schedules to leave the voice channel in 1 minute.
      */
     public void scheduleLeave() {
-        LOGGER.debug("{Guild ID: {}} Scheduling auto-leave.", this.guildId.asLong());
+        LOGGER.debug("{Guild ID: {}} Scheduling auto-leave", this.guildId.asLong());
         this.leavingTask.set(Mono.delay(LEAVE_DELAY, Schedulers.boundedElastic())
                 .filter(ignored -> this.isLeavingScheduled())
                 .map(ignored -> this.getVoiceConnection())
@@ -61,7 +61,7 @@ public class GuildMusic {
 
     public void cancelLeave() {
         if (this.isLeavingScheduled()) {
-            LOGGER.debug("{Guild ID: {}} Cancelling auto-leave.", this.guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Cancelling auto-leave", this.guildId.asLong());
             this.leavingTask.get().dispose();
         }
     }

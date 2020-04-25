@@ -97,7 +97,7 @@ public class ExceptionHandler {
     }
 
     public static void handleUnknownError(Throwable err) {
-        DEFAULT_LOGGER.error("An unknown error occurred.", err);
+        DEFAULT_LOGGER.error("An unknown error occurred", err);
     }
 
 }

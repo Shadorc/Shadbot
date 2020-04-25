@@ -59,7 +59,7 @@ public class MusicManager {
         //IPv6 rotation config
         final String ipv6Block = CredentialManager.getInstance().get(Credential.IPV6_BLOCK);
         if (ipv6Block != null && !ipv6Block.isBlank()) {
-            LOGGER.info("Configuring YouTube IP rotator.");
+            LOGGER.info("Configuring YouTube IP rotator");
             final List<IpBlock> blocks = Collections.singletonList(new Ipv6Block(ipv6Block));
             final AbstractRoutePlanner planner = new RotatingNanoIpRoutePlanner(blocks);
 
@@ -102,7 +102,7 @@ public class MusicManager {
                                 this.guildMusics.put(guildId, guildMusic);
                                 return guildMusic;
                             })
-                            .doOnNext(guildMusic -> LOGGER.debug("{Guild ID: {}} Guild music created.", guildId.asLong()));
+                            .doOnNext(guildMusic -> LOGGER.debug("{Guild ID: {}} Guild music created", guildId.asLong()));
                 }));
     }
 
@@ -122,7 +122,7 @@ public class MusicManager {
         return client.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
-                .doOnNext(ignored -> LOGGER.info("{Guild ID: {}} Voice channel joined.", guildId.asLong()))
+                .doOnNext(ignored -> LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asLong()))
                 .doOnTerminate(() -> this.guildJoining.getOrDefault(guildId, new AtomicBoolean()).set(false));
     }
 
