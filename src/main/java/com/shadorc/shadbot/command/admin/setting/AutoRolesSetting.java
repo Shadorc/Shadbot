@@ -16,6 +16,7 @@ import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,23 @@ public class AutoRolesSetting extends BaseSetting {
                         throw new CommandException(String.format("Role `%s` not found.", args.get(2)));
                     }
                     return mentionedRoles;
+                })
+                .flatMap(mentionedRoles -> {
+                    if (action != Action.ADD) {
+                        return Mono.just(mentionedRoles);
+                    }
+
+                    final Set<Snowflake> roleIds = mentionedRoles.stream()
+                            .map(Role::getId)
+                            .collect(Collectors.toSet());
+                    return context.getSelfAsMember()
+                            .filterWhen(self -> self.hasHigherRoles(roleIds))
+                            .switchIfEmpty(context.getChannel()
+                                    .flatMap(channel -> DiscordUtils.sendMessage(Emoji.WARNING +
+                                            " I can't automatically add this role because I'm lower or " +
+                                            "at the same level in the role hierarchy.", channel))
+                                    .then(Mono.empty()))
+                            .map(ignored -> mentionedRoles);
                 })
                 .zipWith(DatabaseManager.getGuilds()
                         .getDBGuild(context.getGuildId()))
