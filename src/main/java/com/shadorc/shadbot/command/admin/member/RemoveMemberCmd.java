@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.command.admin.member;
 
+import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.command.MissingArgumentException;
 import com.shadorc.shadbot.command.MissingPermissionException;
@@ -56,7 +57,7 @@ public abstract class RemoveMemberCmd extends BaseCmd {
             return Mono.error(new CommandException(String.format("You cannot %s yourself.", this.getName())));
         }
 
-        if (mentionUserId.equals(context.getSelfId())) {
+        if (mentionUserId.equals(Shadbot.getSelfId())) {
             return Mono.error(new CommandException(String.format("You cannot %s me.", this.getName())));
         }
 
