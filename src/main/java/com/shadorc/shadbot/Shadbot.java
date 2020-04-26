@@ -29,6 +29,7 @@ import discord4j.store.jdk.JdkStoreService;
 import io.sentry.Sentry;
 import reactor.blockhound.BlockHound;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
@@ -117,7 +118,8 @@ public class Shadbot {
                 .on(ReadyEvent.class)
                 .take(Shadbot.gateway.getGatewayClientGroup().getShardCount())
                 .last()
-                .doOnNext(ignored -> {
+                .then(Mono.delay(Duration.ofSeconds(5), Schedulers.boundedElastic()))
+                .doOnTerminate(() -> {
                     Shadbot.taskManager.schedulesPresenceUpdates();
                     Shadbot.taskManager.schedulesPostStats();
 
