@@ -5,6 +5,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.retriever.EntityRetrievalStrategy;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import org.json.JSONObject;
@@ -30,7 +31,9 @@ public class BotListStats {
 
     public Mono<Void> postStats() {
         DEFAULT_LOGGER.info("Posting statistics...");
-        return this.gateway.getGuilds()
+        return this.gateway
+                .withRetrievalStrategy(EntityRetrievalStrategy.STORE)
+                .getGuilds()
                 .count()
                 .flatMap(guildCount -> this.postOnBotListDotSpace(guildCount)
                         .and(this.postOnBotsOnDiscordXyz(guildCount))
