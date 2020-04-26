@@ -89,6 +89,7 @@ public class Shadbot {
         DEFAULT_LOGGER.info("Connecting to Discord...");
         Shadbot.gateway = client.gateway()
                 .setMaxMissedHeartbeatAck(2)
+                .setAwaitConnections(false)
                 .setEntityRetrievalStrategy(EntityRetrievalStrategy.STORE_FALLBACK_REST)
                 .setEnabledIntents(IntentSet.of(
                         // TODO: Remove once fixed: https://github.com/Discord4J/Discord4J/issues/660
