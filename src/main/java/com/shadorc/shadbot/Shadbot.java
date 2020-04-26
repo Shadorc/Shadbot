@@ -101,7 +101,7 @@ public class Shadbot {
                 .setStoreService(MappingStoreService.create()
                         // Stores messages during 1 hour
                         .setMapping(new CaffeineStoreService(
-                                builder -> builder.expireAfterWrite(Duration.ofHours(1))), MessageData.class)
+                                builder -> builder.expireAfterWrite(Duration.ofMinutes(30))), MessageData.class)
                         .setFallback(new JdkStoreService()))
                 .setInitialStatus(shardInfo -> Presence.idle(Activity.playing("Connecting...")))
                 .setMemberRequestFilter(MemberRequestFilter.none())
