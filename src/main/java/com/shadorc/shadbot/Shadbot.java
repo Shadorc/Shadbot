@@ -92,8 +92,6 @@ public class Shadbot {
                 .setAwaitConnections(false)
                 .setEntityRetrievalStrategy(EntityRetrievalStrategy.STORE_FALLBACK_REST)
                 .setEnabledIntents(IntentSet.of(
-                        // TODO: Remove once fixed: https://github.com/Discord4J/Discord4J/issues/660
-                        Intent.GUILD_PRESENCES,
                         Intent.GUILDS,
                         Intent.GUILD_MEMBERS,
                         Intent.GUILD_VOICE_STATES,
