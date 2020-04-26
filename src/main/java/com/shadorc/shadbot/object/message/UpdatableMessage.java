@@ -84,9 +84,10 @@ public class UpdatableMessage {
      * Delete the previous message sent, if present.
      */
     public Mono<Void> deleteMessage() {
-        return Mono.just(Snowflake.of(this.messageId.get()))
-                .filter(messageId -> messageId.asLong() != 0)
-                .map(messageId -> this.client.rest().getMessageById(this.channelId, messageId))
-                .flatMap(message -> message.delete(null));
+        return Mono.just(this.messageId.get())
+                .filter(messageId -> messageId != 0)
+                .map(Snowflake::of)
+                .flatMap(messageId -> this.client.getMessageById(this.channelId, messageId))
+                .flatMap(Message::delete);
     }
 }
