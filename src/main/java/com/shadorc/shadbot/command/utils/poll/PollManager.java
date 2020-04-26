@@ -5,12 +5,9 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.message.ReactionMessage;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.EmojiData;
-import discord4j.discordjson.json.MessageData;
-import discord4j.discordjson.json.ReactionData;
-import discord4j.rest.entity.RestMessage;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -18,11 +15,10 @@ import reactor.core.scheduler.Schedulers;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class PollManager {
 
@@ -68,12 +64,9 @@ public class PollManager {
         return this.voteMessage.send(embedConsumer)
                 .flatMap(message -> Mono.delay(this.spec.getDuration(), Schedulers.boundedElastic())
                         .thenReturn(message.getId()))
-                .map(messageId -> this.context.getClient()
-                        .rest()
+                .flatMap(messageId -> this.context.getClient()
                         .getMessageById(this.context.getChannelId(), messageId))
-                .flatMap(RestMessage::getData)
-                .map(MessageData::reactions)
-                .map(possible -> possible.toOptional().orElse(Collections.emptyList()))
+                .map(Message::getReactions)
                 .flatMap(this::sendResults)
                 .then();
     }
@@ -95,31 +88,26 @@ public class PollManager {
         return this.context;
     }
 
-    private Mono<Message> sendResults(List<ReactionData> reactionDataList) {
+    private Mono<Message> sendResults(Set<Reaction> reactionSet) {
         // Reactions are not in the same order as they were when added to the message, they need to be ordered
         final Map<ReactionEmoji, String> reactionsChoices = HashBiMap.create(this.spec.getChoices()).inverse();
-        Map<String, Integer> choicesVotes = new HashMap<>(reactionDataList.size());
-        for (final ReactionData reactionData : reactionDataList) {
-            final EmojiData emojiData = reactionData.emoji();
-            final ReactionEmoji reactionEmoji = ReactionEmoji.of(
-                    emojiData.id().map(Long::parseLong).orElse(null),
-                    emojiData.name().orElse(null),
-                    emojiData.animated().toOptional().<Boolean>map(Function.identity()).orElse(false));
-
-            final String choice = reactionsChoices.get(reactionEmoji);
+        final Map<String, Integer> choiceVoteMap = new HashMap<>(reactionSet.size());
+        for (final Reaction reaction : reactionSet) {
+            final String choice = reactionsChoices.get(reaction.getEmoji());
             // Ignore possible reactions added by users
             if (choice != null) {
                 // -1 is here to ignore the reaction of the bot itself
-                choicesVotes.put(choice, reactionData.count() - 1);
+                choiceVoteMap.put(choice, reaction.getCount() - 1);
             }
         }
 
         // Sort votes map by value in the ascending order
-        choicesVotes = Utils.sortMap(choicesVotes, Collections.reverseOrder(Entry.comparingByValue()));
+        final Map<String, Integer> choiceVoteOrderedMap =
+                Utils.sortMap(choiceVoteMap, Collections.reverseOrder(Entry.comparingByValue()));
 
         final StringBuilder representation = new StringBuilder();
         int count = 1;
-        for (final Entry<String, Integer> entry : choicesVotes.entrySet()) {
+        for (final Entry<String, Integer> entry : choiceVoteOrderedMap.entrySet()) {
             representation.append(String.format("%n\t**%d.** %s (%s)", count,
                     entry.getKey(), StringUtils.pluralOf(entry.getValue(), "vote")));
             count++;
