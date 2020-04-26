@@ -15,8 +15,9 @@ import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ public class HangmanGame extends Game {
     private final RateLimiter rateLimiter;
     private final AtomicLong messageId;
     private final String word;
-    private final List<String> lettersTested;
+    private final Set<String> lettersTested;
 
     private long startTime;
     private int failCount;
@@ -48,7 +49,7 @@ public class HangmanGame extends Game {
         this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(1));
         this.messageId = new AtomicLong(-1);
         this.word = gameCmd.getWord(difficulty);
-        this.lettersTested = new ArrayList<>();
+        this.lettersTested = new HashSet<>();
         this.failCount = 0;
     }
 
