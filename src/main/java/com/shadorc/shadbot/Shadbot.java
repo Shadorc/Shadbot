@@ -11,6 +11,7 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.retriever.EntityRetrievalStrategy;
@@ -109,10 +110,20 @@ public class Shadbot {
                 .block();
 
         Shadbot.taskManager = new TaskManager(gateway);
-        Shadbot.taskManager.schedulesPresenceUpdates();
         Shadbot.taskManager.schedulesLottery();
-        Shadbot.taskManager.schedulesPostStats();
         Shadbot.taskManager.schedulesSystemResourcesLog();
+
+        Shadbot.gateway.getEventDispatcher()
+                .on(ReadyEvent.class)
+                .take(Shadbot.gateway.getGatewayClientGroup().getShardCount())
+                .last()
+                .doOnNext(ignored -> {
+                    Shadbot.taskManager.schedulesPresenceUpdates();
+                    Shadbot.taskManager.schedulesPostStats();
+
+                    DEFAULT_LOGGER.info("Shadbot is fully connected");
+                })
+                .subscribe(null, ExceptionHandler::handleUnknownError);
 
         DEFAULT_LOGGER.info("Registering listeners...");
         Shadbot.register(Shadbot.gateway, new TextChannelDeleteListener());
@@ -126,8 +137,6 @@ public class Shadbot {
         Shadbot.register(Shadbot.gateway, new ReactionListener.ReactionAddListener());
         Shadbot.register(Shadbot.gateway, new ReactionListener.ReactionRemoveListener());
 
-        DEFAULT_LOGGER.info("Shadbot is fully connected");
-
         Shadbot.gateway.onDisconnect().block();
         System.exit(0);
     }
@@ -139,11 +148,9 @@ public class Shadbot {
                         .thenReturn(event.toString())
                         .filter(ignored -> DEFAULT_LOGGER.isTraceEnabled())
                         .elapsed()
-                        .doOnNext(tuple -> {
-                            DEFAULT_LOGGER.trace("{} took {} to be processed: {}",
-                                    eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()),
-                                    tuple.getT2());
-                        })
+                        .doOnNext(tuple -> DEFAULT_LOGGER.trace("{} took {} to be processed: {}",
+                                eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()),
+                                tuple.getT2()))
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
