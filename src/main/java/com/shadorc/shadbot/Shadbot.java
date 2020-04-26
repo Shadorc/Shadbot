@@ -137,16 +137,12 @@ public class Shadbot {
                 .on(eventListener.getEventType())
                 .flatMap(event -> eventListener.execute(event)
                         .thenReturn(event.toString())
+                        .filter(ignored -> DEFAULT_LOGGER.isTraceEnabled())
                         .elapsed()
                         .doOnNext(tuple -> {
-                            if (DEFAULT_LOGGER.isTraceEnabled()) {
-                                DEFAULT_LOGGER.trace("{} took {} to be processed: {}",
-                                        eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()),
-                                        tuple.getT2());
-                            } else if (tuple.getT1() > Duration.ofMinutes(1).toMillis()) {
-                                DEFAULT_LOGGER.warn("{} took {} to be processed",
-                                        eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()));
-                            }
+                            DEFAULT_LOGGER.trace("{} took {} to be processed: {}",
+                                    eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()),
+                                    tuple.getT2());
                         })
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
