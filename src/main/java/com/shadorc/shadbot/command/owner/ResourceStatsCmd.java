@@ -41,6 +41,9 @@ public class ResourceStatsCmd extends BaseCmd {
     public static final Duration UPDATE_INTERVAL = Duration.ofSeconds(10);
     public static final Duration MAX_DURATION = Duration.ofHours(4);
 
+    private static final int CHART_WIDTH = 960;
+    private static final int CHART_HEIGHT = 360;
+
     public ResourceStatsCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("resource_stats", "resource-stats"), "res_stats");
     }
@@ -132,11 +135,10 @@ public class ResourceStatsCmd extends BaseCmd {
         final ChartPanel chartPanel = new ChartPanel(chart, false);
 
         // Draw jpeg
-        final int width = 640;
-        final int height = 360;
-        final BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
+
+        final BufferedImage bufferedImage = new BufferedImage(CHART_WIDTH, CHART_HEIGHT, BufferedImage.TYPE_INT_BGR);
         final Graphics graphics = bufferedImage.getGraphics();
-        chartPanel.setBounds(0, 0, width, height);
+        chartPanel.setBounds(0, 0, CHART_WIDTH, CHART_HEIGHT);
         chartPanel.paint(graphics);
 
         return bufferedImage;
