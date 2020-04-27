@@ -102,25 +102,17 @@
             <id>sedmelluq</id>
             <url>https://dl.bintray.com/sedmelluq/com.sedmelluq</url>
         </repository>
-        <!-- DiscordJ snapshot repository -->
-        <repository>
-            <id>oss.sonatype.org-snapshot</id>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
     </repositories>
     <dependencies>
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>3.1.0-SNAPSHOT</version>
+            <version>3.1.0.M2</version>
         </dependency>
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>stores-caffeine</artifactId>
-            <version>3.1.0.RC1</version>
+            <version>3.1.0.RC2</version>
         </dependency>
         <dependency>
             <groupId>com.sedmelluq</groupId>
