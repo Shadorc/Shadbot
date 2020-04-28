@@ -11,11 +11,19 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.rest.util.Snowflake;
+import io.prometheus.client.Counter;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 
 public class MessageProcessor {
+
+    private static final Counter COMMAND_USAGE_COUNTER = Counter.build()
+            .namespace("shadbot")
+            .name("command_usage")
+            .help("Command usage")
+            .labelNames("command")
+            .register();
 
     private final MessageCreateEvent event;
 
@@ -111,9 +119,9 @@ public class MessageProcessor {
                     .then();
         }
 
-        return DatabaseManager.getStats()
-                .logCommand(command)
-                .thenMany(context.getPermissions())
+        COMMAND_USAGE_COUNTER.labels(command.getName()).inc();
+
+        return context.getPermissions()
                 .collectList()
                 // The author has the permission to execute this command
                 .filter(userPerms -> userPerms.contains(command.getPermission()))

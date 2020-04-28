@@ -8,7 +8,6 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.guilds.GuildsCollection;
 import com.shadorc.shadbot.db.lottery.LotteryCollection;
 import com.shadorc.shadbot.db.premium.PremiumCollection;
-import com.shadorc.shadbot.db.stats.StatsCollection;
 import com.shadorc.shadbot.utils.Utils;
 
 public class DatabaseManager {
@@ -24,7 +23,6 @@ public class DatabaseManager {
     private final PremiumCollection premiumCollection;
     private final GuildsCollection guildsCollection;
     private final LotteryCollection lotteryCollection;
-    private final StatsCollection statsCollection;
 
     private DatabaseManager() {
         final MongoClientSettings settings = MongoClientSettings.builder()
@@ -38,7 +36,6 @@ public class DatabaseManager {
         this.premiumCollection = new PremiumCollection(database);
         this.guildsCollection = new GuildsCollection(database);
         this.lotteryCollection = new LotteryCollection(database);
-        this.statsCollection = new StatsCollection(database);
     }
 
     public static PremiumCollection getPremium() {
@@ -51,10 +48,6 @@ public class DatabaseManager {
 
     public static LotteryCollection getLottery() {
         return DatabaseManager.instance.lotteryCollection;
-    }
-
-    public static StatsCollection getStats() {
-        return DatabaseManager.instance.statsCollection;
     }
 
     public void close() {

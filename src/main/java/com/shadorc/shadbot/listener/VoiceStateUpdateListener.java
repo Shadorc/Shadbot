@@ -10,9 +10,16 @@ import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.rest.util.Snowflake;
+import io.prometheus.client.Gauge;
 import reactor.core.publisher.Mono;
 
 public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateEvent> {
+
+    private static final Gauge VOICE_COUNT_GAUGE = Gauge.build()
+            .namespace("shadbot")
+            .name("voice_count")
+            .help("Connected voice channel count")
+            .register();
 
     @Override
     public Class<VoiceStateUpdateEvent> getEventType() {
@@ -21,16 +28,24 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
 
     @Override
     public Mono<Void> execute(VoiceStateUpdateEvent event) {
+        final Snowflake userId = event.getCurrent().getUserId();
+
+        // If the voice state update comes from the bot...
+        if (userId.equals(Shadbot.getSelfId())) {
+            // If the voice state update comes from the bot disconnection...
+            if (event.getCurrent().getChannelId().isEmpty()) {
+                return Mono.fromRunnable(VOICE_COUNT_GAUGE::dec)
+                        .and(MusicManager.getInstance().destroyConnection(event.getCurrent().getGuildId()));
+            }
+            // ... else, if the voice state update comes from the bot connection
+            else {
+                return Mono.fromRunnable(VOICE_COUNT_GAUGE::inc);
+            }
+        }
         // If the voice state update does not come from the bot...
-        if (!event.getCurrent().getUserId().equals(Shadbot.getSelfId())) {
+        else {
             return VoiceStateUpdateListener.onUserEvent(event);
         }
-        // ... else, if the voice state update comes from the bot disconnection
-        else if (event.getCurrent().getChannelId().isEmpty()) {
-            MusicManager.getInstance().destroyConnection(event.getCurrent().getGuildId());
-        }
-
-        return Mono.empty();
     }
 
     private static Mono<Void> onUserEvent(VoiceStateUpdateEvent event) {

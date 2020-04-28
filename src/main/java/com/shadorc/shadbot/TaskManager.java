@@ -2,14 +2,14 @@ package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
-import com.shadorc.shadbot.command.owner.ResourceStatsCmd;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.TextUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
+import io.prometheus.client.Gauge;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Scheduler;
@@ -61,11 +61,33 @@ public class TaskManager {
 
     public void schedulesSystemResourcesLog() {
         this.logger.info("Scheduling system resources log...");
-        final Disposable task = DatabaseManager.getStats().dropSystemStats()
-                .thenMany(Flux.interval(Duration.ZERO, ResourceStatsCmd.UPDATE_INTERVAL, this.defaultScheduler)
-                        .flatMap(ignored -> DatabaseManager.getStats().logSystemResources())
-                        .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err)))
+
+        final Gauge ramUsageGauge = Gauge.build()
+                .namespace("process")
+                .name("ram_usage_mb")
+                .help("Ram usage in MB")
+                .register();
+
+        final Gauge cpuUsageGauge = Gauge.build()
+                .namespace("process")
+                .name("cpu_usage_percent")
+                .help("CPU usage in percent")
+                .register();
+
+        final Gauge threadCountGauge = Gauge.build()
+                .namespace("process")
+                .name("thread_count")
+                .help("Thread count")
+                .register();
+
+        final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(10), this.defaultScheduler)
+                .doOnNext(ignored -> {
+                    ramUsageGauge.set(Utils.getMemoryUsed());
+                    cpuUsageGauge.set(Utils.getCpuUsage());
+                    threadCountGauge.set(Thread.activeCount());
+                })
                 .subscribe(null, ExceptionHandler::handleUnknownError);
+
         this.tasks.add(task);
     }
 

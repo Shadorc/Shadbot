@@ -26,6 +26,7 @@ import discord4j.rest.util.Snowflake;
 import discord4j.store.api.mapping.MappingStoreService;
 import discord4j.store.caffeine.CaffeineStoreService;
 import discord4j.store.jdk.JdkStoreService;
+import io.prometheus.client.exporter.HTTPServer;
 import io.sentry.Sentry;
 import reactor.blockhound.BlockHound;
 import reactor.core.publisher.Mono;
@@ -33,6 +34,7 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
@@ -48,12 +50,23 @@ public class Shadbot {
 
     private static GatewayDiscordClient gateway;
     private static TaskManager taskManager;
+    private static HTTPServer prometheusServer;
 
     public static void main(String[] args) {
         // Set default to Locale US
         Locale.setDefault(Locale.US);
 
         DEFAULT_LOGGER.info("Starting Shadbot V{}", Config.VERSION);
+
+        final String port = CredentialManager.getInstance().get(Credential.PROMETHEUS_PORT);
+        if (port != null) {
+            DEFAULT_LOGGER.info("Initializing Prometheus on port {}...", port);
+            try {
+                prometheusServer = new HTTPServer(Integer.parseInt(port));
+            } catch (final IOException err) {
+                DEFAULT_LOGGER.error("An error occurred while initializing Prometheus", err);
+            }
+        }
 
         if (!Config.IS_SNAPSHOT) {
             DEFAULT_LOGGER.info("Initializing Sentry...");
@@ -179,6 +192,9 @@ public class Shadbot {
     }
 
     public static Mono<Void> quit() {
+        if (prometheusServer != null) {
+            prometheusServer.stop();
+        }
         if (Shadbot.taskManager != null) {
             Shadbot.taskManager.stop();
         }

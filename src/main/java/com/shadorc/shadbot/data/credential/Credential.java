@@ -18,5 +18,6 @@ public enum Credential {
     STEAM_API_KEY,
     WALLHAVEN_API_KEY,
     SENTRY_DSN,
-    IPV6_BLOCK;
+    IPV6_BLOCK,
+    PROMETHEUS_PORT;
 }
