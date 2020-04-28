@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateEvent> {
 
-    private static final Gauge VOICE_COUNT_GAUGE = Gauge.build()
+    public static final Gauge VOICE_COUNT_GAUGE = Gauge.build()
             .namespace("shadbot")
             .name("voice_count")
             .help("Connected voice channel count")
