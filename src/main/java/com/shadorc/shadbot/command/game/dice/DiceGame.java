@@ -9,6 +9,7 @@ import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
+import io.prometheus.client.Summary;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,6 +18,12 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class DiceGame extends MultiplayerGame<DicePlayer> {
+
+    private static final Summary DICE_SUMMARY = Summary.build()
+            .name("game_dice")
+            .help("Dice game")
+            .labelNames("result")
+            .register();
 
     private final long bet;
     private final UpdatableMessage updatableMessage;
@@ -49,9 +56,11 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                     final String username = tuple.getT2();
                     if (player.getNumber() == winningNum) {
                         long gains = Math.min((long) (this.bet * (this.getPlayers().size() + DiceCmd.MULTIPLIER)), Config.MAX_COINS);
+                        DICE_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
                                 .thenReturn(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains)));
                     } else {
+                        DICE_SUMMARY.labels("loss").observe(this.bet);
                         return Mono.just(String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(this.bet)));
                     }
                 })

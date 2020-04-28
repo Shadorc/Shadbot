@@ -12,6 +12,7 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Snowflake;
+import io.prometheus.client.Summary;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -23,6 +24,11 @@ import java.util.function.Consumer;
 
 public class RpsCmd extends BaseCmd {
 
+    private static final Summary RPS_SUMMARY = Summary.build()
+            .name("game_rps")
+            .help("RPS game")
+            .labelNames("result")
+            .register();
     private static final int GAINS = 500;
 
     private final Map<Tuple2<Snowflake, Snowflake>, RpsPlayer> players;
@@ -52,6 +58,7 @@ public class RpsCmd extends BaseCmd {
                     if (userHandsign.isSuperior(botHandsign)) {
                         final int winStreak = player.getWinStreak().incrementAndGet();
                         final long gains = Math.min((long) GAINS * winStreak, Config.MAX_COINS);
+                        RPS_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
                                 .thenReturn(strBuilder.append(
                                         String.format(Emoji.BANK + " (**%s**) Well done, you win **%s** (Win Streak x%d)!",

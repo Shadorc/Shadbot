@@ -13,6 +13,7 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
+import io.prometheus.client.Summary;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,6 +23,12 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
+
+    private static final Summary BLACKJACK_SUMMARY = Summary.build()
+            .name("game_blackjack")
+            .help("Blackjack game")
+            .labelNames("result")
+            .register();
 
     private final RateLimiter rateLimiter;
     private final UpdatableMessage updatableMessage;
@@ -75,10 +82,12 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                     switch (BlackjackGame.getResult(playerValue, dealerValue)) {
                         case 1:
                             final long coins = Math.min(player.getBet(), Config.MAX_COINS);
+                            BLACKJACK_SUMMARY.labels("win").observe(coins);
                             return player.cancelBet()
                                     .then(player.win(coins))
                                     .thenReturn(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(coins)));
                         case -1:
+                            BLACKJACK_SUMMARY.labels("loss").observe(player.getBet());
                             return Mono.just(String.format("**%s** (Losses: **%s**)",
                                     username, FormatUtils.coins(player.getBet())));
                         default:

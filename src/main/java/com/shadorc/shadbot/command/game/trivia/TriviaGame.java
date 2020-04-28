@@ -15,6 +15,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Snowflake;
+import io.prometheus.client.Summary;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
@@ -27,6 +28,11 @@ import java.util.function.Consumer;
 
 public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 
+    private static final Summary TRIVIA_SUMMARY = Summary.build()
+            .name("game_trivia")
+            .help("Trivia game")
+            .labelNames("result")
+            .register();
     protected static final int MIN_GAINS = 100;
     protected static final int MAX_BONUS = 150;
 
@@ -106,6 +112,8 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
         final long gains = (long) Math.ceil(MIN_GAINS + remainingDuration.toSeconds() * coinsPerSec);
 
         this.stop();
+
+        TRIVIA_SUMMARY.labels("win").observe(gains);
 
         return new Player(this.getContext().getGuildId(), member.getId())
                 .win(gains)

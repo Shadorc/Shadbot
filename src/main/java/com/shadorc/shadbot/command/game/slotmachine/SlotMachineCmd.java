@@ -11,6 +11,7 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
+import io.prometheus.client.Summary;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -20,6 +21,11 @@ import java.util.function.Consumer;
 
 public class SlotMachineCmd extends BaseCmd {
 
+    private static final Summary SLOT_MACHINE_SUMMARY = Summary.build()
+            .name("game_slot_machine")
+            .help("Slot Machine game")
+            .labelNames("result")
+            .register();
     private static final double RAND_FACTOR = 0.25;
     private static final int PAID_COST = 25;
 
@@ -69,9 +75,11 @@ public class SlotMachineCmd extends BaseCmd {
                         final int slotGains = slots.get(0).getGains();
                         final long gains = ThreadLocalRandom.current().nextInt((int) (slotGains * RAND_FACTOR),
                                 (int) (slotGains * (RAND_FACTOR + 1)));
+                        SLOT_MACHINE_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
                                 .thenReturn(strBuilder.append(String.format("You win **%s** !", FormatUtils.coins(gains))));
                     } else {
+                        SLOT_MACHINE_SUMMARY.labels("loss").observe(PAID_COST);
                         return Mono.just(strBuilder.append(String.format("You lose **%s** !", FormatUtils.coins(PAID_COST))));
                     }
                 })

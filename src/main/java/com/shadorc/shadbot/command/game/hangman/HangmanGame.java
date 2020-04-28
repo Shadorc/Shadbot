@@ -12,6 +12,7 @@ import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Snowflake;
+import io.prometheus.client.Summary;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -24,6 +25,11 @@ import java.util.stream.Collectors;
 
 public class HangmanGame extends Game {
 
+    private static final Summary HANGMAN_SUMMARY = Summary.build()
+            .name("game_hangman")
+            .help("Hangman game")
+            .labelNames("result")
+            .register();
     private static final List<String> IMG_LIST = List.of(
             HangmanGame.getImageUrl("8/8b", 0),
             HangmanGame.getImageUrl("3/30", 1),
@@ -74,7 +80,7 @@ public class HangmanGame extends Game {
                         final float bonusPerImg = (float) MAX_BONUS / IMG_LIST.size();
                         final float imagesRemaining = IMG_LIST.size() - this.failCount;
                         final int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
-
+                        HANGMAN_SUMMARY.labels("win").observe(gains);
                         return new Player(this.getContext().getGuildId(), this.getContext().getAuthorId())
                                 .win(gains)
                                 .thenReturn(strBuilder.append(

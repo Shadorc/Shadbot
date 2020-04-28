@@ -10,6 +10,7 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
+import io.prometheus.client.Summary;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -17,6 +18,12 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 public class RussianRouletteCmd extends BaseCmd {
+
+    private static final Summary RUSSIAN_ROULETTE_SUMMARY = Summary.build()
+            .name("game_russian_roulette")
+            .help("Russian Roulette game")
+            .labelNames("result")
+            .register();
 
     private static final int PAID_COST = 250;
 
@@ -46,12 +53,14 @@ public class RussianRouletteCmd extends BaseCmd {
 
                     if (ThreadLocalRandom.current().nextInt(6) == 0) {
                         final long coins = ThreadLocalRandom.current().nextInt(MIN_LOSE, MAX_LOSE + 1);
+                        RUSSIAN_ROULETTE_SUMMARY.labels("loss").observe(coins);
                         return player.lose(coins)
                                 .thenReturn(strBuilder.append(
                                         String.format("**PAN** ... Sorry, you died.%nYou lose **%s**.",
                                                 FormatUtils.coins(coins))));
                     } else {
                         final long coins = ThreadLocalRandom.current().nextInt(MIN_GAINS, MAX_GAINS + 1);
+                        RUSSIAN_ROULETTE_SUMMARY.labels("win").observe(coins);
                         return player.win(coins)
                                 .thenReturn(strBuilder.append(
                                         String.format("**click** ... Phew, you are still alive !%nYou get **%s**.",
