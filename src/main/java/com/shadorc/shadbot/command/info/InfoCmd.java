@@ -91,14 +91,15 @@ public class InfoCmd extends BaseCmd {
     private String getShadbotSection(Context context, User owner) {
         final String uptime = DurationFormatUtils.formatDuration(TimeUtils.getMillisUntil(Shadbot.getLaunchTime()),
                 "d 'day(s),' HH 'hour(s) and' mm 'minute(s)'", true);
-        final long guildManagerCount = MusicManager.getInstance().getGuildMusicCount();
 
         return String.format("%n%n-= Shadbot =-")
                 + String.format("%nUptime: %s", uptime)
-                + String.format("%nDeveloper: %s#%s", owner.getUsername(), owner.getDiscriminator())
+                + String.format("%nDeveloper: %s", owner.getTag())
                 + String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
                 + String.format("%nServers: %s", FormatUtils.number(GuildCreateListener.GUILD_COUNT_GAUGE.get()))
-                + String.format("%nVoice Channels: %f (GM: %d)", VoiceStateUpdateListener.VOICE_COUNT_GAUGE.get(), guildManagerCount);
+                + String.format("%nVoice Channels: %s (GM: %d)",
+                FormatUtils.number(VoiceStateUpdateListener.VOICE_COUNT_GAUGE.get()),
+                MusicManager.getInstance().getGuildMusicCount());
     }
 
     @Override

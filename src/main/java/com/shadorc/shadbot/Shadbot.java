@@ -114,7 +114,7 @@ public class Shadbot {
                         Intent.GUILD_MESSAGE_REACTIONS,
                         Intent.DIRECT_MESSAGES))
                 .setStoreService(MappingStoreService.create()
-                        // Stores messages during 1 hour
+                        // Stores messages during 30 minutes
                         .setMapping(new CaffeineStoreService(
                                 builder -> builder.expireAfterWrite(Duration.ofMinutes(30))), MessageData.class)
                         .setFallback(new JdkStoreService()))

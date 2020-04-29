@@ -65,7 +65,7 @@ public class TaskManager {
     }
 
     public void schedulesPeriodicStats() {
-        this.logger.info("Scheduling system resources log...");
+        this.logger.info("Scheduling periodic stats log...");
 
         final Gauge ramUsageGauge = Gauge.build()
                 .namespace("process")
