@@ -9,17 +9,22 @@ import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
+import discord4j.gateway.GatewayClientGroup;
 import io.prometheus.client.Gauge;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.Logger;
 import reactor.util.Loggers;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class TaskManager {
 
@@ -59,7 +64,7 @@ public class TaskManager {
         this.tasks.add(task);
     }
 
-    public void schedulesSystemResourcesLog() {
+    public void schedulesPeriodicStats() {
         this.logger.info("Scheduling system resources log...");
 
         final Gauge ramUsageGauge = Gauge.build()
@@ -80,8 +85,23 @@ public class TaskManager {
                 .help("Thread count")
                 .register();
 
+        final Gauge responseTimeGauge = Gauge.build()
+                .namespace("shard")
+                .name("response_time")
+                .help("Shard response time")
+                .labelNames("shard_id")
+                .register();
+
+        final GatewayClientGroup group = this.gateway.getGatewayClientGroup();
+        final Mono<Map<Integer, Long>> getResponseTimes = Flux.range(0, group.getShardCount())
+                .map(i -> Tuples.of(i, group.find(i).orElseThrow().getResponseTime().toMillis()))
+                .collectMap(Tuple2::getT1, Tuple2::getT2);
+
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(10), this.defaultScheduler)
-                .doOnNext(ignored -> {
+                .flatMap(ignored -> getResponseTimes)
+                .doOnNext(responseTimeMap -> {
+                    responseTimeMap.forEach((key, value) -> responseTimeGauge.labels(key.toString()).set(value));
+
                     ramUsageGauge.set(Utils.getMemoryUsed());
                     cpuUsageGauge.set(Utils.getCpuUsage());
                     threadCountGauge.set(Thread.activeCount());

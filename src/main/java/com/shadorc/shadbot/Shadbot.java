@@ -125,7 +125,7 @@ public class Shadbot {
 
         Shadbot.taskManager = new TaskManager(gateway);
         Shadbot.taskManager.schedulesLottery();
-        Shadbot.taskManager.schedulesSystemResourcesLog();
+        Shadbot.taskManager.schedulesPeriodicStats();
 
         Shadbot.gateway.getEventDispatcher()
                 .on(ReadyEvent.class)
