@@ -134,7 +134,9 @@ public class Shadbot {
                 .then(Mono.delay(Duration.ofSeconds(5), Schedulers.boundedElastic()))
                 .doOnTerminate(() -> {
                     Shadbot.taskManager.schedulesPresenceUpdates();
-                    Shadbot.taskManager.schedulesPostStats();
+                    if (!Config.IS_SNAPSHOT) {
+                        Shadbot.taskManager.schedulesPostStats();
+                    }
 
                     DEFAULT_LOGGER.info("Shadbot is fully connected");
                 })
