@@ -13,8 +13,8 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ProcessUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.GitProperties;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
@@ -71,8 +71,9 @@ public class InfoCmd extends BaseCmd {
 
     private String getPerformanceSection() {
         return String.format("%n%n-= Performance =-")
-                + String.format("%nMemory: %s/%s MB", FormatUtils.number(Utils.getMemoryUsed()), FormatUtils.number(Utils.getMaxMemory()))
-                + String.format("%nCPU (Process): %.1f%%", Utils.getCpuUsage())
+                + String.format("%nMemory: %s/%s MB",
+                FormatUtils.number(ProcessUtils.getMemoryUsed()), FormatUtils.number(ProcessUtils.getMaxMemory()))
+                + String.format("%nCPU (Process): %.1f%%", ProcessUtils.getCpuUsage())
                 + String.format("%nThreads: %s", FormatUtils.number(Thread.activeCount()));
     }
 
