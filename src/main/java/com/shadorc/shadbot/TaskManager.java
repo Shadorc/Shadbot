@@ -9,6 +9,7 @@ import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
+import discord4j.gateway.GatewayClient;
 import discord4j.gateway.GatewayClientGroup;
 import io.prometheus.client.Gauge;
 import reactor.core.Disposable;
@@ -82,7 +83,10 @@ public class TaskManager {
 
         final GatewayClientGroup group = this.gateway.getGatewayClientGroup();
         final Mono<Map<Integer, Long>> getResponseTimes = Flux.range(0, group.getShardCount())
-                .map(i -> Tuples.of(i, group.find(i).orElseThrow().getResponseTime().toMillis()))
+                .flatMap(i -> Mono.justOrEmpty(group.find(i))
+                        .map(GatewayClient::getResponseTime)
+                        .map(Duration::toMillis)
+                        .map(millis -> Tuples.of(i, millis)))
                 .collectMap(Tuple2::getT1, Tuple2::getT2);
 
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(10), this.defaultScheduler)
