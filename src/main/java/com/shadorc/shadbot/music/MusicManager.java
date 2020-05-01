@@ -27,6 +27,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -111,13 +112,13 @@ public class MusicManager {
      */
     private Mono<VoiceConnection> joinVoiceChannel(GatewayDiscordClient client, Snowflake guildId, Snowflake voiceChannelId,
                                                    AudioProvider audioProvider) {
-        // Do not join a voice channel if a voice connection is already established
-        if (this.guildJoining.getOrDefault(guildId, new AtomicBoolean(false)).get()) {
+        // Do not join the voice channel if the bot is already joining a voice channel or if a voice connection is already established
+        if (this.guildJoining.computeIfAbsent(guildId, ignored -> new AtomicBoolean(false)).getAndSet(true)
+                && !this.guildMusics.containsKey(guildId)) {
             return Mono.empty();
         }
 
-        this.guildJoining.computeIfAbsent(guildId, id -> new AtomicBoolean()).set(true);
-        LOGGER.debug("{Guild ID: {}} Joining voice channel...", guildId.asLong());
+        LOGGER.info("{Guild ID: {}} Joining voice channel...", guildId.asLong());
 
         return client.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
