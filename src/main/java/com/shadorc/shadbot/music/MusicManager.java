@@ -12,6 +12,7 @@ import com.sedmelluq.lava.extensions.youtuberotator.planner.AbstractRoutePlanner
 import com.sedmelluq.lava.extensions.youtuberotator.planner.RotatingNanoIpRoutePlanner;
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.IpBlock;
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
@@ -59,7 +60,7 @@ public class MusicManager {
 
         //IPv6 rotation config
         final String ipv6Block = CredentialManager.getInstance().get(Credential.IPV6_BLOCK);
-        if (ipv6Block != null && !ipv6Block.isBlank()) {
+        if (!Config.IS_SNAPSHOT && ipv6Block != null && !ipv6Block.isBlank()) {
             LOGGER.info("Configuring YouTube IP rotator");
             final List<IpBlock> blocks = Collections.singletonList(new Ipv6Block(ipv6Block));
             final AbstractRoutePlanner planner = new RotatingNanoIpRoutePlanner(blocks);
