@@ -13,6 +13,8 @@ import discord4j.rest.util.Snowflake;
 import io.prometheus.client.Gauge;
 import reactor.core.publisher.Mono;
 
+import static com.shadorc.shadbot.music.MusicManager.LOGGER;
+
 public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateEvent> {
 
     public static final Gauge VOICE_COUNT_GAUGE = Gauge.build()
@@ -34,6 +36,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
         if (userId.equals(Shadbot.getSelfId())) {
             // If the voice state update comes from the bot disconnection...
             if (event.getCurrent().getChannelId().isEmpty()) {
+                LOGGER.info("{Guild ID: {}} Voice channel left", event.getCurrent().getGuildId().asLong());
                 return Mono.fromRunnable(VOICE_COUNT_GAUGE::dec)
                         .and(MusicManager.getInstance().destroyConnection(event.getCurrent().getGuildId()));
             }
