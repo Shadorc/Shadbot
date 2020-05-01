@@ -4,6 +4,7 @@ import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.utils.ExceptionHandler;
+import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ProcessUtils;
 import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.core.GatewayDiscordClient;
@@ -57,7 +58,7 @@ public class TaskManager {
     }
 
     public void schedulesLottery() {
-        this.logger.info("Starting lottery... Next lottery draw in {}", LotteryCmd.getDelay());
+        this.logger.info("Starting lottery... Next lottery draw in {}", FormatUtils.customDate(LotteryCmd.getDelay()));
         final Disposable task = Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), this.defaultScheduler)
                 .flatMap(ignored -> LotteryCmd.draw(this.gateway))
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
