@@ -21,7 +21,10 @@ import reactor.core.publisher.Mono;
 
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
+
+import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 
 public class PlayCmd extends BaseCmd {
 
@@ -40,7 +43,11 @@ public class PlayCmd extends BaseCmd {
                 .flatMap(voiceChannel -> context.getChannel()
                         .flatMap(channel -> MusicManager.getInstance()
                                 .getOrCreate(context.getClient(), context.getGuildId(), voiceChannel.getId())
-                                .flatMap(guildMusic -> this.play(context, channel, guildMusic, this.getIdentifier(arg)))));
+                                .flatMap(guildMusic -> this.play(context, channel, guildMusic, this.getIdentifier(arg)))))
+                .doOnError(TimeoutException.class, err -> LOGGER.info("{Guild ID: {}} Voice channel connection timed out",
+                        context.getGuildId().asLong()))
+                .onErrorMap(TimeoutException.class, err -> new CommandException("An error occurred while joining the voice channel, " +
+                        "please try again later or in another voice channel."));
     }
 
     private String getIdentifier(String arg) {
