@@ -5,6 +5,7 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
+import com.shadorc.shadbot.object.SpyRestEntityRetriever;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
@@ -15,6 +16,7 @@ import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.retriever.EntityRetrievalStrategy;
+import discord4j.core.retriever.FallbackEntityRetriever;
 import discord4j.core.shard.MemberRequestFilter;
 import discord4j.discordjson.json.ApplicationInfoData;
 import discord4j.discordjson.json.MessageData;
@@ -105,7 +107,8 @@ public class Shadbot {
         Shadbot.gateway = client.gateway()
                 .setMaxMissedHeartbeatAck(2)
                 .setAwaitConnections(false)
-                .setEntityRetrievalStrategy(EntityRetrievalStrategy.STORE_FALLBACK_REST)
+                .setEntityRetrievalStrategy(gateway -> new FallbackEntityRetriever(
+                        EntityRetrievalStrategy.STORE.apply(gateway), new SpyRestEntityRetriever(gateway)))
                 .setEnabledIntents(IntentSet.of(
                         Intent.GUILDS,
                         Intent.GUILD_MEMBERS,
