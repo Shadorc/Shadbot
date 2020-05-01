@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
+
 public class GuildsCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = Loggers.getLogger("shadbot.database.guilds");
@@ -42,7 +44,8 @@ public class GuildsCollection extends DatabaseCollection {
                         LOGGER.debug("[DBGuild {}] Not found", guildId.asLong());
                     }
                 })
-                .defaultIfEmpty(new DBGuild(guildId));
+                .defaultIfEmpty(new DBGuild(guildId))
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
     }
 
     public Mono<DBMember> getDBMember(Snowflake guildId, Snowflake memberId) {
@@ -65,7 +68,8 @@ public class GuildsCollection extends DatabaseCollection {
                     }
                     return list;
                 })
-                .flatMapMany(Flux::fromIterable);
+                .flatMapMany(Flux::fromIterable)
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
     }
 
 }

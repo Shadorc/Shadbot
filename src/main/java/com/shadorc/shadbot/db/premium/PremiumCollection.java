@@ -20,6 +20,8 @@ import reactor.util.Loggers;
 import java.time.Duration;
 import java.util.UUID;
 
+import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
+
 public class PremiumCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = Loggers.getLogger("shadbot.database.premium");
@@ -42,7 +44,8 @@ public class PremiumCollection extends DatabaseCollection {
         return Mono.from(request)
                 .map(document -> document.toJson(Utils.JSON_WRITER_SETTINGS))
                 .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, RelicBean.class)))
-                .map(Relic::new);
+                .map(Relic::new)
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("premium").inc());
     }
 
     /**
@@ -58,7 +61,8 @@ public class PremiumCollection extends DatabaseCollection {
         return Flux.from(request)
                 .map(document -> document.toJson(Utils.JSON_WRITER_SETTINGS))
                 .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, RelicBean.class)))
-                .map(Relic::new);
+                .map(Relic::new)
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("premium").inc());
     }
 
     /**
@@ -87,7 +91,9 @@ public class PremiumCollection extends DatabaseCollection {
                         Filters.eq("user_id", userId.asString()),
                         Filters.eq("guild_id", guildId.asString())));
 
-        return Flux.from(request).hasElements();
+        return Flux.from(request)
+                .hasElements()
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("premium").inc());
     }
 
 }

@@ -13,6 +13,7 @@ import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
+import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 import static com.shadorc.shadbot.db.guilds.GuildsCollection.LOGGER;
 
 public class DBMember extends SerializableEntity<DBMemberBean> implements DatabaseEntity {
@@ -77,7 +78,8 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                                         this.getId().asLong(), this.getGuildId().asLong(), result));
                     }
                     return Mono.empty();
-                });
+                })
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
     }
 
     // Note: If one day, a member contains more data than just coins, this method will need to be updated
@@ -97,7 +99,8 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Insertion result: {}",
                         this.getId().asLong(), this.getGuildId().asLong(), result))
-                .then();
+                .then()
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
     }
 
     @Override
@@ -110,7 +113,8 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                         Updates.pull("members", Filters.eq("_id", this.getId().asString()))))
                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Deletion result: {}",
                         this.getId().asLong(), this.getGuildId().asLong(), result))
-                .then();
+                .then()
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.lottery.bean.LotteryHistoricBean;
 import reactor.core.publisher.Mono;
 
+import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 import static com.shadorc.shadbot.db.premium.PremiumCollection.LOGGER;
 
 public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> implements DatabaseEntity {
@@ -42,7 +43,8 @@ public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> imp
                         this.toDocument(),
                         new ReplaceOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[LotteryHistoric] Insertion result: {}", result))
-                .then();
+                .then()
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("lottery").inc());
     }
 
     @Override
@@ -53,7 +55,8 @@ public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> imp
                 .getCollection()
                 .deleteOne(Filters.eq("_id", "historic")))
                 .doOnNext(result -> LOGGER.trace("[LotteryHistoric] Deletion result: {}", result))
-                .then();
+                .then()
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("lottery").inc());
     }
 
     @Override

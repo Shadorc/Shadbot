@@ -10,6 +10,7 @@ import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
 import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
+import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 import static com.shadorc.shadbot.db.lottery.LotteryCollection.LOGGER;
 
 public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> implements DatabaseEntity {
@@ -45,7 +46,8 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[LotteryGambler {} / {}] Insertion result: {}",
                         this.getUserId().asLong(), this.getGuildId().asLong(), result))
-                .then();
+                .then()
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("lottery").inc());
     }
 
     @Override
@@ -60,7 +62,8 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
                         Filters.eq("gamblers.user_id", this.getUserId().asString()))))
                 .doOnNext(result -> LOGGER.trace("[LotteryGambler {} / {}] Deletion result: {}",
                         this.getUserId().asLong(), this.getGuildId().asLong(), result))
-                .then();
+                .then()
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("lottery").inc());
     }
 
     @Override

@@ -9,8 +9,12 @@ import com.shadorc.shadbot.db.guilds.GuildsCollection;
 import com.shadorc.shadbot.db.lottery.LotteryCollection;
 import com.shadorc.shadbot.db.premium.PremiumCollection;
 import com.shadorc.shadbot.utils.Utils;
+import io.prometheus.client.Counter;
 
 public class DatabaseManager {
+
+    public static final Counter DB_REQUEST_COUNTER = Counter.build().namespace("database")
+            .name("request_count").help("Database request count").labelNames("collection").register();
 
     private static DatabaseManager instance;
 
