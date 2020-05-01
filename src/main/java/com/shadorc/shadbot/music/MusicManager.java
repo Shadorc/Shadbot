@@ -28,7 +28,6 @@ import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +35,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.shadorc.shadbot.listener.VoiceStateUpdateListener.VOICE_COUNT_GAUGE;
 
 public class MusicManager {
 
@@ -124,7 +125,10 @@ public class MusicManager {
         return client.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
-                .doOnNext(ignored -> LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asLong()))
+                .doOnNext(ignored -> {
+                    LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asLong());
+                    VOICE_COUNT_GAUGE.inc();
+                })
                 .doOnTerminate(() -> this.guildJoining.getOrDefault(guildId, new AtomicBoolean()).set(false));
     }
 
