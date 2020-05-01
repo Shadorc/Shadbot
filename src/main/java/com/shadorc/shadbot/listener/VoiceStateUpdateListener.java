@@ -30,13 +30,12 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
 
     @Override
     public Mono<Void> execute(VoiceStateUpdateEvent event) {
-        LOGGER.debug("{Guild ID: {}} Voice state update event: {}", event.getCurrent().getGuildId(), event);
-
         final Snowflake userId = event.getCurrent().getUserId();
         final Snowflake guildId = event.getCurrent().getGuildId();
 
         // If the voice state update comes from the bot...
         if (userId.equals(Shadbot.getSelfId())) {
+            LOGGER.debug("{Guild ID: {}} Voice state update event: {}", guildId.asLong(), event);
             // If the voice state update comes from the bot disconnection...
             if (event.getCurrent().getChannelId().isEmpty()) {
                 LOGGER.info("{Guild ID: {}} Voice channel left", guildId.asLong());
