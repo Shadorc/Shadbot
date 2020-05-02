@@ -62,7 +62,7 @@ public class Shadbot {
         if (port != null) {
             DEFAULT_LOGGER.info("Initializing Prometheus on port {}...", port);
             try {
-                prometheusServer = new HTTPServer(Integer.parseInt(port));
+                Shadbot.prometheusServer = new HTTPServer(Integer.parseInt(port));
             } catch (final IOException err) {
                 DEFAULT_LOGGER.error("An error occurred while initializing Prometheus", err);
             }
@@ -102,9 +102,9 @@ public class Shadbot {
         Shadbot.SELF_ID.set(selfId);
 
         DEFAULT_LOGGER.info("Connecting to Discord...");
-        Shadbot.gateway = client.gateway()
+        client.gateway()
                 .setMaxMissedHeartbeatAck(2)
-                .setAwaitConnections(true)
+                .setAwaitConnections(false)
                 .setEntityRetrievalStrategy(gateway -> new FallbackEntityRetriever(
                         EntityRetrievalStrategy.STORE.apply(gateway), new SpyRestEntityRetriever(gateway)))
                 .setEnabledIntents(IntentSet.of(
@@ -121,32 +121,33 @@ public class Shadbot {
                         .setFallback(new JdkStoreService()))
                 .setInitialStatus(shardInfo -> Presence.idle(Activity.playing("Connecting...")))
                 .setMemberRequestFilter(MemberRequestFilter.none())
-                .login()
+                .withGateway(gateway -> {
+                    Shadbot.gateway = gateway;
+
+                    Shadbot.taskManager = new TaskManager(gateway);
+                    Shadbot.taskManager.schedulesLottery();
+                    Shadbot.taskManager.schedulesPeriodicStats();
+                    Shadbot.taskManager.schedulesPresenceUpdates();
+                    if (!Config.IS_SNAPSHOT) {
+                        Shadbot.taskManager.schedulesPostStats();
+                    }
+
+                    DEFAULT_LOGGER.info("Registering listeners...");
+                    Shadbot.register(gateway, new TextChannelDeleteListener());
+                    Shadbot.register(gateway, new GuildCreateListener());
+                    Shadbot.register(gateway, new GuildDeleteListener());
+                    Shadbot.register(gateway, new MemberListener.MemberJoinListener());
+                    Shadbot.register(gateway, new MemberListener.MemberLeaveListener());
+                    Shadbot.register(gateway, new MessageCreateListener());
+                    Shadbot.register(gateway, new MessageUpdateListener());
+                    Shadbot.register(gateway, new VoiceStateUpdateListener());
+                    Shadbot.register(gateway, new ReactionListener.ReactionAddListener());
+                    Shadbot.register(gateway, new ReactionListener.ReactionRemoveListener());
+
+                    return gateway.onDisconnect();
+                })
                 .block();
 
-        Shadbot.taskManager = new TaskManager(gateway);
-        Shadbot.taskManager.schedulesLottery();
-        Shadbot.taskManager.schedulesPeriodicStats();
-        Shadbot.taskManager.schedulesPresenceUpdates();
-        if (!Config.IS_SNAPSHOT) {
-            Shadbot.taskManager.schedulesPostStats();
-        }
-
-        DEFAULT_LOGGER.info("Registering listeners...");
-        Shadbot.register(Shadbot.gateway, new TextChannelDeleteListener());
-        Shadbot.register(Shadbot.gateway, new GuildCreateListener());
-        Shadbot.register(Shadbot.gateway, new GuildDeleteListener());
-        Shadbot.register(Shadbot.gateway, new MemberListener.MemberJoinListener());
-        Shadbot.register(Shadbot.gateway, new MemberListener.MemberLeaveListener());
-        Shadbot.register(Shadbot.gateway, new MessageCreateListener());
-        Shadbot.register(Shadbot.gateway, new MessageUpdateListener());
-        Shadbot.register(Shadbot.gateway, new VoiceStateUpdateListener());
-        Shadbot.register(Shadbot.gateway, new ReactionListener.ReactionAddListener());
-        Shadbot.register(Shadbot.gateway, new ReactionListener.ReactionRemoveListener());
-
-        DEFAULT_LOGGER.info("Shadbot is fully connected");
-
-        Shadbot.gateway.onDisconnect().block();
         System.exit(0);
     }
 
@@ -186,8 +187,8 @@ public class Shadbot {
     }
 
     public static Mono<Void> quit() {
-        if (prometheusServer != null) {
-            prometheusServer.stop();
+        if (Shadbot.prometheusServer != null) {
+            Shadbot.prometheusServer.stop();
         }
         if (Shadbot.taskManager != null) {
             Shadbot.taskManager.stop();
