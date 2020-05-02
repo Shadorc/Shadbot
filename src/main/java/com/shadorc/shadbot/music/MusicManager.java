@@ -116,7 +116,7 @@ public class MusicManager {
                                                    AudioProvider audioProvider) {
         // Do not join the voice channel if the bot is already joining a voice channel or if a voice connection is already established
         if (this.guildJoining.computeIfAbsent(guildId, ignored -> new AtomicBoolean(false)).getAndSet(true)
-                && !this.guildMusics.containsKey(guildId)) {
+                || this.guildMusics.containsKey(guildId)) {
             return Mono.empty();
         }
 
