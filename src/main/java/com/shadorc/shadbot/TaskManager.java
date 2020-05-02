@@ -3,10 +3,7 @@ package com.shadorc.shadbot;
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.utils.ExceptionHandler;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ProcessUtils;
-import com.shadorc.shadbot.utils.TextUtils;
+import com.shadorc.shadbot.utils.*;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
@@ -46,12 +43,9 @@ public class TaskManager {
 
     public void schedulesPresenceUpdates() {
         this.logger.info("Scheduling presence updates...");
-        final Disposable task = Flux.interval(Duration.ZERO, Duration.ofMinutes(30), this.defaultScheduler)
-                .flatMap(ignored -> {
-                    final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX,
-                            TextUtils.TIPS.getRandomTextFormatted());
-                    return this.gateway.updatePresence(Presence.online(Activity.playing(presence)));
-                })
+        final Disposable task = Flux.interval(Duration.ofMinutes(30), Duration.ofMinutes(30), this.defaultScheduler)
+                .map(ignored -> DiscordUtils.getRandomStatus())
+                .flatMap(this.gateway::updatePresence)
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
         this.tasks.add(task);
