@@ -38,10 +38,11 @@ public class DatabaseManager {
 
         final String username = CredentialManager.getInstance().get(Credential.DATABASE_USERNAME);
         final String pwd = CredentialManager.getInstance().get(Credential.DATABASE_PWD);
-        final String host = CredentialManager.getInstance().get(Credential.DATABASE_PWD);
-        if (username != null && pwd != null && host != null) {
+        final String host = CredentialManager.getInstance().get(Credential.DATABASE_HOST);
+        final String port = CredentialManager.getInstance().get(Credential.DATABASE_PORT);
+        if (username != null && pwd != null && host != null && port != null) {
             settingsBuilder.applyConnectionString(new ConnectionString(
-                    String.format("mongodb+srv://%s:%s@%s/%s", username, pwd, host, Config.DATABASE_NAME)));
+                    String.format("mongodb://%s:%s@%s:%s/%s", username, pwd, host, port, Config.DATABASE_NAME)));
         }
 
         this.client = MongoClients.create(settingsBuilder.build());
