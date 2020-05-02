@@ -12,7 +12,6 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
-import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.retriever.EntityRetrievalStrategy;
@@ -32,7 +31,6 @@ import io.prometheus.client.exporter.HTTPServer;
 import io.sentry.Sentry;
 import reactor.blockhound.BlockHound;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
@@ -106,7 +104,7 @@ public class Shadbot {
         DEFAULT_LOGGER.info("Connecting to Discord...");
         Shadbot.gateway = client.gateway()
                 .setMaxMissedHeartbeatAck(2)
-                .setAwaitConnections(false)
+                .setAwaitConnections(true)
                 .setEntityRetrievalStrategy(gateway -> new FallbackEntityRetriever(
                         EntityRetrievalStrategy.STORE.apply(gateway), new SpyRestEntityRetriever(gateway)))
                 .setEnabledIntents(IntentSet.of(
@@ -129,21 +127,10 @@ public class Shadbot {
         Shadbot.taskManager = new TaskManager(gateway);
         Shadbot.taskManager.schedulesLottery();
         Shadbot.taskManager.schedulesPeriodicStats();
-
-        Shadbot.gateway.getEventDispatcher()
-                .on(ReadyEvent.class)
-                .take(Shadbot.gateway.getGatewayClientGroup().getShardCount())
-                .last()
-                .then(Mono.delay(Duration.ofSeconds(5), Schedulers.boundedElastic()))
-                .doOnTerminate(() -> {
-                    Shadbot.taskManager.schedulesPresenceUpdates();
-                    if (!Config.IS_SNAPSHOT) {
-                        Shadbot.taskManager.schedulesPostStats();
-                    }
-
-                    DEFAULT_LOGGER.info("Shadbot is fully connected");
-                })
-                .subscribe(null, ExceptionHandler::handleUnknownError);
+        Shadbot.taskManager.schedulesPresenceUpdates();
+        if (!Config.IS_SNAPSHOT) {
+            Shadbot.taskManager.schedulesPostStats();
+        }
 
         DEFAULT_LOGGER.info("Registering listeners...");
         Shadbot.register(Shadbot.gateway, new TextChannelDeleteListener());
@@ -156,6 +143,8 @@ public class Shadbot {
         Shadbot.register(Shadbot.gateway, new VoiceStateUpdateListener());
         Shadbot.register(Shadbot.gateway, new ReactionListener.ReactionAddListener());
         Shadbot.register(Shadbot.gateway, new ReactionListener.ReactionRemoveListener());
+
+        DEFAULT_LOGGER.info("Shadbot is fully connected");
 
         Shadbot.gateway.onDisconnect().block();
         System.exit(0);
