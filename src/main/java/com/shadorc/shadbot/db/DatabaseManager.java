@@ -1,10 +1,13 @@
 package com.shadorc.shadbot.db;
 
+import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoDatabase;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.data.credential.Credential;
+import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.guilds.GuildsCollection;
 import com.shadorc.shadbot.db.lottery.LotteryCollection;
 import com.shadorc.shadbot.db.premium.PremiumCollection;
@@ -29,12 +32,19 @@ public class DatabaseManager {
     private final LotteryCollection lotteryCollection;
 
     private DatabaseManager() {
-        final MongoClientSettings settings = MongoClientSettings.builder()
+        final MongoClientSettings.Builder settingsBuilder = MongoClientSettings.builder()
                 .codecRegistry(Utils.CODEC_REGISTRY)
-                .applicationName(String.format("Shadbot V%s", Config.VERSION))
-                .build();
+                .applicationName(String.format("Shadbot V%s", Config.VERSION));
 
-        this.client = MongoClients.create(settings);
+        final String username = CredentialManager.getInstance().get(Credential.DATABASE_USERNAME);
+        final String pwd = CredentialManager.getInstance().get(Credential.DATABASE_PWD);
+        final String host = CredentialManager.getInstance().get(Credential.DATABASE_PWD);
+        if (username != null && pwd != null && host != null) {
+            settingsBuilder.applyConnectionString(new ConnectionString(
+                    String.format("mongodb+srv://%s:%s@%s/%s", username, pwd, host, Config.DATABASE_NAME)));
+        }
+
+        this.client = MongoClients.create(settingsBuilder.build());
 
         final MongoDatabase database = this.client.getDatabase(Config.DATABASE_NAME);
         this.premiumCollection = new PremiumCollection(database);
