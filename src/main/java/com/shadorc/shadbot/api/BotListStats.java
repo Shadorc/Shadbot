@@ -4,8 +4,8 @@ import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
+import com.shadorc.shadbot.listener.GuildCreateListener;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.retriever.EntityRetrievalStrategy;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import org.json.JSONObject;
@@ -31,15 +31,12 @@ public class BotListStats {
 
     public Mono<Void> postStats() {
         DEFAULT_LOGGER.info("Posting statistics...");
-        return this.gateway
-                .withRetrievalStrategy(EntityRetrievalStrategy.STORE)
-                .getGuilds()
-                .count()
-                .flatMap(guildCount -> this.postOnBotListDotSpace(guildCount)
-                        .and(this.postOnBotsOnDiscordXyz(guildCount))
-                        .and(this.postOnDiscordBotListDotCom(guildCount))
+        return Mono.just((long) GuildCreateListener.GUILD_COUNT_GAUGE.get())
+                .flatMap(guildCount -> this.postOnBotlistDotSpace(guildCount)
+                        .and(this.postOnBotsOndiscordDotXyz(guildCount))
+                        .and(this.postOnDiscordbotlistDotCom(guildCount))
                         .and(this.postOnDiscordBotsDotGg(guildCount))
-                        .and(this.postOnDiscordBotsDotOrg(guildCount)))
+                        .and(this.postOnTopDotGg(guildCount)))
                 .doOnSuccess(ignored -> DEFAULT_LOGGER.info("Statistics posted"));
     }
 
@@ -67,7 +64,7 @@ public class BotListStats {
      * WebSite: https://botlist.space/bots <br>
      * Documentation: https://docs.botlist.space/bl-docs/bots
      */
-    private Mono<String> postOnBotListDotSpace(Long guildCount) {
+    private Mono<String> postOnBotlistDotSpace(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
         final String url = String.format("https://api.botlist.space/v1/bots/%d", Shadbot.getSelfId().asLong());
@@ -78,7 +75,7 @@ public class BotListStats {
      * WebSite: https://bots.ondiscord.xyz/ <br>
      * Documentation: https://bots.ondiscord.xyz/info/api
      */
-    private Mono<String> postOnBotsOnDiscordXyz(Long guildCount) {
+    private Mono<String> postOnBotsOndiscordDotXyz(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("guildCount", guildCount);
         final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", Shadbot.getSelfId().asLong());
@@ -89,7 +86,7 @@ public class BotListStats {
      * WebSite: https://discordbotlist.com/ <br>
      * Documentation: https://discordbotlist.com/api-docs
      */
-    private Flux<String> postOnDiscordBotListDotCom(Long guildCount) {
+    private Flux<String> postOnDiscordbotlistDotCom(long guildCount) {
         final int shardCount = this.gateway.getGatewayClientGroup().getShardCount();
         return Flux.fromStream(IntStream.range(0, shardCount).boxed())
                 .flatMap(shardId -> {
@@ -107,7 +104,7 @@ public class BotListStats {
      * WebSite: https://discord.bots.gg/ <br>
      * Documentation: https://discord.bots.gg/docs/endpoints
      */
-    private Flux<String> postOnDiscordBotsDotGg(Long guildCount) {
+    private Flux<String> postOnDiscordBotsDotGg(long guildCount) {
         final int shardCount = this.gateway.getGatewayClientGroup().getShardCount();
         return Flux.fromStream(IntStream.range(0, shardCount).boxed())
                 .flatMap(shardId -> {
@@ -124,7 +121,7 @@ public class BotListStats {
      * WebSite: https://top.gg/ <br>
      * Documentation: https://top.gg/api/docs#bots
      */
-    private Flux<String> postOnDiscordBotsDotOrg(Long guildCount) {
+    private Flux<String> postOnTopDotGg(long guildCount) {
         final int shardCount = this.gateway.getGatewayClientGroup().getShardCount();
         return Flux.fromStream(IntStream.range(0, shardCount).boxed())
                 .flatMap(shardId -> {
