@@ -2,11 +2,11 @@ package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
-import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.ExceptionHandler;
+import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ProcessUtils;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.object.presence.Activity;
-import discord4j.core.object.presence.Presence;
 import discord4j.gateway.GatewayClient;
 import discord4j.gateway.GatewayClientGroup;
 import io.prometheus.client.Gauge;

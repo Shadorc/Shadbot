@@ -12,8 +12,6 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
-import discord4j.core.object.presence.Activity;
-import discord4j.core.object.presence.Presence;
 import discord4j.core.retriever.EntityRetrievalStrategy;
 import discord4j.core.retriever.FallbackEntityRetriever;
 import discord4j.core.shard.MemberRequestFilter;
