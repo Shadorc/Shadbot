@@ -1,4 +1,5 @@
 Check {default_prefix}lottery
+Check {default_prefix}setting
 Feedback? {default_prefix}feedback
 Prefix lost? {default_prefix}prefix
 Add music first: {default_prefix}playfirst
