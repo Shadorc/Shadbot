@@ -71,7 +71,7 @@ public class BotListStats {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
         final String url = String.format("https://api.botlist.space/v1/bots/%d", Shadbot.getSelfId().asLong());
-        return this.post(url, CredentialManager.getInstance().get(Credential.BOT_LIST_DOT_SPACE), content);
+        return this.post(url, CredentialManager.getInstance().get(Credential.BOTLIST_DOT_SPACE), content);
     }
 
     /**
@@ -99,7 +99,7 @@ public class BotListStats {
                     final String url = String.format("https://discordbotlist.com/api/bots/%d/stats",
                             Shadbot.getSelfId().asLong());
                     return this.post(url, String.format("Bot %s",
-                            CredentialManager.getInstance().get(Credential.DISCORD_BOT_LIST_DOT_COM_TOKEN)), content);
+                            CredentialManager.getInstance().get(Credential.DISCORDBOTLIST_DOT_COM_TOKEN)), content);
                 });
     }
 
