@@ -54,7 +54,10 @@ public class DiscordUtils {
      * @param token Discord's token.
      * @return The extracted self ID from the Discord token.
      */
-    public static Long extractSelfId(String token) {
+    public static long extractSelfId(String token) {
+        if(token.indexOf('.') == -1) {
+            throw new IllegalArgumentException("Invalid token.");
+        }
         return Long.parseLong(new String(Base64.getDecoder().decode(token.split("\\.")[0]), StandardCharsets.UTF_8));
     }
 
