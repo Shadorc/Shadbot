@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.shadorc.shadbot.music.MusicManager.LOGGER;
@@ -26,24 +27,24 @@ public class GuildMusic {
     private static final Duration LEAVE_DELAY = Duration.ofMinutes(1);
 
     private final GatewayDiscordClient client;
-    private final Snowflake guildId;
-    private final VoiceConnection voiceConnection;
+    private final long guildId;
     private final TrackScheduler trackScheduler;
+
     private final Map<AudioLoadResultListener, Future<Void>> listeners;
     private final AtomicBoolean isWaitingForChoice;
-    private final AtomicReference<Snowflake> messageChannelId;
-    private final AtomicReference<Snowflake> djId;
+    private final AtomicLong messageChannelId;
+    private final AtomicLong djId;
     private final AtomicReference<Disposable> leavingTask;
 
-    public GuildMusic(GatewayDiscordClient client, Snowflake guildId, VoiceConnection voiceConnection, TrackScheduler trackScheduler) {
+    public GuildMusic(GatewayDiscordClient client, Snowflake guildId, TrackScheduler trackScheduler) {
         this.client = client;
-        this.guildId = guildId;
-        this.voiceConnection = voiceConnection;
+        this.guildId = guildId.asLong();
         this.trackScheduler = trackScheduler;
+
         this.listeners = new ConcurrentHashMap<>();
         this.isWaitingForChoice = new AtomicBoolean(false);
-        this.messageChannelId = new AtomicReference<>();
-        this.djId = new AtomicReference<>();
+        this.messageChannelId = new AtomicLong();
+        this.djId = new AtomicLong();
         this.leavingTask = new AtomicReference<>();
     }
 
@@ -51,43 +52,44 @@ public class GuildMusic {
      * Schedules to leave the voice channel in 1 minute.
      */
     public void scheduleLeave() {
-        LOGGER.debug("{Guild ID: {}} Scheduling auto-leave", this.guildId.asLong());
+        LOGGER.debug("{Guild ID: {}} Scheduling auto-leave", this.guildId);
         this.leavingTask.set(Mono.delay(LEAVE_DELAY, Schedulers.boundedElastic())
                 .filter(ignored -> this.isLeavingScheduled())
-                .map(ignored -> this.getVoiceConnection())
+                .map(ignored -> this.client.getVoiceConnectionRegistry())
+                .flatMap(registry -> registry.getVoiceConnection(this.guildId))
                 .flatMap(VoiceConnection::disconnect)
                 .subscribe(null, ExceptionHandler::handleUnknownError));
     }
 
     public void cancelLeave() {
         if (this.isLeavingScheduled()) {
-            LOGGER.debug("{Guild ID: {}} Cancelling auto-leave", this.guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Cancelling auto-leave", this.guildId);
             this.leavingTask.get().dispose();
         }
     }
 
     public void addAudioLoadResultListener(AudioLoadResultListener listener, String identifier) {
-        LOGGER.debug("{Guild ID: {}} Adding audio load result listener: {}", this.guildId.asLong(), listener);
+        LOGGER.debug("{Guild ID: {}} Adding audio load result listener: {}", this.guildId, listener);
         this.listeners.put(listener, MusicManager.getInstance().loadItemOrdered(this.guildId, identifier, listener));
     }
 
     public Mono<Void> removeAudioLoadResultListener(AudioLoadResultListener listener) {
-        LOGGER.debug("{Guild ID: {}} Removing audio load result listener: {}", this.guildId.asLong(), listener);
+        LOGGER.debug("{Guild ID: {}} Removing audio load result listener: {}", this.guildId, listener);
         this.listeners.remove(listener);
         // If there is no music playing and nothing is loading, leave the voice channel
         if (this.trackScheduler.isStopped() && this.listeners.values().stream().allMatch(Future::isDone)) {
-            return Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
-                    .map(GuildMusic::getVoiceConnection)
+            return this.client.getVoiceConnectionRegistry()
+                    .getVoiceConnection(this.guildId)
                     .flatMap(VoiceConnection::disconnect);
         }
         return Mono.empty();
     }
 
     public Mono<Void> end() {
-        LOGGER.debug("{Guild ID: {}} Ending guild music.", this.guildId.asLong());
-        return Mono.justOrEmpty(MusicManager.getInstance()
-                .getGuildMusic(this.guildId))
-                .map(GuildMusic::getVoiceConnection)
+        LOGGER.debug("{Guild ID: {}} Ending guild music.", this.guildId);
+        return this.getClient()
+                .getVoiceConnectionRegistry()
+                .getVoiceConnection(this.guildId)
                 .flatMap(VoiceConnection::disconnect)
                 .then(this.getMessageChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel))
@@ -98,8 +100,8 @@ public class GuildMusic {
         return this.client;
     }
 
-    public VoiceConnection getVoiceConnection() {
-        return this.voiceConnection;
+    public Snowflake getGuildId() {
+        return Snowflake.of(this.guildId);
     }
 
     public TrackScheduler getTrackScheduler() {
@@ -107,7 +109,7 @@ public class GuildMusic {
     }
 
     public Snowflake getMessageChannelId() {
-        return this.messageChannelId.get();
+        return Snowflake.of(this.messageChannelId.get());
     }
 
     public Mono<MessageChannel> getMessageChannel() {
@@ -116,7 +118,7 @@ public class GuildMusic {
     }
 
     public Snowflake getDjId() {
-        return this.djId.get();
+        return Snowflake.of(this.djId.get());
     }
 
     public boolean isWaitingForChoice() {
@@ -132,11 +134,11 @@ public class GuildMusic {
     }
 
     public void setMessageChannelId(Snowflake messageChannelId) {
-        this.messageChannelId.set(messageChannelId);
+        this.messageChannelId.set(messageChannelId.asLong());
     }
 
     public void setDjId(Snowflake djId) {
-        this.djId.set(djId);
+        this.djId.set(djId.asLong());
     }
 
     public void destroy() {
