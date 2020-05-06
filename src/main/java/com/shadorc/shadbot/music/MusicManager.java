@@ -139,7 +139,7 @@ public class MusicManager {
         final GuildMusic guildMusic = this.guildMusics.remove(guildId);
         if (guildMusic != null) {
             guildMusic.destroy();
-            LOGGER.debug("{Guild ID: {}} Guild music destroyed.", guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Guild music destroyed", guildId.asLong());
         }
 
         return Mono.justOrEmpty(guildMusic)
