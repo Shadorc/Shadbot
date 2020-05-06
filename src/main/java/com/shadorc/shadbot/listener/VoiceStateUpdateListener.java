@@ -36,19 +36,19 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
         // If the voice state update comes from the bot...
         if (userId.equals(Shadbot.getSelfId())) {
             LOGGER.debug("{Guild ID: {}} Voice state update event: {}", guildId.asLong(), event);
-            // If the voice state update comes from the bot disconnection...
             if (event.getCurrent().getChannelId().isEmpty()) {
                 LOGGER.info("{Guild ID: {}} Voice channel left", guildId.asLong());
                 return Mono.fromRunnable(VOICE_COUNT_GAUGE::dec)
                         .and(MusicManager.getInstance().destroyConnection(guildId));
+            } else {
+                LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asLong());
+                return Mono.fromRunnable(VOICE_COUNT_GAUGE::inc);
             }
         }
         // If the voice state update does not come from the bot...
         else {
             return VoiceStateUpdateListener.onUserEvent(event);
         }
-
-        return Mono.empty();
     }
 
     private static Mono<Void> onUserEvent(VoiceStateUpdateEvent event) {

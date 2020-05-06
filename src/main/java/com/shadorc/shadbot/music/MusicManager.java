@@ -37,8 +37,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.shadorc.shadbot.listener.VoiceStateUpdateListener.VOICE_COUNT_GAUGE;
-
 public class MusicManager {
 
     private static MusicManager instance;
@@ -134,10 +132,6 @@ public class MusicManager {
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
                 .doOnError(IllegalStateException.class, err -> LOGGER.warn(err.getMessage()))
                 .onErrorMap(IllegalStateException.class, err -> new CommandException("I'm already joining a voice channel. Please wait."))
-                .doOnNext(ignored -> {
-                    LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asLong());
-                    VOICE_COUNT_GAUGE.inc();
-                })
                 .doOnTerminate(() -> this.guildJoining.remove(guildId));
     }
 
