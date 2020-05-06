@@ -35,7 +35,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
 
         // If the voice state update comes from the bot...
         if (userId.equals(Shadbot.getSelfId())) {
-            LOGGER.debug("{Guild ID: {}} Voice state update event: {}", guildId.asLong(), event);
+            LOGGER.trace("{Guild ID: {}} Voice state update event: {}", guildId.asLong(), event);
             if (event.getCurrent().getChannelId().isEmpty()) {
                 LOGGER.info("{Guild ID: {}} Voice channel left", guildId.asLong());
                 return Mono.fromRunnable(VOICE_COUNT_GAUGE::dec)

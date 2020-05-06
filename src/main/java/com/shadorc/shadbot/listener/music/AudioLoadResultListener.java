@@ -50,7 +50,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
     @Override
     public void trackLoaded(AudioTrack audioTrack) {
-        LOGGER.debug("{Guild ID: {}} Track loaded: {}", this.guildId.asLong(), audioTrack);
+        LOGGER.debug("{Guild ID: {}} Track loaded: {}", this.guildId.asLong(), audioTrack.hashCode());
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .filter(guildMusic -> !guildMusic.getTrackScheduler().startOrQueue(audioTrack, this.insertFirst))
                 .flatMap(GuildMusic::getMessageChannel)
@@ -64,25 +64,24 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
     @Override
     public void playlistLoaded(AudioPlaylist audioPlaylist) {
-        LOGGER.debug("{Guild ID: {}} Playlist loaded: {}", this.guildId.asLong(), audioPlaylist);
         // SoundCloud returns an empty playlist when no results where found
         if (audioPlaylist.getTracks().isEmpty()) {
-            LOGGER.debug("{Guild ID: {}} Empty playlist", this.guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Empty playlist: {}", this.guildId.asLong(), audioPlaylist.hashCode());
             this.onNoMatches();
         }
         // If a track is specifically selected
         else if (audioPlaylist.getSelectedTrack() != null) {
-            LOGGER.debug("{Guild ID: {}} Playlist loaded, track selected", this.guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Playlist loaded, track selected: {}", this.guildId.asLong(), audioPlaylist.hashCode());
             this.trackLoaded(audioPlaylist.getSelectedTrack());
         }
         // The user is searching something
         else if (audioPlaylist.isSearchResult()) {
-            LOGGER.debug("{Guild ID: {}} Playlist loaded, search results", this.guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Playlist loaded, search results: {}", this.guildId.asLong(), audioPlaylist.hashCode());
             this.onSearchResult(audioPlaylist);
         }
         // The user loads a full playlist
         else {
-            LOGGER.debug("{Guild ID: {}} Playlist loaded, full playlist", this.guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Playlist loaded, full playlist: {}", this.guildId.asLong(), audioPlaylist.hashCode());
             this.onPlaylistLoaded(audioPlaylist);
         }
     }
@@ -183,7 +182,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
     @Override
     public void noMatches() {
-        LOGGER.debug("{Guild ID: {}} No matches: {}", this.guildId.asLong(), this.identifier);
+        LOGGER.debug("{Guild ID: {}} No matches for identifier: {}", this.guildId.asLong(), this.identifier);
         this.onNoMatches();
     }
 

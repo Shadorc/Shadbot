@@ -69,12 +69,12 @@ public class GuildMusic {
     }
 
     public void addAudioLoadResultListener(AudioLoadResultListener listener, String identifier) {
-        LOGGER.debug("{Guild ID: {}} Adding audio load result listener: {}", this.guildId, listener);
+        LOGGER.debug("{Guild ID: {}} Adding audio load result listener: {}", this.guildId, listener.hashCode());
         this.listeners.put(listener, MusicManager.getInstance().loadItemOrdered(this.guildId, identifier, listener));
     }
 
     public Mono<Void> removeAudioLoadResultListener(AudioLoadResultListener listener) {
-        LOGGER.debug("{Guild ID: {}} Removing audio load result listener: {}", this.guildId, listener);
+        LOGGER.debug("{Guild ID: {}} Removing audio load result listener: {}", this.guildId, listener.hashCode());
         this.listeners.remove(listener);
         // If there is no music playing and nothing is loading, leave the voice channel
         if (this.trackScheduler.isStopped() && this.listeners.values().stream().allMatch(Future::isDone)) {
@@ -86,7 +86,7 @@ public class GuildMusic {
     }
 
     public Mono<Void> end() {
-        LOGGER.debug("{Guild ID: {}} Ending guild music.", this.guildId);
+        LOGGER.debug("{Guild ID: {}} Ending guild music", this.guildId);
         return this.getClient()
                 .getVoiceConnectionRegistry()
                 .getVoiceConnection(this.guildId)
