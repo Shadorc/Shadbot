@@ -85,7 +85,7 @@ public class ExceptionHandler {
     }
 
     private static Mono<Void> onUnknown(Throwable err, BaseCmd cmd, Context context) {
-        DEFAULT_LOGGER.error(String.format("{Guild ID: {}} [{}] An unknown error occurred. (Input: {})",
+        DEFAULT_LOGGER.error(String.format("{Guild ID: %d} [%s] An unknown error occurred. (Input: %s)",
                 context.getGuildId().asLong(), cmd.getClass().getSimpleName(), context.getContent()), err);
 
         return context.getChannel()
