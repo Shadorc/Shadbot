@@ -142,7 +142,6 @@ public class MusicManager {
 
         return Mono.justOrEmpty(guildMusic)
                 .map(GuildMusic::getVoiceConnection)
-                .filter(VoiceConnection::isConnected)
                 .flatMap(VoiceConnection::disconnect);
     }
 
