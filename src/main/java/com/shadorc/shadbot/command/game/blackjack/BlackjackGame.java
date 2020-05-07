@@ -88,8 +88,10 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                                     .thenReturn(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(coins)));
                         case -1:
                             BLACKJACK_SUMMARY.labels("loss").observe(player.getBet());
-                            return Mono.just(String.format("**%s** (Losses: **%s**)",
-                                    username, FormatUtils.coins(player.getBet())));
+                            return player.cancelBet()
+                                    .then(player.lose(player.getBet()))
+                                    .thenReturn(String.format("**%s** (Losses: **%s**)",
+                                            username, FormatUtils.coins(player.getBet())));
                         default:
                             return player.draw()
                                     .thenReturn(String.format("**%s** (Draw)", username));
