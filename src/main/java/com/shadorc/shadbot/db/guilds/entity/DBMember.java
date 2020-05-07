@@ -67,7 +67,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                 .flatMap(modifiedCount -> {
                     // Member was not found, insert it
                     if (modifiedCount == 0) {
-                        LOGGER.debug("[DBMember {} / {}] Coins not updated. Upsert member: {} coins",
+                        LOGGER.debug("[DBMember {} / {}] Coins not update. Upsert member: {} coins",
                                 this.getId().asLong(), this.getGuildId().asLong(), coins);
                         return Mono.from(DatabaseManager.getGuilds()
                                 .getCollection()
