@@ -79,7 +79,7 @@ public class CommandManager {
                 new IamCmd(), new SettingsCmd(),
                 // Owner Commands
                 new LoggerCmd(), new LeaveCmd(), new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(),
-                new DatabaseCmd(), new EnableCommandCmd(),
+                new EnableCommandCmd(),
                 // Hidden Commands
                 new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd(), new PrefixCmd());
     }
