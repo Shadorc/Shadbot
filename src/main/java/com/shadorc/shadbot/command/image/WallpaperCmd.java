@@ -43,8 +43,8 @@ public class WallpaperCmd extends BaseCmd {
                     if (arg.isBlank()) {
                         urlBuilder.append("&sorting=toplist");
                     } else {
-                        final String keywords = Arrays.stream(arg.split(","))
-                                .map(keyword -> String.format("+%s", keyword.trim()))
+                        final String keywords = Arrays.stream(arg.split("[, ]"))
+                                .map(keyword -> String.format("+%s", NetUtils.encode(keyword.trim())))
                                 .collect(Collectors.joining());
                         urlBuilder.append(String.format("&q=%s", keywords));
                         urlBuilder.append("&sorting=relevance");
@@ -76,7 +76,7 @@ public class WallpaperCmd extends BaseCmd {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
                 .setDescription("Search for a wallpaper.")
-                .addArg("search", "keywords (e.g. doom,game)", true)
+                .addArg("search", "keywords (e.g. doom game)", true)
                 .setSource("https://wallhaven.cc/")
                 .build();
     }
