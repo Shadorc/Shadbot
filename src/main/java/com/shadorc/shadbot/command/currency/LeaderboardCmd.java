@@ -40,7 +40,7 @@ public class LeaderboardCmd extends BaseCmd {
                 .flatMap(dbMember -> Mono.zip(
                         context.getClient().getUserById(dbMember.getId()).map(User::getUsername),
                         Mono.just(dbMember.getCoins())))
-                .collectList()
+                .collectSortedList(Comparator.<Tuple2<String, Long>>comparingLong(Tuple2::getT2).reversed())
                 .map(list -> {
                     if (list.isEmpty()) {
                         return "\nEveryone is poor here.";
