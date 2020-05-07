@@ -36,13 +36,15 @@ public class DatabaseManager {
                 .codecRegistry(Utils.CODEC_REGISTRY)
                 .applicationName(String.format("Shadbot V%s", Config.VERSION));
 
-        final String username = CredentialManager.getInstance().get(Credential.DATABASE_USERNAME);
-        final String pwd = CredentialManager.getInstance().get(Credential.DATABASE_PWD);
-        final String host = CredentialManager.getInstance().get(Credential.DATABASE_HOST);
-        final String port = CredentialManager.getInstance().get(Credential.DATABASE_PORT);
-        if (username != null && pwd != null && host != null && port != null) {
-            settingsBuilder.applyConnectionString(new ConnectionString(
-                    String.format("mongodb://%s:%s@%s:%s/%s", username, pwd, host, port, Config.DATABASE_NAME)));
+        if (!Config.IS_SNAPSHOT) {
+            final String username = CredentialManager.getInstance().get(Credential.DATABASE_USERNAME);
+            final String pwd = CredentialManager.getInstance().get(Credential.DATABASE_PWD);
+            final String host = CredentialManager.getInstance().get(Credential.DATABASE_HOST);
+            final String port = CredentialManager.getInstance().get(Credential.DATABASE_PORT);
+            if (username != null && pwd != null && host != null && port != null) {
+                settingsBuilder.applyConnectionString(new ConnectionString(
+                        String.format("mongodb://%s:%s@%s:%s/%s", username, pwd, host, port, Config.DATABASE_NAME)));
+            }
         }
 
         this.client = MongoClients.create(settingsBuilder.build());
