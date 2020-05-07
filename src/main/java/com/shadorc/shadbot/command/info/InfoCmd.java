@@ -8,7 +8,6 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.listener.GuildCreateListener;
 import com.shadorc.shadbot.listener.VoiceStateUpdateListener;
-import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -98,9 +97,7 @@ public class InfoCmd extends BaseCmd {
                 + String.format("%nDeveloper: %s", owner.getTag())
                 + String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
                 + String.format("%nServers: %s", FormatUtils.number(GuildCreateListener.GUILD_COUNT_GAUGE.get()))
-                + String.format("%nVoice Channels: %s (GM: %d)",
-                FormatUtils.number(VoiceStateUpdateListener.VOICE_COUNT_GAUGE.get()),
-                MusicManager.getInstance().getGuildMusicCount());
+                + String.format("%nVoice Channels: %s", FormatUtils.number(VoiceStateUpdateListener.VOICE_COUNT_GAUGE.get()));
     }
 
     @Override
