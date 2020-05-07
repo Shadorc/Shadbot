@@ -9,7 +9,6 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
@@ -52,9 +51,7 @@ public class BlackjackInputs extends Inputs {
                 .flatMap(isCancelMsg -> {
                     final Member member = event.getMember().orElseThrow();
                     if (isCancelMsg) {
-                        return Flux.fromIterable(this.game.getPlayers().values())
-                                .flatMap(BlackjackPlayer::cancelBet)
-                                .then(event.getMessage().getChannel())
+                        return event.getMessage().getChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(
                                         String.format(Emoji.CHECK_MARK + " Blackjack game cancelled by **%s**.",
                                                 member.getUsername()), channel))
