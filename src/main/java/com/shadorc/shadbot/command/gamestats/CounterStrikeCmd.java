@@ -166,6 +166,7 @@ public class CounterStrikeCmd extends BaseCmd {
         return HelpBuilder.create(this, context)
                 .setDescription("Show player's stats for Counter-Strike: Global Offensive.")
                 .addArg("steamID", "steam ID, custom ID or profile URL", false)
+                .setExample(String.format("%s%s shadorc", context.getPrefix(), this.getName()))
                 .build();
     }
 }
