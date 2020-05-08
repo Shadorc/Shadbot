@@ -37,10 +37,10 @@ public class LeaderboardCmd extends BaseCmd {
                 .filter(dbMember -> dbMember.getCoins() > 0)
                 .sort(Comparator.comparingLong(DBMember::getCoins).reversed())
                 .take(USER_COUNT)
-                .flatMap(dbMember -> Mono.zip(
+                .flatMapSequential(dbMember -> Mono.zip(
                         context.getClient().getUserById(dbMember.getId()).map(User::getUsername),
                         Mono.just(dbMember.getCoins())))
-                .collectSortedList(Comparator.<Tuple2<String, Long>>comparingLong(Tuple2::getT2).reversed())
+                .collectList()
                 .map(list -> {
                     if (list.isEmpty()) {
                         return "\nEveryone is poor here.";
