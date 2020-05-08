@@ -7,10 +7,8 @@ import discord4j.discordjson.possible.Possible;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.text.NumberFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Period;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -74,7 +72,12 @@ public class FormatUtils {
                 .filter(unit -> period.get(unit) != 0)
                 .map(unit -> String.format("%s %s", FormatUtils.number(period.get(unit)), unit.toString().toLowerCase()))
                 .collect(Collectors.joining(", "));
-        return str.isEmpty() ? FormatUtils.shortDuration(instant.toEpochMilli()) : str;
+
+        if (str.isEmpty()) {
+            return FormatUtils.shortDuration(Instant.now().toEpochMilli() - instant.toEpochMilli());
+        }
+
+        return str;
     }
 
     /**
