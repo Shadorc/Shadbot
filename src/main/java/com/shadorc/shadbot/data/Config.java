@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.data;
 
+import discord4j.rest.util.Snowflake;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
@@ -22,6 +23,7 @@ public class Config {
     public static final String SUPPORT_SERVER_URL = PROPERTIES.getProperty("support.server.url");
     public static final String INVITE_URL = PROPERTIES.getProperty("invite.url");
     public static final String USER_AGENT = String.format("Shadbot/%s/D4J-DiscordBot (%s)", VERSION, GITHUB_URL);
+    public static final Snowflake TESTBOT_ID = Snowflake.of(PROPERTIES.getProperty("testbot.id"));
 
     public static final String DEFAULT_PREFIX = PROPERTIES.getProperty("default.prefix");
     public static final String COMMAND_DELIMITER = PROPERTIES.getProperty("command.delimiter");

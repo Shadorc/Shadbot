@@ -43,8 +43,8 @@ public class MessageProcessor {
 
     private Mono<Void> processCommand(DBGuild dbGuild, String content) {
         return Mono.justOrEmpty(this.event.getMember())
-                // The author is not a bot
-                .filter(member -> !member.isBot())
+                // The author is not a bot or is not the bot used for auto-testing
+                .filter(member -> !member.isBot() || member.getId().equals(Config.TESTBOT_ID))
                 .flatMap(member -> member.getRoles().collectList())
                 .zipWith(this.event.getGuild().map(Guild::getOwnerId))
                 // The role is allowed or the author is the guild's owner
