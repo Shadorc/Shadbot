@@ -63,7 +63,8 @@ public class WallpaperCmd extends BaseCmd {
 
                     final Wallpaper wallpaper = Utils.randValue(wallpapers);
                     return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor("Wallpaper", wallpaper.getUrl(), context.getAvatarUrl())
+                            .andThen(embed -> embed.setAuthor(String.format("Wallpaper: %s", arg.isBlank() ? "random" : arg),
+                                    wallpaper.getUrl(), context.getAvatarUrl())
                                     .setImage(wallpaper.getPath())
                                     .addField("Resolution", wallpaper.getResolution(), false)));
                 })
