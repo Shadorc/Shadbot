@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.object;
+package com.shadorc.shadbot.core.retriever;
 
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.*;
