@@ -49,8 +49,7 @@ public class CommandManager {
     private final Map<String, BaseCmd> commandsMap;
 
     private CommandManager() {
-        this.commandsMap = new LinkedHashMap<>();
-        this.add(
+        this.commandsMap = this.initialize(
                 // Utility Commands
                 new WeatherCmd(), new CalcCmd(), new TranslateCmd(), new WikiCmd(), new PollCmd(),
                 new UrbanCmd(), new LyricsCmd(),
@@ -84,20 +83,22 @@ public class CommandManager {
                 new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd(), new PrefixCmd());
     }
 
-    private void add(BaseCmd... cmds) {
+    private Map<String, BaseCmd> initialize(BaseCmd... cmds) {
+        final Map<String, BaseCmd> map = new LinkedHashMap<>();
         for (final BaseCmd cmd : cmds) {
             for (final String name : cmd.getNames()) {
-                if (this.commandsMap.putIfAbsent(name, cmd) != null) {
+                if (map.putIfAbsent(name, cmd) != null) {
                     DEFAULT_LOGGER.error("Command name collision between {} and {}",
-                            name, this.commandsMap.get(name).getClass().getSimpleName());
+                            name, map.get(name).getClass().getSimpleName());
                 }
             }
         }
         DEFAULT_LOGGER.info("{} commands initialized", cmds.length);
+        return Collections.unmodifiableMap(map);
     }
 
     public Map<String, BaseCmd> getCommands() {
-        return Collections.unmodifiableMap(this.commandsMap);
+        return this.commandsMap;
     }
 
     public BaseCmd getCommand(String name) {

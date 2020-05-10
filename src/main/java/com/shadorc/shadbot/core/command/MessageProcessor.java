@@ -24,23 +24,53 @@ public class MessageProcessor {
             .help("Command usage")
             .labelNames("command")
             .register();
+    private static final String DM_TEXT = String.format("Hello !"
+                    + "%nCommands only work in a server but you can see help using `%shelp`."
+                    + "%nIf you have a question, a suggestion or if you just want to talk, don't hesitate to "
+                    + "join my support server : %s",
+            Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
 
     public static Mono<Void> processEvent(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getGuildId())
                 // This is a private channel, there is no guild ID
                 .switchIfEmpty(MessageProcessor.processPrivateMessage(event).then(Mono.empty()))
-                .flatMap(guildId -> DatabaseManager.getGuilds().getDBGuild(guildId))
-                // The content is not a Webhook
-                .zipWith(Mono.justOrEmpty(event.getMessage().getContent()))
-                .flatMap(tuple -> MessageProcessor.processCommand(event, tuple.getT1(), tuple.getT2()));
+                .flatMap(guildId -> MessageProcessor.processGuildMessage(guildId, event));
     }
 
-    private static Mono<Void> processCommand(MessageCreateEvent event, DBGuild dbGuild, String content) {
+    private static Mono<Void> processPrivateMessage(MessageCreateEvent event) {
+        if (event.getMessage().getContent().startsWith(String.format("%shelp", Config.DEFAULT_PREFIX))) {
+            return CommandManager.getInstance().getCommand("help")
+                    .execute(new Context(event, Config.DEFAULT_PREFIX));
+        }
+
+        return event.getMessage()
+                .getChannel()
+                .filterWhen(channel -> channel.getMessagesBefore(Snowflake.of(Instant.now()))
+                        .take(25)
+                        .map(Message::getContent)
+                        .filter(DM_TEXT::equals)
+                        .hasElements()
+                        .map(hasElements -> !hasElements))
+                .flatMap(channel -> DiscordUtils.sendMessage(DM_TEXT, channel))
+                .then();
+    }
+
+    private static Mono<Void> processGuildMessage(Snowflake guildId, MessageCreateEvent event) {
+        // Only execute database request if the message contains a command
+        if (CommandManager.getInstance().getCommands().keySet().stream()
+                .anyMatch(cmd -> event.getMessage().getContent().contains(cmd))) {
+            return DatabaseManager.getGuilds().getDBGuild(guildId)
+                    .flatMap(dbGuild -> MessageProcessor.processCommand(event, dbGuild));
+        }
+        return Mono.empty();
+    }
+
+    private static Mono<Void> processCommand(MessageCreateEvent event, DBGuild dbGuild) {
         return Mono.justOrEmpty(event.getMember())
                 // The author is not a bot or is not the bot used for auto-testing
                 .filter(member -> !member.isBot() || member.getId().equals(Config.TESTBOT_ID))
-                .flatMap(member -> member.getRoles().collectList())
-                .zipWith(event.getGuild().map(Guild::getOwnerId))
+                .flatMap(member -> Mono.zip(member.getRoles().collectList(),
+                        event.getGuild().map(Guild::getOwnerId)))
                 // The role is allowed or the author is the guild's owner
                 .filter(tuple -> dbGuild.getSettings().hasAllowedRole(tuple.getT1())
                         || event.getMessage().getAuthor().map(User::getId).map(tuple.getT2()::equals).orElse(false))
@@ -48,36 +78,11 @@ public class MessageProcessor {
                 .flatMap(ignored -> event.getMessage().getChannel())
                 .filter(channel -> dbGuild.getSettings().isTextChannelAllowed(channel.getId()))
                 // The message starts with the correct prefix
-                .flatMap(ignored -> MessageProcessor.getPrefix(dbGuild, content))
+                .flatMap(ignored -> MessageProcessor.getPrefix(dbGuild, event.getMessage().getContent()))
                 // Execute the command
                 .flatMap(prefix -> MessageProcessor.executeCommand(dbGuild, new Context(event, prefix)));
     }
 
-    private static Mono<Void> processPrivateMessage(MessageCreateEvent event) {
-        final String text = String.format("Hello !"
-                        + "%nCommands only work in a server but you can see help using `%shelp`."
-                        + "%nIf you have a question, a suggestion or if you just want to talk, don't hesitate to "
-                        + "join my support server : %s",
-                Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
-
-        final String content = event.getMessage().getContent();
-        if (content.startsWith(String.format("%shelp", Config.DEFAULT_PREFIX))) {
-            return CommandManager.getInstance().getCommand("help")
-                    .execute(new Context(event, Config.DEFAULT_PREFIX));
-        }
-
-        return event.getMessage()
-                .getChannel()
-                .flatMapMany(channel -> channel.getMessagesBefore(Snowflake.of(Instant.now())))
-                .take(50)
-                .map(Message::getContent)
-                .flatMap(Mono::justOrEmpty)
-                .collectList()
-                .filter(list -> list.stream().noneMatch(text::equalsIgnoreCase))
-                .flatMap(ignored -> event.getMessage().getChannel())
-                .flatMap(channel -> DiscordUtils.sendMessage(text, channel))
-                .then();
-    }
 
     private static Mono<String> getPrefix(DBGuild dbGuild, String content) {
         final String prefix = dbGuild.getSettings().getPrefix();
