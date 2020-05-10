@@ -25,54 +25,48 @@ public class MessageProcessor {
             .labelNames("command")
             .register();
 
-    private final MessageCreateEvent event;
-
-    public MessageProcessor(MessageCreateEvent event) {
-        this.event = event;
-    }
-
-    public Mono<Void> processMessage() {
-        return Mono.justOrEmpty(this.event.getGuildId())
-                .flatMap(guildId -> DatabaseManager.getGuilds().getDBGuild(guildId))
+    public static Mono<Void> processEvent(MessageCreateEvent event) {
+        return Mono.justOrEmpty(event.getGuildId())
                 // This is a private channel, there is no guild ID
-                .switchIfEmpty(this.processPrivateMessage().then(Mono.empty()))
+                .switchIfEmpty(MessageProcessor.processPrivateMessage(event).then(Mono.empty()))
+                .flatMap(guildId -> DatabaseManager.getGuilds().getDBGuild(guildId))
                 // The content is not a Webhook
-                .zipWith(Mono.justOrEmpty(this.event.getMessage().getContent()))
-                .flatMap(tuple -> this.processCommand(tuple.getT1(), tuple.getT2()));
+                .zipWith(Mono.justOrEmpty(event.getMessage().getContent()))
+                .flatMap(tuple -> MessageProcessor.processCommand(event, tuple.getT1(), tuple.getT2()));
     }
 
-    private Mono<Void> processCommand(DBGuild dbGuild, String content) {
-        return Mono.justOrEmpty(this.event.getMember())
+    private static Mono<Void> processCommand(MessageCreateEvent event, DBGuild dbGuild, String content) {
+        return Mono.justOrEmpty(event.getMember())
                 // The author is not a bot or is not the bot used for auto-testing
                 .filter(member -> !member.isBot() || member.getId().equals(Config.TESTBOT_ID))
                 .flatMap(member -> member.getRoles().collectList())
-                .zipWith(this.event.getGuild().map(Guild::getOwnerId))
+                .zipWith(event.getGuild().map(Guild::getOwnerId))
                 // The role is allowed or the author is the guild's owner
                 .filter(tuple -> dbGuild.getSettings().hasAllowedRole(tuple.getT1())
-                        || this.event.getMessage().getAuthor().map(User::getId).map(tuple.getT2()::equals).orElse(false))
+                        || event.getMessage().getAuthor().map(User::getId).map(tuple.getT2()::equals).orElse(false))
                 // The channel is allowed
-                .flatMap(ignored -> this.event.getMessage().getChannel())
+                .flatMap(ignored -> event.getMessage().getChannel())
                 .filter(channel -> dbGuild.getSettings().isTextChannelAllowed(channel.getId()))
                 // The message starts with the correct prefix
-                .flatMap(ignored -> this.getPrefix(dbGuild, content))
+                .flatMap(ignored -> MessageProcessor.getPrefix(dbGuild, content))
                 // Execute the command
-                .flatMap(prefix -> this.executeCommand(dbGuild, new Context(this.event, prefix)));
+                .flatMap(prefix -> MessageProcessor.executeCommand(dbGuild, new Context(event, prefix)));
     }
 
-    private Mono<Void> processPrivateMessage() {
+    private static Mono<Void> processPrivateMessage(MessageCreateEvent event) {
         final String text = String.format("Hello !"
                         + "%nCommands only work in a server but you can see help using `%shelp`."
                         + "%nIf you have a question, a suggestion or if you just want to talk, don't hesitate to "
                         + "join my support server : %s",
                 Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
 
-        final String content = this.event.getMessage().getContent();
+        final String content = event.getMessage().getContent();
         if (content.startsWith(String.format("%shelp", Config.DEFAULT_PREFIX))) {
             return CommandManager.getInstance().getCommand("help")
-                    .execute(new Context(this.event, Config.DEFAULT_PREFIX));
+                    .execute(new Context(event, Config.DEFAULT_PREFIX));
         }
 
-        return this.event.getMessage()
+        return event.getMessage()
                 .getChannel()
                 .flatMapMany(channel -> channel.getMessagesBefore(Snowflake.of(Instant.now())))
                 .take(50)
@@ -80,12 +74,12 @@ public class MessageProcessor {
                 .flatMap(Mono::justOrEmpty)
                 .collectList()
                 .filter(list -> list.stream().noneMatch(text::equalsIgnoreCase))
-                .flatMap(ignored -> this.event.getMessage().getChannel())
+                .flatMap(ignored -> event.getMessage().getChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(text, channel))
                 .then();
     }
 
-    private Mono<String> getPrefix(DBGuild dbGuild, String content) {
+    private static Mono<String> getPrefix(DBGuild dbGuild, String content) {
         final String prefix = dbGuild.getSettings().getPrefix();
         if (content.startsWith(prefix)) {
             return Mono.just(prefix);
@@ -96,13 +90,13 @@ public class MessageProcessor {
         return Mono.empty();
     }
 
-    private boolean isRateLimited(Context context, BaseCmd cmd) {
+    private static boolean isRateLimited(Context context, BaseCmd cmd) {
         return cmd.getRateLimiter()
                 .map(rateLimiter -> rateLimiter.isLimitedAndWarn(context.getChannelId(), context.getMember()))
                 .orElse(false);
     }
 
-    private Mono<Void> executeCommand(DBGuild dbGuild, Context context) {
+    private static Mono<Void> executeCommand(DBGuild dbGuild, Context context) {
         final BaseCmd command = CommandManager.getInstance().getCommand(context.getCommandName());
         // The command does not exist
         if (command == null) {
@@ -134,7 +128,7 @@ public class MessageProcessor {
                 // The command is allowed in the guild
                 .filter(cmd -> dbGuild.getSettings().isCommandAllowed(cmd))
                 // The user is not rate limited
-                .filter(cmd -> !this.isRateLimited(context, cmd))
+                .filter(cmd -> !MessageProcessor.isRateLimited(context, cmd))
                 .flatMap(cmd -> cmd.execute(context))
                 .onErrorResume(err -> ExceptionHandler.handleCommandError(err, command, context));
     }
