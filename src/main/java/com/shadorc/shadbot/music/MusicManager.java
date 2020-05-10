@@ -25,12 +25,12 @@ import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.rest.util.Snowflake;
 import discord4j.voice.AudioProvider;
 import discord4j.voice.VoiceConnection;
+import discord4j.voice.retry.VoiceGatewayException;
 import io.prometheus.client.Gauge;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -134,11 +134,10 @@ public class MusicManager {
                 // Do not join the voice channel if the current voice connection is in not disconnected
                 .filterWhen(ignored -> isDisconnected)
                 .doOnNext(ignored -> LOGGER.info("{Guild ID: {}} Joining voice channel...", guildId.asLong()))
-                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)
-                        // TODO: Remove once https://github.com/Discord4J/Discord4J/pull/700 is merged
-                        .setTimeout(Duration.ofSeconds(15))))
-                .doOnError(IllegalStateException.class, err -> LOGGER.warn(err.getMessage()))
-                .onErrorMap(IllegalStateException.class, err -> new CommandException("I'm already joining a voice channel. Please wait."))
+                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
+                .doOnError(VoiceGatewayException.class, err -> LOGGER.warn(err.getMessage()))
+                .onErrorMap(VoiceGatewayException.class,
+                        err -> new CommandException("An unknown error occurred while joining the voice channel, please try again."))
                 .doOnTerminate(() -> this.guildJoining.remove(guildId));
     }
 
