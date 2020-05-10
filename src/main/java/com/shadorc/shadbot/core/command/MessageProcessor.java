@@ -124,12 +124,10 @@ public class MessageProcessor {
                                 String.format(Emoji.ACCESS_DENIED + " (**%s**) You do not have the permission to " +
                                         "execute this command.", context.getUsername()), channel)
                                 .then(Mono.empty())))
-                .flatMap(ignored -> Mono.just(command))
-                // The command is allowed in the guild
-                .filter(cmd -> dbGuild.getSettings().isCommandAllowed(cmd))
-                // The user is not rate limited
-                .filter(cmd -> !MessageProcessor.isRateLimited(context, cmd))
-                .flatMap(cmd -> cmd.execute(context))
+                // The command is allowed in the guild and the user is not rate limited
+                .filter(ignored -> dbGuild.getSettings().isCommandAllowed(command)
+                        && !MessageProcessor.isRateLimited(context, command))
+                .flatMap(ignored -> command.execute(context))
                 .onErrorResume(err -> ExceptionHandler.handleCommandError(err, command, context));
     }
 
