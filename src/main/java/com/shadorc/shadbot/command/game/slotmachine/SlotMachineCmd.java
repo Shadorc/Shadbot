@@ -34,7 +34,36 @@ public class SlotMachineCmd extends BaseCmd {
         this.setGameRateLimiter();
     }
 
-    private static List<SlotOptions> randSlots() {
+    @Override
+    public Mono<Void> execute(Context context) {
+        return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), PAID_COST)
+                .map(ignored -> new GamblerPlayer(context.getGuildId(), context.getAuthorId(), PAID_COST))
+                .flatMap(player -> player.bet().thenReturn(player))
+                .flatMap(player -> {
+                    final List<SlotOptions> slots = this.randSlots();
+
+                    final StringBuilder strBuilder = new StringBuilder(String.format("%s%n%s (**%s**) ",
+                            FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername()));
+
+                    if (slots.stream().distinct().count() == 1) {
+                        final int slotGains = slots.get(0).getGains();
+                        final long gains = ThreadLocalRandom.current().nextInt((int) (slotGains * RAND_FACTOR),
+                                (int) (slotGains * (RAND_FACTOR + 1)));
+                        SLOT_MACHINE_SUMMARY.labels("win").observe(gains);
+                        return player.win(gains)
+                                .thenReturn(strBuilder.append(String.format("You win **%s** !", FormatUtils.coins(gains))));
+                    } else {
+                        SLOT_MACHINE_SUMMARY.labels("loss").observe(PAID_COST);
+                        return Mono.just(strBuilder.append(String.format("You lose **%s** !", FormatUtils.coins(PAID_COST))));
+                    }
+                })
+                .map(StringBuilder::toString)
+                .flatMap(text -> context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
+                .then();
+    }
+
+    private List<SlotOptions> randSlots() {
         // Pseudo-random number between 0 and 100 inclusive
         final int rand = ThreadLocalRandom.current().nextInt(100 + 1);
         if (rand == 0) {
@@ -58,35 +87,6 @@ public class SlotMachineCmd extends BaseCmd {
             }
         } while (list.size() != 3);
         return list;
-    }
-
-    @Override
-    public Mono<Void> execute(Context context) {
-        return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), PAID_COST)
-                .map(ignored -> new GamblerPlayer(context.getGuildId(), context.getAuthorId(), PAID_COST))
-                .flatMap(player -> player.bet().thenReturn(player))
-                .flatMap(player -> {
-                    final List<SlotOptions> slots = SlotMachineCmd.randSlots();
-
-                    final StringBuilder strBuilder = new StringBuilder(String.format("%s%n%s (**%s**) ",
-                            FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername()));
-
-                    if (slots.stream().distinct().count() == 1) {
-                        final int slotGains = slots.get(0).getGains();
-                        final long gains = ThreadLocalRandom.current().nextInt((int) (slotGains * RAND_FACTOR),
-                                (int) (slotGains * (RAND_FACTOR + 1)));
-                        SLOT_MACHINE_SUMMARY.labels("win").observe(gains);
-                        return player.win(gains)
-                                .thenReturn(strBuilder.append(String.format("You win **%s** !", FormatUtils.coins(gains))));
-                    } else {
-                        SLOT_MACHINE_SUMMARY.labels("loss").observe(PAID_COST);
-                        return Mono.just(strBuilder.append(String.format("You lose **%s** !", FormatUtils.coins(PAID_COST))));
-                    }
-                })
-                .map(StringBuilder::toString)
-                .flatMap(text -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
-                .then();
     }
 
     @Override
