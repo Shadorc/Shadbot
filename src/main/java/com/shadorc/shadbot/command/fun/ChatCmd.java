@@ -58,8 +58,8 @@ public class ChatCmd extends BaseCmd {
 
     private Mono<String> getResponse(Snowflake channelId, String input) {
         return Flux.fromIterable(BOTS.entrySet())
-                .flatMap(bot -> this.talk(channelId, bot.getValue(), input)
-                        .map(response -> String.format("**%s**: %s", bot.getKey(), response)))
+                .flatMap(bot -> Mono.defer(() -> this.talk(channelId, bot.getValue(), input)
+                        .map(response -> String.format("**%s**: %s", bot.getKey(), response))))
                 .takeUntil(str -> !str.isBlank())
                 .next();
     }
