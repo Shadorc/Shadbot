@@ -15,9 +15,9 @@ import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 
@@ -51,7 +51,7 @@ public class GuildsCollection extends DatabaseCollection {
     public Mono<DBMember> getDBMember(Snowflake guildId, Snowflake memberId) {
         return this.getDBMembers(guildId, memberId)
                 .filter(dbMember -> dbMember.getId().equals(memberId))
-                .next();
+                .single();
     }
 
     public Flux<DBMember> getDBMembers(Snowflake guildId, Snowflake... memberIds) {
@@ -62,11 +62,11 @@ public class GuildsCollection extends DatabaseCollection {
                 .flatMapMany(Flux::fromIterable)
                 .collectMap(DBMember::getId)
                 .map(dbMembers -> {
-                    final List<DBMember> list = new ArrayList<>();
+                    final Set<DBMember> members = new HashSet<>();
                     for (final Snowflake memberId : memberIds) {
-                        list.add(dbMembers.computeIfAbsent(memberId, id -> new DBMember(guildId, id)));
+                        members.add(dbMembers.getOrDefault(memberId, new DBMember(guildId, memberId)));
                     }
-                    return list;
+                    return members;
                 })
                 .flatMapMany(Flux::fromIterable)
                 .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
