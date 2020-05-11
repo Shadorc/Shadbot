@@ -13,6 +13,8 @@ import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 import static com.shadorc.shadbot.db.guilds.GuildsCollection.LOGGER;
 
@@ -123,5 +125,23 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                 "guildId='" + this.guildId + '\'' +
                 ", bean=" + this.getBean() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || this.getClass() != o.getClass()) {
+            return false;
+        }
+        final DBMember dbMember = (DBMember) o;
+        return Objects.equals(this.getGuildId(), dbMember.getGuildId())
+                && Objects.equals(this.getId(), dbMember.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.guildId, this.getId());
     }
 }

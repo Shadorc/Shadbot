@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
@@ -109,5 +110,22 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
         return "DBGuild{" +
                 "bean=" + this.getBean() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || this.getClass() != o.getClass()) {
+            return false;
+        }
+        final DBGuild dbGuild = (DBGuild) o;
+        return Objects.equals(this.getId(), dbGuild.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getBean().getId());
     }
 }
