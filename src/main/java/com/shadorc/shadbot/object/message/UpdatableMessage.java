@@ -6,7 +6,9 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
+import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.Snowflake;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
@@ -88,6 +90,7 @@ public class UpdatableMessage {
                 .filter(messageId -> messageId != 0)
                 .map(Snowflake::of)
                 .flatMap(messageId -> this.client.getMessageById(this.channelId, messageId))
+                .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
                 .flatMap(Message::delete);
     }
 }

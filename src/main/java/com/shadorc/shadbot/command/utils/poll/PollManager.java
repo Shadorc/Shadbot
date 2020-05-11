@@ -8,6 +8,8 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.http.client.ClientException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -66,6 +68,7 @@ public class PollManager {
                         .thenReturn(message.getId()))
                 .flatMap(messageId -> this.context.getClient()
                         .getMessageById(this.context.getChannelId(), messageId))
+                .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
                 .map(Message::getReactions)
                 .flatMap(this::sendResults)
                 .then();
