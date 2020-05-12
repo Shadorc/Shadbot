@@ -53,7 +53,10 @@ public enum Emoji {
 
     SCISSORS("scissors"),
     GEM("gem"),
-    LEAF("leaves");
+    LEAF("leaves"),
+
+    BALLOT_BOX("ballot_box"),
+    BUG("bug");
 
     private final String discordNotation;
 

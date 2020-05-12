@@ -21,6 +21,7 @@ public class Config {
     public static final String GITHUB_URL = PROPERTIES.getProperty("github.url");
     public static final String PATREON_URL = PROPERTIES.getProperty("patreon.url");
     public static final String SUPPORT_SERVER_URL = PROPERTIES.getProperty("support.server.url");
+    public static final String TOP_GG_URL = PROPERTIES.getProperty("top.gg.url");
     public static final String INVITE_URL = PROPERTIES.getProperty("invite.url");
     public static final String USER_AGENT = String.format("Shadbot/%s/D4J-DiscordBot (%s)", VERSION, GITHUB_URL);
     public static final Snowflake TESTBOT_ID = Snowflake.of(PROPERTIES.getProperty("testbot.id"));

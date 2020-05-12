@@ -9,10 +9,14 @@ import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.guilds.bean.DBMemberBean;
+import com.shadorc.shadbot.db.guilds.entity.achievement.Achievement;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.rest.util.Snowflake;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import reactor.core.publisher.Mono;
 
+import java.util.EnumSet;
 import java.util.Objects;
 
 import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
@@ -28,7 +32,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
     }
 
     public DBMember(Snowflake guildId, Snowflake id) {
-        super(new DBMemberBean(id.asString(), 0));
+        super(new DBMemberBean(id.asString()));
         this.guildId = guildId.asString();
     }
 
@@ -44,6 +48,10 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
         return this.getBean().getCoins();
     }
 
+    public EnumSet<Achievement> getAchievements() {
+        return Achievement.of(this.getBean().getAchievements());
+    }
+
     public Mono<UpdateResult> addCoins(long gains) {
         final long coins = NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS);
 
@@ -55,28 +63,55 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
         }
 
         LOGGER.debug("[DBMember {} / {}] Coins update: {} coins", this.getId().asLong(), this.getGuildId().asLong(), coins);
+        return this.update(Updates.set("members.$.coins", coins), this.toDocument().append("coins", coins));
+    }
 
+    public Mono<UpdateResult> unlockAchievement(Achievement achievement) {
+        final int achievements = this.getBean().getAchievements() | achievement.getFlag();
+        return this.updateAchievement(achievements);
+    }
+
+    public Mono<UpdateResult> lockAchievement(Achievement achievement) {
+        final int achievements = this.getBean().getAchievements() & ~achievement.getFlag();
+        return this.updateAchievement(achievements);
+    }
+
+    private Mono<UpdateResult> updateAchievement(int achievements) {
+        // If the achievement is already in this state, no need to request an update
+        if (this.getBean().getAchievements() == achievements) {
+            LOGGER.debug("[DBMember {} / {}] Achievements update useless, aborting: achievements {}",
+                    this.getId().asLong(), this.getGuildId().asLong(), achievements);
+            return Mono.empty();
+        }
+
+        LOGGER.debug("[DBMember {} / {}] Achievements update: achievements {}",
+                this.getId().asLong(), this.getGuildId().asLong(), achievements);
+        return this.update(Updates.set("members.$.achievements", achievements), this.toDocument().append("achievements", achievements));
+
+    }
+
+    private Mono<UpdateResult> update(Bson update, Document document) {
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
                         Filters.and(
                                 Filters.eq("_id", this.getGuildId().asString()),
                                 Filters.eq("members._id", this.getId().asString())),
-                        Updates.set("members.$.coins", coins)))
-                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Coins update result: {}",
+                        update))
+                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Update result: {}",
                         this.getId().asLong(), this.getGuildId().asLong(), result))
                 .map(UpdateResult::getModifiedCount)
                 .flatMap(modifiedCount -> {
                     // Member was not found, insert it
                     if (modifiedCount == 0) {
-                        LOGGER.debug("[DBMember {} / {}] Coins not update. Upsert member: {} coins",
-                                this.getId().asLong(), this.getGuildId().asLong(), coins);
+                        LOGGER.debug("[DBMember {} / {}] Not updated. Upsert member",
+                                this.getId().asLong(), this.getGuildId().asLong());
                         return Mono.from(DatabaseManager.getGuilds()
                                 .getCollection()
                                 .updateOne(Filters.eq("_id", this.getGuildId().asString()),
-                                        Updates.push("members", this.toDocument().append("coins", coins)),
+                                        Updates.push("members", document),
                                         new UpdateOptions().upsert(true)))
-                                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Coins upsert result: {}",
+                                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Upsert result: {}",
                                         this.getId().asLong(), this.getGuildId().asLong(), result));
                     }
                     return Mono.empty();
