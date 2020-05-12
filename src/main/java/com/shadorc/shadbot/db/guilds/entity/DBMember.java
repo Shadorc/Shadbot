@@ -128,20 +128,20 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || this.getClass() != o.getClass()) {
+        if (obj == null || this.getClass() != obj.getClass()) {
             return false;
         }
-        final DBMember dbMember = (DBMember) o;
-        return Objects.equals(this.getGuildId(), dbMember.getGuildId())
-                && Objects.equals(this.getId(), dbMember.getId());
+        final DBMember dbMember = (DBMember) obj;
+        return Objects.equals(this.guildId, dbMember.guildId)
+                && Objects.equals(this.getBean().getId(), dbMember.getBean().getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.guildId, this.getId());
+        return Objects.hash(this.guildId, this.getBean().getId());
     }
 }

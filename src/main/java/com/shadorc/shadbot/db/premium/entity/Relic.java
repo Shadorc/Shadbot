@@ -15,6 +15,7 @@ import reactor.util.annotation.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -104,5 +105,22 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
         return "Relic{" +
                 "bean=" + this.getBean() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+        final Relic relic = (Relic) obj;
+        return Objects.equals(this.getBean().getId(), relic.getBean().getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getBean().getId());
     }
 }

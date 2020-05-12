@@ -13,7 +13,7 @@ public abstract class SerializableEntity<T extends Bean> {
         this.bean = bean;
     }
 
-    public T getBean() {
+    protected T getBean() {
         return this.bean;
     }
 

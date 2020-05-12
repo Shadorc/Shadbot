@@ -10,6 +10,8 @@ import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
 import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 import static com.shadorc.shadbot.db.lottery.LotteryCollection.LOGGER;
 
@@ -71,5 +73,23 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
         return "LotteryGambler{" +
                 "bean=" + this.getBean() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+        final LotteryGambler lotteryGambler = (LotteryGambler) obj;
+        return Objects.equals(this.getBean().getGuildId(), lotteryGambler.getBean().getGuildId())
+                && Objects.equals(this.getBean().getUserId(), lotteryGambler.getBean().getUserId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getBean().getGuildId(), this.getBean().getUserId());
     }
 }

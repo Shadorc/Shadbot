@@ -113,15 +113,15 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || this.getClass() != o.getClass()) {
+        if (obj == null || this.getClass() != obj.getClass()) {
             return false;
         }
-        final DBGuild dbGuild = (DBGuild) o;
-        return Objects.equals(this.getId(), dbGuild.getId());
+        final DBGuild dbGuild = (DBGuild) obj;
+        return Objects.equals(this.getBean().getId(), dbGuild.getBean().getId());
     }
 
     @Override
