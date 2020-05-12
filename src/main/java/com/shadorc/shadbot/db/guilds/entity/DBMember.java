@@ -63,7 +63,13 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
         }
 
         LOGGER.debug("[DBMember {} / {}] Coins update: {} coins", this.getId().asLong(), this.getGuildId().asLong(), coins);
-        return this.update(Updates.set("members.$.coins", coins), this.toDocument().append("coins", coins));
+        return this.update(Updates.set("members.$.coins", coins), this.toDocument().append("coins", coins))
+                .then(Mono.defer(() -> {
+                    if (coins >= 1_000_000_000) {
+                        return this.unlockAchievement(Achievement.MONEY);
+                    }
+                    return Mono.empty();
+                }));
     }
 
     public Mono<UpdateResult> unlockAchievement(Achievement achievement) {

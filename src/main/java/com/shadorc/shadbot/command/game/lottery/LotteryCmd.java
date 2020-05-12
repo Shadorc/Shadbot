@@ -6,6 +6,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.achievement.Achievement;
 import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
 import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
 import com.shadorc.shadbot.object.Emoji;
@@ -145,7 +146,8 @@ public class LotteryCmd extends BaseCmd {
                     return Flux.fromIterable(winners)
                             .flatMap(winner -> DatabaseManager.getGuilds()
                                     .getDBMember(winner.getGuildId(), winner.getId())
-                                    .flatMap(dbMember -> dbMember.addCoins(coins))
+                                    .flatMap(dbMember -> dbMember.addCoins(coins)
+                                            .and(dbMember.unlockAchievement(Achievement.BINGO)))
                                     .then(winner.getPrivateChannel()))
                             .cast(MessageChannel.class)
                             .flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you " +

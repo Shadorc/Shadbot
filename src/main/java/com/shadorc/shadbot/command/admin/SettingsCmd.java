@@ -13,6 +13,7 @@ import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -82,7 +83,10 @@ public class SettingsCmd extends BaseCmd {
         }
 
         try {
-            return setting.execute(context);
+            return setting.execute(context)
+                    .then(DatabaseManager.getGuilds().getDBMember(context.getGuildId(), context.getAuthorId()))
+                    .flatMap(dbMember -> dbMember.unlockAchievement(Achievement.ENGINEER))
+                    .then();
         } catch (final MissingArgumentException err) {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(
