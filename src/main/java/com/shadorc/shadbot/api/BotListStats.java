@@ -134,4 +134,13 @@ public class BotListStats {
                 });
     }
 
+    /**
+     * @return Monthly votes count from https://top.gg/
+     */
+    public static Mono<String> getStats() {
+        final Consumer<HttpHeaders> headersConsumer = header -> header.add(HttpHeaderNames.AUTHORIZATION,
+                CredentialManager.getInstance().get(Credential.TOP_DOT_GG_TOKEN));
+        return NetUtils.get(headersConsumer, String.format("https://top.gg/api/bots/%d/votes", Shadbot.getSelfId().asLong()));
+    }
+
 }
