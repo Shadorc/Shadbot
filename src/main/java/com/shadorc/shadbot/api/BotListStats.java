@@ -1,20 +1,20 @@
 package com.shadorc.shadbot.api;
 
 import com.shadorc.shadbot.Shadbot;
-import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.listener.GuildCreateListener;
+import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.core.GatewayDiscordClient;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpHeaders;
 import org.json.JSONObject;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.netty.http.client.HttpClient;
 
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
@@ -22,11 +22,9 @@ import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 public class BotListStats {
 
     private final GatewayDiscordClient gateway;
-    private final HttpClient httpClient;
 
     public BotListStats(GatewayDiscordClient gateway) {
         this.gateway = gateway;
-        this.httpClient = HttpClient.create();
     }
 
     public Mono<Void> postStats() {
@@ -41,14 +39,10 @@ public class BotListStats {
     }
 
     private Mono<String> post(String url, String authorization, JSONObject content) {
-        return this.httpClient
-                .headers(header -> header.add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-                        .add(HttpHeaderNames.AUTHORIZATION, authorization))
-                .post()
-                .uri(url)
-                .send((req, res) -> res.sendString(Mono.just(content.toString()), StandardCharsets.UTF_8))
-                .responseSingle((res, con) -> con.asString(StandardCharsets.UTF_8))
-                .timeout(Config.TIMEOUT)
+        final Consumer<HttpHeaders> headersConsumer =
+                header -> header.add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+                        .add(HttpHeaderNames.AUTHORIZATION, authorization);
+        return NetUtils.post(headersConsumer, url, content.toString())
                 .onErrorResume(err -> {
                     if (err instanceof TimeoutException) {
                         return Mono.fromRunnable(() ->
