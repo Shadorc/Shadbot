@@ -81,8 +81,14 @@ public class NetUtils {
     }
 
     public static RequestSender request(HttpMethod method, String url) {
-        return NetUtils.request(ignored -> {
-        }, method, url);
+        return NetUtils.request(spec -> {}, method, url);
+    }
+
+    public static Mono<String> post(Consumer<HttpHeaders> headerBuilder, String url, String content) {
+        return NetUtils.request(headerBuilder, HttpMethod.POST, url)
+                .send((req, res) -> res.sendString(Mono.just(content), StandardCharsets.UTF_8))
+                .responseSingle((res, con) -> con.asString(StandardCharsets.UTF_8))
+                .timeout(Config.TIMEOUT);
     }
 
     public static <T> Mono<T> get(Consumer<HttpHeaders> headerBuilder, String url, JavaType type) {
@@ -96,18 +102,21 @@ public class NetUtils {
     }
 
     public static <T> Mono<T> get(String url, JavaType type) {
-        return NetUtils.get(ignored -> {
-        }, url, type);
+        return NetUtils.get(spec -> {}, url, type);
     }
 
     public static <T> Mono<T> get(String url, Class<? extends T> type) {
         return NetUtils.get(url, TypeFactory.defaultInstance().constructType(type));
     }
 
-    public static Mono<String> get(String url) {
-        return NetUtils.request(HttpMethod.GET, url)
+    public static Mono<String> get(Consumer<HttpHeaders> headerBuilder, String url) {
+        return NetUtils.request(headerBuilder, HttpMethod.GET, url)
                 .responseSingle((resp, body) -> body.asString(StandardCharsets.UTF_8))
                 .timeout(Config.TIMEOUT);
+    }
+
+    public static Mono<String> get(String url) {
+        return NetUtils.get(spec -> {}, url);
     }
 
 }
