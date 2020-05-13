@@ -60,7 +60,6 @@ public class SettingsCmd extends BaseCmd {
 
         try {
             return setting.execute(context);
-            // TODO: A try with a publisher?
         } catch (final MissingArgumentException err) {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(
