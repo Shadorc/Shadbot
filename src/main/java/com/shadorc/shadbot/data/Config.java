@@ -1,10 +1,10 @@
 package com.shadorc.shadbot.data;
 
+import discord4j.rest.util.Color;
 import discord4j.rest.util.Snowflake;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
@@ -34,7 +34,7 @@ public class Config {
     public static final int MUSIC_SEARCHES = Integer.parseInt(PROPERTIES.getProperty("music.searches"));
     public static final int MUSIC_CHOICE_DURATION = Integer.parseInt(PROPERTIES.getProperty("music.choice.duration"));
 
-    public static final Color BOT_COLOR = Color.decode(PROPERTIES.getProperty("embed.color"));
+    public static final Color BOT_COLOR = new Color(Integer.decode(PROPERTIES.getProperty("embed.color")));
     public static final Duration TIMEOUT = Duration.ofMillis(Long.parseLong(PROPERTIES.getProperty("timeout")));
     public static final int RELIC_DURATION = Integer.parseInt(PROPERTIES.getProperty("relic.duration"));
     public static final long MAX_COINS = Long.parseLong(PROPERTIES.getProperty("coins.max"));
