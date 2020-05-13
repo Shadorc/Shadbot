@@ -30,15 +30,10 @@ public class UserInfoCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final Mono<Member> getMember = context.getMessage()
-                .getUserMentions()
-                .switchIfEmpty(context.getGuild()
-                        .flatMapMany(guild -> DiscordUtils.extractMembers(guild, context.getContent())))
-                .defaultIfEmpty(context.getAuthor())
-                .next()
-                .flatMap(user -> user.asMember(context.getGuildId()));
+        final Mono<Member> getMemberOrAuthor = context.getGuild()
+                .flatMap(guild -> DiscordUtils.extractMemberOrAuthor(guild, context.getMessage()));
 
-        return Mono.zip(getMember, getMember.flatMapMany(Member::getRoles).collectList())
+        return Mono.zip(getMemberOrAuthor, getMemberOrAuthor.flatMapMany(Member::getRoles).collectList())
                 .map(tuple -> this.getEmbed(tuple.getT1(), tuple.getT2(), context.getAvatarUrl()))
                 .flatMap(embed -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))

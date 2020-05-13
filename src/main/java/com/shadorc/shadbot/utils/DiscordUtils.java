@@ -19,9 +19,7 @@ import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
-import discord4j.discordjson.json.ImmutableEmbedData;
 import discord4j.discordjson.json.gateway.StatusUpdate;
-import discord4j.discordjson.possible.Possible;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.Permission;
 import discord4j.rest.util.Snowflake;
@@ -128,6 +126,15 @@ public class DiscordUtils {
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(1))
                         .filter(err -> err instanceof PrematureCloseException || err instanceof Errors.NativeIoException));
+    }
+
+    public static Mono<Member> extractMemberOrAuthor(Guild guild, Message message) {
+        return message
+                .getUserMentions()
+                .switchIfEmpty(DiscordUtils.extractMembers(guild, message.getContent()))
+                .next()
+                .flatMap(user -> user.asMember(guild.getId()))
+                .switchIfEmpty(message.getAuthorAsMember());
     }
 
     /**
@@ -273,14 +280,6 @@ public class DiscordUtils {
      */
     public static Consumer<EmbedCreateSpec> getDefaultEmbed() {
         return spec -> spec.setColor(Config.BOT_COLOR);
-    }
-
-    /**
-     * @return A default {@link ImmutableEmbedData} with the default color set.
-     */
-    public static ImmutableEmbedData.Builder getDefaultEmbedData() {
-        return ImmutableEmbedData.builder()
-                .color(Possible.of(Config.BOT_COLOR.getRGB() & 0xFFFFFF));
     }
 
 }
