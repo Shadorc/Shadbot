@@ -16,6 +16,7 @@ import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -53,10 +54,10 @@ public class AllowedRolesSetting extends BaseSetting {
                     final List<Role> mentionedRoles = tuple.getT1();
                     final DBGuild dbGuild = tuple.getT2();
 
-                    final List<Snowflake> allowedRoles = dbGuild.getSettings().getAllowedRoleIds();
-                    final List<Snowflake> mentionedRoleIds = mentionedRoles.stream()
+                    final Set<Snowflake> allowedRoles = dbGuild.getSettings().getAllowedRoleIds();
+                    final Set<Snowflake> mentionedRoleIds = mentionedRoles.stream()
                             .map(Role::getId)
-                            .collect(Collectors.toList());
+                            .collect(Collectors.toUnmodifiableSet());
 
                     final StringBuilder strBuilder = new StringBuilder();
                     if (action == Action.ADD) {

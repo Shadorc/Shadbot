@@ -17,6 +17,7 @@ import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -58,7 +59,7 @@ public class AutoRolesSetting extends BaseSetting {
                     final List<Snowflake> mentionedRoleIds = mentionedRoles.stream()
                             .map(Role::getId)
                             .collect(Collectors.toList());
-                    final List<Snowflake> autoRoleIds = dbGuild.getSettings().getAutoRoleIds();
+                    final Set<Snowflake> autoRoleIds = dbGuild.getSettings().getAutoRoleIds();
 
                     final StringBuilder strBuilder = new StringBuilder();
                     if (action == Action.ADD) {

@@ -9,9 +9,7 @@ import discord4j.core.object.entity.Role;
 import discord4j.rest.util.Permission;
 import discord4j.rest.util.Snowflake;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -46,26 +44,27 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return this.getAllowedVoiceChannelIds().isEmpty() || this.getAllowedVoiceChannelIds().contains(channelId);
     }
 
-    public List<Snowflake> getAllowedTextChannelIds() {
-        return this.toSnowflakeList(SettingsBean::getAllowedTextChannelIds);
+    public Set<Snowflake> getAllowedTextChannelIds() {
+        return this.toSnowflakeSet(SettingsBean::getAllowedTextChannelIds);
     }
 
-    public List<Snowflake> getAllowedVoiceChannelIds() {
-        return this.toSnowflakeList(SettingsBean::getAllowedVoiceChannelIds);
+    public Set<Snowflake> getAllowedVoiceChannelIds() {
+        return this.toSnowflakeSet(SettingsBean::getAllowedVoiceChannelIds);
     }
 
-    public List<Snowflake> getAllowedRoleIds() {
-        return this.toSnowflakeList(SettingsBean::getAllowedRoleIds);
+    public Set<Snowflake> getAllowedRoleIds() {
+        return this.toSnowflakeSet(SettingsBean::getAllowedRoleIds);
     }
 
-    public List<Snowflake> getAutoRoleIds() {
-        return this.toSnowflakeList(SettingsBean::getAutoRoleIds);
+    public Set<Snowflake> getAutoRoleIds() {
+        return this.toSnowflakeSet(SettingsBean::getAutoRoleIds);
     }
 
-    public List<String> getBlacklistedCmd() {
+    public Set<String> getBlacklistedCmd() {
         return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getBlacklist)
-                .orElse(new ArrayList<>());
+                .map(HashSet::new)
+                .orElse(new HashSet<>());
     }
 
     public Integer getDefaultVol() {
@@ -105,13 +104,14 @@ public class Settings extends SerializableEntity<SettingsBean> {
                 .orElse(Config.DEFAULT_PREFIX);
     }
 
-    private List<Snowflake> toSnowflakeList(Function<SettingsBean, List<String>> mapper) {
+    private Set<Snowflake> toSnowflakeSet(Function<SettingsBean, List<String>> mapper) {
         return Optional.ofNullable(this.getBean())
                 .map(mapper)
-                .orElse(new ArrayList<>())
+                .map(HashSet::new)
+                .orElse(new HashSet<>())
                 .stream()
                 .map(Snowflake::of)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     @Override

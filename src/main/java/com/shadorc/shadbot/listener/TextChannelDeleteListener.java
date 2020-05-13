@@ -7,6 +7,7 @@ import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Set;
 
 public class TextChannelDeleteListener implements EventListener<TextChannelDeleteEvent> {
 
@@ -20,7 +21,7 @@ public class TextChannelDeleteListener implements EventListener<TextChannelDelet
         return DatabaseManager.getGuilds()
                 .getDBGuild(event.getChannel().getGuildId())
                 .flatMap(dbGuild -> {
-                    final List<Snowflake> allowedTextChannelIds = dbGuild.getSettings().getAllowedTextChannelIds();
+                    final Set<Snowflake> allowedTextChannelIds = dbGuild.getSettings().getAllowedTextChannelIds();
                     // If the channel was an allowed channel...
                     if (allowedTextChannelIds.remove(event.getChannel().getId())) {
                         // ...update settings to remove the deleted one

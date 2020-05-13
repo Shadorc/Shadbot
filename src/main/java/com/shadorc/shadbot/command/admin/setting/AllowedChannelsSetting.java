@@ -17,6 +17,7 @@ import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -54,18 +55,18 @@ public class AllowedChannelsSetting extends BaseSetting {
                     final List<GuildChannel> mentionedChannels = tuple.getT1();
                     final DBGuild dbGuild = tuple.getT2();
 
-                    final List<Snowflake> allowedTextChannelIds = dbGuild.getSettings().getAllowedTextChannelIds();
-                    final List<Snowflake> allowedVoiceChannelIds = dbGuild.getSettings().getAllowedVoiceChannelIds();
+                    final Set<Snowflake> allowedTextChannelIds = dbGuild.getSettings().getAllowedTextChannelIds();
+                    final Set<Snowflake> allowedVoiceChannelIds = dbGuild.getSettings().getAllowedVoiceChannelIds();
 
-                    final List<Snowflake> mentionedVoiceChannelIds = mentionedChannels.stream()
+                    final Set<Snowflake> mentionedVoiceChannelIds = mentionedChannels.stream()
                             .filter(channel -> channel.getType() == Channel.Type.GUILD_VOICE)
                             .map(Channel::getId)
-                            .collect(Collectors.toList());
+                            .collect(Collectors.toUnmodifiableSet());
 
-                    final List<Snowflake> mentionedTextChannelIds = mentionedChannels.stream()
+                    final Set<Snowflake> mentionedTextChannelIds = mentionedChannels.stream()
                             .filter(channel -> channel.getType() == Channel.Type.GUILD_TEXT)
                             .map(Channel::getId)
-                            .collect(Collectors.toList());
+                            .collect(Collectors.toUnmodifiableSet());
 
                     final StringBuilder strBuilder = new StringBuilder();
                     if (action == Action.ADD) {
