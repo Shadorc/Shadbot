@@ -25,7 +25,8 @@ public class BlacklistSettingCmd extends BaseSetting {
     }
 
     public BlacklistSettingCmd() {
-        super(Setting.BLACKLIST, "Manage blacklisted commands.");
+        super(List.of("blacklist"),
+                Setting.BLACKLIST, "Manage blacklisted command(s).");
     }
 
     @Override

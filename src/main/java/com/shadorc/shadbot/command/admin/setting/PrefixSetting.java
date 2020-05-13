@@ -18,7 +18,8 @@ public class PrefixSetting extends BaseSetting {
     private static final int MAX_PREFIX_LENGTH = 5;
 
     public PrefixSetting() {
-        super(Setting.PREFIX, "Manage Shadbot's prefix.");
+        super(List.of("prefix"),
+                Setting.PREFIX, "Manage Shadbot's prefix.");
     }
 
     @Override

@@ -2,21 +2,19 @@ package com.shadorc.shadbot.command.admin;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.command.MissingArgumentException;
-import com.shadorc.shadbot.command.admin.setting.*;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.core.setting.BaseSetting;
-import com.shadorc.shadbot.core.setting.Setting;
+import com.shadorc.shadbot.core.setting.SettingManager;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -24,34 +22,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
-import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
-
 public class SettingsCmd extends BaseCmd {
-
-    private final Map<Setting, BaseSetting> settingsMap;
 
     public SettingsCmd() {
         super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("setting", "settings"));
         this.setRateLimiter(new RateLimiter(2, Duration.ofSeconds(3)));
-
-        this.settingsMap = new EnumMap<>(Setting.class);
-        this.add(new AllowedChannelsSetting(), new AllowedRolesSetting(), new AutoMessageSetting(),
-                new AutoRolesSetting(), new BlacklistSettingCmd(), new NSFWSetting(), new PrefixSetting(),
-                new VolumeSetting());
-    }
-
-    private void add(BaseSetting... settings) {
-        for (final BaseSetting setting : settings) {
-            if (this.settingsMap.putIfAbsent(setting.getSetting(), setting) != null) {
-                DEFAULT_LOGGER.error("Command name collision between {} and {}",
-                        setting.getName(), this.settingsMap.get(setting.getSetting()).getClass().getSimpleName());
-            }
-        }
     }
 
     @Override
@@ -67,8 +45,7 @@ public class SettingsCmd extends BaseCmd {
                     .then();
         }
 
-        final Setting settingEnum = Utils.parseEnum(Setting.class, args.get(0));
-        final BaseSetting setting = this.settingsMap.get(settingEnum);
+        final BaseSetting setting = SettingManager.getInstance().getSetting(args.get(0));
         if (setting == null) {
             return Mono.error(new CommandException(String.format("Setting `%s` does not exist. Use `%shelp %s` " +
                     "to see all available settings.", args.get(0), context.getPrefix(), this.getName())));
@@ -83,6 +60,7 @@ public class SettingsCmd extends BaseCmd {
 
         try {
             return setting.execute(context);
+            // TODO: A try with a publisher?
         } catch (final MissingArgumentException err) {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(
@@ -186,7 +164,10 @@ public class SettingsCmd extends BaseCmd {
                 .addField("Current settings", String.format("`%s%s show`",
                         context.getPrefix(), this.getName()), false);
 
-        this.settingsMap.values()
+        SettingManager.getInstance().getSettings()
+                .values()
+                .stream()
+                .distinct()
                 .forEach(setting -> embed.addField(String.format("Name: %s", setting.getName()),
                         setting.getDescription(),
                         false));

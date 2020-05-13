@@ -21,7 +21,8 @@ public class VolumeSetting extends BaseSetting {
     private static final int MAX_VOLUME = 75;
 
     public VolumeSetting() {
-        super(Setting.DEFAULT_VOLUME, "Manage music default volume.");
+        super(List.of("default_volume", "volume"),
+                Setting.DEFAULT_VOLUME, "Manage music's default volume.");
     }
 
     @Override

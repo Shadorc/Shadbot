@@ -27,7 +27,8 @@ public class AllowedChannelsSetting extends BaseSetting {
     }
 
     public AllowedChannelsSetting() {
-        super(Setting.ALLOWED_CHANNELS, "Manage channels allowed to Shadbot.");
+        super(List.of("allowed_channels", "allowed-channels", "allowed_channel", "allowed-channel"),
+                Setting.ALLOWED_CHANNELS, "Manage in which channel(s) Shadbot can talk in.");
     }
 
     @Override
