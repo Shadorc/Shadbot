@@ -144,11 +144,13 @@ public class LotteryCmd extends BaseCmd {
                     final Long coins = winners.isEmpty() ? null : Math.min(jackpot / winners.size(), Config.MAX_COINS);
 
                     return Flux.fromIterable(winners)
-                            .flatMap(winner -> DatabaseManager.getGuilds()
-                                    .getDBMember(winner.getGuildId(), winner.getId())
-                                    .flatMap(dbMember -> dbMember.addCoins(coins)
-                                            .and(dbMember.unlockAchievement(Achievement.BINGO)))
-                                    .then(winner.getPrivateChannel()))
+                            .flatMap(member -> DatabaseManager.getGuilds()
+                                    .getDBMember(member.getGuildId(), member.getId())
+                                    .flatMap(dbMember -> dbMember.addCoins(coins))
+                                    .and(DatabaseManager.getUsers()
+                                            .getDBUser(member.getId())
+                                            .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.BINGO)))
+                                    .then(member.getPrivateChannel()))
                             .cast(MessageChannel.class)
                             .flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you " +
                                             "have the winning lottery number! You earn **%s**.",

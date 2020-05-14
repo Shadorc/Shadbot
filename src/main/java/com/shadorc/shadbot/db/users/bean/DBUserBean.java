@@ -2,11 +2,13 @@ package com.shadorc.shadbot.db.users.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.shadorc.shadbot.db.Bean;
+import reactor.util.annotation.Nullable;
 
 public class DBUserBean implements Bean {
 
     @JsonProperty("_id")
     private String id;
+    @Nullable
     @JsonProperty("achievements")
     private Integer achievements;
 
@@ -21,8 +23,8 @@ public class DBUserBean implements Bean {
         return this.id;
     }
 
-    public Integer getAchievements() {
-        return this.achievements;
+    public int getAchievements() {
+        return this.achievements == null ? 0 : this.achievements;
     }
 
     @Override

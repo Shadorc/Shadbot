@@ -2,13 +2,15 @@ package com.shadorc.shadbot.db.guilds.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.shadorc.shadbot.db.Bean;
+import reactor.util.annotation.Nullable;
 
 public class DBMemberBean implements Bean {
 
     @JsonProperty("_id")
     private String id;
+    @Nullable
     @JsonProperty("coins")
-    private long coins;
+    private Long coins;
 
     public DBMemberBean(String id) {
         this.id = id;
@@ -22,7 +24,7 @@ public class DBMemberBean implements Bean {
     }
 
     public long getCoins() {
-        return this.coins;
+        return this.coins == null ? 0 : this.coins;
     }
 
     @Override

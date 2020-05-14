@@ -4,7 +4,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBMember;
+import com.shadorc.shadbot.db.users.entity.DBUser;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
@@ -26,8 +26,8 @@ public class AchievementsCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         return context.getGuild()
                 .flatMap(guild -> DiscordUtils.extractMemberOrAuthor(guild, context.getMessage()))
-                .flatMap(member -> DatabaseManager.getGuilds().getDBMember(context.getGuildId(), member.getId())
-                        .map(DBMember::getAchievements)
+                .flatMap(member -> DatabaseManager.getUsers().getDBUser(member.getId())
+                        .map(DBUser::getAchievements)
                         .map(achievements -> DiscordUtils.getDefaultEmbed()
                                 .andThen(embed -> {
                                     embed.setAuthor(String.format("%s's Achievements", member.getUsername()),

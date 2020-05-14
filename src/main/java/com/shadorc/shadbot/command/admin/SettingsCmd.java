@@ -84,8 +84,8 @@ public class SettingsCmd extends BaseCmd {
 
         try {
             return setting.execute(context)
-                    .then(DatabaseManager.getGuilds().getDBMember(context.getGuildId(), context.getAuthorId()))
-                    .flatMap(dbMember -> dbMember.unlockAchievement(Achievement.ENGINEER))
+                    .then(DatabaseManager.getUsers().getDBUser(context.getAuthorId()))
+                    .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.ENGINEER))
                     .then();
         } catch (final MissingArgumentException err) {
             return context.getChannel()
