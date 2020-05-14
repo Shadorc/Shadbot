@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.music;
 
+import com.sedmelluq.discord.lavaplayer.filter.equalizer.EqualizerFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
@@ -15,6 +16,11 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 public class TrackScheduler {
 
+    private static final float[] BASS_BOOST =
+            {0.2f, 0.15f, 0.1f, 0.05f, 0.0f, -0.05f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f};
+    private static final float[] BASS_BOOST_2 =
+            {-0.05f, 0.07f, 0.16f, 0.03f, -0.05f, -0.11f};
+
     public enum RepeatMode {
         NONE,
         SONG,
@@ -23,13 +29,16 @@ public class TrackScheduler {
 
     private final AudioPlayer audioPlayer;
     private final BlockingDeque<AudioTrack> queue;
+    private final EqualizerFactory equalizer;
 
     private RepeatMode repeatMode;
     private AudioTrack currentTrack;
+    private int boostPercentage;
 
     public TrackScheduler(AudioPlayer audioPlayer, int defaultVolume) {
         this.audioPlayer = audioPlayer;
         this.queue = new LinkedBlockingDeque<>();
+        this.equalizer = new EqualizerFactory();
         this.setRepeatMode(RepeatMode.NONE);
         this.setVolume(defaultVolume);
     }
@@ -92,6 +101,23 @@ public class TrackScheduler {
 
     public void clearPlaylist() {
         this.queue.clear();
+    }
+
+    public void boost(int percentage) {
+        if (this.boostPercentage > 0 && percentage == 0) {
+            this.audioPlayer.setFilterFactory(null);
+            return;
+        }
+        if (this.boostPercentage == 0 && percentage > 0) {
+            this.audioPlayer.setFilterFactory(this.equalizer);
+        }
+
+        final float multiplier = percentage / 100.0f;
+        for (int i = 0; i < BASS_BOOST_2.length; i++) {
+            this.equalizer.setGain(i, BASS_BOOST[i] * multiplier);
+        }
+
+        this.boostPercentage = percentage;
     }
 
     public void destroy() {

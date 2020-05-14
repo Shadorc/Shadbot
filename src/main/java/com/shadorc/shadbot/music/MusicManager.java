@@ -58,6 +58,7 @@ public class MusicManager {
     private MusicManager() {
         this.audioPlayerManager = new DefaultAudioPlayerManager();
         this.audioPlayerManager.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
+        this.audioPlayerManager.getConfiguration().setFilterHotSwapEnabled(true);
         AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
         this.guildMusics = new ConcurrentHashMap<>();
         this.guildJoining = new ConcurrentHashMap<>();
