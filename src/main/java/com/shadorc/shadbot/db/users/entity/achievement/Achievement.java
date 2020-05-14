@@ -15,7 +15,8 @@ public enum Achievement {
     SUPERHERO(2, Emoji.HEARTS, "Superhero", String.format("Contribute to [Shadbot](%s)", Config.PATREON_URL)),
     VOTER(3, Emoji.BALLOT_BOX, "Voter", String.format("Vote for Shadbot on [top.gg](%s)", Config.TOP_GG_URL)),
     BUG_FINDER(4, Emoji.BUG, "Bug finder", "Report a bug"),
-    BINGO(5, Emoji.TICKET, "Bingo", "Win the lottery");
+    BINGO(5, Emoji.TICKET, "Bingo", "Win the lottery"),
+    IMPROVER(6, Emoji.ROCKET, "Improver", "Make a suggestion");
 
     private final int value;
     private final int flag;
