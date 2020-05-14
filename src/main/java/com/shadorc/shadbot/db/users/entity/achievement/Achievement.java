@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.db.guilds.entity.achievement;
+package com.shadorc.shadbot.db.users.entity.achievement;
 
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;

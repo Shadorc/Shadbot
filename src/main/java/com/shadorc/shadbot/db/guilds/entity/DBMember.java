@@ -9,14 +9,13 @@ import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.guilds.bean.DBMemberBean;
-import com.shadorc.shadbot.db.guilds.entity.achievement.Achievement;
+import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.rest.util.Snowflake;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import reactor.core.publisher.Mono;
 
-import java.util.EnumSet;
 import java.util.Objects;
 
 import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
@@ -48,10 +47,6 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
         return this.getBean().getCoins();
     }
 
-    public EnumSet<Achievement> getAchievements() {
-        return Achievement.of(this.getBean().getAchievements());
-    }
-
     public Mono<UpdateResult> addCoins(long gains) {
         final long coins = NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS);
 
@@ -66,34 +61,12 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
         return this.update(Updates.set("members.$.coins", coins), this.toDocument().append("coins", coins))
                 .then(Mono.defer(() -> {
                     if (coins >= 1_000_000_000) {
-                        return this.unlockAchievement(Achievement.MONEY);
+                        return DatabaseManager.getUsers()
+                                .getDBUser(this.getId())
+                                .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.MONEY));
                     }
                     return Mono.empty();
                 }));
-    }
-
-    public Mono<UpdateResult> unlockAchievement(Achievement achievement) {
-        final int achievements = this.getBean().getAchievements() | achievement.getFlag();
-        return this.updateAchievement(achievements);
-    }
-
-    public Mono<UpdateResult> lockAchievement(Achievement achievement) {
-        final int achievements = this.getBean().getAchievements() & ~achievement.getFlag();
-        return this.updateAchievement(achievements);
-    }
-
-    private Mono<UpdateResult> updateAchievement(int achievements) {
-        // If the achievement is already in this state, no need to request an update
-        if (this.getBean().getAchievements() == achievements) {
-            LOGGER.debug("[DBMember {} / {}] Achievements update useless, aborting: achievements {}",
-                    this.getId().asLong(), this.getGuildId().asLong(), achievements);
-            return Mono.empty();
-        }
-
-        LOGGER.debug("[DBMember {} / {}] Achievements update: achievements {}",
-                this.getId().asLong(), this.getGuildId().asLong(), achievements);
-        return this.update(Updates.set("members.$.achievements", achievements), this.toDocument().append("achievements", achievements));
-
     }
 
     private Mono<UpdateResult> update(Bson update, Document document) {
