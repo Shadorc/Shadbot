@@ -61,15 +61,4 @@ public enum Achievement {
         }
         return achievements;
     }
-
-    @Override
-    public String toString() {
-        return "Achievement{" +
-                "value=" + this.value +
-                ", flag=" + this.flag +
-                ", emoji=" + this.emoji +
-                ", title='" + this.title + '\'' +
-                ", description='" + this.description + '\'' +
-                '}';
-    }
 }
