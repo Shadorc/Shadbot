@@ -6,7 +6,6 @@ import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Set;
 
 public class TextChannelDeleteListener implements EventListener<TextChannelDeleteEvent> {
