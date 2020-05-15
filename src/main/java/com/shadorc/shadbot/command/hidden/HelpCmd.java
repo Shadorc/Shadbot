@@ -55,7 +55,7 @@ public class HelpCmd extends BaseCmd {
                             for (final CommandCategory category : CommandCategory.values()) {
                                 if (!map.getOrDefault(category, Collections.emptyList()).isEmpty()
                                         && category != CommandCategory.HIDDEN) {
-                                    embed.addField(String.format("%s Commands", category),
+                                    embed.addField(String.format("%s Commands", category.getName()),
                                             String.join(" ", map.get(category)), false);
                                 }
                             }
