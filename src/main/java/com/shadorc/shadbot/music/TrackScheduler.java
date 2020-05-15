@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.music;
 
+import com.sedmelluq.discord.lavaplayer.filter.equalizer.EqualizerFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
@@ -15,6 +16,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 public class TrackScheduler {
 
+    private static final float[] BASS_BOOST = {-0.05f, 0.07f, 0.16f, 0.03f, -0.05f, -0.11f};
+
     public enum RepeatMode {
         NONE,
         SONG,
@@ -26,6 +29,8 @@ public class TrackScheduler {
 
     private RepeatMode repeatMode;
     private AudioTrack currentTrack;
+    private EqualizerFactory equalizer;
+    private int boostPercentage;
 
     public TrackScheduler(AudioPlayer audioPlayer, int defaultVolume) {
         this.audioPlayer = audioPlayer;
@@ -92,6 +97,28 @@ public class TrackScheduler {
 
     public void clearPlaylist() {
         this.queue.clear();
+    }
+
+    public void bassBoost(int percentage) {
+        // Disable filter factory
+        if (this.boostPercentage > 0 && percentage == 0) {
+            this.audioPlayer.setFilterFactory(null);
+            return;
+        }
+        // Enable filter factory
+        if (this.boostPercentage == 0 && percentage > 0) {
+            if (this.equalizer == null) {
+                this.equalizer = new EqualizerFactory();
+            }
+            this.audioPlayer.setFilterFactory(this.equalizer);
+        }
+
+        final float multiplier = percentage / 100.0f;
+        for (int i = 0; i < BASS_BOOST.length; i++) {
+            this.equalizer.setGain(i, BASS_BOOST[i] * multiplier);
+        }
+
+        this.boostPercentage = percentage;
     }
 
     public void destroy() {

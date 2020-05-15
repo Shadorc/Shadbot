@@ -67,7 +67,7 @@ public class CommandManager {
                 // Music Commands
                 new PlayCmd(), new PauseCmd(), new StopCmd(), new SkipCmd(), new RepeatCmd(),
                 new BackwardCmd(), new ForwardCmd(), new VolumeCmd(), new NameCmd(),
-                new PlaylistCmd(), new ShuffleCmd(), new ClearCmd(),
+                new PlaylistCmd(), new ShuffleCmd(), new ClearCmd(), new BassBoostCmd(),
                 // Game Stats Commands
                 new FortniteCmd(), new DiabloCmd(), new CounterStrikeCmd(), new OverwatchCmd(),
                 // Info Commands
