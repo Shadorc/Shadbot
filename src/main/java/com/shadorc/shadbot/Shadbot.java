@@ -124,12 +124,12 @@ public class Shadbot {
                     Shadbot.gateway = gateway;
 
                     Shadbot.taskManager = new TaskManager(gateway);
-                    Shadbot.taskManager.schedulesLottery();
-                    Shadbot.taskManager.schedulesPeriodicStats();
-                    Shadbot.taskManager.schedulesPresenceUpdates();
+                    Shadbot.taskManager.scheduleLottery();
+                    Shadbot.taskManager.schedulePeriodicStats();
+                    Shadbot.taskManager.schedulePresenceUpdates();
                     if (!Config.IS_SNAPSHOT) {
-                        Shadbot.taskManager.schedulesPostStats();
-                        Shadbot.taskManager.schedulesVotersCheck();
+                        Shadbot.taskManager.schedulePostStats();
+                        Shadbot.taskManager.scheduleVotersCheck();
                     }
 
                     DEFAULT_LOGGER.info("Registering listeners...");
