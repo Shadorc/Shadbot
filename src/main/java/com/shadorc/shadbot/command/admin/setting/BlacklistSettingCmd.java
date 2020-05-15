@@ -63,7 +63,7 @@ public class BlacklistSettingCmd extends BaseSetting {
 
     private Mono<Void> blacklistCategories(Context context, Action action, List<String> categoryNames) {
         final Set<String> unknownCategories = categoryNames.stream()
-                .filter(category -> Utils.parseEnum(CommandCategory.class, category.toUpperCase()) == null)
+                .filter(category -> Utils.parseEnum(CommandCategory.class, category) == null)
                 .collect(Collectors.toSet());
 
         if (!unknownCategories.isEmpty()) {
@@ -72,7 +72,7 @@ public class BlacklistSettingCmd extends BaseSetting {
         }
 
         final Set<CommandCategory> categories = categoryNames.stream()
-                .map(category -> Utils.parseEnum(CommandCategory.class, category.toUpperCase()))
+                .map(category -> Utils.parseEnum(CommandCategory.class, category))
                 .collect(Collectors.toSet());
 
         // Do not allow to blacklist admin category
