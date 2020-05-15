@@ -16,10 +16,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 public class TrackScheduler {
 
-    private static final float[] BASS_BOOST =
-            {0.2f, 0.15f, 0.1f, 0.05f, 0.0f, -0.05f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f};
-    private static final float[] BASS_BOOST_2 =
-            {-0.05f, 0.07f, 0.16f, 0.03f, -0.05f, -0.11f};
+    private static final float[] BASS_BOOST = {-0.05f, 0.07f, 0.16f, 0.03f, -0.05f, -0.11f};
 
     public enum RepeatMode {
         NONE,
@@ -113,7 +110,7 @@ public class TrackScheduler {
         }
 
         final float multiplier = percentage / 100.0f;
-        for (int i = 0; i < BASS_BOOST_2.length; i++) {
+        for (int i = 0; i < BASS_BOOST.length; i++) {
             this.equalizer.setGain(i, BASS_BOOST[i] * multiplier);
         }
 

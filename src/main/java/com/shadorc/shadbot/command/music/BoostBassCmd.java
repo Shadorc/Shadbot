@@ -20,7 +20,7 @@ public class BoostBassCmd extends BaseCmd {
     private static final int VALUE_MAX = 200;
 
     public BoostBassCmd() {
-        super(CommandCategory.MUSIC, List.of("bass"));
+        super(CommandCategory.MUSIC, List.of("boost", "boost_bass"));
         this.setDefaultRateLimiter();
     }
 
@@ -48,10 +48,11 @@ public class BoostBassCmd extends BaseCmd {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
-                .setDescription("Enable/disable bass boost.")
+                .setDescription("Drop the bass.")
                 .addArg("percentage",
-                        String.format("boost percentage, must be between %d and %d. %d disables bass boost.",
-                                VALUE_MIN, VALUE_MAX, VALUE_MIN), false)
+                        String.format("boost percentage, must be between **%d%%** and **%d%%**.", VALUE_MIN, VALUE_MAX), false)
+                .addField("Info", String.format("**%d** will disable the bass boost." +
+                        "%nA value higher than **%d%%** will saturate the sound.", VALUE_MIN, VALUE_MAX), false)
                 .build();
     }
 }
