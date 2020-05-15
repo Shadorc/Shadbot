@@ -11,8 +11,10 @@ public class IamCodec implements Codec<IamBean> {
 
     @Override
     public IamBean decode(BsonReader reader, DecoderContext decoderContext) {
-        reader.readStartDocument();
-        return new IamBean(reader.readString(), reader.readString());
+        try (reader) {
+            reader.readStartDocument();
+            return new IamBean(reader.readString(), reader.readString());
+        }
     }
 
     @Override

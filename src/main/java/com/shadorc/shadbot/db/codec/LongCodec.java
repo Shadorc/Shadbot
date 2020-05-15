@@ -10,7 +10,9 @@ public class LongCodec implements Codec<Long> {
 
     @Override
     public Long decode(BsonReader reader, DecoderContext decoderContext) {
-        return reader.readInt64();
+        try (reader) {
+            return reader.readInt64();
+        }
     }
 
     @Override

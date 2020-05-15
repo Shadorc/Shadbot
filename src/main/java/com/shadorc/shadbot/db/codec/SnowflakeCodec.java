@@ -11,7 +11,9 @@ public class SnowflakeCodec implements Codec<Snowflake> {
 
     @Override
     public Snowflake decode(BsonReader reader, DecoderContext decoderContext) {
-        return Snowflake.of(reader.readString());
+        try (reader) {
+            return Snowflake.of(reader.readString());
+        }
     }
 
     @Override
