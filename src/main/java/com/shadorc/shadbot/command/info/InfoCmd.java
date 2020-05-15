@@ -6,7 +6,6 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.listener.VoiceStateUpdateListener;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -44,11 +43,13 @@ public class InfoCmd extends BaseCmd {
         return Mono.zip(
                 context.getClient().getUserById(Shadbot.getOwnerId()),
                 context.getChannel(),
-                DiscordUtils.getGuildCount(context.getClient()))
+                DiscordUtils.getGuildCount(context.getClient()),
+                DiscordUtils.getVoiceCount(context.getClient()))
                 .flatMap(tuple -> {
                     final User owner = tuple.getT1();
                     final MessageChannel channel = tuple.getT2();
                     final long guildCount = tuple.getT3();
+                    final long voiceCount = tuple.getT4();
 
                     final long start = System.currentTimeMillis();
                     return DiscordUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Testing ping...",
@@ -57,7 +58,7 @@ public class InfoCmd extends BaseCmd {
                                     + this.getVersionSection()
                                     + this.getPerformanceSection()
                                     + this.getInternetSection(context, start)
-                                    + this.getShadbotSection(context, owner, guildCount)
+                                    + this.getShadbotSection(context, owner, guildCount, voiceCount)
                                     + "```")));
                 })
                 .then();
@@ -91,7 +92,7 @@ public class InfoCmd extends BaseCmd {
                 + String.format("%nGateway Latency: %dms", gatewayLatency);
     }
 
-    private String getShadbotSection(Context context, User owner, long guildCount) {
+    private String getShadbotSection(Context context, User owner, long guildCount, long voiceCount) {
         final String uptime = DurationFormatUtils.formatDuration(TimeUtils.getMillisUntil(Shadbot.getLaunchTime()),
                 "d 'day(s),' HH 'hour(s) and' mm 'minute(s)'", true);
 
@@ -100,7 +101,7 @@ public class InfoCmd extends BaseCmd {
                 + String.format("%nDeveloper: %s", owner.getTag())
                 + String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
                 + String.format("%nServers: %s", FormatUtils.number(guildCount))
-                + String.format("%nVoice Channels: %s", FormatUtils.number(VoiceStateUpdateListener.VOICE_COUNT_GAUGE.get()));
+                + String.format("%nVoice Channels: %s", FormatUtils.number(voiceCount));
     }
 
     @Override
