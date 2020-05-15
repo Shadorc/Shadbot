@@ -24,7 +24,8 @@ import java.util.function.Consumer;
 
 public class NetUtils {
 
-    private static final HttpClient HTTP_CLIENT = HttpClient.create();
+    private static final HttpClient HTTP_CLIENT = HttpClient.create()
+            .followRedirect(true);
 
     /**
      * @param html The HTML to convert to text with new lines preserved, may be {@code null}.
