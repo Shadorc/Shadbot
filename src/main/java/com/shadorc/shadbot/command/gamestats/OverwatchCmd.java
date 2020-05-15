@@ -70,7 +70,7 @@ public class OverwatchCmd extends BaseCmd {
                     return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Overwatch Stats (Quickplay)",
                                     String.format("https://playoverwatch.com/en-gb/career/%s/%s",
-                                            platform.toString().toLowerCase(), profile.getProfile().getUsername()), context.getAvatarUrl())
+                                            platform.getName(), profile.getProfile().getUsername()), context.getAvatarUrl())
                                     .setThumbnail(profile.getProfile().getPortrait())
                                     .setDescription(String.format("Stats for user **%s**", profile.getProfile().getUsername()))
                                     .addField("Level", profile.getProfile().getLevel(), true)
