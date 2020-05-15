@@ -119,8 +119,9 @@ public class AllowedChannelsSetting extends BaseSetting {
         return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <#channel(s)>`",
                         context.getPrefix(), this.getCommandName()), false)
-                        .addField("Argument", String.format("**action** - %s%n**channel(s)** - the (voice) channel(s) to %s",
-                                FormatUtils.format(Action.class, "/"),
+                        .addField("Argument", String.format("**action** - %s",
+                                FormatUtils.format(Action.class, "/"))
+                                + String.format("%n**channel(s)** - the (voice) channel(s) to %s",
                                 FormatUtils.format(Action.class, "/")), false)
                         .addField("Example", String.format("`%s%s add #general`",
                                 context.getPrefix(), this.getCommandName()), false));
