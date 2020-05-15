@@ -26,16 +26,15 @@ public class TrackScheduler {
 
     private final AudioPlayer audioPlayer;
     private final BlockingDeque<AudioTrack> queue;
-    private final EqualizerFactory equalizer;
 
     private RepeatMode repeatMode;
     private AudioTrack currentTrack;
+    private EqualizerFactory equalizer;
     private int boostPercentage;
 
     public TrackScheduler(AudioPlayer audioPlayer, int defaultVolume) {
         this.audioPlayer = audioPlayer;
         this.queue = new LinkedBlockingDeque<>();
-        this.equalizer = new EqualizerFactory();
         this.setRepeatMode(RepeatMode.NONE);
         this.setVolume(defaultVolume);
     }
@@ -101,11 +100,16 @@ public class TrackScheduler {
     }
 
     public void bassBoost(int percentage) {
+        // Disable filter factory
         if (this.boostPercentage > 0 && percentage == 0) {
             this.audioPlayer.setFilterFactory(null);
             return;
         }
+        // Enable filter factory
         if (this.boostPercentage == 0 && percentage > 0) {
+            if (this.equalizer == null) {
+                this.equalizer = new EqualizerFactory();
+            }
             this.audioPlayer.setFilterFactory(this.equalizer);
         }
 
