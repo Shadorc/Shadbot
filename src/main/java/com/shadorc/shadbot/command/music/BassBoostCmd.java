@@ -24,7 +24,7 @@ public class BassBoostCmd extends BaseCmd {
     private static final int VALUE_MAX = 200;
 
     public BassBoostCmd() {
-        super(CommandCategory.MUSIC, List.of("bass_boost", "bass-boost"));
+        super(CommandCategory.MUSIC, List.of("bass_boost"));
         this.setDefaultRateLimiter();
     }
 

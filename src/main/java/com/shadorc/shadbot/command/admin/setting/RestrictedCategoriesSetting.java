@@ -30,7 +30,7 @@ public class RestrictedCategoriesSetting extends BaseSetting {
     }
 
     public RestrictedCategoriesSetting() {
-        super(List.of("restricted_categories", "restricted-categories", "restricted_category", "restricted-category"),
+        super(List.of("restricted_categories", "restricted_category"),
                 Setting.RESTRICTED_CATEGORIES, "Restrict categories to specific channels.");
     }
 

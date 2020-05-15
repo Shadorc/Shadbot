@@ -22,7 +22,7 @@ public class SuicideGirlsCmd extends BaseCmd {
     private static final String HOME_URL = "https://www.suicidegirls.com/photos/sg/recent/all/";
 
     public SuicideGirlsCmd() {
-        super(CommandCategory.IMAGE, List.of("suicide_girls", "suicide-girls", "suicidegirls"), "sg");
+        super(CommandCategory.IMAGE, List.of("suicide_girls"), "sg");
         this.setDefaultRateLimiter();
     }
 

@@ -23,7 +23,7 @@ public class ThisDayCmd extends BaseCmd {
     private static final String HOME_URL = "https://www.onthisday.com/";
 
     public ThisDayCmd() {
-        super(CommandCategory.FUN, List.of("this_day", "this-day", "thisday"), "td");
+        super(CommandCategory.FUN, List.of("this_day"), "td");
         this.setDefaultRateLimiter();
     }
 

@@ -28,7 +28,7 @@ public class AutoRolesSetting extends BaseSetting {
     }
 
     public AutoRolesSetting() {
-        super(List.of("auto_roles", "auto-roles", "auto_role", "auto-role"),
+        super(List.of("auto_roles", "auto_role"),
                 Setting.AUTO_ROLES, "Manage auto assigned role(s).");
     }
 

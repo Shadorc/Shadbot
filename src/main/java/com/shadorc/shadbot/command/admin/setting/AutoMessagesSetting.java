@@ -31,7 +31,7 @@ public class AutoMessagesSetting extends BaseSetting {
     }
 
     public AutoMessagesSetting() {
-        super(List.of("auto_messages", "auto-messages", "auto_message", "auto-message"),
+        super(List.of("auto_messages", "auto_message"),
                 Setting.AUTO_MESSAGE, "Manage auto-message(s) on user join/leave.");
     }
 

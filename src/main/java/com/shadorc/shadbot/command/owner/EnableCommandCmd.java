@@ -16,7 +16,7 @@ import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 public class EnableCommandCmd extends BaseCmd {
 
     public EnableCommandCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("enable_command", "enable-command", "enablecommand"));
+        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("enable_command"));
     }
 
     @Override

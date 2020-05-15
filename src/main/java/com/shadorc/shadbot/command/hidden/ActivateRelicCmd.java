@@ -20,7 +20,7 @@ import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 public class ActivateRelicCmd extends BaseCmd {
 
     public ActivateRelicCmd() {
-        super(CommandCategory.HIDDEN, List.of("activate_relic", "activate-relic", "activaterelic"));
+        super(CommandCategory.HIDDEN, List.of("activate_relic"));
         this.setDefaultRateLimiter();
     }
 

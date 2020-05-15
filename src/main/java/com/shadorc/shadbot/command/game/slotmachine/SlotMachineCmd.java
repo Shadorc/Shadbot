@@ -30,7 +30,7 @@ public class SlotMachineCmd extends BaseCmd {
     private static final int PAID_COST = 25;
 
     public SlotMachineCmd() {
-        super(CommandCategory.GAME, List.of("slot_machine", "slot-machine", "slotmachine"), "sm");
+        super(CommandCategory.GAME, List.of("slot_machine"), "sm");
         this.setGameRateLimiter();
     }
 

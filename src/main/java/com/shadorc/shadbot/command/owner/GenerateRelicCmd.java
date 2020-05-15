@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 public class GenerateRelicCmd extends BaseCmd {
 
     public GenerateRelicCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("generate_relic", "generate-relic", "generaterelic"));
+        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("generate_relic"));
     }
 
     @Override

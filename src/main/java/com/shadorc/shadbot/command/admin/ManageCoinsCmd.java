@@ -31,7 +31,7 @@ public class ManageCoinsCmd extends BaseCmd {
     }
 
     public ManageCoinsCmd() {
-        super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("manage_coins", "manage-coins", "managecoins"));
+        super(CommandCategory.ADMIN, CommandPermission.ADMIN, List.of("manage_coins", "manage_coin"));
         this.setRateLimiter(new RateLimiter(2, Duration.ofSeconds(3)));
     }
 

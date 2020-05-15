@@ -31,7 +31,7 @@ public class TranslateCmd extends BaseCmd {
     private final BiMap<String, String> langIsoMap;
 
     public TranslateCmd() {
-        super(CommandCategory.UTILS, List.of("translate", "translation", "trans"));
+        super(CommandCategory.UTILS, List.of("translate"));
         this.setDefaultRateLimiter();
 
         this.langIsoMap = HashBiMap.create();

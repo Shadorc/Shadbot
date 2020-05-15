@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 public class SendMessageCmd extends BaseCmd {
 
     public SendMessageCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("send_message", "send-message", "sendmessage"));
+        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("send_message"));
     }
 
     @Override

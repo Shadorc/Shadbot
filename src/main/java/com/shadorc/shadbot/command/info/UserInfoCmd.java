@@ -22,7 +22,7 @@ public class UserInfoCmd extends BaseCmd {
     private final DateTimeFormatter dateFormatter;
 
     public UserInfoCmd() {
-        super(CommandCategory.INFO, List.of("user_info", "user-info", "userinfo"));
+        super(CommandCategory.INFO, List.of("user_info"));
         this.setDefaultRateLimiter();
 
         this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);

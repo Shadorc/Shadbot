@@ -27,7 +27,7 @@ public class AllowedRolesSetting extends BaseSetting {
     }
 
     public AllowedRolesSetting() {
-        super(List.of("allowed_roles", "allowed-roles", "allowed_role", "allowed-role"),
+        super(List.of("allowed_roles", "allowed_role"),
                 Setting.ALLOWED_ROLES, "Manage role(s) that can interact with Shadbot.");
     }
 
