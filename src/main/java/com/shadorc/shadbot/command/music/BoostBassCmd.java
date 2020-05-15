@@ -20,7 +20,7 @@ public class BoostBassCmd extends BaseCmd {
     private static final int VALUE_MAX = 200;
 
     public BoostBassCmd() {
-        super(CommandCategory.MUSIC, List.of("boost", "boost_bass"));
+        super(CommandCategory.MUSIC, List.of("bass_boost", "bass-boost", "boost"));
         this.setDefaultRateLimiter();
     }
 
@@ -36,12 +36,17 @@ public class BoostBassCmd extends BaseCmd {
 
         context.requireGuildMusic()
                 .getTrackScheduler()
-                .boost(percentage);
+                .bassBoost(percentage);
+
+        final String text;
+        if (percentage == 0) {
+            text = String.format(Emoji.CHECK_MARK + " Bass boost disabled by **%s**.", context.getUsername());
+        } else {
+            text = String.format(Emoji.CHECK_MARK + " Bass boost set to **%d%%** by **%s**.", percentage, context.getUsername());
+        }
 
         return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(
-                        String.format(Emoji.CHECK_MARK + " Bass boosted by **%s**.",
-                                context.getUsername()), channel))
+                .flatMap(channel -> DiscordUtils.sendMessage(text, channel))
                 .then();
     }
 
@@ -50,8 +55,8 @@ public class BoostBassCmd extends BaseCmd {
         return HelpBuilder.create(this, context)
                 .setDescription("Drop the bass.")
                 .addArg("percentage",
-                        String.format("boost percentage, must be between **%d%%** and **%d%%**.", VALUE_MIN, VALUE_MAX), false)
-                .addField("Info", String.format("**%d** will disable the bass boost." +
+                        String.format("must be between **%d%%** and **%d%%**.", VALUE_MIN, VALUE_MAX), false)
+                .addField("Info", String.format("**%d%%** will disable the boost." +
                         "%nA value higher than **%d%%** will saturate the sound.", VALUE_MIN, VALUE_MAX), false)
                 .build();
     }

@@ -100,7 +100,7 @@ public class TrackScheduler {
         this.queue.clear();
     }
 
-    public void boost(int percentage) {
+    public void bassBoost(int percentage) {
         if (this.boostPercentage > 0 && percentage == 0) {
             this.audioPlayer.setFilterFactory(null);
             return;
