@@ -94,7 +94,7 @@ public class FormatUtils {
     }
 
     public static <T extends Enum<T>> String format(Class<T> enumClass, CharSequence delimiter) {
-        return FormatUtils.format(enumClass.getEnumConstants(), value -> value.toString().toLowerCase(), delimiter);
+        return FormatUtils.format(enumClass.getEnumConstants(), value -> value.name().toLowerCase(), delimiter);
     }
 
     public static <T> String format(Collection<T> collection, Function<T, String> mapper, CharSequence delimiter) {
@@ -144,7 +144,7 @@ public class FormatUtils {
         }
         return String.format("Options: %s",
                 FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`",
-                        value.toString().toLowerCase()), ", "));
+                        value.name().toLowerCase()), ", "));
     }
 
     /**

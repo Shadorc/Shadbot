@@ -50,7 +50,7 @@ public class Utils {
     @Nullable
     public static <T extends Enum<T>> T parseEnum(Class<T> enumClass, @Nullable String value) {
         for (final T enumeration : enumClass.getEnumConstants()) {
-            if (enumeration.toString().equalsIgnoreCase(value)) {
+            if (enumeration.name().equalsIgnoreCase(value)) {
                 return enumeration;
             }
         }
