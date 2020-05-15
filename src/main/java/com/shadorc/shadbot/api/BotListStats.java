@@ -37,7 +37,8 @@ public class BotListStats {
                         .and(this.postOnBotsOndiscordDotXyz(guildCount))
                         .and(this.postOnDiscordbotlistDotCom(shardCount, guildCount))
                         .and(this.postOnDiscordBotsDotGg(shardCount, guildCount))
-                        .and(this.postOnTopDotGg(shardCount, guildCount)))
+                        .and(this.postOnTopDotGg(shardCount, guildCount))
+                        .and(this.postOnWonderbotlistDotCom(shardCount, guildCount)))
                 .doOnSuccess(ignored -> DEFAULT_LOGGER.info("Statistics posted"));
     }
 
