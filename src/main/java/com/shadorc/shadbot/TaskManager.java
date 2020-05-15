@@ -43,7 +43,7 @@ public class TaskManager {
         this.tasks = new ArrayList<>(4);
     }
 
-    public void schedulesPresenceUpdates() {
+    public void schedulePresenceUpdates() {
         this.logger.info("Scheduling presence updates...");
         final Disposable task = Flux.interval(Duration.ofMinutes(30), Duration.ofMinutes(30), this.defaultScheduler)
                 .map(ignored -> DiscordUtils.getRandomStatus())
@@ -53,7 +53,7 @@ public class TaskManager {
         this.tasks.add(task);
     }
 
-    public void schedulesLottery() {
+    public void scheduleLottery() {
         this.logger.info("Starting lottery... Next lottery draw in {}", FormatUtils.customDate(LotteryCmd.getDelay()));
         final Disposable task = Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), this.defaultScheduler)
                 .flatMap(ignored -> LotteryCmd.draw(this.gateway))
@@ -62,7 +62,7 @@ public class TaskManager {
         this.tasks.add(task);
     }
 
-    public void schedulesPeriodicStats() {
+    public void schedulePeriodicStats() {
         this.logger.info("Scheduling periodic stats log...");
 
         final Gauge ramUsageGauge = Gauge.build().namespace("process").name("ram_usage_mb")
@@ -109,7 +109,7 @@ public class TaskManager {
         this.tasks.add(task);
     }
 
-    public void schedulesPostStats() {
+    public void schedulePostStats() {
         this.logger.info("Starting bot list stats scheduler...");
         final Disposable task = Flux.interval(Duration.ofHours(3), Duration.ofHours(3), this.defaultScheduler)
                 .flatMap(ignored -> this.botListStats.postStats())
@@ -117,9 +117,9 @@ public class TaskManager {
         this.tasks.add(task);
     }
 
-    public void schedulesVotersCheck() {
+    public void scheduleVotersCheck() {
         this.logger.info("Starting voters checker scheduler...");
-        final Disposable task = Flux.interval(Duration.ZERO, Duration.ofHours(6), this.defaultScheduler)
+        final Disposable task = Flux.interval(Duration.ZERO, Duration.ofMinutes(30), this.defaultScheduler)
                 .flatMap(ignored -> this.botListStats.getStats())
                 .flatMap(DatabaseManager.getUsers()::getDBUser)
                 .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.VOTER))
