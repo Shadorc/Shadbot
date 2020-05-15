@@ -79,8 +79,6 @@ public class TaskManager {
                 .help("Shard response time").labelNames("shard_id").register();
         final Gauge guildCountGauge = Gauge.build().namespace("shadbot").name("guild_count")
                 .help("Guild count").register();
-        final Gauge voiceCountGauge = Gauge.build().namespace("shadbot").name("voice_count")
-                .help("Connected voice channel count").register();
 
         final GatewayClientGroup group = this.gateway.getGatewayClientGroup();
         final Mono<Map<Integer, Long>> getResponseTimes = Flux.range(0, group.getShardCount())
@@ -91,19 +89,18 @@ public class TaskManager {
                 .collectMap(Tuple2::getT1, Tuple2::getT2);
 
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(10), this.defaultScheduler)
-                .flatMap(ignored -> {
+                .doOnNext(ignored -> {
                     ramUsageGauge.set(ProcessUtils.getMemoryUsed());
                     cpuUsageGauge.set(ProcessUtils.getCpuUsage());
                     threadCountGauge.set(Thread.activeCount());
                     gcCountGauge.set(ProcessUtils.getGCCount());
                     gcTimeGauge.set(ProcessUtils.getGCTime());
-
-                    return Mono.when(
-                            getResponseTimes
-                                    .doOnNext(map -> map.forEach((key, value) -> responseTimeGauge.labels(key.toString()).set(value))),
-                            DiscordUtils.getGuildCount(this.gateway).doOnNext(guildCountGauge::set),
-                            DiscordUtils.getVoiceCount(this.gateway).doOnNext(voiceCountGauge::set));
                 })
+                .flatMap(ignored -> getResponseTimes)
+                .doOnNext(responseTimeMap -> responseTimeMap
+                        .forEach((key, value) -> responseTimeGauge.labels(key.toString()).set(value)))
+                .flatMap(ignored -> DiscordUtils.getGuildCount(this.gateway))
+                .doOnNext(guildCountGauge::set)
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
         this.tasks.add(task);

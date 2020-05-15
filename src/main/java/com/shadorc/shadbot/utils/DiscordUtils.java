@@ -55,19 +55,6 @@ public class DiscordUtils {
     }
 
     /**
-     * @param gateway - The gateway.
-     * @return The number of voice channels the bot is currently connected to.
-     */
-    public static Mono<Long> getVoiceCount(GatewayDiscordClient gateway) {
-        return gateway.withRetrievalStrategy(EntityRetrievalStrategy.STORE)
-                .getGuilds()
-                .flatMap(Guild::getVoiceStates)
-                .filter(voiceState -> voiceState.getUserId().equals(Shadbot.getSelfId()))
-                .filter(voiceState -> voiceState.getChannelId().isPresent())
-                .count();
-    }
-
-    /**
      * @return A random status update showing "Playing {prefix}help | {tip}"
      */
     public static StatusUpdate getRandomStatus() {
