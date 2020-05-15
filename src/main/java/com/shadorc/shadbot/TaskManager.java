@@ -7,6 +7,7 @@ import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ProcessUtils;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.retriever.EntityRetrievalStrategy;
 import discord4j.gateway.GatewayClient;
 import discord4j.gateway.GatewayClientGroup;
 import io.prometheus.client.Gauge;
@@ -75,6 +76,8 @@ public class TaskManager {
                 .help("Garbage collector total time in ms").register();
         final Gauge responseTimeGauge = Gauge.build().namespace("shard").name("response_time")
                 .help("Shard response time").labelNames("shard_id").register();
+        final Gauge guildCountGauge = Gauge.build().namespace("shadbot").name("guild_count")
+                .help("Guild count").register();
 
         final GatewayClientGroup group = this.gateway.getGatewayClientGroup();
         final Mono<Map<Integer, Long>> getResponseTimes = Flux.range(0, group.getShardCount())
@@ -84,17 +87,23 @@ public class TaskManager {
                         .map(millis -> Tuples.of(i, millis)))
                 .collectMap(Tuple2::getT1, Tuple2::getT2);
 
-        final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(10), this.defaultScheduler)
-                .flatMap(ignored -> getResponseTimes)
-                .doOnNext(responseTimeMap -> {
-                    responseTimeMap.forEach((key, value) -> responseTimeGauge.labels(key.toString()).set(value));
+        final Mono<Long> getGuildCount = this.gateway.withRetrievalStrategy(EntityRetrievalStrategy.STORE)
+                .getGuilds()
+                .count();
 
+        final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(10), this.defaultScheduler)
+                .doOnNext(ignored -> {
                     ramUsageGauge.set(ProcessUtils.getMemoryUsed());
                     cpuUsageGauge.set(ProcessUtils.getCpuUsage());
                     threadCountGauge.set(Thread.activeCount());
                     gcCountGauge.set(ProcessUtils.getGCCount());
                     gcTimeGauge.set(ProcessUtils.getGCTime());
                 })
+                .flatMap(ignored -> getResponseTimes)
+                .doOnNext(responseTimeMap -> responseTimeMap
+                        .forEach((key, value) -> responseTimeGauge.labels(key.toString()).set(value)))
+                .flatMap(ignored -> getGuildCount)
+                .doOnNext(guildCountGauge::set)
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
         this.tasks.add(task);
