@@ -9,7 +9,6 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
-import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
@@ -18,7 +17,6 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.channel.*;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
-import discord4j.core.retriever.EntityRetrievalStrategy;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
 import discord4j.discordjson.json.gateway.StatusUpdate;
@@ -43,16 +41,6 @@ import java.util.function.Consumer;
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class DiscordUtils {
-
-    /**
-     * @param gateway - The gateway.
-     * @return The number of guilds the bot is currently connected to.
-     */
-    public static Mono<Long> getGuildCount(GatewayDiscordClient gateway) {
-        return gateway.withRetrievalStrategy(EntityRetrievalStrategy.STORE)
-                .getGuilds()
-                .count();
-    }
 
     /**
      * @return A random status update showing "Playing {prefix}help | {tip}"

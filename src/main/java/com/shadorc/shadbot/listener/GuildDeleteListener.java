@@ -7,6 +7,7 @@ import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import reactor.core.publisher.Mono;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
+import static com.shadorc.shadbot.listener.GuildCreateListener.GUILD_COUNT_GAUGE;
 
 public class GuildDeleteListener implements EventListener<GuildDeleteEvent> {
 
@@ -18,6 +19,8 @@ public class GuildDeleteListener implements EventListener<GuildDeleteEvent> {
     @Override
     public Mono<Void> execute(GuildDeleteEvent event) {
         DEFAULT_LOGGER.info("{Guild ID: {}} Disconnected", event.getGuildId().asLong());
+
+        GUILD_COUNT_GAUGE.dec();
 
         return MusicManager.getInstance()
                 .destroyConnection(event.getGuildId())

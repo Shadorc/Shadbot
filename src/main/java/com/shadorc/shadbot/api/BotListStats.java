@@ -4,7 +4,7 @@ import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.api.json.dbl.VoterResponse;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.listener.GuildCreateListener;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.rest.util.Snowflake;
@@ -32,7 +32,7 @@ public class BotListStats {
     public Mono<Void> postStats() {
         DEFAULT_LOGGER.info("Posting statistics...");
         final int shardCount = this.gateway.getGatewayClientGroup().getShardCount();
-        return DiscordUtils.getGuildCount(this.gateway)
+        return Mono.just((long) GuildCreateListener.GUILD_COUNT_GAUGE.get())
                 .flatMap(guildCount -> this.postOnBotlistDotSpace(guildCount)
                         .and(this.postOnBotsOndiscordDotXyz(guildCount))
                         .and(this.postOnDiscordbotlistDotCom(shardCount, guildCount))
