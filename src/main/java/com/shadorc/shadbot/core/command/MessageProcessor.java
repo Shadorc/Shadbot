@@ -58,7 +58,7 @@ public class MessageProcessor {
         // Only execute database request if the message contains a command
         if (CommandManager.getInstance().getCommands().keySet().stream()
                 .anyMatch(cmd -> {
-                    if (event.getMessage().getContent().contains(cmd)) {
+                    if (event.getMessage().getContent().split(" ")[0].contains(cmd)) {
                         if (LOGGER.isTraceEnabled()) {
                             LOGGER.trace("DBGuild requested for message containing: {}", cmd);
                         }
