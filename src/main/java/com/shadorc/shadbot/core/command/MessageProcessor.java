@@ -55,17 +55,9 @@ public class MessageProcessor {
     }
 
     private static Mono<Void> processGuildMessage(Snowflake guildId, MessageCreateEvent event) {
-        // Only execute database request if the message contains a command
-        if (CommandManager.getInstance().getCommands().keySet().stream()
-                .anyMatch(cmd -> {
-                    if (event.getMessage().getContent().split(" ")[0].contains(cmd)) {
-                        if (LOGGER.isTraceEnabled()) {
-                            LOGGER.trace("DBGuild requested for message containing: {}", cmd);
-                        }
-                        return true;
-                    }
-                    return false;
-                })) {
+        final String firstWord = event.getMessage().getContent().split(" ")[0];
+        // Only execute database request if the first word of the message contains an existing command
+        if (CommandManager.getInstance().getCommands().keySet().stream().anyMatch(firstWord::contains)) {
             return DatabaseManager.getGuilds().getDBGuild(guildId)
                     .flatMap(dbGuild -> MessageProcessor.processCommand(event, dbGuild));
         }
