@@ -3,7 +3,7 @@ package com.shadorc.shadbot.api;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
-import com.shadorc.shadbot.listener.GuildCreateListener;
+import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.core.GatewayDiscordClient;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -29,7 +29,7 @@ public class BotListStats {
 
     public Mono<Void> postStats() {
         DEFAULT_LOGGER.info("Posting statistics...");
-        return Mono.just((long) GuildCreateListener.GUILD_COUNT_GAUGE.get())
+        return DiscordUtils.getGuildCount(this.gateway)
                 .flatMap(guildCount -> this.postOnBotlistDotSpace(guildCount)
                         .and(this.postOnBotsOndiscordDotXyz(guildCount))
                         .and(this.postOnDiscordbotlistDotCom(guildCount))

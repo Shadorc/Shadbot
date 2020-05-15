@@ -7,7 +7,6 @@ import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ProcessUtils;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.retriever.EntityRetrievalStrategy;
 import discord4j.gateway.GatewayClient;
 import discord4j.gateway.GatewayClientGroup;
 import io.prometheus.client.Gauge;
@@ -87,10 +86,6 @@ public class TaskManager {
                         .map(millis -> Tuples.of(i, millis)))
                 .collectMap(Tuple2::getT1, Tuple2::getT2);
 
-        final Mono<Long> getGuildCount = this.gateway.withRetrievalStrategy(EntityRetrievalStrategy.STORE)
-                .getGuilds()
-                .count();
-
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(10), this.defaultScheduler)
                 .doOnNext(ignored -> {
                     ramUsageGauge.set(ProcessUtils.getMemoryUsed());
@@ -102,7 +97,7 @@ public class TaskManager {
                 .flatMap(ignored -> getResponseTimes)
                 .doOnNext(responseTimeMap -> responseTimeMap
                         .forEach((key, value) -> responseTimeGauge.labels(key.toString()).set(value)))
-                .flatMap(ignored -> getGuildCount)
+                .flatMap(ignored -> DiscordUtils.getGuildCount(this.gateway))
                 .doOnNext(guildCountGauge::set)
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
