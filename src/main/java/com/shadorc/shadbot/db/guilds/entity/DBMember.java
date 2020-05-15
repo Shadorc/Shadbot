@@ -8,9 +8,13 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
+import com.shadorc.shadbot.db.guilds.GuildsCollection;
 import com.shadorc.shadbot.db.guilds.bean.DBMemberBean;
+import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.rest.util.Snowflake;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -28,7 +32,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
     }
 
     public DBMember(Snowflake guildId, Snowflake id) {
-        super(new DBMemberBean(id.asString(), 0));
+        super(new DBMemberBean(id.asString()));
         this.guildId = guildId.asString();
     }
 
@@ -55,33 +59,44 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
         }
 
         LOGGER.debug("[DBMember {} / {}] Coins update: {} coins", this.getId().asLong(), this.getGuildId().asLong(), coins);
+        return this.update(Updates.set("members.$.coins", coins), this.toDocument().append("coins", coins))
+                .then(Mono.defer(() -> {
+                    if (coins >= 1_000_000_000) {
+                        return DatabaseManager.getUsers()
+                                .getDBUser(this.getId())
+                                .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.MONEY));
+                    }
+                    return Mono.empty();
+                }));
+    }
 
+    private Mono<UpdateResult> update(Bson update, Document document) {
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
                         Filters.and(
                                 Filters.eq("_id", this.getGuildId().asString()),
                                 Filters.eq("members._id", this.getId().asString())),
-                        Updates.set("members.$.coins", coins)))
-                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Coins update result: {}",
+                        update))
+                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Update result: {}",
                         this.getId().asLong(), this.getGuildId().asLong(), result))
                 .map(UpdateResult::getModifiedCount)
                 .flatMap(modifiedCount -> {
                     // Member was not found, insert it
                     if (modifiedCount == 0) {
-                        LOGGER.debug("[DBMember {} / {}] Coins not update. Upsert member: {} coins",
-                                this.getId().asLong(), this.getGuildId().asLong(), coins);
+                        LOGGER.debug("[DBMember {} / {}] Not updated. Upsert member",
+                                this.getId().asLong(), this.getGuildId().asLong());
                         return Mono.from(DatabaseManager.getGuilds()
                                 .getCollection()
                                 .updateOne(Filters.eq("_id", this.getGuildId().asString()),
-                                        Updates.push("members", this.toDocument().append("coins", coins)),
+                                        Updates.push("members", document),
                                         new UpdateOptions().upsert(true)))
-                                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Coins upsert result: {}",
+                                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Upsert result: {}",
                                         this.getId().asLong(), this.getGuildId().asLong(), result));
                     }
                     return Mono.empty();
                 })
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     // Note: If one day, a member contains more data than just coins, this method will need to be updated
@@ -102,7 +117,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Insertion result: {}",
                         this.getId().asLong(), this.getGuildId().asLong(), result))
                 .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     @Override
@@ -116,7 +131,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Deletion result: {}",
                         this.getId().asLong(), this.getGuildId().asLong(), result))
                 .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     @Override

@@ -2,6 +2,8 @@ package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
@@ -75,6 +77,8 @@ public class TaskManager {
                 .help("Garbage collector total time in ms").register();
         final Gauge responseTimeGauge = Gauge.build().namespace("shard").name("response_time")
                 .help("Shard response time").labelNames("shard_id").register();
+        final Gauge guildCountGauge = Gauge.build().namespace("shadbot").name("guild_count")
+                .help("Guild count").register();
 
         final GatewayClientGroup group = this.gateway.getGatewayClientGroup();
         final Mono<Map<Integer, Long>> getResponseTimes = Flux.range(0, group.getShardCount())
@@ -85,16 +89,18 @@ public class TaskManager {
                 .collectMap(Tuple2::getT1, Tuple2::getT2);
 
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(10), this.defaultScheduler)
-                .flatMap(ignored -> getResponseTimes)
-                .doOnNext(responseTimeMap -> {
-                    responseTimeMap.forEach((key, value) -> responseTimeGauge.labels(key.toString()).set(value));
-
+                .doOnNext(ignored -> {
                     ramUsageGauge.set(ProcessUtils.getMemoryUsed());
                     cpuUsageGauge.set(ProcessUtils.getCpuUsage());
                     threadCountGauge.set(Thread.activeCount());
                     gcCountGauge.set(ProcessUtils.getGCCount());
                     gcTimeGauge.set(ProcessUtils.getGCTime());
                 })
+                .flatMap(ignored -> getResponseTimes)
+                .doOnNext(responseTimeMap -> responseTimeMap
+                        .forEach((key, value) -> responseTimeGauge.labels(key.toString()).set(value)))
+                .flatMap(ignored -> DiscordUtils.getGuildCount(this.gateway))
+                .doOnNext(guildCountGauge::set)
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
         this.tasks.add(task);
@@ -104,6 +110,16 @@ public class TaskManager {
         this.logger.info("Starting bot list stats scheduler...");
         final Disposable task = Flux.interval(Duration.ofHours(3), Duration.ofHours(3), this.defaultScheduler)
                 .flatMap(ignored -> this.botListStats.postStats())
+                .subscribe(null, ExceptionHandler::handleUnknownError);
+        this.tasks.add(task);
+    }
+
+    public void schedulesVotersCheck() {
+        this.logger.info("Starting voters checker scheduler...");
+        final Disposable task = Flux.interval(Duration.ZERO, Duration.ofHours(6), this.defaultScheduler)
+                .flatMap(ignored -> this.botListStats.getStats())
+                .flatMap(DatabaseManager.getUsers()::getDBUser)
+                .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.VOTER))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
         this.tasks.add(task);
     }

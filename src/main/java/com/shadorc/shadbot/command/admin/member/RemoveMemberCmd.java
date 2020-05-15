@@ -62,7 +62,8 @@ public abstract class RemoveMemberCmd extends BaseCmd {
         }
 
         final StringBuilder reason = new StringBuilder(
-                StringUtils.remove(arg, String.format("<@%d>", mentionUserId.asLong())));
+                StringUtils.remove(arg,
+                        String.format("<@%d>", mentionUserId.asLong()), String.format("<@!%d>", mentionUserId.asLong())));
         if (reason.length() == 0) {
             reason.append("Reason not specified.");
         }

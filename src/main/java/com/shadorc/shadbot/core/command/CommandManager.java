@@ -57,7 +57,7 @@ public class CommandManager {
                 new ChatCmd(), new ThisDayCmd(), new LeetCmd(), new JokeCmd(), new DtcCmd(),
                 // Image Commands
                 new GifCmd(), new ImageCmd(), new WallpaperCmd(), new SuicideGirlsCmd(),
-                new Rule34Cmd(),
+                new Rule34Cmd(), new XkcdCmd(),
                 // Game Commands
                 new RpsCmd(), new HangmanCmd(), new TriviaCmd(), new RussianRouletteCmd(),
                 new SlotMachineCmd(), new RouletteCmd(), new BlackjackCmd(), new DiceCmd(),
@@ -72,13 +72,13 @@ public class CommandManager {
                 new FortniteCmd(), new DiabloCmd(), new CounterStrikeCmd(), new OverwatchCmd(),
                 // Info Commands
                 new PingCmd(), new InfoCmd(), new UserInfoCmd(), new ServerInfoCmd(),
-                new RolelistCmd(), new FeedbackCmd(), new InviteCmd(),
+                new RolelistCmd(), new FeedbackCmd(), new InviteCmd(), new AchievementsCmd(),
                 // Admin Commands
                 new ManageCoinsCmd(), new PruneCmd(), new KickCmd(), new SoftBanCmd(), new BanCmd(),
                 new IamCmd(), new SettingsCmd(),
                 // Owner Commands
                 new LoggerCmd(), new LeaveCmd(), new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(),
-                new EnableCommandCmd(),
+                new EnableCommandCmd(), new ManageAchievementsCmd(),
                 // Hidden Commands
                 new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd(), new PrefixCmd());
     }

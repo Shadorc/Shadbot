@@ -24,9 +24,10 @@ import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 public class GuildsCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = Loggers.getLogger("shadbot.database.guilds");
+    public static final String NAME = "guilds";
 
     public GuildsCollection(MongoDatabase database) {
-        super(database.getCollection("guilds"));
+        super(database.getCollection(GuildsCollection.NAME));
     }
 
     public Mono<DBGuild> getDBGuild(Snowflake guildId) {
@@ -45,7 +46,7 @@ public class GuildsCollection extends DatabaseCollection {
                     }
                 })
                 .defaultIfEmpty(new DBGuild(guildId))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     public Mono<DBMember> getDBMember(Snowflake guildId, Snowflake memberId) {
@@ -79,7 +80,7 @@ public class GuildsCollection extends DatabaseCollection {
                     return members;
                 })
                 .flatMapMany(Flux::fromIterable)
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
 }
