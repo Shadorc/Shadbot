@@ -4,6 +4,7 @@ import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.DBUser;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
@@ -33,9 +34,9 @@ public class BassBoostCmd extends BaseCmd {
                 .map(DBUser::getAchievements)
                 .filter(achievements -> achievements.contains(Achievement.VOTER))
                 .switchIfEmpty(Mono.error(new CommandException(
-                        String.format("You need to unlock the **%s** achievement to use this command." +
-                                        " You can get more information using `%sachievements`",
-                                Achievement.VOTER.getTitle(), context.getPrefix()))))
+                        String.format("You can use this command by contributing to Shadbot <%s> or by unlocking the " +
+                                        "**%s** achievement (more information using `%sachievements`).",
+                                Config.PATREON_URL, Achievement.VOTER.getTitle(), context.getPrefix()))))
                 .flatMap(ignored -> {
                     final String arg = context.requireArg();
 
