@@ -128,7 +128,7 @@ public class BotListStats {
                 });
     }
 
-	/*
+    /**
      * WebSite: https://wonderbotlist.com <br>
      * Documentation: https://api.wonderbotlist.com/fr/#bots
      */
@@ -139,8 +139,8 @@ public class BotListStats {
         final String url = String.format("https://api.wonderbotlist.com/v1/bot/%d", Shadbot.getSelfId().asLong());
         return this.post(url, CredentialManager.getInstance().get(Credential.WONDERBOTLIST_DOT_COM_TOKEN), content);
     }
-	
-	/**
+
+    /**
      * @return Monthly voter IDs from https://top.gg/
      */
     public Flux<Snowflake> getStats() {
@@ -152,6 +152,6 @@ public class BotListStats {
                 .map(VoterResponse::getId)
                 .map(Snowflake::of)
                 .distinct();
-	}
+    }
 
 }
