@@ -28,7 +28,7 @@ public class ManageAchievementsCmd extends BaseCmd {
 
     public ManageAchievementsCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER,
-                List.of("manage_achievements", "manage_achievement", "manage-achievements", "manage-achievement"), "ma");
+                List.of("manage_achievements", "manage_achievement", "manage-achievements", "manage-achievement"));
     }
 
     @Override
