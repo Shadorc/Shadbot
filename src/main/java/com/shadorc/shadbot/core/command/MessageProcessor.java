@@ -15,6 +15,8 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
+
 public class MessageProcessor {
 
     private static final Counter COMMAND_USAGE_COUNTER = Counter.build()
@@ -54,7 +56,13 @@ public class MessageProcessor {
     private static Mono<Void> processGuildMessage(Snowflake guildId, MessageCreateEvent event) {
         // Only execute database request if the message contains a command
         if (CommandManager.getInstance().getCommands().keySet().stream()
-                .anyMatch(cmd -> event.getMessage().getContent().contains(cmd))) {
+                .anyMatch(cmd -> {
+                    if (event.getMessage().getContent().contains(cmd)) {
+                        DEFAULT_LOGGER.trace(CommandManager.getInstance().getCommands().keySet().size() + " / " + cmd);
+                        return true;
+                    }
+                    return false;
+                })) {
             return DatabaseManager.getGuilds().getDBGuild(guildId)
                     .flatMap(dbGuild -> MessageProcessor.processCommand(event, dbGuild));
         }
