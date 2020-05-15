@@ -29,17 +29,16 @@ public class OverwatchCmd extends BaseCmd {
         PC("pc"),
         PSN("psn"),
         XBL("xbl"),
-        SWITCH("nintendo-switch");
+        NINTENDO_SWITCH("nintendo-switch");
 
-        private final String value;
+        private final String name;
 
-        Platform(String value) {
-            this.value = value;
+        Platform(String name) {
+            this.name = name;
         }
 
-        @Override
-        public String toString() {
-            return this.value;
+        public String getName() {
+            return this.name;
         }
     }
 
@@ -106,7 +105,7 @@ public class OverwatchCmd extends BaseCmd {
     }
 
     private String getUrl(String endpoint, Platform platform, String username) {
-        return String.format("%s/%s/%s/global/%s", HOME_URL, endpoint, platform.toString().toLowerCase(), username);
+        return String.format("%s/%s/%s/global/%s", HOME_URL, endpoint, platform.getName(), username);
     }
 
     @Override
