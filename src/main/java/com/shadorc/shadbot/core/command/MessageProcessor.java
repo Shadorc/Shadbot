@@ -12,13 +12,14 @@ import discord4j.core.object.entity.Message;
 import discord4j.rest.util.Snowflake;
 import io.prometheus.client.Counter;
 import reactor.core.publisher.Mono;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 
 import java.time.Instant;
 
-import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
-
 public class MessageProcessor {
 
+    private static final Logger LOGGER = Loggers.getLogger("shadbot.processor");
     private static final Counter COMMAND_USAGE_COUNTER = Counter.build()
             .namespace("shadbot").name("command_usage").help("Command usage")
             .labelNames("command").register();
@@ -58,7 +59,9 @@ public class MessageProcessor {
         if (CommandManager.getInstance().getCommands().keySet().stream()
                 .anyMatch(cmd -> {
                     if (event.getMessage().getContent().contains(cmd)) {
-                        DEFAULT_LOGGER.trace(CommandManager.getInstance().getCommands().keySet().size() + " / " + cmd);
+                        if (LOGGER.isTraceEnabled()) {
+                            LOGGER.trace("DBGuild requested for message containing: {}", cmd);
+                        }
                         return true;
                     }
                     return false;
