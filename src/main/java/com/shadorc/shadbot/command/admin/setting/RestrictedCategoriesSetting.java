@@ -104,7 +104,7 @@ public class RestrictedCategoriesSetting extends BaseSetting {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <category> <channel>`",
-                        context.getPrefix(), context.getCommandName()), false)
+                        context.getPrefix(), this.getCommandName()), false)
                         .addField("Argument",
                                 String.format("**action** - %s", FormatUtils.format(Action.class, "/"))
                                         + String.format("%n**category** - %s", FormatUtils.format(CommandCategory.class, "/"))
