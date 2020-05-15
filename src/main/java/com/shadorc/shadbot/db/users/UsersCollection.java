@@ -18,9 +18,10 @@ import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 public class UsersCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = Loggers.getLogger("shadbot.database.users");
+    public static final String NAME = "users";
 
     public UsersCollection(MongoDatabase database) {
-        super(database.getCollection("users"));
+        super(database.getCollection(UsersCollection.NAME));
     }
 
     public Mono<DBUser> getDBUser(Snowflake id) {
@@ -39,7 +40,7 @@ public class UsersCollection extends DatabaseCollection {
                     }
                 })
                 .defaultIfEmpty(new DBUser(id))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("users").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(UsersCollection.NAME).inc());
     }
 
 }

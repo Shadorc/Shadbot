@@ -6,6 +6,7 @@ import com.mongodb.client.model.Updates;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
+import com.shadorc.shadbot.db.lottery.LotteryCollection;
 import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
 import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
@@ -49,7 +50,7 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
                 .doOnNext(result -> LOGGER.trace("[LotteryGambler {} / {}] Insertion result: {}",
                         this.getUserId().asLong(), this.getGuildId().asLong(), result))
                 .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("lottery").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
 
     @Override
@@ -65,7 +66,7 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
                 .doOnNext(result -> LOGGER.trace("[LotteryGambler {} / {}] Deletion result: {}",
                         this.getUserId().asLong(), this.getGuildId().asLong(), result))
                 .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("lottery").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
 
     @Override

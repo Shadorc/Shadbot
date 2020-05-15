@@ -25,9 +25,10 @@ import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 public class PremiumCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = Loggers.getLogger("shadbot.database.premium");
+    public static final String NAME = "premium";
 
     public PremiumCollection(MongoDatabase database) {
-        super(database.getCollection("premium"));
+        super(database.getCollection(PremiumCollection.NAME));
     }
 
     /**
@@ -45,7 +46,7 @@ public class PremiumCollection extends DatabaseCollection {
                 .map(document -> document.toJson(Utils.JSON_WRITER_SETTINGS))
                 .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, RelicBean.class)))
                 .map(Relic::new)
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("premium").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(PremiumCollection.NAME).inc());
     }
 
     /**
@@ -62,7 +63,7 @@ public class PremiumCollection extends DatabaseCollection {
                 .map(document -> document.toJson(Utils.JSON_WRITER_SETTINGS))
                 .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, RelicBean.class)))
                 .map(Relic::new)
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("premium").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(PremiumCollection.NAME).inc());
     }
 
     /**
@@ -93,7 +94,7 @@ public class PremiumCollection extends DatabaseCollection {
 
         return Flux.from(request)
                 .hasElements()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("premium").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(PremiumCollection.NAME).inc());
     }
 
 }

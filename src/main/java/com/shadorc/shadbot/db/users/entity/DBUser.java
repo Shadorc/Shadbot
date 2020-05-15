@@ -7,6 +7,7 @@ import com.mongodb.client.result.UpdateResult;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
+import com.shadorc.shadbot.db.users.UsersCollection;
 import com.shadorc.shadbot.db.users.bean.DBUserBean;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import discord4j.rest.util.Snowflake;
@@ -65,7 +66,7 @@ public class DBUser extends SerializableEntity<DBUserBean> implements DatabaseEn
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[DBUser {}] Achievements update result: {}",
                         this.getId().asLong(), result))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("users").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(UsersCollection.NAME).inc());
     }
 
     @Override

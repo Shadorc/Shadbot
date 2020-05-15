@@ -8,6 +8,7 @@ import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
+import com.shadorc.shadbot.db.guilds.GuildsCollection;
 import com.shadorc.shadbot.db.guilds.bean.DBGuildBean;
 import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
@@ -64,7 +65,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Setting update result: {}",
                         this.getId().asLong(), result))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     public Mono<UpdateResult> removeSetting(Setting setting) {
@@ -77,7 +78,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                         Updates.unset(String.format("settings.%s", setting))))
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Setting deletion result: {}",
                         this.getId().asLong(), result))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     @Override
@@ -90,7 +91,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Insertion result: {}",
                         this.getId().asLong(), result))
                 .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     @Override
@@ -102,7 +103,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                 .deleteOne(Filters.eq("_id", this.getId().asString())))
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Deletion result: {}", this.getId().asLong(), result))
                 .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     @Override

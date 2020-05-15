@@ -8,6 +8,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
+import com.shadorc.shadbot.db.guilds.GuildsCollection;
 import com.shadorc.shadbot.db.guilds.bean.DBMemberBean;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.utils.NumberUtils;
@@ -95,7 +96,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                     }
                     return Mono.empty();
                 })
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     // Note: If one day, a member contains more data than just coins, this method will need to be updated
@@ -116,7 +117,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Insertion result: {}",
                         this.getId().asLong(), this.getGuildId().asLong(), result))
                 .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     @Override
@@ -130,7 +131,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Deletion result: {}",
                         this.getId().asLong(), this.getGuildId().asLong(), result))
                 .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels("guilds").inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     @Override
