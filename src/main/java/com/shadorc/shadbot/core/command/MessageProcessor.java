@@ -9,7 +9,6 @@ import com.shadorc.shadbot.utils.ExceptionHandler;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.User;
 import discord4j.rest.util.Snowflake;
 import io.prometheus.client.Counter;
 import reactor.core.publisher.Mono;
@@ -19,11 +18,8 @@ import java.time.Instant;
 public class MessageProcessor {
 
     private static final Counter COMMAND_USAGE_COUNTER = Counter.build()
-            .namespace("shadbot")
-            .name("command_usage")
-            .help("Command usage")
-            .labelNames("command")
-            .register();
+            .namespace("shadbot").name("command_usage").help("Command usage")
+            .labelNames("command").register();
     private static final String DM_TEXT = String.format("Hello !"
                     + "%nCommands only work in a server but you can see help using `%shelp`."
                     + "%nIf you have a question, a suggestion or if you just want to talk, don't hesitate to "
@@ -70,10 +66,9 @@ public class MessageProcessor {
                 // The author is not a bot or is not the bot used for auto-testing
                 .filter(member -> !member.isBot() || member.getId().equals(Config.TESTBOT_ID))
                 .flatMap(member -> Mono.zip(member.getRoles().collectList(),
-                        event.getGuild().map(Guild::getOwnerId)))
+                        event.getGuild().map(Guild::getOwnerId).map(member.getId()::equals)))
                 // The role is allowed or the author is the guild's owner
-                .filter(tuple -> dbGuild.getSettings().hasAllowedRole(tuple.getT1())
-                        || event.getMessage().getAuthor().map(User::getId).map(tuple.getT2()::equals).orElse(false))
+                .filter(tuple -> dbGuild.getSettings().hasAllowedRole(tuple.getT1()) || tuple.getT2())
                 // The channel is allowed
                 .flatMap(ignored -> event.getMessage().getChannel())
                 .filter(channel -> dbGuild.getSettings().isTextChannelAllowed(channel.getId()))
