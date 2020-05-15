@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.shadorc.shadbot</groupId>
     <artifactId>shadbot</artifactId>
-    <version>3.3.3-SNAPSHOT</version>
+    <version>3.3.4-SNAPSHOT</version>
     <name>Shadbot</name>
     <url>https://github.com/Shadorc/Shadbot</url>
     <description>
@@ -102,26 +102,18 @@
             <id>sedmelluq</id>
             <url>https://dl.bintray.com/sedmelluq/com.sedmelluq</url>
         </repository>
-        <!-- DiscordJ snapshot repository -->
-        <repository>
-            <id>oss.sonatype.org-snapshot</id>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
     </repositories>
     <dependencies>
         <!-- Discord4J TODO: Use bom-->
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>3.1.0-SNAPSHOT</version>
+            <version>3.1.0.RC1</version>
         </dependency>
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>stores-caffeine</artifactId>
-            <version>3.1.0.RC2</version>
+            <version>3.1.0</version>
         </dependency>
         <!-- lavaplayer -->
         <dependency>
@@ -138,12 +130,12 @@
         <dependency>
             <groupId>io.prometheus</groupId>
             <artifactId>simpleclient</artifactId>
-            <version>0.8.1</version>
+            <version>0.9.0</version>
         </dependency>
         <dependency>
             <groupId>io.prometheus</groupId>
             <artifactId>simpleclient_httpserver</artifactId>
-            <version>0.8.1</version>
+            <version>0.9.0</version>
         </dependency>
         <!-- Sentry -->
         <dependency>

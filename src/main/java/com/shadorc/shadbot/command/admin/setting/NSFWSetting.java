@@ -23,7 +23,8 @@ public class NSFWSetting extends BaseSetting {
     }
 
     public NSFWSetting() {
-        super(Setting.NSFW, "Manage current channel's NSFW state.");
+        super(List.of("nsfw"),
+                Setting.NSFW, "Manage current channel's NSFW state.");
     }
 
     @Override

@@ -57,7 +57,7 @@ public class CommandManager {
                 new ChatCmd(), new ThisDayCmd(), new LeetCmd(), new JokeCmd(), new DtcCmd(),
                 // Image Commands
                 new GifCmd(), new ImageCmd(), new WallpaperCmd(), new SuicideGirlsCmd(),
-                new Rule34Cmd(),
+                new Rule34Cmd(), new XkcdCmd(),
                 // Game Commands
                 new RpsCmd(), new HangmanCmd(), new TriviaCmd(), new RussianRouletteCmd(),
                 new SlotMachineCmd(), new RouletteCmd(), new BlackjackCmd(), new DiceCmd(),

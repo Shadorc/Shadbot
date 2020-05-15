@@ -24,7 +24,8 @@ import java.util.function.Consumer;
 
 public class NetUtils {
 
-    private static final HttpClient HTTP_CLIENT = HttpClient.create();
+    private static final HttpClient HTTP_CLIENT = HttpClient.create()
+            .followRedirect(true);
 
     /**
      * @param html The HTML to convert to text with new lines preserved, may be {@code null}.
@@ -60,11 +61,13 @@ public class NetUtils {
         final int statusCode = resp.status().code();
         if (statusCode / 100 != 2 && statusCode != 404) {
             return body.asString()
+                    .defaultIfEmpty("Empty body")
                     .flatMap(err -> Mono.error(new IOException(String.format("%s %s failed (%d) %s",
                             resp.method().asciiName(), resp.uri(), statusCode, err))));
         }
         if (!resp.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE).startsWith(HttpHeaderValues.APPLICATION_JSON.toString())) {
             return body.asString()
+                    .defaultIfEmpty("Empty body")
                     .flatMap(err -> Mono.error(new IOException(String.format("%s %s wrong header (%s) %s",
                             resp.method().asciiName(), resp.uri(), resp.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE), err))));
         }

@@ -43,12 +43,14 @@ public class HelpCmd extends BaseCmd {
                 .flatMap(authorPermissions -> this.getMultiMap(context, authorPermissions))
                 .map(map -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
-                            embed.setAuthor("Shadbot Help", Config.SUPPORT_SERVER_URL, context.getAvatarUrl())
-                                    .setDescription(String.format("Any issues, questions or suggestions ?"
-                                                    + " Join the [support server.](%s)"
-                                                    + "%nI need your help to [keep Shadbot alive!](%s)"
-                                                    + "%nGet more information for a specific command by using `%s%s <command>`.",
-                                            Config.SUPPORT_SERVER_URL, Config.PATREON_URL, context.getPrefix(), this.getName()));
+                            embed.setAuthor("Shadbot Help", "https://github.com/Shadorc/Shadbot/wiki/Commands",
+                                    context.getAvatarUrl());
+                            embed.setDescription(String.format("Any issues, questions or suggestions ?"
+                                            + " Join the [support server.](%s)"
+                                            + "%nI need your help to [keep Shadbot alive!](%s)"
+                                            + "%nGet more information for a specific command by using `%s%s <command>`.",
+                                    Config.SUPPORT_SERVER_URL, Config.PATREON_URL, context.getPrefix(), this.getName()));
+                            embed.setFooter("Click on the title to get a detailed list", "https://i.imgur.com/eaWQxvS.png");
 
                             for (final CommandCategory category : CommandCategory.values()) {
                                 if (!map.getOrDefault(category, Collections.emptyList()).isEmpty()

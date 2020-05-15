@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class AutoMessageSetting extends BaseSetting {
+public class AutoMessagesSetting extends BaseSetting {
 
     private enum Action {
         ENABLE, DISABLE;
@@ -30,8 +30,9 @@ public class AutoMessageSetting extends BaseSetting {
         CHANNEL, JOIN_MESSAGE, LEAVE_MESSAGE;
     }
 
-    public AutoMessageSetting() {
-        super(Setting.AUTO_MESSAGE, "Manage auto messages on user join/leave.");
+    public AutoMessagesSetting() {
+        super(List.of("auto_messages", "auto-messages", "auto_message", "auto-message"),
+                Setting.AUTO_MESSAGE, "Manage auto-message(s) on user join/leave.");
     }
 
     @Override
@@ -51,7 +52,7 @@ public class AutoMessageSetting extends BaseSetting {
                 .flatMap(dbGuild -> {
                     switch (type) {
                         case CHANNEL:
-                            return AutoMessageSetting.channel(context, dbGuild, action);
+                            return AutoMessagesSetting.channel(context, dbGuild, action);
                         case JOIN_MESSAGE:
                             return this.updateMessage(context, dbGuild, Setting.JOIN_MESSAGE, action, args);
                         case LEAVE_MESSAGE:

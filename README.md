@@ -17,8 +17,10 @@
     <p><b><a href="https://discord.gg/CKnV4ff">Join</a> the support server if you have any questions, suggestions or if you just want to talk.</b></p>
     <hr>
     <h2>Privacy</h2>
-    If an error occurred while you're interacting with Shadbot, I may log the message that triggers the command for debugging purpose.
-    If you have any questions, do not hesitate to <a href="https://discord.gg/CKnV4ff">join</a> the support server.
+    In order to store custom settings or coins, I may save server ID, channel(s) ID, role(s) ID or user(s) ID in a persistent database. 
+    <br>If an error occurs while you're interacting with Shadbot, I may log the content of the message that triggered the command for debugging purpose.
+    <br>If you have any questions or requests, do not hesitate to <a href="https://discord.gg/CKnV4ff">join</a> the support server or directly contact
+    me via Discord.
     <hr>
     <h2>Libraries used</h2>
     <ul>
