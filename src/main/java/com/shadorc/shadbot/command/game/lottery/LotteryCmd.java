@@ -8,6 +8,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
 import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
+import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.*;
@@ -143,10 +144,13 @@ public class LotteryCmd extends BaseCmd {
                     final Long coins = winners.isEmpty() ? null : Math.min(jackpot / winners.size(), Config.MAX_COINS);
 
                     return Flux.fromIterable(winners)
-                            .flatMap(winner -> DatabaseManager.getGuilds()
-                                    .getDBMember(winner.getGuildId(), winner.getId())
+                            .flatMap(member -> DatabaseManager.getGuilds()
+                                    .getDBMember(member.getGuildId(), member.getId())
                                     .flatMap(dbMember -> dbMember.addCoins(coins))
-                                    .then(winner.getPrivateChannel()))
+                                    .and(DatabaseManager.getUsers()
+                                            .getDBUser(member.getId())
+                                            .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.BINGO)))
+                                    .then(member.getPrivateChannel()))
                             .cast(MessageChannel.class)
                             .flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you " +
                                             "have the winning lottery number! You earn **%s**.",

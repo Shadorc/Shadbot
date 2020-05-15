@@ -129,6 +129,7 @@ public class Shadbot {
                     Shadbot.taskManager.schedulesPresenceUpdates();
                     if (!Config.IS_SNAPSHOT) {
                         Shadbot.taskManager.schedulesPostStats();
+                        Shadbot.taskManager.schedulesVotersCheck();
                     }
 
                     DEFAULT_LOGGER.info("Registering listeners...");

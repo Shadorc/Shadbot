@@ -11,6 +11,7 @@ import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.guilds.GuildsCollection;
 import com.shadorc.shadbot.db.lottery.LotteryCollection;
 import com.shadorc.shadbot.db.premium.PremiumCollection;
+import com.shadorc.shadbot.db.users.UsersCollection;
 import com.shadorc.shadbot.utils.Utils;
 import io.prometheus.client.Counter;
 
@@ -30,6 +31,7 @@ public class DatabaseManager {
     private final PremiumCollection premiumCollection;
     private final GuildsCollection guildsCollection;
     private final LotteryCollection lotteryCollection;
+    private final UsersCollection usersCollection;
 
     private DatabaseManager() {
         final MongoClientSettings.Builder settingsBuilder = MongoClientSettings.builder()
@@ -53,6 +55,7 @@ public class DatabaseManager {
         this.premiumCollection = new PremiumCollection(database);
         this.guildsCollection = new GuildsCollection(database);
         this.lotteryCollection = new LotteryCollection(database);
+        this.usersCollection = new UsersCollection(database);
     }
 
     public static PremiumCollection getPremium() {
@@ -65,6 +68,10 @@ public class DatabaseManager {
 
     public static LotteryCollection getLottery() {
         return DatabaseManager.instance.lotteryCollection;
+    }
+
+    public static UsersCollection getUsers() {
+        return DatabaseManager.instance.usersCollection;
     }
 
     public void close() {

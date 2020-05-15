@@ -1,11 +1,13 @@
 package com.shadorc.shadbot.api;
 
 import com.shadorc.shadbot.Shadbot;
+import com.shadorc.shadbot.api.json.dbl.VoterResponse;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.rest.util.Snowflake;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -136,6 +138,20 @@ public class BotListStats {
                 .put("shards", shardCount);
         final String url = String.format("https://api.wonderbotlist.com/v1/bot/%d", Shadbot.getSelfId().asLong());
         return this.post(url, CredentialManager.getInstance().get(Credential.WONDERBOTLIST_DOT_COM_TOKEN), content);
+    }
+
+    /**
+     * @return Monthly voter IDs from https://top.gg/
+     */
+    public Flux<Snowflake> getStats() {
+        final Consumer<HttpHeaders> headersConsumer = header -> header.add(HttpHeaderNames.AUTHORIZATION,
+                CredentialManager.getInstance().get(Credential.TOP_DOT_GG_TOKEN));
+        return NetUtils.get(headersConsumer, String.format("https://top.gg/api/bots/%d/votes",
+                Shadbot.getSelfId().asLong()), VoterResponse[].class)
+                .flatMapMany(Flux::fromArray)
+                .map(VoterResponse::getId)
+                .map(Snowflake::of)
+                .distinct();
     }
 
 }
