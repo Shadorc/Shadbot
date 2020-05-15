@@ -85,7 +85,9 @@ public class HelpCmd extends BaseCmd {
                 .filter(cmd -> authorPermissions.contains(cmd.getPermission()))
                 // ... and removes commands that are not allowed by the guild
                 .filterWhen(cmd -> Mono.zip(getIsDm,
-                        getSettings.map(settings -> settings.isCommandAllowed(cmd)).defaultIfEmpty(true))
+                        getSettings.map(settings -> settings.isCommandAllowed(cmd)
+                                && settings.isCategoryAllowed(context.getChannelId(), cmd.getCategory()))
+                                .defaultIfEmpty(true))
                         .map(tuple -> tuple.getT1() || tuple.getT2()))
                 .collectMultimap(BaseCmd::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName()));
     }

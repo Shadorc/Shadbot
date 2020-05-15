@@ -6,6 +6,8 @@ import com.shadorc.shadbot.db.guilds.bean.setting.IamBean;
 import reactor.util.annotation.Nullable;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SettingsBean implements Bean {
 
@@ -42,6 +44,9 @@ public class SettingsBean implements Bean {
     @Nullable
     @JsonProperty("prefix")
     private String prefix;
+    @Nullable
+    @JsonProperty("restricted_categories")
+    private Map<String, Set<String>> restrictedCategories;
 
     public SettingsBean() {
 
@@ -102,6 +107,11 @@ public class SettingsBean implements Bean {
         return this.prefix;
     }
 
+    @Nullable
+    public Map<String, Set<String>> getRestrictedCategories() {
+        return this.restrictedCategories;
+    }
+
     @Override
     public String toString() {
         return "SettingsBean{" +
@@ -111,11 +121,12 @@ public class SettingsBean implements Bean {
                 ", autoRoleIds=" + this.autoRoleIds +
                 ", blacklist=" + this.blacklist +
                 ", defaultVolume=" + this.defaultVolume +
-                ", iamMessage=" + this.iam +
+                ", iam=" + this.iam +
                 ", joinMessage='" + this.joinMessage + '\'' +
                 ", leaveMessage='" + this.leaveMessage + '\'' +
                 ", messageChannelId='" + this.messageChannelId + '\'' +
                 ", prefix='" + this.prefix + '\'' +
+                ", restrictedCategories=" + this.restrictedCategories +
                 '}';
     }
 }

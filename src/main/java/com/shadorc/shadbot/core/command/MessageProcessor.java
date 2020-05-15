@@ -103,6 +103,7 @@ public class MessageProcessor {
             return Mono.empty();
         }
 
+        // The command has been temporarly disabled by the bot's owner
         if (!command.isEnabled()) {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(
@@ -111,6 +112,11 @@ public class MessageProcessor {
                                             "questions.",
                                     context.getUsername(), Config.SUPPORT_SERVER_URL), channel))
                     .then();
+        }
+
+        // This category is not allowed in this channel
+        if (!dbGuild.getSettings().isCategoryAllowed(context.getChannelId(), command.getCategory())) {
+            return Mono.empty();
         }
 
         COMMAND_USAGE_COUNTER.labels(command.getName()).inc();

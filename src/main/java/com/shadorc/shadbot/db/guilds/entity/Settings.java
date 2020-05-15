@@ -1,10 +1,12 @@
 package com.shadorc.shadbot.db.guilds.entity;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.guilds.bean.SettingsBean;
 import com.shadorc.shadbot.db.guilds.entity.setting.Iam;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.entity.Role;
 import discord4j.rest.util.Permission;
 import discord4j.rest.util.Snowflake;
@@ -42,6 +44,21 @@ public class Settings extends SerializableEntity<SettingsBean> {
     public boolean isVoiceChannelAllowed(Snowflake channelId) {
         // If no permission has been set OR the voice channel is allowed
         return this.getAllowedVoiceChannelIds().isEmpty() || this.getAllowedVoiceChannelIds().contains(channelId);
+    }
+
+    public boolean isCategoryAllowed(Snowflake channelId, CommandCategory category) {
+        final Map<Snowflake, Set<CommandCategory>> map = this.getRestrictedCategories();
+
+        // If no permission has been set
+        if (map.isEmpty()) {
+            return true;
+        }
+        // If this category has explicitly been allowed in this channel
+        if (map.containsKey(channelId) && map.get(channelId).contains(category)) {
+            return true;
+        }
+
+        return map.values().stream().noneMatch(set -> set.contains(category));
     }
 
     public Set<Snowflake> getAllowedTextChannelIds() {
@@ -102,6 +119,19 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getPrefix)
                 .orElse(Config.DEFAULT_PREFIX);
+    }
+
+    public Map<Snowflake, Set<CommandCategory>> getRestrictedCategories() {
+        return Optional.ofNullable(this.getBean())
+                .map(SettingsBean::getRestrictedCategories)
+                .orElse(new HashMap<>())
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> Snowflake.of(entry.getKey()),
+                        entry -> entry.getValue()
+                                .stream()
+                                .map(value -> Utils.parseEnum(CommandCategory.class, value))
+                                .collect(Collectors.toSet())));
     }
 
     private Set<Snowflake> toSnowflakeSet(Function<SettingsBean, List<String>> mapper) {
