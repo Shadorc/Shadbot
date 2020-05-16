@@ -35,7 +35,7 @@ public class Config {
     public static final int MUSIC_SEARCHES = Integer.parseInt(PROPERTIES.getProperty("music.searches"));
     public static final int MUSIC_CHOICE_DURATION = Integer.parseInt(PROPERTIES.getProperty("music.choice.duration"));
 
-    public static final Color BOT_COLOR = new Color(Integer.decode(PROPERTIES.getProperty("embed.color")));
+    public static final Color BOT_COLOR = Color.of(Integer.decode(PROPERTIES.getProperty("embed.color")));
     public static final Duration TIMEOUT = Duration.ofMillis(Long.parseLong(PROPERTIES.getProperty("timeout")));
     public static final int RELIC_DURATION = Integer.parseInt(PROPERTIES.getProperty("relic.duration"));
     public static final long MAX_COINS = Long.parseLong(PROPERTIES.getProperty("coins.max"));
