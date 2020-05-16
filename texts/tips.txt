@@ -1,6 +1,6 @@
 {default_prefix}lottery
 {default_prefix}setting
 {default_prefix}invite
-{default_prefix}playfirst
+{default_prefix}achievements
 Feedback? {default_prefix}feedback
 Prefix lost? {default_prefix}prefix
