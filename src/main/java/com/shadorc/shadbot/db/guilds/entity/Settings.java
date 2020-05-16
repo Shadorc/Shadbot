@@ -26,29 +26,46 @@ public class Settings extends SerializableEntity<SettingsBean> {
     }
 
     public boolean hasAllowedRole(List<Role> roles) {
-        // If the user is an administrator OR no permissions have been set OR the role is allowed
-        return this.getAllowedRoleIds().isEmpty()
-                || roles.stream().anyMatch(role -> role.getPermissions().contains(Permission.ADMINISTRATOR))
-                || roles.stream().anyMatch(role -> this.getAllowedRoleIds().contains(role.getId()));
+        final Set<Snowflake> allowedRoleIds = this.getAllowedRoleIds();
+        // If no permission has been set
+        if (allowedRoleIds.isEmpty()) {
+            return true;
+        }
+        //If the user is an administrator OR the role is allowed
+        return roles.stream()
+                .anyMatch(role -> role.getPermissions().contains(Permission.ADMINISTRATOR)
+                        || allowedRoleIds.contains(role.getId()));
     }
 
     public boolean isCommandAllowed(BaseCmd cmd) {
-        return cmd.getNames().stream().noneMatch(this.getBlacklistedCmd()::contains);
+        final Set<String> blacklistedCmds = this.getBlacklistedCmds();
+        // If no blacklisted command has been set
+        if (blacklistedCmds.isEmpty()) {
+            return true;
+        }
+        return cmd.getNames().stream().noneMatch(blacklistedCmds::contains);
     }
 
     public boolean isTextChannelAllowed(Snowflake channelId) {
-        // If no permission has been set OR the text channel is allowed
-        return this.getAllowedTextChannelIds().isEmpty() || this.getAllowedTextChannelIds().contains(channelId);
+        final Set<Snowflake> allowedTextChannelIds = this.getAllowedTextChannelIds();
+        // If no permission has been set
+        if (allowedTextChannelIds.isEmpty()) {
+            return true;
+        }
+        return allowedTextChannelIds.contains(channelId);
     }
 
     public boolean isVoiceChannelAllowed(Snowflake channelId) {
-        // If no permission has been set OR the voice channel is allowed
-        return this.getAllowedVoiceChannelIds().isEmpty() || this.getAllowedVoiceChannelIds().contains(channelId);
+        final Set<Snowflake> allowedVoiceChannelIds = this.getAllowedVoiceChannelIds();
+        // If no permission has been set
+        if (allowedVoiceChannelIds.isEmpty()) {
+            return true;
+        }
+        return allowedVoiceChannelIds.contains(channelId);
     }
 
     public boolean isCategoryAllowed(Snowflake channelId, CommandCategory category) {
         final Map<Snowflake, Set<CommandCategory>> map = this.getRestrictedCategories();
-
         // If no permission has been set
         if (map.isEmpty()) {
             return true;
@@ -57,7 +74,6 @@ public class Settings extends SerializableEntity<SettingsBean> {
         if (map.containsKey(channelId) && map.get(channelId).contains(category)) {
             return true;
         }
-
         return map.values().stream().noneMatch(set -> set.contains(category));
     }
 
