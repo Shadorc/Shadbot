@@ -12,8 +12,13 @@ public class DBUserBean implements Bean {
     @JsonProperty("achievements")
     private Integer achievements;
 
-    public DBUserBean(String id) {
+    public DBUserBean(String id, @Nullable Integer achievements) {
         this.id = id;
+        this.achievements = achievements;
+    }
+
+    public DBUserBean(String id) {
+        this(id, null);
     }
 
     public DBUserBean() {

@@ -12,8 +12,13 @@ public class DBMemberBean implements Bean {
     @JsonProperty("coins")
     private Long coins;
 
-    public DBMemberBean(String id) {
+    public DBMemberBean(String id, @Nullable Long coins) {
         this.id = id;
+        this.coins = coins;
+    }
+
+    public DBMemberBean(String id) {
+        this(id, null);
     }
 
     public DBMemberBean() {

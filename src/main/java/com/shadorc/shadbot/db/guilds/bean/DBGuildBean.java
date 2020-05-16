@@ -23,6 +23,10 @@ public class DBGuildBean implements Bean {
         this.settingsBean = settingsBean;
     }
 
+    public DBGuildBean(String id) {
+        this(id, null, null);
+    }
+
     public DBGuildBean() {
     }
 

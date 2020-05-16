@@ -28,7 +28,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
     }
 
     public DBGuild(Snowflake id) {
-        super(new DBGuildBean(id.asString(), null, null));
+        super(new DBGuildBean(id.asString()));
     }
 
     public Snowflake getId() {
