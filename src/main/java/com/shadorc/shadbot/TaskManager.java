@@ -45,7 +45,7 @@ public class TaskManager {
 
     public void schedulePresenceUpdates() {
         this.logger.info("Scheduling presence updates...");
-        final Disposable task = Flux.interval(Duration.ofMinutes(30), Duration.ofMinutes(30), this.defaultScheduler)
+        final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofMinutes(15), this.defaultScheduler)
                 .map(ignored -> DiscordUtils.getRandomStatus())
                 .flatMap(this.gateway::updatePresence)
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
