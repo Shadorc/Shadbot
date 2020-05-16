@@ -55,7 +55,7 @@ public class MessageProcessor {
     }
 
     private static Mono<Void> processGuildMessage(Snowflake guildId, MessageCreateEvent event) {
-        final String firstWord = event.getMessage().getContent().split(" ")[0];
+        final String firstWord = event.getMessage().getContent().split(" ", 2)[0];
         // Only execute database request if the first word of the message contains an existing command
         if (CommandManager.getInstance().getCommands().keySet().stream().anyMatch(firstWord::contains)) {
             return DatabaseManager.getGuilds().getDBGuild(guildId)
