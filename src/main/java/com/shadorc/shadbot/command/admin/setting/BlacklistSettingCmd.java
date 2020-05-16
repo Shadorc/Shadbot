@@ -83,7 +83,7 @@ public class BlacklistSettingCmd extends BaseSetting {
         return DatabaseManager.getGuilds()
                 .getDBGuild(context.getGuildId())
                 .flatMap(dbGuild -> {
-                    final Set<String> blacklist = dbGuild.getSettings().getBlacklistedCmd();
+                    final Set<String> blacklist = dbGuild.getSettings().getBlacklistedCmds();
 
                     final Set<String> cmdNames = new HashSet<>();
                     for (final CommandCategory category : categories) {
@@ -135,7 +135,7 @@ public class BlacklistSettingCmd extends BaseSetting {
         return DatabaseManager.getGuilds()
                 .getDBGuild(context.getGuildId())
                 .flatMap(dbGuild -> {
-                    final Set<String> blacklist = dbGuild.getSettings().getBlacklistedCmd();
+                    final Set<String> blacklist = dbGuild.getSettings().getBlacklistedCmds();
 
                     final String actionVerbose;
                     if (action == Action.ADD) {

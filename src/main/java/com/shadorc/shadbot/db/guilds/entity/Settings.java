@@ -77,7 +77,7 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return this.toSnowflakeSet(SettingsBean::getAutoRoleIds);
     }
 
-    public Set<String> getBlacklistedCmd() {
+    public Set<String> getBlacklistedCmds() {
         return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getBlacklist)
                 .map(HashSet::new)

@@ -84,9 +84,9 @@ public class SettingsCmd extends BaseCmd {
             settingsStr.append(String.format("%n**Default volume:** %d%%", dbGuild.getSettings().getDefaultVol()));
         }
 
-        if (!dbGuild.getSettings().getBlacklistedCmd().isEmpty()) {
+        if (!dbGuild.getSettings().getBlacklistedCmds().isEmpty()) {
             settingsStr.append(String.format("%n**Blacklisted commands:**%n\t%s",
-                    String.join("\n\t", dbGuild.getSettings().getBlacklistedCmd())));
+                    String.join("\n\t", dbGuild.getSettings().getBlacklistedCmds())));
         }
 
         dbGuild.getSettings().getJoinMessage()
