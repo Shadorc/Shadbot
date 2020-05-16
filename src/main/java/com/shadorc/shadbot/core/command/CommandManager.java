@@ -51,7 +51,7 @@ public class CommandManager {
     private CommandManager() {
         this.commandsMap = this.initialize(
                 // Utility Commands
-                new WeatherCmd(), new CalcCmd(), new TranslateCmd(), new WikiCmd(), new PollCmd(),
+                new WeatherCmd(), new MathCmd(), new TranslateCmd(), new WikiCmd(), new PollCmd(),
                 new UrbanCmd(), new LyricsCmd(),
                 // Fun Commands
                 new ChatCmd(), new ThisDayCmd(), new LeetCmd(), new JokeCmd(), new DtcCmd(),

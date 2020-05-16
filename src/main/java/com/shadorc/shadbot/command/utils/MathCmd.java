@@ -15,13 +15,13 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class CalcCmd extends BaseCmd {
+public class MathCmd extends BaseCmd {
 
     private final DoubleEvaluator evaluator;
     private final DecimalFormat formatter;
 
-    public CalcCmd() {
-        super(CommandCategory.UTILS, List.of("calc", "math"));
+    public MathCmd() {
+        super(CommandCategory.UTILS, List.of("math", "calc"));
         this.setDefaultRateLimiter();
 
         this.evaluator = new DoubleEvaluator();
