@@ -6,18 +6,22 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.premium.RelicType;
+import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
+import discord4j.core.object.entity.Guild;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class RelicStatusCmd extends BaseCmd {
@@ -31,39 +35,40 @@ public class RelicStatusCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         return DatabaseManager.getPremium()
                 .getUserRelics(context.getAuthorId())
-                .switchIfEmpty(context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(
-                                String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
-                                                + "you can help me keep it alive by making a donation on <%s>."
-                                                + "%nAll donations are important and really help me %s",
-                                        context.getUsername(), Config.PATREON_URL, Emoji.HEARTS), channel))
-                        .then(Mono.empty()))
-                .map(relic -> {
-                    final StringBuilder contentBld = new StringBuilder(String.format("**ID:** %s", relic.getId()));
+                .flatMap(relic -> RelicStatusCmd.getRelicAndGuild(context, relic))
+                .map(tuple -> {
+                    final Relic relic = tuple.getT1();
+                    final Optional<Guild> optGuild = tuple.getT2();
 
-                    relic.getGuildId()
-                            .ifPresent(guildId -> contentBld.append(String.format("%n**Guild ID:** %d", guildId.asLong())));
+                    final StringBuilder descBuilder = new StringBuilder(String.format("**ID:** %s", relic.getId()));
 
-                    contentBld.append(String.format("%n**Duration:** %s", FormatUtils.customDate(relic.getDuration())));
+                    optGuild.ifPresent(guild ->
+                            descBuilder.append(String.format("%n**Guild:** %s (ID: %d)",
+                                    guild.getName(), guild.getId().asLong())));
+
+                    descBuilder.append(String.format("%n**Duration:** %s",
+                            FormatUtils.customDate(relic.getDuration())));
+
                     if (!relic.isExpired()) {
                         relic.getActivation()
                                 .ifPresent(activation -> {
                                     final Duration durationLeft = relic.getDuration()
                                             .minusMillis(TimeUtils.getMillisUntil(activation.toEpochMilli()));
-                                    contentBld.append(String.format("%n**Expires in:** %s",
+                                    descBuilder.append(String.format("%n**Expires in:** %s",
                                             FormatUtils.customDate(durationLeft)));
                                 });
                     }
 
-                    final StringBuilder titleBld = new StringBuilder();
+                    final StringBuilder titleBuilder = new StringBuilder();
                     if (relic.getType() == RelicType.GUILD) {
-                        titleBld.append("Legendary ");
+                        titleBuilder.append("Legendary ");
                     }
-                    titleBld.append(String.format("Relic (%s)", relic.isExpired() ? "Expired" : "Activated"));
+                    titleBuilder.append(String.format("Relic (%s)", relic.isExpired() ? "Expired" : "Activated"));
 
-                    return ImmutableEmbedFieldData.of(titleBld.toString(), contentBld.toString(), Possible.of(false));
+                    return ImmutableEmbedFieldData.of(titleBuilder.toString(), descBuilder.toString(), Possible.of(false));
                 })
                 .collectList()
+                .filter(list -> !list.isEmpty())
                 .map(fields -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Contributor Status", null, context.getAvatarUrl())
@@ -73,7 +78,22 @@ public class RelicStatusCmd extends BaseCmd {
                         }))
                 .flatMap(embed -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+                .switchIfEmpty(context.getChannel()
+                        .flatMap(channel -> DiscordUtils.sendMessage(
+                                String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
+                                                + "you can help me keep it alive by making a donation on <%s>."
+                                                + "%nAll donations are important and really help me %s",
+                                        context.getUsername(), Config.PATREON_URL, Emoji.HEARTS), channel)))
                 .then();
+    }
+
+    private static Mono<Tuple2<Relic, Optional<Guild>>> getRelicAndGuild(Context context, Relic relic) {
+        final Mono<Optional<Guild>> getGuild = Mono.justOrEmpty(relic.getGuildId())
+                .flatMap(context.getClient()::getGuildById)
+                .map(Optional::of)
+                .defaultIfEmpty(Optional.empty());
+
+        return Mono.zip(Mono.just(relic), getGuild);
     }
 
     @Override
