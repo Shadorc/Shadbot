@@ -86,7 +86,7 @@ public class TaskManager {
                         .map(millis -> Tuples.of(i, millis)))
                 .collectMap(Tuple2::getT1, Tuple2::getT2);
 
-        final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(10), this.defaultScheduler)
+        final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(15), this.defaultScheduler)
                 .doOnNext(ignored -> {
                     ramUsageGauge.set(ProcessUtils.getMemoryUsed());
                     cpuUsageGauge.set(ProcessUtils.getCpuUsage());
