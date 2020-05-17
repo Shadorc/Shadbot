@@ -19,8 +19,7 @@
     <h2>Privacy</h2>
     In order to store custom settings or coins, I may save server ID, channel(s) ID, role(s) ID or user(s) ID in a persistent database. 
     <br>If an error occurs while you're interacting with Shadbot, I may log the content of the message that triggered the command for debugging purpose.
-    <br>If you have any questions or requests, do not hesitate to <a href="https://discord.gg/CKnV4ff">join</a> the support server or directly contact
-    me via Discord (Shadorc#8423).
+    <br>If you have any questions or requests, do not hesitate to <a href="https://discord.gg/CKnV4ff">join</a> the support server or directly contact me via Discord (Shadorc#8423).
     <hr>
     <h2>Libraries used</h2>
     <ul>
