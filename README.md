@@ -5,7 +5,7 @@
         <img align="right" src="https://i.imgur.com/ab9PUtE.png" height="220" width="220">
     </a>
     <h1>Shadbot</h1>
-    <p><b>Shadbot is a configurable Discord Bot which plays musics, executes useful, admin and fun commands, play games and more !</b></p>
+    <p><b>A configurable multipurpose Discord bot providing music, gambling mini-games, stats about video games and more!</b></p>
     <hr>
     <h2>Usage</h2>
     <a href="https://discordbots.org/bot/331146243596091403">
