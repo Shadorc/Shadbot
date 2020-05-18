@@ -13,8 +13,8 @@ public class RouletteInputs extends Inputs {
 
     private final RouletteGame game;
 
-    public RouletteInputs(GatewayDiscordClient client, RouletteGame game) {
-        super(client, game.getDuration());
+    public RouletteInputs(GatewayDiscordClient gateway, RouletteGame game) {
+        super(gateway, game.getDuration());
         this.game = game;
     }
 

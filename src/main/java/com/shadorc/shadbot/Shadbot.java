@@ -151,8 +151,8 @@ public class Shadbot {
         System.exit(0);
     }
 
-    private static <T extends Event> void register(GatewayDiscordClient client, EventListener<T> eventListener) {
-        client.getEventDispatcher()
+    private static <T extends Event> void register(GatewayDiscordClient gateway, EventListener<T> eventListener) {
+        gateway.getEventDispatcher()
                 .on(eventListener.getEventType())
                 .flatMap(event -> eventListener.execute(event)
                         .thenReturn(event.toString())

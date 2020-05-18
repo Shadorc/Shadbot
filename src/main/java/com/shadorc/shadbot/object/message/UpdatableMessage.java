@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 
 public class UpdatableMessage {
 
-    private final GatewayDiscordClient client;
+    private final GatewayDiscordClient gateway;
     private final Snowflake channelId;
     private final AtomicLong messageId;
 
@@ -29,11 +29,11 @@ public class UpdatableMessage {
     /**
      * Sends a message that will be deleted each time the {@code send} method is called.
      *
-     * @param client The Discord client.
+     * @param gateway The Discord gateway.
      * @param channelId The Channel ID in which to send the message.
      */
-    public UpdatableMessage(GatewayDiscordClient client, Snowflake channelId) {
-        this.client = client;
+    public UpdatableMessage(GatewayDiscordClient gateway, Snowflake channelId) {
+        this.gateway = gateway;
         this.channelId = channelId;
         this.messageId = new AtomicLong();
     }
@@ -76,7 +76,7 @@ public class UpdatableMessage {
         };
 
         return this.deleteMessage()
-                .then(this.client.getChannelById(this.channelId))
+                .then(this.gateway.getChannelById(this.channelId))
                 .cast(MessageChannel.class)
                 .flatMap(channel -> DiscordUtils.sendMessage(consumer, channel, embed != null))
                 .doOnNext(message -> this.messageId.set(message.getId().asLong()));
@@ -89,7 +89,7 @@ public class UpdatableMessage {
         return Mono.just(this.messageId.get())
                 .filter(messageId -> messageId != 0)
                 .map(Snowflake::of)
-                .flatMap(messageId -> this.client.getMessageById(this.channelId, messageId))
+                .flatMap(messageId -> this.gateway.getMessageById(this.channelId, messageId))
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
                 .flatMap(Message::delete);
     }

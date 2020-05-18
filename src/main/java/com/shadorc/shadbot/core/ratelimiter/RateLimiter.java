@@ -60,8 +60,8 @@ public class RateLimiter {
         return false;
     }
 
-    private void sendWarningMessage(GatewayDiscordClient client, Snowflake channelId, Snowflake userId) {
-        client.getUserById(userId)
+    private void sendWarningMessage(GatewayDiscordClient gateway, Snowflake channelId, Snowflake userId) {
+        gateway.getUserById(userId)
                 .map(author -> {
                     final String username = author.getUsername();
                     final String message = TextUtils.SPAMS.getRandomText();
@@ -71,7 +71,7 @@ public class RateLimiter {
                     return String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
                             username, message, maxNum, durationStr);
                 })
-                .flatMap(new TemporaryMessage(client, channelId, Duration.ofSeconds(10))::send)
+                .flatMap(new TemporaryMessage(gateway, channelId, Duration.ofSeconds(10))::send)
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 

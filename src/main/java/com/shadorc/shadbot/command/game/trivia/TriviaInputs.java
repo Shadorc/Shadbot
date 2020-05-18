@@ -13,8 +13,8 @@ public class TriviaInputs extends Inputs {
 
     private final TriviaGame game;
 
-    public TriviaInputs(GatewayDiscordClient client, TriviaGame game) {
-        super(client, game.getDuration());
+    public TriviaInputs(GatewayDiscordClient gateway, TriviaGame game) {
+        super(gateway, game.getDuration());
         this.game = game;
     }
 

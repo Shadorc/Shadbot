@@ -41,8 +41,8 @@ public class BlackjackPlayer extends GamblerPlayer {
         this.stand();
     }
 
-    public Mono<ImmutableEmbedFieldData> format(GatewayDiscordClient client) {
-        return this.getUsername(client)
+    public Mono<ImmutableEmbedFieldData> format(GatewayDiscordClient gateway) {
+        return this.getUsername(gateway)
                 .map(username -> {
                     final StringBuilder name = new StringBuilder(String.format("%s's hand", username));
                     if (this.isStanding) {

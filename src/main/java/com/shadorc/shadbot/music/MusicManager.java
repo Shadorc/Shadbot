@@ -91,19 +91,19 @@ public class MusicManager {
      * a new one is created and a request to join the {@link VoiceChannel} corresponding to the provided
      * {@code voiceChannelId} is sent.
      */
-    public Mono<GuildMusic> getOrCreate(GatewayDiscordClient client, Snowflake guildId, Snowflake voiceChannelId) {
+    public Mono<GuildMusic> getOrCreate(GatewayDiscordClient gateway, Snowflake guildId, Snowflake voiceChannelId) {
         return Mono.justOrEmpty(this.getGuildMusic(guildId))
                 .switchIfEmpty(Mono.defer(() -> {
                     final AudioPlayer audioPlayer = this.audioPlayerManager.createPlayer();
                     audioPlayer.addListener(new TrackEventListener(guildId));
                     final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
 
-                    return this.joinVoiceChannel(client, guildId, voiceChannelId, audioProvider)
+                    return this.joinVoiceChannel(gateway, guildId, voiceChannelId, audioProvider)
                             .flatMap(ignored -> DatabaseManager.getGuilds().getDBGuild(guildId))
                             .map(DBGuild::getSettings)
                             .map(Settings::getDefaultVol)
                             .map(volume -> new TrackScheduler(audioPlayer, volume))
-                            .map(trackScheduler -> new GuildMusic(client, guildId, trackScheduler))
+                            .map(trackScheduler -> new GuildMusic(gateway, guildId, trackScheduler))
                             .doOnNext(guildMusic -> {
                                 this.guildMusics.put(guildId, guildMusic);
                                 GUILD_MUSIC_GAUGE.inc();
@@ -115,7 +115,7 @@ public class MusicManager {
     /**
      * Requests to join a voice channel.
      */
-    private Mono<VoiceConnection> joinVoiceChannel(GatewayDiscordClient client, Snowflake guildId, Snowflake voiceChannelId,
+    private Mono<VoiceConnection> joinVoiceChannel(GatewayDiscordClient gateway, Snowflake guildId, Snowflake voiceChannelId,
                                                    AudioProvider audioProvider) {
 
         // Do not join the voice channel if the bot is already joining one
@@ -123,14 +123,14 @@ public class MusicManager {
             return Mono.empty();
         }
 
-        final Mono<Boolean> isDisconnected = client.getVoiceConnectionRegistry()
+        final Mono<Boolean> isDisconnected = gateway.getVoiceConnectionRegistry()
                 .getVoiceConnection(guildId.asLong())
                 .flatMapMany(VoiceConnection::stateEvents)
                 .next()
                 .map(VoiceConnection.State.DISCONNECTED::equals)
                 .defaultIfEmpty(true);
 
-        return client.getChannelById(voiceChannelId)
+        return gateway.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
                 // Do not join the voice channel if the current voice connection is in not disconnected
                 .filterWhen(ignored -> isDisconnected)
@@ -151,7 +151,7 @@ public class MusicManager {
         }
 
         return Mono.justOrEmpty(guildMusic)
-                .map(GuildMusic::getClient)
+                .map(GuildMusic::getGateway)
                 .map(GatewayDiscordClient::getVoiceConnectionRegistry)
                 .flatMap(registry -> registry.getVoiceConnection(guildId.asLong()))
                 .flatMap(VoiceConnection::disconnect);

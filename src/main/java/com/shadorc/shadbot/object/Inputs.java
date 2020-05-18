@@ -10,16 +10,16 @@ import java.time.Duration;
 
 public abstract class Inputs {
 
-    private final GatewayDiscordClient client;
+    private final GatewayDiscordClient gateway;
     private final Duration timeout;
 
-    protected Inputs(GatewayDiscordClient client, Duration timeout) {
-        this.client = client;
+    protected Inputs(GatewayDiscordClient gateway, Duration timeout) {
+        this.gateway = gateway;
         this.timeout = timeout;
     }
 
     public Flux<Void> waitForInputs() {
-        return this.client.getEventDispatcher()
+        return this.gateway.getEventDispatcher()
                 .on(MessageCreateEvent.class)
                 .takeWhile(this::takeEventWile)
                 .filterWhen(this::isValidEvent)

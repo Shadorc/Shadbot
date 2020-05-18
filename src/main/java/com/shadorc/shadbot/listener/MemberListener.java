@@ -85,8 +85,8 @@ public class MemberListener {
         }
     }
 
-    private static Mono<Message> sendAutoMessage(GatewayDiscordClient client, User user, Snowflake channelId, String message) {
-        return client.getChannelById(channelId)
+    private static Mono<Message> sendAutoMessage(GatewayDiscordClient gateway, User user, Snowflake channelId, String message) {
+        return gateway.getChannelById(channelId)
                 .cast(MessageChannel.class)
                 .flatMap(channel -> DiscordUtils.sendMessage(message
                         .replace("{username}", user.getUsername())

@@ -17,13 +17,13 @@ import java.util.function.Consumer;
 
 public class ReactionMessage {
 
-    private final GatewayDiscordClient client;
+    private final GatewayDiscordClient gateway;
     private final Snowflake channelId;
     private final Collection<ReactionEmoji> reactions;
 
-    public ReactionMessage(GatewayDiscordClient client, Snowflake channelId,
+    public ReactionMessage(GatewayDiscordClient gateway, Snowflake channelId,
                            Collection<ReactionEmoji> reactions) {
-        this.client = client;
+        this.gateway = gateway;
         this.channelId = channelId;
         this.reactions = Collections.unmodifiableCollection(reactions);
     }
@@ -33,7 +33,7 @@ public class ReactionMessage {
      * @return A {@link Mono} containing a {@link Message} with {@link Reaction} added.
      */
     public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {
-        return this.client.getChannelById(this.channelId)
+        return this.gateway.getChannelById(this.channelId)
                 .cast(MessageChannel.class)
                 .flatMap(channel -> DiscordUtils.sendMessage(embed, channel))
                 .flatMap(message -> Flux.fromIterable(this.reactions)

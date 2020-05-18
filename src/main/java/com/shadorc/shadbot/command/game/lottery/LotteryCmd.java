@@ -124,14 +124,14 @@ public class LotteryCmd extends BaseCmd {
         return Duration.ofMillis(TimeUtils.getMillisUntil(nextDate.toInstant()));
     }
 
-    public static Mono<Void> draw(GatewayDiscordClient client) {
+    public static Mono<Void> draw(GatewayDiscordClient gateway) {
         DEFAULT_LOGGER.info("Lottery draw started...");
         final int winningNum = ThreadLocalRandom.current().nextInt(MIN_NUM, MAX_NUM + 1);
 
         return DatabaseManager.getLottery()
                 .getGamblers()
                 .filter(gambler -> gambler.getNumber() == winningNum)
-                .flatMap(winner -> client.getMemberById(winner.getGuildId(), winner.getUserId()))
+                .flatMap(winner -> gateway.getMemberById(winner.getGuildId(), winner.getUserId()))
                 .collectList()
                 .zipWith(DatabaseManager.getLottery().getJackpot())
                 .flatMap(tuple -> {

@@ -16,8 +16,8 @@ public class HangmanInputs extends Inputs {
 
     private final HangmanGame game;
 
-    public HangmanInputs(GatewayDiscordClient client, HangmanGame game) {
-        super(client, game.getDuration());
+    public HangmanInputs(GatewayDiscordClient gateway, HangmanGame game) {
+        super(gateway, game.getDuration());
         this.game = game;
     }
 

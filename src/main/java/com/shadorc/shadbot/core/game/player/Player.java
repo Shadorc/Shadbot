@@ -21,8 +21,8 @@ public class Player {
         return this.userId;
     }
 
-    public Mono<String> getUsername(GatewayDiscordClient client) {
-        return client.getUserById(this.userId).map(User::getUsername);
+    public Mono<String> getUsername(GatewayDiscordClient gateway) {
+        return gateway.getUserById(this.userId).map(User::getUsername);
     }
 
     public Mono<DBMember> getDBMember() {

@@ -11,17 +11,17 @@ import java.time.Duration;
 
 public class TemporaryMessage {
 
-    private final GatewayDiscordClient client;
+    private final GatewayDiscordClient gateway;
     private final Snowflake channelId;
     private final Duration duration;
 
     /**
-     * @param client The Discord client.
+     * @param gateway The Discord gateway.
      * @param channelId The Channel ID in which to send the message.
      * @param duration The delay to wait before deleting the message.
      */
-    public TemporaryMessage(GatewayDiscordClient client, Snowflake channelId, Duration duration) {
-        this.client = client;
+    public TemporaryMessage(GatewayDiscordClient gateway, Snowflake channelId, Duration duration) {
+        this.gateway = gateway;
         this.channelId = channelId;
         this.duration = duration;
     }
@@ -33,7 +33,7 @@ public class TemporaryMessage {
      * @return A {@link Mono} representing the message sent.
      */
     public Mono<Void> send(String content) {
-        return this.client.getChannelById(this.channelId)
+        return this.gateway.getChannelById(this.channelId)
                 .cast(MessageChannel.class)
                 .flatMap(channel -> DiscordUtils.sendMessage(content, channel))
                 .flatMap(message -> Mono.delay(this.duration, Schedulers.boundedElastic())

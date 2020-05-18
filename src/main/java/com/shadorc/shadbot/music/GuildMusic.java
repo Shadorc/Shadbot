@@ -26,7 +26,7 @@ public class GuildMusic {
 
     private static final Duration LEAVE_DELAY = Duration.ofMinutes(1);
 
-    private final GatewayDiscordClient client;
+    private final GatewayDiscordClient gateway;
     private final long guildId;
     private final TrackScheduler trackScheduler;
 
@@ -36,8 +36,8 @@ public class GuildMusic {
     private final AtomicLong djId;
     private final AtomicReference<Disposable> leavingTask;
 
-    public GuildMusic(GatewayDiscordClient client, Snowflake guildId, TrackScheduler trackScheduler) {
-        this.client = client;
+    public GuildMusic(GatewayDiscordClient gateway, Snowflake guildId, TrackScheduler trackScheduler) {
+        this.gateway = gateway;
         this.guildId = guildId.asLong();
         this.trackScheduler = trackScheduler;
 
@@ -55,7 +55,7 @@ public class GuildMusic {
         LOGGER.debug("{Guild ID: {}} Scheduling auto-leave", this.guildId);
         this.leavingTask.set(Mono.delay(LEAVE_DELAY, Schedulers.boundedElastic())
                 .filter(ignored -> this.isLeavingScheduled())
-                .map(ignored -> this.client.getVoiceConnectionRegistry())
+                .map(ignored -> this.gateway.getVoiceConnectionRegistry())
                 .flatMap(registry -> registry.getVoiceConnection(this.guildId))
                 .flatMap(VoiceConnection::disconnect)
                 .subscribe(null, ExceptionHandler::handleUnknownError));
@@ -78,7 +78,7 @@ public class GuildMusic {
         this.listeners.remove(listener);
         // If there is no music playing and nothing is loading, leave the voice channel
         if (this.trackScheduler.isStopped() && this.listeners.values().stream().allMatch(Future::isDone)) {
-            return this.client.getVoiceConnectionRegistry()
+            return this.gateway.getVoiceConnectionRegistry()
                     .getVoiceConnection(this.guildId)
                     .flatMap(VoiceConnection::disconnect);
         }
@@ -87,7 +87,7 @@ public class GuildMusic {
 
     public Mono<Void> end() {
         LOGGER.debug("{Guild ID: {}} Ending guild music", this.guildId);
-        return this.getClient()
+        return this.getGateway()
                 .getVoiceConnectionRegistry()
                 .getVoiceConnection(this.guildId)
                 .flatMap(VoiceConnection::disconnect)
@@ -96,8 +96,8 @@ public class GuildMusic {
                 .then();
     }
 
-    public GatewayDiscordClient getClient() {
-        return this.client;
+    public GatewayDiscordClient getGateway() {
+        return this.gateway;
     }
 
     public Snowflake getGuildId() {
@@ -113,7 +113,7 @@ public class GuildMusic {
     }
 
     public Mono<MessageChannel> getMessageChannel() {
-        return this.client.getChannelById(this.getMessageChannelId())
+        return this.gateway.getChannelById(this.getMessageChannelId())
                 .cast(MessageChannel.class);
     }
 

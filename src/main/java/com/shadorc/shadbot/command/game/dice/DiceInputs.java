@@ -13,8 +13,8 @@ public class DiceInputs extends Inputs {
 
     private final DiceGame game;
 
-    public DiceInputs(GatewayDiscordClient client, DiceGame game) {
-        super(client, game.getDuration());
+    public DiceInputs(GatewayDiscordClient gateway, DiceGame game) {
+        super(gateway, game.getDuration());
         this.game = game;
     }
 

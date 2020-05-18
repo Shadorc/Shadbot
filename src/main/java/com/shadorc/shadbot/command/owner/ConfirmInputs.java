@@ -15,8 +15,8 @@ public class ConfirmInputs extends Inputs {
     private final Mono<Void> task;
     private final AtomicBoolean isCancelled;
 
-    public ConfirmInputs(GatewayDiscordClient client, Duration timeout, Mono<Void> task) {
-        super(client, timeout);
+    public ConfirmInputs(GatewayDiscordClient gateway, Duration timeout, Mono<Void> task) {
+        super(gateway, timeout);
         this.task = task;
         this.isCancelled = new AtomicBoolean(false);
     }

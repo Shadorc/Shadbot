@@ -17,8 +17,8 @@ public class BlackjackInputs extends Inputs {
 
     private final BlackjackGame game;
 
-    public BlackjackInputs(GatewayDiscordClient client, BlackjackGame game) {
-        super(client, game.getDuration());
+    public BlackjackInputs(GatewayDiscordClient gateway, BlackjackGame game) {
+        super(gateway, game.getDuration());
         this.game = game;
     }
 
