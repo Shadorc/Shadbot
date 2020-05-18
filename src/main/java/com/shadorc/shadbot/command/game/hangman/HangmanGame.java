@@ -131,7 +131,7 @@ public class HangmanGame extends Game {
                 .getMessageById(this.getContext().getChannelId(), Snowflake.of(this.messageId.get()))
                 .flatMap(message -> message.edit(spec -> spec.setEmbed(embedConsumer)))
                 .switchIfEmpty(Mono.error(new RuntimeException("Message not found.")))
-                // An error can occur of the message if the message is not found or if the message id is -1
+                // An error can occur if the message is not found or if the message id is -1
                 .onErrorResume(err -> this.getContext().getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
                 .map(Message::getId)
