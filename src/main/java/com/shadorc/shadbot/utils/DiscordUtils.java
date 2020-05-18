@@ -150,9 +150,11 @@ public class DiscordUtils {
         return guild.getMembers()
                 .filter(member -> words.contains(member.getDisplayName())
                         || words.contains(String.format("@%s", member.getDisplayName()))
-                        || words.contains(member.getMention())
                         || words.contains(member.getUsername())
                         || words.contains(String.format("@%s", member.getUsername()))
+                        || words.contains(member.getTag())
+                        || words.contains(String.format("@%s", member.getTag()))
+                        || words.contains(member.getMention())
                         || words.contains(member.getNicknameMention()));
     }
 
