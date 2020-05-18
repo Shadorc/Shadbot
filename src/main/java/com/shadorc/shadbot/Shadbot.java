@@ -102,7 +102,6 @@ public class Shadbot {
 
         DEFAULT_LOGGER.info("Connecting to Discord...");
         client.gateway()
-                .setMaxMissedHeartbeatAck(2)
                 .setAwaitConnections(false)
                 .setEntityRetrievalStrategy(gateway -> new DistinctFallbackEntityRetriever(
                         EntityRetrievalStrategy.STORE.apply(gateway), new SpyRestEntityRetriever(gateway)))
