@@ -77,7 +77,7 @@ public class CommandManager {
                 new ManageCoinsCmd(), new PruneCmd(), new KickCmd(), new SoftBanCmd(), new BanCmd(),
                 new IamCmd(), new SettingsCmd(),
                 // Owner Commands
-                new LoggerCmd(), new LeaveCmd(), new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(),
+                new LoggerCmd(), new LeaveGuildCmd(), new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(),
                 new EnableCommandCmd(), new ManageAchievementsCmd(),
                 // Hidden Commands
                 new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd(), new PrefixCmd());

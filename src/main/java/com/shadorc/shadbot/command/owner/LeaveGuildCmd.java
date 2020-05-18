@@ -19,10 +19,10 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class LeaveCmd extends BaseCmd {
+public class LeaveGuildCmd extends BaseCmd {
 
-    public LeaveCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("leave"));
+    public LeaveGuildCmd() {
+        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("leave_guild"));
     }
 
     @Override
