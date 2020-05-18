@@ -9,11 +9,9 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
@@ -47,20 +45,24 @@ public class ManageAchievementsCmd extends BaseCmd {
         if (userId == null) {
             return Mono.error(new CommandException("Invalid user ID."));
         }
-        return DatabaseManager.getUsers().getDBUser(Snowflake.of(userId))
-                .flatMap(dbUser -> {
-                    switch (action) {
-                        case ADD:
-                            return dbUser.unlockAchievement(achievement);
-                        case REMOVE:
-                            return dbUser.lockAchievement(achievement);
-                        default:
-                            return Mono.error(new IllegalStateException(String.format("Unknown action: %s", action)));
-                    }
-                })
-                .then(context.getChannel())
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s %s to %d done.",
-                        action, achievement.getTitle(), userId), channel))
+        return context.getClient()
+                .getUserById(Snowflake.of(userId))
+                .onErrorResume(ClientException.isStatusCode(403), err -> Mono.empty())
+                .flatMap(user -> DatabaseManager.getUsers().getDBUser(user.getId())
+                        .flatMap(dbUser -> {
+                            switch (action) {
+                                case ADD:
+                                    return dbUser.unlockAchievement(achievement);
+                                case REMOVE:
+                                    return dbUser.lockAchievement(achievement);
+                                default:
+                                    return Mono.error(new IllegalStateException(String.format("Unknown action: %s", action)));
+                            }
+                        })
+                        .then(context.getChannel())
+                        .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s **%s** to **%s** done.",
+                                StringUtils.capitalizeEnum(action), achievement.getTitle(), user.getTag()), channel)))
+                .switchIfEmpty(Mono.error(new CommandException("User not found.")))
                 .then();
     }
 
