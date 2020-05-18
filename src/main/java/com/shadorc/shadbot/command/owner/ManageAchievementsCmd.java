@@ -13,6 +13,7 @@ import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.Snowflake;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -47,7 +48,8 @@ public class ManageAchievementsCmd extends BaseCmd {
         }
         return context.getClient()
                 .getUserById(Snowflake.of(userId))
-                .onErrorResume(ClientException.isStatusCode(403), err -> Mono.empty())
+                .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
+                        err -> Mono.empty())
                 .flatMap(user -> DatabaseManager.getUsers().getDBUser(user.getId())
                         .flatMap(dbUser -> {
                             switch (action) {
