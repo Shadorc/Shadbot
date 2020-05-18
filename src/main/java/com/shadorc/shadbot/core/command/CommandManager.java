@@ -73,6 +73,7 @@ public class CommandManager {
                 // Info Commands
                 new PingCmd(), new InfoCmd(), new UserInfoCmd(), new ServerInfoCmd(),
                 new RolelistCmd(), new FeedbackCmd(), new InviteCmd(), new AchievementsCmd(),
+                new VoteCmd(),
                 // Admin Commands
                 new ManageCoinsCmd(), new PruneCmd(), new KickCmd(), new SoftBanCmd(), new BanCmd(),
                 new IamCmd(), new SettingsCmd(),
