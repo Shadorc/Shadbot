@@ -12,14 +12,11 @@ import discord4j.core.object.entity.Message;
 import discord4j.rest.util.Snowflake;
 import io.prometheus.client.Counter;
 import reactor.core.publisher.Mono;
-import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.time.Instant;
 
 public class MessageProcessor {
 
-    private static final Logger LOGGER = Loggers.getLogger("shadbot.processor");
     private static final Counter COMMAND_USAGE_COUNTER = Counter.build()
             .namespace("shadbot").name("command_usage").help("Command usage")
             .labelNames("command").register();
