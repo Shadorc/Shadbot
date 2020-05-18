@@ -108,12 +108,11 @@ public class MessageProcessor {
 
         // The command has been temporarly disabled by the bot's owner
         if (!command.isEnabled()) {
+            final String text = String.format(Emoji.ACCESS_DENIED + " (**%s**) Sorry, this command is temporary " +
+                            "disabled. Do not hesitate to join the support server (<%s>) if you have any questions.",
+                    context.getUsername(), Config.SUPPORT_SERVER_URL);
             return context.getChannel()
-                    .flatMap(channel -> DiscordUtils.sendMessage(
-                            String.format(Emoji.ACCESS_DENIED + " (**%s**) Sorry, this command is temporary disabled." +
-                                            " Do not hesitate to join the support server (<%s>) if you have any " +
-                                            "questions.",
-                                    context.getUsername(), Config.SUPPORT_SERVER_URL), channel))
+                    .flatMap(channel -> DiscordUtils.sendMessage(text, channel))
                     .then();
         }
 
