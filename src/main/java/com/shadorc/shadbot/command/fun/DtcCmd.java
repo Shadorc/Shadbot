@@ -62,7 +62,7 @@ public class DtcCmd extends BaseCmd {
 
     private String formatContent(String content) {
         final String formattedContent = content.replace("*", "\\*");
-        return FormatUtils.format(content.split("\n"), this::formatLine, "\n");
+        return FormatUtils.format(formattedContent.split("\n"), this::formatLine, "\n");
     }
 
     private String formatLine(String line) {
