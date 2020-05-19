@@ -132,12 +132,20 @@ public class DiscordUtils {
     }
 
     public static Mono<Member> extractMemberOrAuthor(Guild guild, Message message) {
-        return message
-                .getUserMentions()
+        final String[] args = message.getContent().split(" ");
+        if (args.length == 1) {
+            return message.getAuthorAsMember();
+        }
+
+        if (args.length > 2) {
+            return Mono.error(new CommandException("You can't specify more than one user."));
+        }
+
+        return message.getUserMentions()
                 .switchIfEmpty(DiscordUtils.extractMembers(guild, message.getContent()))
                 .next()
                 .flatMap(user -> user.asMember(guild.getId()))
-                .switchIfEmpty(message.getAuthorAsMember());
+                .switchIfEmpty(Mono.error(new CommandException(String.format("User **%s** not found.", args[1]))));
     }
 
     /**
