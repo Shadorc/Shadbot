@@ -80,7 +80,7 @@ public class RpsCmd extends BaseCmd {
 
     private RpsPlayer getOrCreatePlayer(Context context) {
         return this.players.computeIfAbsent(Tuples.of(context.getGuildId(), context.getAuthorId()),
-                ignored -> new RpsPlayer(context.getGuildId(), context.getAuthorId()));
+                TupleUtils.function(RpsPlayer::new));
     }
 
     @Override

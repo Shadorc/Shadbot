@@ -24,8 +24,4 @@ public class GamblerPlayer extends Player {
         return this.win(this.bet);
     }
 
-    public Mono<Void> draw() {
-        return this.cancelBet();
-    }
-
 }
