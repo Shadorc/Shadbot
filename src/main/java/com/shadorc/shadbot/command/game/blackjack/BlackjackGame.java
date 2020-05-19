@@ -29,6 +29,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
             .help("Blackjack game")
             .labelNames("result")
             .register();
+    private static final float WIN_MULTIPLICATOR = 2.0f;
 
     private final RateLimiter rateLimiter;
     private final UpdatableMessage updatableMessage;
@@ -81,7 +82,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
 
                     switch (BlackjackGame.getResult(playerValue, dealerValue)) {
                         case 1:
-                            final long coins = Math.min(player.getBet(), Config.MAX_COINS);
+                            final long coins = Math.min((long) (player.getBet() * WIN_MULTIPLICATOR), Config.MAX_COINS);
                             BLACKJACK_SUMMARY.labels("win").observe(coins);
                             return player.cancelBet()
                                     .then(player.win(coins))
@@ -93,7 +94,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                                     .thenReturn(String.format("**%s** (Losses: **%s**)",
                                             username, FormatUtils.coins(player.getBet())));
                         default:
-                            return player.draw()
+                            return player.cancelBet()
                                     .thenReturn(String.format("**%s** (Draw)", username));
                     }
                 })
