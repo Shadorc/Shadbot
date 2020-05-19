@@ -2,7 +2,6 @@ package com.shadorc.shadbot.command.game.roulette;
 
 import com.shadorc.shadbot.command.game.roulette.RouletteCmd.Place;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
@@ -19,7 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
+public class RouletteGame extends MultiplayerGame<RouletteCmd, RoulettePlayer> {
 
     private static final Summary ROULETTE_SUMMARY = Summary.build()
             .name("game_roulette")
@@ -40,7 +39,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
     private long startTime;
     private String results;
 
-    public RouletteGame(GameCmd<RouletteGame> gameCmd, Context context) {
+    public RouletteGame(RouletteCmd gameCmd, Context context) {
         super(gameCmd, context, Duration.ofSeconds(30));
         this.updatableMessage = new UpdatableMessage(context.getClient(), context.getChannelId());
     }

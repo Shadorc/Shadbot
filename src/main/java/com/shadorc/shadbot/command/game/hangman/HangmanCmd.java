@@ -46,7 +46,8 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                             .putIfAbsent(context.getChannelId(), new HangmanGame(this, context, difficulty));
                     if (hangmanManager == null) {
                         final HangmanGame newHangmanManager = this.getManagers().get(context.getChannelId());
-                        return newHangmanManager.start().then(newHangmanManager.show());
+                        return newHangmanManager.start()
+                                .then(newHangmanManager.show());
                     } else {
                         return context.getChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(
@@ -70,15 +71,12 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
         return Mono.empty();
     }
 
-    protected String getWord(Difficulty difficulty) {
-        switch (difficulty) {
-            case EASY:
-                return this.easyWords.getRandomWord();
-            case HARD:
-                return this.hardWords.getRandomWord();
-            default:
-                throw new RuntimeException(String.format("Unknown difficulty: %s", difficulty));
-        }
+    protected WordsList getEasyWords() {
+        return this.easyWords;
+    }
+
+    protected WordsList getHardWords() {
+        return this.hardWords;
     }
 
     @Override
@@ -88,7 +86,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                 .addArg("difficulty", String.format("%s. The difficulty of the word to find",
                         FormatUtils.format(Difficulty.class, "/")), true)
                 .addField("Gains", String.format("The winner gets **%s** plus a bonus (**%s max.**) depending " +
-                                "on his number of errors.",
+                                "on his number of errors and the difficulty.",
                         FormatUtils.coins(HangmanGame.MIN_GAINS),
                         FormatUtils.coins(HangmanGame.MAX_BONUS)), false)
                 .build();

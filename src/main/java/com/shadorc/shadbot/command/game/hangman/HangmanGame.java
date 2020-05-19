@@ -23,16 +23,13 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class HangmanGame extends Game {
+public class HangmanGame extends Game<HangmanCmd> {
 
     protected static final int MIN_GAINS = 500;
     protected static final int MAX_BONUS = 1000;
 
-    private static final Summary HANGMAN_SUMMARY = Summary.build()
-            .name("game_hangman")
-            .help("Hangman game")
-            .labelNames("result")
-            .register();
+    private static final Summary HANGMAN_SUMMARY = Summary.build().name("game_hangman").help("Hangman game")
+            .labelNames("result").register();
     private static final List<String> IMG_LIST = List.of(
             HangmanGame.getImageUrl("8/8b", 0),
             HangmanGame.getImageUrl("3/30", 1),
@@ -57,7 +54,7 @@ public class HangmanGame extends Game {
         this.difficulty = difficulty;
         this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(1));
         this.messageId = new AtomicLong(-1);
-        this.word = gameCmd.getWord(difficulty);
+        this.word = this.getWord(difficulty);
         this.lettersTested = new HashSet<>();
         this.failCount = 0;
     }
@@ -73,24 +70,24 @@ public class HangmanGame extends Game {
 
     @Override
     public Mono<Void> end() {
-        return Mono.just(new StringBuilder())
-                .flatMap(strBuilder -> {
-                    if (this.failCount == IMG_LIST.size()) {
-                        return Mono.just(strBuilder.append(
-                                String.format(Emoji.THUMBSDOWN + " (**%s**) You lose, the word to guess was **%s** !",
-                                        this.getContext().getUsername(), this.word)));
-                    } else {
-                        final float imagesRemaining = IMG_LIST.size() - this.failCount;
-                        final int difficultyMultiplicator = this.difficulty == HangmanCmd.Difficulty.HARD ? 4 : 1;
-                        final int gains = (int) (MIN_GAINS + Math.ceil(BONUS_PER_IMAGE * imagesRemaining) * difficultyMultiplicator);
-                        HANGMAN_SUMMARY.labels("win").observe(gains);
-                        return new Player(this.getContext().getGuildId(), this.getContext().getAuthorId())
-                                .win(gains)
-                                .thenReturn(strBuilder.append(
-                                        String.format(Emoji.PURSE + " (**%s**) Well played, you found the word ! You won **%s**.",
-                                                this.getContext().getUsername(), FormatUtils.coins(gains))));
-                    }
-                })
+        return Mono.defer(() -> {
+            final StringBuilder strBuilder = new StringBuilder();
+            if (this.failCount == IMG_LIST.size()) {
+                return Mono.just(strBuilder.append(
+                        String.format(Emoji.THUMBSDOWN + " (**%s**) You lose, the word to guess was **%s** !",
+                                this.getContext().getUsername(), this.word)));
+            } else {
+                final float imagesRemaining = IMG_LIST.size() - this.failCount;
+                final int difficultyMultiplicator = this.difficulty == HangmanCmd.Difficulty.HARD ? 4 : 1;
+                final int gains = (int) (MIN_GAINS + Math.ceil(BONUS_PER_IMAGE * imagesRemaining) * difficultyMultiplicator);
+                HANGMAN_SUMMARY.labels("win").observe(gains);
+                return new Player(this.getContext().getGuildId(), this.getContext().getAuthorId())
+                        .win(gains)
+                        .thenReturn(strBuilder.append(
+                                String.format(Emoji.PURSE + " (**%s**) Well played, you found the word ! You won **%s**.",
+                                        this.getContext().getUsername(), FormatUtils.coins(gains))));
+            }
+        })
                 .map(StringBuilder::toString)
                 .flatMap(text -> this.show()
                         .then(this.getContext().getChannel())
@@ -143,7 +140,18 @@ public class HangmanGame extends Game {
                 .then();
     }
 
-    public Mono<Void> checkLetter(String chr) {
+    private String getWord(HangmanCmd.Difficulty difficulty) {
+        switch (difficulty) {
+            case EASY:
+                return this.getGameCmd().getEasyWords().getRandomWord();
+            case HARD:
+                return this.getGameCmd().getHardWords().getRandomWord();
+            default:
+                throw new RuntimeException(String.format("Unknown difficulty: %s", difficulty));
+        }
+    }
+
+    protected Mono<Void> checkLetter(String chr) {
         if (this.lettersTested.contains(chr)) {
             return Mono.empty();
         }
@@ -165,7 +173,7 @@ public class HangmanGame extends Game {
         return this.show();
     }
 
-    public Mono<Void> checkWord(String word) {
+    protected Mono<Void> checkWord(String word) {
         // If the word has been guessed
         if (this.word.equalsIgnoreCase(word)) {
             this.lettersTested.addAll(StringUtils.split(word, ""));

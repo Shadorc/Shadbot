@@ -3,7 +3,6 @@ package com.shadorc.shadbot.command.game.trivia;
 import com.shadorc.shadbot.api.json.trivia.TriviaResponse;
 import com.shadorc.shadbot.api.json.trivia.TriviaResult;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
 import com.shadorc.shadbot.core.game.player.Player;
 import com.shadorc.shadbot.object.Emoji;
@@ -26,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
+public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
 
     private static final Summary TRIVIA_SUMMARY = Summary.build()
             .name("game_trivia")
@@ -44,7 +43,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
     private long startTime;
 
     // Trivia API doc : https://opentdb.com/api_config.php
-    public TriviaGame(GameCmd<TriviaGame> gameCmd, Context context, @Nullable Integer categoryId) {
+    public TriviaGame(TriviaCmd gameCmd, Context context, @Nullable Integer categoryId) {
         super(gameCmd, context, Duration.ofSeconds(30));
         this.categoryId = categoryId;
         this.answers = new ArrayList<>();

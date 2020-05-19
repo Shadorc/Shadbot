@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.command.game.blackjack;
 
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.data.Config;
@@ -22,7 +21,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
+public class BlackjackGame extends MultiplayerGame<BlackjackCmd, BlackjackPlayer> {
 
     private static final Summary BLACKJACK_SUMMARY = Summary.build()
             .name("game_blackjack")
@@ -40,7 +39,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
 
     private long startTime;
 
-    public BlackjackGame(GameCmd<BlackjackGame> gameCmd, Context context) {
+    public BlackjackGame(BlackjackCmd gameCmd, Context context) {
         super(gameCmd, context, Duration.ofMinutes(1));
 
         this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(2));

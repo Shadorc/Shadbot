@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.command.game.dice;
 
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
@@ -17,7 +16,7 @@ import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-public class DiceGame extends MultiplayerGame<DicePlayer> {
+public class DiceGame extends MultiplayerGame<DiceCmd, DicePlayer> {
 
     private static final Summary DICE_SUMMARY = Summary.build()
             .name("game_dice")
@@ -31,7 +30,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
     private long startTime;
     private String results;
 
-    public DiceGame(GameCmd<DiceGame> gameCmd, Context context, long bet) {
+    public DiceGame(DiceCmd gameCmd, Context context, long bet) {
         super(gameCmd, context, Duration.ofSeconds(30));
         this.bet = bet;
         this.updatableMessage = new UpdatableMessage(context.getClient(), context.getChannelId());
@@ -55,7 +54,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                     final DicePlayer player = tuple.getT1();
                     final String username = tuple.getT2();
                     if (player.getNumber() == winningNum) {
-                        long gains = Math.min((long) (this.bet * (this.getPlayers().size() + DiceCmd.MULTIPLIER)), Config.MAX_COINS);
+                        final long gains = Math.min((long) (this.bet * (this.getPlayers().size() + DiceCmd.MULTIPLIER)), Config.MAX_COINS);
                         DICE_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
                                 .thenReturn(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains)));

@@ -13,15 +13,15 @@ import reactor.core.scheduler.Schedulers;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class Game {
+public abstract class Game<G extends GameCmd<?>> {
 
-    private final GameCmd<?> gameCmd;
+    private final G gameCmd;
     private final Context context;
     private final Duration duration;
     private final AtomicBoolean isScheduled;
     private Disposable scheduledTask;
 
-    protected Game(GameCmd<?> gameCmd, Context context, Duration duration) {
+    protected Game(G gameCmd, Context context, Duration duration) {
         this.gameCmd = gameCmd;
         this.context = context;
         this.duration = duration;
@@ -90,6 +90,10 @@ public abstract class Game {
      */
     public boolean isScheduled() {
         return this.scheduledTask != null && this.isScheduled.get();
+    }
+
+    public G getGameCmd() {
+        return this.gameCmd;
     }
 
     public Context getContext() {
