@@ -13,9 +13,13 @@ public class TriviaInputs extends Inputs {
 
     private final TriviaGame game;
 
-    public TriviaInputs(GatewayDiscordClient gateway, TriviaGame game) {
+    private TriviaInputs(GatewayDiscordClient gateway, TriviaGame game) {
         super(gateway, game.getDuration());
         this.game = game;
+    }
+
+    public static TriviaInputs create(GatewayDiscordClient gateway, TriviaGame game) {
+        return new TriviaInputs(gateway, game);
     }
 
     @Override

@@ -64,7 +64,7 @@ public class HangmanGame extends Game<HangmanCmd> {
         return Mono.fromRunnable(() -> {
             this.schedule(Mono.fromRunnable(this::stop));
             this.startTime = System.currentTimeMillis();
-            new HangmanInputs(this.getContext().getClient(), this).subscribe();
+            HangmanInputs.create(this.getContext().getClient(), this).listen();
         });
     }
 

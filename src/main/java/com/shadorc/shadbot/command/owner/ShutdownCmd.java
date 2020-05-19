@@ -28,8 +28,7 @@ public class ShutdownCmd extends BaseCmd {
                         String.format(Emoji.QUESTION + " (**%s**) Do you really want to shutdown ? y/n",
                                 context.getUsername()), channel))
                 .then(Mono.fromRunnable(() ->
-                        new ConfirmInputs(context.getClient(), Duration.ofSeconds(15), Shadbot.quit())
-                                .subscribe()));
+                        ConfirmInputs.create(context.getClient(), Duration.ofSeconds(15), Shadbot.quit()).listen()));
     }
 
     @Override

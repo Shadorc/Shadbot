@@ -49,7 +49,7 @@ public class RouletteGame extends MultiplayerGame<RouletteCmd, RoulettePlayer> {
         return Mono.fromRunnable(() -> {
             this.schedule(this.end());
             this.startTime = System.currentTimeMillis();
-            new RouletteInputs(this.getContext().getClient(), this).subscribe();
+            RouletteInputs.create(this.getContext().getClient(), this).listen();
         });
     }
 

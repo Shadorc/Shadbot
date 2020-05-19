@@ -13,9 +13,13 @@ public class DiceInputs extends Inputs {
 
     private final DiceGame game;
 
-    public DiceInputs(GatewayDiscordClient gateway, DiceGame game) {
+    private DiceInputs(GatewayDiscordClient gateway, DiceGame game) {
         super(gateway, game.getDuration());
         this.game = game;
+    }
+
+    public static DiceInputs create(GatewayDiscordClient gateway, DiceGame game) {
+        return new DiceInputs(gateway, game);
     }
 
     @Override

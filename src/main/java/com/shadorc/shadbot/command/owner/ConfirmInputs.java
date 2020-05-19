@@ -15,10 +15,14 @@ public class ConfirmInputs extends Inputs {
     private final Mono<Void> task;
     private final AtomicBoolean isCancelled;
 
-    public ConfirmInputs(GatewayDiscordClient gateway, Duration timeout, Mono<Void> task) {
+    private ConfirmInputs(GatewayDiscordClient gateway, Duration timeout, Mono<Void> task) {
         super(gateway, timeout);
         this.task = task;
         this.isCancelled = new AtomicBoolean(false);
+    }
+
+    public static ConfirmInputs create(GatewayDiscordClient gateway, Duration timeout, Mono<Void> task) {
+        return new ConfirmInputs(gateway, timeout, task);
     }
 
     @Override

@@ -13,9 +13,13 @@ public class RouletteInputs extends Inputs {
 
     private final RouletteGame game;
 
-    public RouletteInputs(GatewayDiscordClient gateway, RouletteGame game) {
+    private RouletteInputs(GatewayDiscordClient gateway, RouletteGame game) {
         super(gateway, game.getDuration());
         this.game = game;
+    }
+
+    public static RouletteInputs create(GatewayDiscordClient gateway, RouletteGame game) {
+        return new RouletteInputs(gateway, game);
     }
 
     @Override

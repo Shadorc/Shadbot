@@ -27,7 +27,7 @@ public abstract class Inputs {
                 .take(this.timeout);
     }
 
-    public void subscribe() {
+    public void listen() {
         this.waitForInputs()
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);

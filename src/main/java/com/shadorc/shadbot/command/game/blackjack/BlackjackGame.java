@@ -64,7 +64,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackCmd, BlackjackPlayer
 
             this.schedule(this.end());
             this.startTime = System.currentTimeMillis();
-            new BlackjackInputs(this.getContext().getClient(), this).subscribe();
+            BlackjackInputs.create(this.getContext().getClient(), this).listen();
         });
     }
 

@@ -32,8 +32,6 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
             .help("Trivia game")
             .labelNames("result")
             .register();
-    protected static final int MIN_GAINS = 200;
-    protected static final int MAX_BONUS = 200;
 
     @Nullable
     private final Integer categoryId;
@@ -51,7 +49,8 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
 
     @Override
     public Mono<Void> start() {
-        final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s", Objects.toString(this.categoryId, ""));
+        final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s",
+                Objects.toString(this.categoryId, ""));
         return NetUtils.get(url, TriviaResponse.class)
                 .map(TriviaResponse::getResults)
                 .map(list -> list.get(0))
@@ -68,7 +67,7 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
 
                     this.schedule(this.end());
                     this.startTime = System.currentTimeMillis();
-                    new TriviaInputs(this.getContext().getClient(), this).subscribe();
+                    TriviaInputs.create(this.getContext().getClient(), this).listen();
                 })
                 .then();
     }
@@ -106,9 +105,9 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
     }
 
     protected Mono<Message> win(Member member) {
-        final double coinsPerSec = (double) MAX_BONUS / this.getDuration().toSeconds();
+        final double coinsPerSec = (double) Constants.MAX_BONUS / this.getDuration().toSeconds();
         final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-        final long gains = (long) Math.ceil(MIN_GAINS + remainingDuration.toSeconds() * coinsPerSec);
+        final long gains = (long) Math.ceil(Constants.MIN_GAINS + remainingDuration.toSeconds() * coinsPerSec);
 
         this.stop();
 

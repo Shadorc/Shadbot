@@ -25,9 +25,13 @@ public class AudioLoadResultInputs extends Inputs {
 
     private final AudioLoadResultListener listener;
 
-    public AudioLoadResultInputs(GatewayDiscordClient gateway, Duration timeout, AudioLoadResultListener listener) {
+    private AudioLoadResultInputs(GatewayDiscordClient gateway, Duration timeout, AudioLoadResultListener listener) {
         super(gateway, timeout);
         this.listener = listener;
+    }
+
+    public static AudioLoadResultInputs create(GatewayDiscordClient gateway, Duration timeout, AudioLoadResultListener listener) {
+        return new AudioLoadResultInputs(gateway, timeout, listener);
     }
 
     @Override

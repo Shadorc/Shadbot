@@ -41,7 +41,7 @@ public class DiceGame extends MultiplayerGame<DiceCmd, DicePlayer> {
         return Mono.fromRunnable(() -> {
             this.schedule(this.end());
             this.startTime = System.currentTimeMillis();
-            new DiceInputs(this.getContext().getClient(), this).subscribe();
+            DiceInputs.create(this.getContext().getClient(), this).listen();
         });
     }
 

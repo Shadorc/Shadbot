@@ -38,7 +38,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
 
                     if (context.getArg().isPresent()) {
                         // Display a list of available categories
-                        if ("categories".equalsIgnoreCase(context.getArg().get())) {
+                        if ("categories".equalsIgnoreCase(context.getArg().orElseThrow())) {
                             final String ids = FormatUtils.format(this.categories.getIds(), Object::toString, "\n");
                             final String names = String.join("\n", this.categories.getNames());
                             final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
@@ -54,9 +54,9 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
                         // The user tries to access a category that does not exist
                         else if (!this.categories.getIds().contains(categoryId)) {
                             return Mono.error(new CommandException(
-                                    String.format("`%s` is not a valid ID. Use `%s%s categories` to see the "
+                                    String.format("`%d` is not a valid ID. Use `%s%s categories` to see the "
                                                     + "complete list of available categories.",
-                                            context.getArg().get(), context.getPrefix(), this.getName())));
+                                            categoryId, context.getPrefix(), this.getName())));
                         }
                     }
 
@@ -96,7 +96,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
                         context.getPrefix(), this.getName()), false)
                 .addField("Gains", String.format("The winner gets **%s** plus a bonus (**%s max.**) depending " +
                                 "on his speed to answer.",
-                        FormatUtils.coins(TriviaGame.MIN_GAINS), FormatUtils.coins(TriviaGame.MAX_BONUS)), false)
+                        FormatUtils.coins(Constants.MIN_GAINS), FormatUtils.coins(Constants.MAX_BONUS)), false)
                 .build();
     }
 }
