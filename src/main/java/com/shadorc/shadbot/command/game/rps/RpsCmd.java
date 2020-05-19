@@ -25,18 +25,15 @@ import java.util.function.Consumer;
 
 public class RpsCmd extends BaseCmd {
 
-    private static final Summary RPS_SUMMARY = Summary.build()
-            .name("game_rps")
-            .help("RPS game")
-            .labelNames("result")
-            .register();
-    private static final int GAINS = 300;
+    private static final Summary RPS_SUMMARY = Summary.build().name("game_rps").help("RPS game")
+            .labelNames("result").register();
 
     private final Map<Tuple2<Snowflake, Snowflake>, RpsPlayer> players;
 
     public RpsCmd() {
         super(CommandCategory.GAME, List.of("rps"));
         this.setGameRateLimiter();
+
         this.players = new ConcurrentHashMap<>();
     }
 
@@ -54,11 +51,11 @@ public class RpsCmd extends BaseCmd {
                 context.getUsername(), userHandsign.getHandsign(), userHandsign.getEmoji(),
                 botHandsign.getEmoji(), botHandsign.getHandsign()));
 
-        return Mono.just(this.getOrCreatePlayer(context))
+        return Mono.just(this.getPlayer(context.getGuildId(), context.getAuthorId()))
                 .flatMap(player -> {
                     if (userHandsign.isSuperior(botHandsign)) {
                         final int winStreak = player.getWinStreak().incrementAndGet();
-                        final long gains = Math.min((long) GAINS * winStreak, Config.MAX_COINS);
+                        final long gains = Math.min((long) Constants.GAINS * winStreak, Config.MAX_COINS);
                         RPS_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
                                 .thenReturn(strBuilder.append(
@@ -79,9 +76,8 @@ public class RpsCmd extends BaseCmd {
                 .then();
     }
 
-    private RpsPlayer getOrCreatePlayer(Context context) {
-        return this.players.computeIfAbsent(Tuples.of(context.getGuildId(), context.getAuthorId()),
-                TupleUtils.function(RpsPlayer::new));
+    private RpsPlayer getPlayer(Snowflake guildId, Snowflake userId) {
+        return this.players.computeIfAbsent(Tuples.of(guildId, userId), TupleUtils.function(RpsPlayer::new));
     }
 
     @Override
@@ -90,7 +86,7 @@ public class RpsCmd extends BaseCmd {
                 .setDescription("Play a Rock–paper–scissors game.")
                 .addArg("handsign", FormatUtils.format(Handsign.values(), Handsign::getHandsign, ", "), false)
                 .addField("Gains", String.format("The winner gets **%s** multiplied by his win-streak.",
-                        FormatUtils.coins(GAINS)), false)
+                        FormatUtils.coins(Constants.GAINS)), false)
                 .build();
     }
 
