@@ -33,8 +33,8 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
             .help("Trivia game")
             .labelNames("result")
             .register();
-    protected static final int MIN_GAINS = 100;
-    protected static final int MAX_BONUS = 150;
+    protected static final int MIN_GAINS = 200;
+    protected static final int MAX_BONUS = 200;
 
     @Nullable
     private final Integer categoryId;
