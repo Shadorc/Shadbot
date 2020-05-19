@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.listener;
 
+import com.shadorc.shadbot.cache.GuildOwnersCache;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
 import io.prometheus.client.Gauge;
 import reactor.core.publisher.Mono;
@@ -14,6 +15,8 @@ public class GuildCreateListener implements EventListener<GuildCreateEvent> {
             .help("Guild count")
             .register();
 
+    public static final GuildOwnersCache GUILD_OWNERS_CACHE = new GuildOwnersCache();
+
     @Override
     public Class<GuildCreateEvent> getEventType() {
         return GuildCreateEvent.class;
@@ -27,6 +30,7 @@ public class GuildCreateListener implements EventListener<GuildCreateEvent> {
             DEFAULT_LOGGER.debug("{Guild ID: {}} Connected ({} users)", guildId, memberCount);
 
             GUILD_COUNT_GAUGE.inc();
+            GUILD_OWNERS_CACHE.put(event.getGuild().getId(), event.getGuild().getOwnerId());
         });
     }
 
