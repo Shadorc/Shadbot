@@ -54,7 +54,7 @@ public class CommandManager {
                 new WeatherCmd(), new MathCmd(), new TranslateCmd(), new WikiCmd(), new PollCmd(),
                 new UrbanCmd(), new LyricsCmd(),
                 // Fun Commands
-                new ChatCmd(), new ThisDayCmd(), new LeetCmd(), new JokeCmd(), new DtcCmd(),
+                new ChatCmd(), new ThisDayCmd(), new JokeCmd(), new DtcCmd(),
                 // Image Commands
                 new GifCmd(), new ImageCmd(), new WallpaperCmd(), new SuicideGirlsCmd(),
                 new Rule34Cmd(), new XkcdCmd(),
