@@ -57,7 +57,8 @@ public enum Emoji {
 
     BALLOT_BOX("ballot_box"),
     BUG("bug"),
-    ROCKET("rocket");
+    ROCKET("rocket"),
+    BROCKEN_HEART("broken_heart");
 
     private final String discordNotation;
 
