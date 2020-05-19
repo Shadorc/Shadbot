@@ -64,7 +64,12 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                     if (coins >= 1_000_000_000) {
                         return DatabaseManager.getUsers()
                                 .getDBUser(this.getId())
-                                .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.MONEY));
+                                .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.CROESUS));
+                    }
+                    if (coins >= 1_000_000) {
+                        return DatabaseManager.getUsers()
+                                .getDBUser(this.getId())
+                                .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.MILLIONAIRE));
                     }
                     return Mono.empty();
                 }));
