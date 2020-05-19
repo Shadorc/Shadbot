@@ -17,7 +17,8 @@ public class MemberLeaveListener implements EventListener<MemberLeaveEvent> {
 
     private static final String TEXT = String.format("I'm not part of your server anymore, thanks for having tested me!" +
             "%nIf you encountered an issue or want to let me know what could be improved, " +
-            "do not hesitate to join my support server and tell me! %s", Config.SUPPORT_SERVER_URL);
+            "do not hesitate to join my support server and tell me!" +
+            "%n%s", Config.SUPPORT_SERVER_URL);
 
     @Override
     public Class<MemberLeaveEvent> getEventType() {
