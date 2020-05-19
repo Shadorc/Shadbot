@@ -9,6 +9,7 @@ import com.shadorc.shadbot.utils.ExceptionHandler;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.User;
 import discord4j.rest.util.Snowflake;
 import io.prometheus.client.Counter;
 import reactor.core.publisher.Mono;
@@ -27,6 +28,11 @@ public class MessageProcessor {
             Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
 
     public static Mono<Void> processEvent(MessageCreateEvent event) {
+        // The message is a webhook or a bot, ignore
+        if (event.getMessage().getAuthor().map(User::isBot).orElse(true)) {
+            return Mono.empty();
+        }
+
         return Mono.justOrEmpty(event.getGuildId())
                 // This is a private channel, there is no guild ID
                 .switchIfEmpty(MessageProcessor.processPrivateMessage(event).then(Mono.empty()))
@@ -42,7 +48,7 @@ public class MessageProcessor {
         return event.getMessage()
                 .getChannel()
                 .filterWhen(channel -> channel.getMessagesBefore(Snowflake.of(Instant.now()))
-                        .take(25)
+                        .take(20)
                         .map(Message::getContent)
                         .filter(DM_TEXT::equals)
                         .hasElements()
@@ -63,8 +69,6 @@ public class MessageProcessor {
 
     private static Mono<Void> processCommand(MessageCreateEvent event, DBGuild dbGuild) {
         return Mono.justOrEmpty(event.getMember())
-                // The author is not a bot or is not the bot used for auto-testing
-                .filter(member -> !member.isBot() || member.getId().equals(Config.TESTBOT_ID))
                 .flatMap(member -> Mono.zip(member.getRoles().collectList(),
                         event.getGuild().map(Guild::getOwnerId).map(member.getId()::equals)))
                 // The role is allowed or the author is the guild's owner
