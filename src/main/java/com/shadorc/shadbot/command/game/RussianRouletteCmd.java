@@ -25,13 +25,13 @@ public class RussianRouletteCmd extends BaseCmd {
             .labelNames("result")
             .register();
 
-    private static final int PAID_COST = 250;
+    private static final int PAID_COST = 50;
 
-    private static final int MIN_GAINS = 1500;
-    private static final int MAX_GAINS = 6000;
+    private static final int MIN_GAINS = 300;
+    private static final int MAX_GAINS = 1200;
 
-    private static final int MIN_LOSE = 4000;
-    private static final int MAX_LOSE = 12000;
+    private static final int MIN_LOSE = 800;
+    private static final int MAX_LOSE = 2400;
 
     public RussianRouletteCmd() {
         super(CommandCategory.GAME, List.of("russian_roulette", "russian-roulette", "russianroulette"), "rr");
