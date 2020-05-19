@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 
 public class HangmanGame extends Game {
 
+    protected static final int MIN_GAINS = 200;
+    protected static final int MAX_BONUS = 200;
+
     private static final Summary HANGMAN_SUMMARY = Summary.build()
             .name("game_hangman")
             .help("Hangman game")
@@ -38,10 +41,9 @@ public class HangmanGame extends Game {
             HangmanGame.getImageUrl("2/27", 4),
             HangmanGame.getImageUrl("6/6b", 5),
             HangmanGame.getImageUrl("d/d6", 6));
+    private static final float BONUS_PER_IMAGE = (float) MAX_BONUS / IMG_LIST.size();
 
-    protected static final int MIN_GAINS = 200;
-    protected static final int MAX_BONUS = 200;
-
+    private final HangmanCmd.Difficulty difficulty;
     private final RateLimiter rateLimiter;
     private final AtomicLong messageId;
     private final String word;
@@ -52,6 +54,7 @@ public class HangmanGame extends Game {
 
     public HangmanGame(HangmanCmd gameCmd, Context context, HangmanCmd.Difficulty difficulty) {
         super(gameCmd, context, Duration.ofMinutes(3));
+        this.difficulty = difficulty;
         this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(1));
         this.messageId = new AtomicLong(-1);
         this.word = gameCmd.getWord(difficulty);
@@ -77,9 +80,9 @@ public class HangmanGame extends Game {
                                 String.format(Emoji.THUMBSDOWN + " (**%s**) You lose, the word to guess was **%s** !",
                                         this.getContext().getUsername(), this.word)));
                     } else {
-                        final float bonusPerImg = (float) MAX_BONUS / IMG_LIST.size();
                         final float imagesRemaining = IMG_LIST.size() - this.failCount;
-                        final int gains = (int) Math.ceil(MIN_GAINS + bonusPerImg * imagesRemaining);
+                        final int difficultyMultiplicator = this.difficulty == HangmanCmd.Difficulty.HARD ? 4 : 1;
+                        final int gains = (int) (MIN_GAINS + Math.ceil(BONUS_PER_IMAGE * imagesRemaining) * difficultyMultiplicator);
                         HANGMAN_SUMMARY.labels("win").observe(gains);
                         return new Player(this.getContext().getGuildId(), this.getContext().getAuthorId())
                                 .win(gains)
