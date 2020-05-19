@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 
 public class HangmanGame extends Game {
 
-    protected static final int MIN_GAINS = 200;
-    protected static final int MAX_BONUS = 200;
+    protected static final int MIN_GAINS = 500;
+    protected static final int MAX_BONUS = 1000;
 
     private static final Summary HANGMAN_SUMMARY = Summary.build()
             .name("game_hangman")
