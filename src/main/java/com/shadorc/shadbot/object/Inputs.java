@@ -3,8 +3,9 @@ package com.shadorc.shadbot.object;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.rest.util.Snowflake;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
@@ -12,15 +13,20 @@ public abstract class Inputs {
 
     private final GatewayDiscordClient gateway;
     private final Duration timeout;
+    private final Snowflake channelId;
 
-    protected Inputs(GatewayDiscordClient gateway, Duration timeout) {
+    protected Inputs(GatewayDiscordClient gateway, Duration timeout, Snowflake channelId) {
         this.gateway = gateway;
         this.timeout = timeout;
+        this.channelId = channelId;
     }
 
     public Flux<Void> waitForInputs() {
         return this.gateway.getEventDispatcher()
                 .on(MessageCreateEvent.class)
+                .filter(event -> event.getMember().isPresent()
+                        && !event.getMessage().getContent().isBlank()
+                        && event.getMessage().getChannelId().equals(this.channelId))
                 .takeWhile(this::takeEventWile)
                 .filterWhen(this::isValidEvent)
                 .flatMap(this::processEvent)
@@ -40,7 +46,7 @@ public abstract class Inputs {
      * @param event The event to evaluate.
      * @return {@code true} if the event is valid and has to be processed, {@code false} otherwise.
      */
-    public abstract Mono<Boolean> isValidEvent(MessageCreateEvent event);
+    public abstract Publisher<Boolean> isValidEvent(MessageCreateEvent event);
 
     /**
      * {@code waitForInput} will relay events while this predicate returns {@code true} for
@@ -56,8 +62,8 @@ public abstract class Inputs {
      * Process valid events.
      *
      * @param event The event to process.
-     * @return A {@link Mono} which emits when the event has been processed.
+     * @return A {@link Publisher} which emits when the event has been processed.
      */
-    public abstract Mono<Void> processEvent(MessageCreateEvent event);
+    public abstract Publisher<Void> processEvent(MessageCreateEvent event);
 
 }

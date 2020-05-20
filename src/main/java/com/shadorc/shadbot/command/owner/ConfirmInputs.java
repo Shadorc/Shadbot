@@ -5,6 +5,7 @@ import com.shadorc.shadbot.object.Inputs;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
+import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -15,14 +16,14 @@ public class ConfirmInputs extends Inputs {
     private final Mono<Void> task;
     private final AtomicBoolean isCancelled;
 
-    private ConfirmInputs(GatewayDiscordClient gateway, Duration timeout, Mono<Void> task) {
-        super(gateway, timeout);
+    private ConfirmInputs(GatewayDiscordClient gateway, Duration timeout, Snowflake channelId, Mono<Void> task) {
+        super(gateway, timeout, channelId);
         this.task = task;
         this.isCancelled = new AtomicBoolean(false);
     }
 
-    public static ConfirmInputs create(GatewayDiscordClient gateway, Duration timeout, Mono<Void> task) {
-        return new ConfirmInputs(gateway, timeout, task);
+    public static ConfirmInputs create(GatewayDiscordClient gateway, Duration timeout, Snowflake channelId, Mono<Void> task) {
+        return new ConfirmInputs(gateway, timeout, channelId, task);
     }
 
     @Override
@@ -31,7 +32,6 @@ public class ConfirmInputs extends Inputs {
                 .map(User::getId)
                 .filter(Shadbot.getOwnerId()::equals)
                 .map(ignored -> event.getMessage().getContent())
-                .flatMap(Mono::justOrEmpty)
                 .map(content -> {
                     if ("n".equalsIgnoreCase(content) || "no".equalsIgnoreCase(content)) {
                         this.isCancelled.set(true);

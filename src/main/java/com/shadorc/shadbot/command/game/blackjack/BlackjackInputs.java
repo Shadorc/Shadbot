@@ -18,7 +18,7 @@ public class BlackjackInputs extends Inputs {
     private final BlackjackGame game;
 
     private BlackjackInputs(GatewayDiscordClient gateway, BlackjackGame game) {
-        super(gateway, game.getDuration());
+        super(gateway, game.getDuration(), game.getContext().getChannelId());
         this.game = game;
     }
 
@@ -28,14 +28,6 @@ public class BlackjackInputs extends Inputs {
 
     @Override
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
-        if (event.getMessage().getContent().isEmpty() || event.getMember().isEmpty()) {
-            return Mono.just(false);
-        }
-
-        if (!event.getMessage().getChannelId().equals(this.game.getContext().getChannelId())) {
-            return Mono.just(false);
-        }
-
         final Member member = event.getMember().get();
         final String content = event.getMessage().getContent();
         return this.game.isCancelMessage(event.getMessage())

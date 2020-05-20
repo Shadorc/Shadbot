@@ -14,7 +14,7 @@ import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.User;
+import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -25,21 +25,22 @@ public class AudioLoadResultInputs extends Inputs {
 
     private final AudioLoadResultListener listener;
 
-    private AudioLoadResultInputs(GatewayDiscordClient gateway, Duration timeout, AudioLoadResultListener listener) {
-        super(gateway, timeout);
+    private AudioLoadResultInputs(GatewayDiscordClient gateway, Duration timeout,
+                                  Snowflake channelId, AudioLoadResultListener listener) {
+        super(gateway, timeout, channelId);
         this.listener = listener;
     }
 
-    public static AudioLoadResultInputs create(GatewayDiscordClient gateway, Duration timeout, AudioLoadResultListener listener) {
-        return new AudioLoadResultInputs(gateway, timeout, listener);
+    public static AudioLoadResultInputs create(GatewayDiscordClient gateway, Duration timeout,
+                                               Snowflake channelId, AudioLoadResultListener listener) {
+        return new AudioLoadResultInputs(gateway, timeout, channelId, listener);
     }
 
     @Override
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
         return Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.listener.getGuildId()))
-                .map(guildMusic -> !event.getMessage().getContent().isBlank()
-                        && event.getMessage().getChannelId().equals(guildMusic.getMessageChannelId())
-                        && event.getMember().map(User::getId).map(guildMusic.getDjId()::equals).orElse(false));
+                .zipWith(Mono.justOrEmpty(event.getMember()))
+                .map(tuple -> tuple.getT1().getDjId().equals(tuple.getT2().getId()));
     }
 
     @Override
@@ -52,11 +53,11 @@ public class AudioLoadResultInputs extends Inputs {
                 .map(DBGuild::getSettings)
                 .map(Settings::getPrefix);
 
-        return Mono.zip(getGuildMusic, Mono.justOrEmpty(event.getMessage().getContent()), getPrefix)
+        return Mono.zip(getGuildMusic, getPrefix)
                 .flatMap(tuple -> {
                     final GuildMusic guildMusic = tuple.getT1();
-                    final String content = tuple.getT2();
-                    final String prefix = tuple.getT3();
+                    final String prefix = tuple.getT2();
+                    final String content = event.getMessage().getContent();
 
                     if (content.equals(String.format("%scancel", prefix))) {
                         guildMusic.setWaitingForChoice(false);

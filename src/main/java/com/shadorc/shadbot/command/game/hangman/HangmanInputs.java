@@ -17,7 +17,7 @@ public class HangmanInputs extends Inputs {
     private final HangmanGame game;
 
     private HangmanInputs(GatewayDiscordClient gateway, HangmanGame game) {
-        super(gateway, game.getDuration());
+        super(gateway, game.getDuration(), game.getContext().getChannelId());
         this.game = game;
     }
 
@@ -27,14 +27,6 @@ public class HangmanInputs extends Inputs {
 
     @Override
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
-        if (event.getMessage().getContent().isEmpty() || event.getMember().isEmpty()) {
-            return Mono.just(false);
-        }
-
-        if (!event.getMessage().getChannelId().equals(this.game.getContext().getChannelId())) {
-            return Mono.just(false);
-        }
-
         final Member member = event.getMember().get();
         return this.game.isCancelMessage(event.getMessage())
                 .map(isCancelCmd -> isCancelCmd || this.game.getContext().getAuthorId().equals(member.getId()));
