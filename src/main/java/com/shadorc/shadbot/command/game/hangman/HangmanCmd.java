@@ -87,8 +87,8 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                         FormatUtils.format(Difficulty.class, "/")), true)
                 .addField("Gains", String.format("The winner gets **%s** plus a bonus (**%s max.**) depending " +
                                 "on his number of errors and the difficulty.",
-                        FormatUtils.coins(HangmanGame.MIN_GAINS),
-                        FormatUtils.coins(HangmanGame.MAX_BONUS)), false)
+                        FormatUtils.coins(Constants.MIN_GAINS),
+                        FormatUtils.coins(Constants.MAX_BONUS)), false)
                 .build();
     }
 }

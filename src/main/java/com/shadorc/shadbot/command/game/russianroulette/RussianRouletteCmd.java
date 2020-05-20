@@ -45,7 +45,7 @@ public class RussianRouletteCmd extends BaseCmd {
                         .flatMap(channel -> DiscordUtils.sendMessage(
                                 String.format(Emoji.BROCKEN_HEART + " (**%s**) Dead people can't play the Russian Roulette... " +
                                                 "You will be able to play again in %d hours!",
-                                        context.getUsername(), RussianRoulettePlayer.RESET_HOURS), channel))
+                                        context.getUsername(), Constants.RESET_HOURS), channel))
                         .then(Mono.empty()))
                 .flatMap(player -> player.bet().thenReturn(player))
                 .flatMap(player -> {
@@ -88,7 +88,7 @@ public class RussianRouletteCmd extends BaseCmd {
                 .setDescription(String.format("Play russian roulette." +
                         "%nYou initially have 1/6 chance of dying and the more you play, " +
                         "the more you win, the more you are likely to lose. " +
-                        "%nOnce dead, you will not be able to play for %d hours.", RussianRoulettePlayer.RESET_HOURS))
+                        "%nOnce dead, you will not be able to play for %d hours.", Constants.RESET_HOURS))
                 .addField("Cost", String.format("A game costs **%s**.", FormatUtils.coins(Constants.PAID_COST)), false)
                 .addField("Gains", String.format("Each time you win, you randomly get between **%s** and **%s** multiplied" +
                                 " by the number of times you tried.",

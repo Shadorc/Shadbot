@@ -23,7 +23,7 @@ public class LotteryEmbedBuilder {
                         .setDescription(String.format("The next draw will take place in **%s**%nTo " +
                                         "participate, type: `%s%s %d-%d`",
                                 FormatUtils.customDate(LotteryCmd.getDelay()),
-                                context.getPrefix(), context.getCommandName(), LotteryCmd.MIN_NUM, LotteryCmd.MAX_NUM)));
+                                context.getPrefix(), context.getCommandName(), Constants.MIN_NUM, Constants.MAX_NUM)));
     }
 
     public static LotteryEmbedBuilder create(Context context) {
