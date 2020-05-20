@@ -85,13 +85,13 @@ public class RussianRouletteCmd extends BaseCmd {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
-                .setDescription(String.format("Play russian roulette." +
-                        "%nYou initially have 1/6 chance of dying and the more you play, " +
-                        "the more you win, the more you are likely to lose. " +
-                        "%nOnce dead, you will not be able to play for %d hours.", Constants.RESET_HOURS))
+                .setDescription("Play russian roulette.")
+                .addField("Rules", String.format("You initially have 1/6 chance of dying and, the more you win, " +
+                        "the more you are likely to lose. " +
+                        "%nOnce dead, you will not be able to play for %d hours.", Constants.RESET_HOURS), false)
                 .addField("Cost", String.format("A game costs **%s**.", FormatUtils.coins(Constants.PAID_COST)), false)
                 .addField("Gains", String.format("Each time you win, you randomly get between **%s** and **%s** multiplied" +
-                                " by the number of times you tried.",
+                                " by your number of tries.",
                         FormatUtils.coins(Constants.MIN_GAINS), FormatUtils.coins(Constants.MAX_GAINS)), false)
                 .build();
     }

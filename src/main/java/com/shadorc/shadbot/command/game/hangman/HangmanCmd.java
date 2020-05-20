@@ -86,7 +86,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                 .addArg("difficulty", String.format("%s. The difficulty of the word to find",
                         FormatUtils.format(Difficulty.class, "/")), true)
                 .addField("Gains", String.format("The winner gets **%s** plus a bonus (**%s max.**) depending " +
-                                "on his number of errors and the difficulty.",
+                                "on his number of errors. Gains are multiplied depending on the difficulty.",
                         FormatUtils.coins(Constants.MIN_GAINS),
                         FormatUtils.coins(Constants.MAX_BONUS)), false)
                 .build();

@@ -97,8 +97,8 @@ public class HelpBuilder {
     public Consumer<EmbedCreateSpec> build() {
         return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> {
-                    embed.setAuthor(String.format("Help for %s command", this.cmd.getName()),
-                            null, this.context.getAvatarUrl());
+                    embed.setAuthor(String.format("Help for command: %s", this.cmd.getName()),
+                            "https://github.com/Shadorc/Shadbot/wiki/Commands", this.context.getAvatarUrl());
                     embed.addField("Usage", this.getUsage(), false);
 
                     if (this.description != null && !this.description.isBlank()) {
