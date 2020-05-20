@@ -10,8 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 public class RussianRoulettePlayer extends GamblerPlayer {
 
-    protected static final int RESET_HOURS = 12;
-
     private Instant lastTimePlayed;
     private Instant deadInstant;
     private int bulletIndex;
@@ -48,13 +46,13 @@ public class RussianRoulettePlayer extends GamblerPlayer {
     public boolean isAlive() {
         // If the player has not played since one day, reset
         if (this.lastTimePlayed != null
-                && TimeUnit.MILLISECONDS.toHours(TimeUtils.getMillisUntil(this.lastTimePlayed)) >= RESET_HOURS) {
+                && TimeUnit.MILLISECONDS.toHours(TimeUtils.getMillisUntil(this.lastTimePlayed)) >= Constants.RESET_HOURS) {
             this.init();
         }
 
         // If the player has been dead for one day, reset
         if (this.deadInstant != null
-                && TimeUnit.MILLISECONDS.toHours(TimeUtils.getMillisUntil(this.deadInstant)) >= RESET_HOURS) {
+                && TimeUnit.MILLISECONDS.toHours(TimeUtils.getMillisUntil(this.deadInstant)) >= Constants.RESET_HOURS) {
             this.init();
             return true;
         }
