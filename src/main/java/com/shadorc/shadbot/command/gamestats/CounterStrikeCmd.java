@@ -136,7 +136,7 @@ public class CounterStrikeCmd extends BaseCmd {
 
                                 final Map<String, Integer> statsMap = userStats.getPlayerStats()
                                         .flatMap(PlayerStats::getStats)
-                                        .get()
+                                        .orElseThrow()
                                         .stream()
                                         .collect(Collectors.toMap(Stats::getName, Stats::getValue));
 

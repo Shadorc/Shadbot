@@ -271,13 +271,13 @@ public class DiscordUtils {
                     }
 
                     // If the user and the bot are not in the same voice channel
-                    if (botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.get()::equals).orElse(false)) {
+                    if (botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.orElseThrow()::equals).orElse(false)) {
                         throw new CommandException(String.format("I'm currently playing music in voice channel **<#%d>**"
                                         + ", join me before using this command.",
                                 botVoiceChannelId.map(Snowflake::asLong).get()));
                     }
 
-                    return userVoiceChannelId.get();
+                    return userVoiceChannelId.orElseThrow();
                 })
                 .flatMap(context.getClient()::getChannelById)
                 .cast(VoiceChannel.class)

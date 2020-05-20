@@ -35,7 +35,7 @@ public class SkipCmd extends BaseCmd {
 
         if (context.getArg().isPresent()) {
             final int playlistSize = guildMusic.getTrackScheduler().getPlaylist().size();
-            final Integer num = NumberUtils.toIntBetweenOrNull(context.getArg().get(), 1, playlistSize);
+            final Integer num = NumberUtils.toIntBetweenOrNull(context.getArg().orElseThrow(), 1, playlistSize);
             if (num == null) {
                 return Mono.error(new CommandException(String.format("Number must be between 1 and %d.",
                         playlistSize)));

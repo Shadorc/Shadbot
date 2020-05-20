@@ -74,7 +74,7 @@ public abstract class Game<G extends GameCmd<?>> {
         }
 
         final String content = message.getContent();
-        final User author = message.getAuthor().get();
+        final User author = message.getAuthor().orElseThrow();
         if (content.equals(String.format("%scancel", this.context.getPrefix()))) {
             return message.getChannel()
                     .flatMap(channel -> DiscordUtils.hasPermission(channel, author.getId(), Permission.ADMINISTRATOR))

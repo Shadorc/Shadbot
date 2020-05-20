@@ -27,7 +27,7 @@ public class HangmanInputs extends Inputs {
 
     @Override
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
-        final Member member = event.getMember().get();
+        final Member member = event.getMember().orElseThrow();
         return this.game.isCancelMessage(event.getMessage())
                 .map(isCancelCmd -> isCancelCmd || this.game.getContext().getAuthorId().equals(member.getId()));
     }

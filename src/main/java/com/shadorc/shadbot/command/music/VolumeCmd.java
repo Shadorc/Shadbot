@@ -38,7 +38,7 @@ public class VolumeCmd extends BaseCmd {
                                                 context.getUsername(), scheduler.getAudioPlayer().getVolume()), channel));
                     }
 
-                    final String arg = context.getArg().get();
+                    final String arg = context.getArg().orElseThrow();
                     final Integer volume = NumberUtils.toPositiveIntOrNull(arg);
                     if (volume == null) {
                         return Mono.error(new CommandException(String.format("`%s` is not a valid volume.", arg)));

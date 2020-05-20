@@ -28,7 +28,7 @@ public class BlackjackInputs extends Inputs {
 
     @Override
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
-        final Member member = event.getMember().get();
+        final Member member = event.getMember().orElseThrow();
         final String content = event.getMessage().getContent();
         return this.game.isCancelMessage(event.getMessage())
                 .map(isCancelCmd -> isCancelCmd || this.game.getPlayers().containsKey(member.getId())
