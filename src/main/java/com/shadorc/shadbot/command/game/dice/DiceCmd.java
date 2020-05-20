@@ -17,8 +17,6 @@ import java.util.function.Consumer;
 
 public class DiceCmd extends GameCmd<DiceGame> {
 
-    protected static final float MULTIPLIER = 4.5f;
-
     public DiceCmd() {
         super(List.of("dice"));
     }
@@ -118,7 +116,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
                         "been chosen by another player.", false)
                 .addArg("bet", false)
                 .addField("Gains", String.format("The winner gets the prize pool plus **%.1f times** " +
-                        "his bet.", MULTIPLIER), false)
+                        "his bet.", Constants.WIN_MULTIPLICATOR), false)
                 .build();
     }
 }

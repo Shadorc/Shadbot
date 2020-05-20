@@ -21,13 +21,8 @@ import java.util.function.Consumer;
 
 public class SlotMachineCmd extends BaseCmd {
 
-    private static final Summary SLOT_MACHINE_SUMMARY = Summary.build()
-            .name("game_slot_machine")
-            .help("Slot Machine game")
-            .labelNames("result")
-            .register();
-    private static final double RAND_FACTOR = 0.25;
-    private static final int PAID_COST = 25;
+    private static final Summary SLOT_MACHINE_SUMMARY = Summary.build().name("game_slot_machine")
+            .help("Slot Machine game").labelNames("result").register();
 
     public SlotMachineCmd() {
         super(CommandCategory.GAME, List.of("slot_machine"), "sm");
@@ -36,8 +31,8 @@ public class SlotMachineCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), PAID_COST)
-                .map(ignored -> new GamblerPlayer(context.getGuildId(), context.getAuthorId(), PAID_COST))
+        return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
+                .map(ignored -> new GamblerPlayer(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST))
                 .flatMap(player -> player.bet().thenReturn(player))
                 .flatMap(player -> {
                     final List<SlotOptions> slots = this.randSlots();
@@ -47,14 +42,14 @@ public class SlotMachineCmd extends BaseCmd {
 
                     if (slots.stream().distinct().count() == 1) {
                         final int slotGains = slots.get(0).getGains();
-                        final long gains = ThreadLocalRandom.current().nextInt((int) (slotGains * RAND_FACTOR),
-                                (int) (slotGains * (RAND_FACTOR + 1)));
+                        final long gains = ThreadLocalRandom.current().nextInt((int) (slotGains * Constants.RAND_FACTOR),
+                                (int) (slotGains * (Constants.RAND_FACTOR + 1)));
                         SLOT_MACHINE_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
                                 .thenReturn(strBuilder.append(String.format("You win **%s** !", FormatUtils.coins(gains))));
                     } else {
-                        SLOT_MACHINE_SUMMARY.labels("loss").observe(PAID_COST);
-                        return Mono.just(strBuilder.append(String.format("You lose **%s** !", FormatUtils.coins(PAID_COST))));
+                        SLOT_MACHINE_SUMMARY.labels("loss").observe(Constants.PAID_COST);
+                        return Mono.just(strBuilder.append(String.format("You lose **%s** !", FormatUtils.coins(Constants.PAID_COST))));
                     }
                 })
                 .map(StringBuilder::toString)
@@ -93,7 +88,7 @@ public class SlotMachineCmd extends BaseCmd {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
                 .setDescription("Play slot machine.")
-                .addField("Cost", String.format("A game costs **%s**.", FormatUtils.coins(PAID_COST)), false)
+                .addField("Cost", String.format("A game costs **%s**.", FormatUtils.coins(Constants.PAID_COST)), false)
                 .addField("Gains", String.format("%s: **%s**, %s: **%s**, %s: **%s**, %s: **%s**." +
                                 "%nYou also gain a small random bonus.",
                         StringUtils.capitalizeEnum(SlotOptions.APPLE), FormatUtils.coins(SlotOptions.APPLE.getGains()),

@@ -25,11 +25,9 @@ import java.util.stream.Collectors;
 
 public class HangmanGame extends Game<HangmanCmd> {
 
-    protected static final int MIN_GAINS = 500;
-    protected static final int MAX_BONUS = 1000;
-
     private static final Summary HANGMAN_SUMMARY = Summary.build().name("game_hangman").help("Hangman game")
             .labelNames("result").register();
+
     private static final List<String> IMG_LIST = List.of(
             HangmanGame.getImageUrl("8/8b", 0),
             HangmanGame.getImageUrl("3/30", 1),
@@ -38,7 +36,7 @@ public class HangmanGame extends Game<HangmanCmd> {
             HangmanGame.getImageUrl("2/27", 4),
             HangmanGame.getImageUrl("6/6b", 5),
             HangmanGame.getImageUrl("d/d6", 6));
-    private static final float BONUS_PER_IMAGE = (float) MAX_BONUS / IMG_LIST.size();
+    private static final float BONUS_PER_IMAGE = (float) Constants.MAX_BONUS / IMG_LIST.size();
 
     private final HangmanCmd.Difficulty difficulty;
     private final RateLimiter rateLimiter;
@@ -79,7 +77,7 @@ public class HangmanGame extends Game<HangmanCmd> {
             } else {
                 final float imagesRemaining = IMG_LIST.size() - this.failCount;
                 final int difficultyMultiplicator = this.difficulty == HangmanCmd.Difficulty.HARD ? 4 : 1;
-                final int gains = (int) (MIN_GAINS + Math.ceil(BONUS_PER_IMAGE * imagesRemaining) * difficultyMultiplicator);
+                final int gains = (int) (Constants.MIN_GAINS + Math.ceil(BONUS_PER_IMAGE * imagesRemaining) * difficultyMultiplicator);
                 HANGMAN_SUMMARY.labels("win").observe(gains);
                 return new Player(this.getContext().getGuildId(), this.getContext().getAuthorId())
                         .win(gains)

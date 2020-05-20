@@ -20,11 +20,9 @@ import java.util.stream.Collectors;
 
 public class RouletteGame extends MultiplayerGame<RouletteCmd, RoulettePlayer> {
 
-    private static final Summary ROULETTE_SUMMARY = Summary.build()
-            .name("game_roulette")
-            .help("Roulette game")
-            .labelNames("result")
-            .register();
+    private static final Summary ROULETTE_SUMMARY = Summary.build().name("game_roulette")
+            .help("Roulette game").labelNames("result").register();
+
     private static final List<Integer> RED_NUMS = List.of(1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36);
     private static final Map<Place, Predicate<Integer>> TESTS = Map.of(
             Place.RED, RED_NUMS::contains,

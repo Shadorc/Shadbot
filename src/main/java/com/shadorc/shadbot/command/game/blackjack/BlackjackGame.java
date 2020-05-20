@@ -23,12 +23,8 @@ import java.util.function.Consumer;
 
 public class BlackjackGame extends MultiplayerGame<BlackjackCmd, BlackjackPlayer> {
 
-    private static final Summary BLACKJACK_SUMMARY = Summary.build()
-            .name("game_blackjack")
-            .help("Blackjack game")
-            .labelNames("result")
-            .register();
-    private static final float WIN_MULTIPLICATOR = 2.0f;
+    private static final Summary BLACKJACK_SUMMARY = Summary.build().name("game_blackjack")
+            .help("Blackjack game").labelNames("result").register();
 
     private final RateLimiter rateLimiter;
     private final UpdatableMessage updatableMessage;
@@ -81,7 +77,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackCmd, BlackjackPlayer
 
                     switch (BlackjackGame.getResult(playerValue, dealerValue)) {
                         case 1:
-                            final long coins = Math.min((long) (player.getBet() * WIN_MULTIPLICATOR), Config.MAX_COINS);
+                            final long coins = Math.min((long) (player.getBet() * Constants.WIN_MULTIPLICATOR), Config.MAX_COINS);
                             BLACKJACK_SUMMARY.labels("win").observe(coins);
                             return player.cancelBet()
                                     .then(player.win(coins))
@@ -154,9 +150,12 @@ public class BlackjackGame extends MultiplayerGame<BlackjackCmd, BlackjackPlayer
 
     @Override
     public boolean addPlayerIfAbsent(BlackjackPlayer player) {
-        player.hit(this.deck.pick());
-        player.hit(this.deck.pick());
-        return super.addPlayerIfAbsent(player);
+        if (super.addPlayerIfAbsent(player)) {
+            player.hit(this.deck.pick());
+            player.hit(this.deck.pick());
+            return true;
+        }
+        return false;
     }
 
     public boolean areAllPlayersStanding() {

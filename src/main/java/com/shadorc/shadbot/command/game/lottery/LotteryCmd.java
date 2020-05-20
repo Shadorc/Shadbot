@@ -34,10 +34,6 @@ import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class LotteryCmd extends BaseCmd {
 
-    private static final int PAID_COST = 100;
-    public static final int MIN_NUM = 1;
-    public static final int MAX_NUM = 100;
-
     public LotteryCmd() {
         super(CommandCategory.GAME, List.of("lottery", "lotto"));
         this.setDefaultRateLimiter();
@@ -57,18 +53,18 @@ public class LotteryCmd extends BaseCmd {
                         .map(isParticipating -> !isParticipating))
                 .switchIfEmpty(Mono.error(new CommandException("You're already participating.")))
                 .flatMap(dbMember -> {
-                    if (dbMember.getCoins() < PAID_COST) {
+                    if (dbMember.getCoins() < Constants.PAID_COST) {
                         return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
                     }
 
-                    final Integer num = NumberUtils.toIntBetweenOrNull(arg, MIN_NUM, MAX_NUM);
+                    final Integer num = NumberUtils.toIntBetweenOrNull(arg, Constants.MIN_NUM, Constants.MAX_NUM);
                     if (num == null) {
                         return Mono.error(new CommandException(
                                 String.format("`%s` is not a valid number, it must be between **%d** and **%d**.",
-                                        arg, MIN_NUM, MAX_NUM)));
+                                        arg, Constants.MIN_NUM, Constants.MAX_NUM)));
                     }
 
-                    return dbMember.addCoins(-PAID_COST)
+                    return dbMember.addCoins(-Constants.PAID_COST)
                             .thenReturn(new LotteryGambler(context.getGuildId(), context.getAuthorId(), num))
                             .flatMap(LotteryGambler::insert)
                             .then(context.getChannel())
@@ -126,7 +122,7 @@ public class LotteryCmd extends BaseCmd {
 
     public static Mono<Void> draw(GatewayDiscordClient gateway) {
         DEFAULT_LOGGER.info("Lottery draw started...");
-        final int winningNum = ThreadLocalRandom.current().nextInt(MIN_NUM, MAX_NUM + 1);
+        final int winningNum = ThreadLocalRandom.current().nextInt(Constants.MIN_NUM, Constants.MAX_NUM + 1);
 
         return DatabaseManager.getLottery()
                 .getGamblers()
@@ -172,11 +168,11 @@ public class LotteryCmd extends BaseCmd {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return HelpBuilder.create(this, context)
                 .setDescription("Buy a ticket for the lottery or display the current lottery status.")
-                .addArg("num", String.format("must be between %d and %d", MIN_NUM, MAX_NUM), true)
+                .addArg("num", String.format("must be between %d and %d", Constants.MIN_NUM, Constants.MAX_NUM), true)
                 .addField("Info", "One winner is randomly drawn every Sunday at noon (English time)."
                         + "\nIf no one wins, the prize pool is put back into play, "
                         + "if there are multiple winners, the prize pool is splitted between them.", false)
-                .addField("Cost", String.format("A ticket costs **%s.**", FormatUtils.coins(PAID_COST)), false)
+                .addField("Cost", String.format("A ticket costs **%s.**", FormatUtils.coins(Constants.PAID_COST)), false)
                 .addField("Gains", "The prize pool contains all coins lost at games during the week plus " +
                         "the purchase price of the lottery tickets.", false)
                 .build();

@@ -18,11 +18,8 @@ import java.util.stream.Collectors;
 
 public class DiceGame extends MultiplayerGame<DiceCmd, DicePlayer> {
 
-    private static final Summary DICE_SUMMARY = Summary.build()
-            .name("game_dice")
-            .help("Dice game")
-            .labelNames("result")
-            .register();
+    private static final Summary DICE_SUMMARY = Summary.build().name("game_dice")
+            .help("Dice game").labelNames("result").register();
 
     private final long bet;
     private final UpdatableMessage updatableMessage;
@@ -54,7 +51,8 @@ public class DiceGame extends MultiplayerGame<DiceCmd, DicePlayer> {
                     final DicePlayer player = tuple.getT1();
                     final String username = tuple.getT2();
                     if (player.getNumber() == winningNum) {
-                        final long gains = Math.min((long) (this.bet * (this.getPlayers().size() + DiceCmd.MULTIPLIER)), Config.MAX_COINS);
+                        final long gains = Math.min((long) (this.bet * (this.getPlayers().size() + Constants.WIN_MULTIPLICATOR)),
+                                Config.MAX_COINS);
                         DICE_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
                                 .thenReturn(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains)));
