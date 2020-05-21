@@ -52,16 +52,6 @@ public class GuildsCollection extends DatabaseCollection {
     public Mono<DBMember> getDBMember(Snowflake guildId, Snowflake memberId) {
         return this.getDBMembers(guildId, memberId)
                 .filter(dbMember -> dbMember.getId().equals(memberId))
-                // TODO: Remove
-                .collectList()
-                .map(list -> {
-                    if (list.size() > 1) {
-                        LOGGER.warn("Member duplication detected! guildId={}, memberId={}",
-                                guildId.asLong(), memberId.asLong());
-                    }
-                    return list.get(0);
-                })
-                // TODO: End removal
                 .single();
     }
 
