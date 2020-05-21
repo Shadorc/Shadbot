@@ -2,9 +2,9 @@ package com.shadorc.shadbot.core.game.player;
 
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
+import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.User;
-import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 public class Player {

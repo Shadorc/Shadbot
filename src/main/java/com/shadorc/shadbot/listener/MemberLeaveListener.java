@@ -6,11 +6,11 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.rest.http.client.ClientException;
-import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 public class MemberLeaveListener implements EventListener<MemberLeaveEvent> {
