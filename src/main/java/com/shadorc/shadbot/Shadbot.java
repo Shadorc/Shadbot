@@ -69,7 +69,8 @@ public class Shadbot {
         if (!Config.IS_SNAPSHOT) {
             DEFAULT_LOGGER.info("Initializing Sentry...");
             Sentry.init(CredentialManager.getInstance().get(Credential.SENTRY_DSN))
-                    .addShouldSendEventCallback(event -> !event.getLogger().startsWith("com.sedmelluq"));
+                    .addShouldSendEventCallback(event -> !event.getLogger().startsWith("com.sedmelluq")
+                            && !event.getMessage().contains("discord4j.common.close.CloseException"));
         }
 
         // BlockHound is used to detect blocking actions in non-blocking threads
