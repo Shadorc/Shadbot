@@ -9,7 +9,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.List;

@@ -3,7 +3,7 @@ package com.shadorc.shadbot.object;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 

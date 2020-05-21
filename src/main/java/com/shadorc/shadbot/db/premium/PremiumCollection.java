@@ -9,7 +9,7 @@ import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;

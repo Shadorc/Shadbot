@@ -22,7 +22,7 @@ import discord4j.core.spec.MessageCreateSpec;
 import discord4j.discordjson.json.gateway.StatusUpdate;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.Permission;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import io.netty.channel.unix.Errors;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Flux;

@@ -5,7 +5,7 @@ import com.shadorc.shadbot.object.Inputs;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;

@@ -14,7 +14,7 @@ import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;

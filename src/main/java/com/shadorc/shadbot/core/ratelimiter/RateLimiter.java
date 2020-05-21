@@ -7,7 +7,7 @@ import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Member;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
 import org.apache.commons.lang3.time.DurationFormatUtils;

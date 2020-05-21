@@ -6,7 +6,7 @@ import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.users.bean.DBUserBean;
 import com.shadorc.shadbot.db.users.entity.DBUser;
 import com.shadorc.shadbot.utils.Utils;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;

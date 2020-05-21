@@ -12,7 +12,7 @@ import com.shadorc.shadbot.db.guilds.GuildsCollection;
 import com.shadorc.shadbot.db.guilds.bean.DBMemberBean;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.utils.NumberUtils;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import reactor.core.publisher.Mono;

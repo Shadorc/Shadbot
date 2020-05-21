@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.cache;
 
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

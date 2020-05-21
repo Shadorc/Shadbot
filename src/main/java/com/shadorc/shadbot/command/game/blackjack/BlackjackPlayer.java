@@ -6,7 +6,7 @@ import com.shadorc.shadbot.object.casino.Hand;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 public class BlackjackPlayer extends GamblerPlayer {

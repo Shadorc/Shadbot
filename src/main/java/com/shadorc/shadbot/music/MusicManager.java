@@ -22,7 +22,7 @@ import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.VoiceChannel;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import discord4j.voice.AudioProvider;
 import discord4j.voice.VoiceConnection;
 import discord4j.voice.retry.VoiceGatewayException;
@@ -124,7 +124,7 @@ public class MusicManager {
         }
 
         final Mono<Boolean> isDisconnected = gateway.getVoiceConnectionRegistry()
-                .getVoiceConnection(guildId.asLong())
+                .getVoiceConnection(guildId)
                 .flatMapMany(VoiceConnection::stateEvents)
                 .next()
                 .map(VoiceConnection.State.DISCONNECTED::equals)
@@ -153,7 +153,7 @@ public class MusicManager {
         return Mono.justOrEmpty(guildMusic)
                 .map(GuildMusic::getGateway)
                 .map(GatewayDiscordClient::getVoiceConnectionRegistry)
-                .flatMap(registry -> registry.getVoiceConnection(guildId.asLong()))
+                .flatMap(registry -> registry.getVoiceConnection(guildId))
                 .flatMap(VoiceConnection::disconnect);
     }
 

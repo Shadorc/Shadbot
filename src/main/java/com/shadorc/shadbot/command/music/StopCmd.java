@@ -24,7 +24,7 @@ public class StopCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         return Mono.just(context.requireGuildMusic())
                 .map(ignored -> context.getClient().getVoiceConnectionRegistry())
-                .flatMap(registry -> registry.getVoiceConnection(context.getGuildId().asLong()))
+                .flatMap(registry -> registry.getVoiceConnection(context.getGuildId()))
                 .flatMap(VoiceConnection::disconnect)
                 .then(context.getChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.STOP_BUTTON + " Music stopped by **%s**.",

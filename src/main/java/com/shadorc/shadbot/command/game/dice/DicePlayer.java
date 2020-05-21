@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.game.dice;
 
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 
 public class DicePlayer extends GamblerPlayer {
 

@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.fun;
 
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;

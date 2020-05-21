@@ -13,7 +13,7 @@ import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.http.client.ClientException;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 

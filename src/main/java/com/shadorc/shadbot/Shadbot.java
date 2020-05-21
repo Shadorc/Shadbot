@@ -21,7 +21,7 @@ import discord4j.discordjson.json.UserData;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.response.ResponseFunction;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import discord4j.store.api.mapping.MappingStoreService;
 import discord4j.store.caffeine.CaffeineStoreService;
 import discord4j.store.jdk.JdkStoreService;

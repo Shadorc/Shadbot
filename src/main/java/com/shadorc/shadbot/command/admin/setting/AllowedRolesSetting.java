@@ -12,7 +12,7 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.List;

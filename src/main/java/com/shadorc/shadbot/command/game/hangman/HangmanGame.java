@@ -11,7 +11,7 @@ import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import io.prometheus.client.Summary;
 import reactor.core.publisher.Mono;
 

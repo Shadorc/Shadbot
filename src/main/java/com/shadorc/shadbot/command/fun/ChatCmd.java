@@ -11,7 +11,7 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import org.json.XML;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

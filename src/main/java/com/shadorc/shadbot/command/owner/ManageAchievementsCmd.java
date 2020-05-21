@@ -12,7 +12,7 @@ import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.http.client.ClientException;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 

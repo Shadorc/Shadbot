@@ -13,7 +13,7 @@ import com.shadorc.shadbot.db.codec.SnowflakeCodec;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.json.JsonWriterSettings;

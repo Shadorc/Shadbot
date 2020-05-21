@@ -2,7 +2,7 @@ package com.shadorc.shadbot.command.game.russianroulette;
 
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
 import com.shadorc.shadbot.utils.TimeUtils;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 
 import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
