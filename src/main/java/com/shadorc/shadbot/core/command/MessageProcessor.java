@@ -6,11 +6,11 @@ import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
-import discord4j.rest.util.Snowflake;
 import io.prometheus.client.Counter;
 import reactor.core.publisher.Mono;
 

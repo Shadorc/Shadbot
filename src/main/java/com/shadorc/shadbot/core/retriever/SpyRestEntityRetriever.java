@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.core.retriever;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.*;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.retriever.RestEntityRetriever;
-import discord4j.rest.util.Snowflake;
 import io.prometheus.client.Counter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

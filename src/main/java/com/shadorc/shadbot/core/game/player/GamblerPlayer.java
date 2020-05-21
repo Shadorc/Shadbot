@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.core.game.player;
 
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 public class GamblerPlayer extends Player {

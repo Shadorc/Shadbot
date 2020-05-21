@@ -1,9 +1,9 @@
 package com.shadorc.shadbot.object.message;
 
 import com.shadorc.shadbot.utils.DiscordUtils;
+import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 

@@ -10,7 +10,7 @@ import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.users.UsersCollection;
 import com.shadorc.shadbot.db.users.bean.DBUserBean;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import org.apache.commons.lang3.NotImplementedException;
 import reactor.core.publisher.Mono;
 

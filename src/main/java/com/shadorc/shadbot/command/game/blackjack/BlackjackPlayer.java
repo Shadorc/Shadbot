@@ -3,10 +3,10 @@ package com.shadorc.shadbot.command.game.blackjack;
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
 import com.shadorc.shadbot.object.casino.Card;
 import com.shadorc.shadbot.object.casino.Hand;
+import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
-import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 public class BlackjackPlayer extends GamblerPlayer {

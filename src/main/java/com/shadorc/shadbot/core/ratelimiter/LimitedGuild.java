@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.core.ratelimiter;
 
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket4j;
 

@@ -7,7 +7,7 @@ import com.shadorc.shadbot.db.guilds.bean.DBGuildBean;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.utils.Utils;
-import discord4j.rest.util.Snowflake;
+import discord4j.common.util.Snowflake;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -52,16 +52,6 @@ public class GuildsCollection extends DatabaseCollection {
     public Mono<DBMember> getDBMember(Snowflake guildId, Snowflake memberId) {
         return this.getDBMembers(guildId, memberId)
                 .filter(dbMember -> dbMember.getId().equals(memberId))
-                // TODO: Remove
-                .collectList()
-                .map(list -> {
-                    if (list.size() > 1) {
-                        LOGGER.warn("Member duplication detected! guildId={}, memberId={}",
-                                guildId.asLong(), memberId.asLong());
-                    }
-                    return list.get(0);
-                })
-                // TODO: End removal
                 .single();
     }
 

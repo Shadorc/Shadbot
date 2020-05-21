@@ -2,8 +2,8 @@ package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
-import discord4j.rest.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.Set;

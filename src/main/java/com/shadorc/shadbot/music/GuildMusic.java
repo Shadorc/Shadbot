@@ -4,9 +4,9 @@ import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;
+import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.rest.util.Snowflake;
 import discord4j.voice.VoiceConnection;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
@@ -56,7 +56,7 @@ public class GuildMusic {
         this.leavingTask.set(Mono.delay(LEAVE_DELAY, Schedulers.boundedElastic())
                 .filter(ignored -> this.isLeavingScheduled())
                 .map(ignored -> this.gateway.getVoiceConnectionRegistry())
-                .flatMap(registry -> registry.getVoiceConnection(this.guildId))
+                .flatMap(registry -> registry.getVoiceConnection(Snowflake.of(this.guildId)))
                 .flatMap(VoiceConnection::disconnect)
                 .subscribe(null, ExceptionHandler::handleUnknownError));
     }
@@ -79,7 +79,7 @@ public class GuildMusic {
         // If there is no music playing and nothing is loading, leave the voice channel
         if (this.trackScheduler.isStopped() && this.listeners.values().stream().allMatch(Future::isDone)) {
             return this.gateway.getVoiceConnectionRegistry()
-                    .getVoiceConnection(this.guildId)
+                    .getVoiceConnection(Snowflake.of(this.guildId))
                     .flatMap(VoiceConnection::disconnect);
         }
         return Mono.empty();
@@ -89,7 +89,7 @@ public class GuildMusic {
         LOGGER.debug("{Guild ID: {}} Ending guild music", this.guildId);
         return this.getGateway()
                 .getVoiceConnectionRegistry()
-                .getVoiceConnection(this.guildId)
+                .getVoiceConnection(Snowflake.of(this.guildId))
                 .flatMap(VoiceConnection::disconnect)
                 .then(this.getMessageChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel))
