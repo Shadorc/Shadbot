@@ -47,6 +47,9 @@ public class SettingsBean implements Bean {
     @Nullable
     @JsonProperty("restricted_categories")
     private Map<String, Set<String>> restrictedCategories;
+    @Nullable
+    @JsonProperty
+    private Map<String, Set<String>> restrictedRoles;
 
     public SettingsBean() {
 
@@ -112,6 +115,11 @@ public class SettingsBean implements Bean {
         return this.restrictedCategories;
     }
 
+    @Nullable
+    public Map<String, Set<String>> getRestrictedRoles() {
+        return this.restrictedRoles;
+    }
+
     @Override
     public String toString() {
         return "SettingsBean{" +
@@ -127,6 +135,7 @@ public class SettingsBean implements Bean {
                 ", messageChannelId='" + this.messageChannelId + '\'' +
                 ", prefix='" + this.prefix + '\'' +
                 ", restrictedCategories=" + this.restrictedCategories +
+                ", restrictedRoles=" + this.restrictedRoles +
                 '}';
     }
 }

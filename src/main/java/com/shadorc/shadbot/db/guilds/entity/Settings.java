@@ -2,6 +2,7 @@ package com.shadorc.shadbot.db.guilds.entity;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
+import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.guilds.bean.SettingsBean;
@@ -147,6 +148,19 @@ public class Settings extends SerializableEntity<SettingsBean> {
                         entry -> entry.getValue()
                                 .stream()
                                 .map(value -> Utils.parseEnum(CommandCategory.class, value))
+                                .collect(Collectors.toSet())));
+    }
+
+    public Map<Snowflake, Set<BaseCmd>> getRestrictedRoles() {
+        return Optional.ofNullable(this.getBean())
+                .map(SettingsBean::getRestrictedCategories)
+                .orElse(new HashMap<>())
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> Snowflake.of(entry.getKey()),
+                        entry -> entry.getValue()
+                                .stream()
+                                .map(CommandManager.getInstance()::getCommand)
                                 .collect(Collectors.toSet())));
     }
 
