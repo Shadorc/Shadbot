@@ -57,6 +57,7 @@ public class AutoMessagesSetting extends BaseSetting {
 
         return Flux.merge(getJoinMessage, getLeaveMessage, getAutoMessage)
                 .reduce("", (value, text) -> value + "\n" + text)
+                .filter(value -> !value.isBlank())
                 .map(builder::value)
                 .map(ImmutableEmbedFieldData.Builder::build);
     }

@@ -17,8 +17,10 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.channel.GuildChannel;
+import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
@@ -45,8 +47,16 @@ public class RestrictedChannelsSetting extends BaseSetting {
 
     @Override
     public Mono<ImmutableEmbedFieldData> show(Context context, Settings settings) {
-        // TODO
-        return Mono.empty();
+        return Flux.fromIterable(settings.getRestrictedChannels().entrySet())
+                .flatMap(entry -> Mono.zip(context.getClient().getChannelById(entry.getKey()).cast(TextChannel.class),
+                        Mono.just(FormatUtils.format(entry.getValue(), BaseCmd::getName, ", "))))
+                .map(tuple -> String.format("%s: %s", tuple.getT1().getMention(), tuple.getT2()))
+                .reduce("", (value, text) -> value + "\n" + text)
+                .filter(value -> !value.isBlank())
+                .map(value -> ImmutableEmbedFieldData.builder()
+                        .name("Restricted channels")
+                        .value(value)
+                        .build());
     }
 
     @Override

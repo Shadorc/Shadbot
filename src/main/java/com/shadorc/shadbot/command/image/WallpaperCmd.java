@@ -38,7 +38,8 @@ public class WallpaperCmd extends BaseCmd {
                 .send()
                 .thenReturn(new StringBuilder(HOME_URL))
                 .map(urlBuilder -> {
-                    urlBuilder.append(String.format("?apikey=%s&purity=100", CredentialManager.getInstance().get(Credential.WALLHAVEN_API_KEY)));
+                    urlBuilder.append(String.format("?apikey=%s&purity=100",
+                            CredentialManager.getInstance().get(Credential.WALLHAVEN_API_KEY)));
 
                     if (arg.isBlank()) {
                         urlBuilder.append("&sorting=toplist");

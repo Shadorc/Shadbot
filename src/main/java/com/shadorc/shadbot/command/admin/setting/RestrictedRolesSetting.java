@@ -19,6 +19,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
@@ -45,8 +46,16 @@ public class RestrictedRolesSetting extends BaseSetting {
 
     @Override
     public Mono<ImmutableEmbedFieldData> show(Context context, Settings settings) {
-        // TODO
-        return Mono.empty();
+        return Flux.fromIterable(settings.getRestrictedRoles().entrySet())
+                .flatMap(entry -> Mono.zip(context.getClient().getRoleById(context.getGuildId(), entry.getKey()),
+                        Mono.just(FormatUtils.format(entry.getValue(), BaseCmd::getName, ", "))))
+                .map(tuple -> String.format("%s: %s", tuple.getT1().getMention(), tuple.getT2()))
+                .reduce("", (value, text) -> value + "\n" + text)
+                .filter(value -> !value.isBlank())
+                .map(value -> ImmutableEmbedFieldData.builder()
+                        .name("Restricted roles")
+                        .value(value)
+                        .build());
     }
 
     @Override

@@ -54,6 +54,7 @@ public class AllowedChannelsSetting extends BaseSetting {
 
         return Flux.merge(getTextChannels, getVoiceChannels)
                 .reduce("", (value, text) -> value + "\n" + text)
+                .filter(value -> !value.isBlank())
                 .map(value -> ImmutableEmbedFieldData.builder()
                         .name("Allowed channels")
                         .value(value)
