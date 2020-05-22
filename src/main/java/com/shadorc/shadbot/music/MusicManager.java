@@ -26,7 +26,6 @@ import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.voice.AudioProvider;
 import discord4j.voice.VoiceConnection;
 import discord4j.voice.retry.VoiceGatewayException;
-import io.prometheus.client.Gauge;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
@@ -42,8 +41,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MusicManager {
 
     public static final Logger LOGGER = Loggers.getLogger("shadbot.music");
-    private static final Gauge GUILD_MUSIC_GAUGE = Gauge.build().namespace("shadbot").name("guild_music_count")
-            .help("Guild music count").register();
 
     private static MusicManager instance;
 
@@ -106,7 +103,6 @@ public class MusicManager {
                             .map(trackScheduler -> new GuildMusic(gateway, guildId, trackScheduler))
                             .doOnNext(guildMusic -> {
                                 this.guildMusics.put(guildId, guildMusic);
-                                GUILD_MUSIC_GAUGE.inc();
                                 LOGGER.debug("{Guild ID: {}} Guild music created", guildId.asLong());
                             });
                 }));
@@ -146,7 +142,6 @@ public class MusicManager {
         final GuildMusic guildMusic = this.guildMusics.remove(guildId);
         if (guildMusic != null) {
             guildMusic.destroy();
-            GUILD_MUSIC_GAUGE.dec();
             LOGGER.debug("{Guild ID: {}} Guild music destroyed", guildId.asLong());
         }
 
