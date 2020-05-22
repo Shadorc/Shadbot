@@ -10,6 +10,8 @@ public class Wallpaper {
     private String path;
     @JsonProperty("resolution")
     private String resolution;
+    @JsonProperty("purity")
+    private String purity;
 
     public String getUrl() {
         return this.url;
@@ -22,4 +24,9 @@ public class Wallpaper {
     public String getResolution() {
         return this.resolution;
     }
+
+    public String getPurity() {
+        return this.purity;
+    }
+
 }

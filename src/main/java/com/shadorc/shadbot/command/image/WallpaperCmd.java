@@ -12,6 +12,7 @@ import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.TextUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -38,11 +39,11 @@ public class WallpaperCmd extends BaseCmd {
                 .send()
                 .thenReturn(new StringBuilder(HOME_URL))
                 .map(urlBuilder -> {
-                    urlBuilder.append(String.format("?apikey=%s&purity=100",
+                    urlBuilder.append(String.format("?apikey=%s",
                             CredentialManager.getInstance().get(Credential.WALLHAVEN_API_KEY)));
 
                     if (arg.isBlank()) {
-                        urlBuilder.append("&sorting=toplist");
+                        urlBuilder.append("&sorting=toplist&purity=100");
                     } else {
                         final String keywords = Arrays.stream(arg.split("[, ]"))
                                 .map(keyword -> String.format("+%s", NetUtils.encode(keyword.trim())))
@@ -55,20 +56,26 @@ public class WallpaperCmd extends BaseCmd {
                 })
                 .flatMap(url -> NetUtils.get(url, WallhavenResponse.class))
                 .map(WallhavenResponse::getWallpapers)
-                .map(wallpapers -> {
-                    if (wallpapers.isEmpty()) {
-                        return updatableMsg.setContent(
-                                String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
-                                        context.getUsername(), arg));
+                .filter(wallpapers -> !wallpapers.isEmpty())
+                .map(Utils::randValue)
+                .zipWith(context.isChannelNsfw())
+                .map(tuple -> {
+                    final Wallpaper wallpaper = tuple.getT1();
+                    final boolean isNsfw = tuple.getT2();
+
+                    if (!"sfw".equals(wallpaper.getPurity()) && !isNsfw) {
+                        return updatableMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
                     }
 
-                    final Wallpaper wallpaper = Utils.randValue(wallpapers);
                     return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor(String.format("Wallpaper: %s", arg.isBlank() ? "random" : arg),
-                                    wallpaper.getUrl(), context.getAvatarUrl())
+                            .andThen(embed -> embed.setAuthor(String.format("Wallpaper: %s",
+                                    arg.isBlank() ? "random" : arg), wallpaper.getUrl(), context.getAvatarUrl())
                                     .setImage(wallpaper.getPath())
                                     .addField("Resolution", wallpaper.getResolution(), false)));
                 })
+                .switchIfEmpty(Mono.just(updatableMsg.setContent(
+                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
+                                context.getUsername(), arg))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
