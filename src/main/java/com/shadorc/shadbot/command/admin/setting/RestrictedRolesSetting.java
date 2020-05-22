@@ -2,6 +2,7 @@ package com.shadorc.shadbot.command.admin.setting;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
@@ -9,6 +10,7 @@ import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
@@ -17,7 +19,7 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +30,10 @@ public class RestrictedRolesSetting extends BaseSetting {
 
     private enum Action {
         ADD, REMOVE;
+    }
+
+    private enum Type {
+        COMMAND, CATEGORY;
     }
 
     public RestrictedRolesSetting() {
@@ -43,9 +49,27 @@ public class RestrictedRolesSetting extends BaseSetting {
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(1), FormatUtils.options(Action.class))));
 
-        final BaseCmd cmd = CommandManager.getInstance().getCommand(args.get(2));
-        if (cmd == null) {
-            return Mono.error(new CommandException(String.format("`%s` is not a valid command.", args.get(2))));
+        final Type type = Utils.parseEnum(Type.class, args.get(2),
+                new CommandException(String.format("`%s` is not a valid type. %s",
+                        args.get(2), FormatUtils.options(Type.class))));
+
+        final Set<BaseCmd> commands = new HashSet<>();
+        switch (type) {
+            case COMMAND:
+                final BaseCmd command = CommandManager.getInstance().getCommand(args.get(3));
+                if (command == null) {
+                    return Mono.error(new CommandException(String.format("`%s` is not a valid command.", args.get(3))));
+                }
+                commands.add(command);
+                break;
+            case CATEGORY:
+                final CommandCategory category = Utils.parseEnum(CommandCategory.class, args.get(2),
+                        new CommandException(String.format("`%s` is not a valid category. %s",
+                                args.get(2), FormatUtils.options(CommandCategory.class))));
+                commands.addAll(CommandManager.getInstance().getCommands().values().stream()
+                        .filter(cmd -> cmd.getCategory() == category)
+                        .collect(Collectors.toSet()));
+                break;
         }
 
         return context.getGuild()
@@ -68,22 +92,21 @@ public class RestrictedRolesSetting extends BaseSetting {
 
                     switch (action) {
                         case ADD:
-                            restrictedRoles.computeIfAbsent(mentionedRole.getId(),
-                                    ignored -> Collections.emptySet())
-                                    .add(cmd);
+                            restrictedRoles.computeIfAbsent(mentionedRole.getId(), ignored -> new HashSet<>())
+                                    .addAll(commands);
                             strBuilder.append(
-                                    String.format("The command `%s` can now be only used by role **%s**.",
-                                            cmd.getName(), mentionedRole.getName()));
+                                    String.format("Command(s) %s can now be only used by role **#%s**.",
+                                            FormatUtils.format(commands, cmd -> String.format("`%s`", cmd.getName()), " "),
+                                            mentionedRole.getName()));
                             break;
                         case REMOVE:
                             if (restrictedRoles.containsKey(mentionedRole.getId())) {
-                                restrictedRoles.get(mentionedRole.getId()).remove(cmd);
+                                restrictedRoles.get(mentionedRole.getId()).removeAll(commands);
                             }
                             strBuilder.append(
-                                    String.format("The command category `%s` can now be used by everyone.", cmd.getName()));
+                                    String.format("Command(s) %s can now be used everywhere.",
+                                            FormatUtils.format(commands, cmd -> String.format("`%s`", cmd.getName()), " ")));
                             break;
-                        default:
-                            throw new IllegalStateException(String.format("Unknown action: %s", action));
                     }
 
                     final Map<String, Set<String>> setting = restrictedRoles
@@ -104,15 +127,14 @@ public class RestrictedRolesSetting extends BaseSetting {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <command> <role>`",
-                        context.getPrefix(), this.getCommandName()), false)
-                        .addField("Argument",
-                                String.format("**action** - %s", FormatUtils.format(Action.class, "/"))
-                                        + "%n**command** - command's name"
-                                        + String.format("%n**channel** - the role to %s", FormatUtils.format(Action.class, "/")),
-                                false)
-                        .addField("Example", String.format("`%s%s add play @admin`",
-                                context.getPrefix(), this.getCommandName()), false));
+        return SettingHelpBuilder.create(this, context)
+                .addArg("action", FormatUtils.format(Action.class, "/"), false)
+                .addArg("type", FormatUtils.format(Type.class, "/"), false)
+                .addArg("name", "command/category name", false)
+                .addArg("role", String.format("the role to %s", FormatUtils.format(Action.class, "/")), false)
+                .setExample(String.format("`%s%s add command play @admin`" +
+                                "%n`%s%s add category nsfw @nsfw`",
+                        context.getPrefix(), this.getCommandName(), context.getPrefix(), context.getCommandName()))
+                .build();
     }
 }
