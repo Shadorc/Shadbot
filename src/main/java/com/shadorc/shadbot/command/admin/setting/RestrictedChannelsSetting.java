@@ -1,7 +1,9 @@
 package com.shadorc.shadbot.command.admin.setting;
 
 import com.shadorc.shadbot.command.CommandException;
+import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
+import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
@@ -17,7 +19,7 @@ import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +30,10 @@ public class RestrictedChannelsSetting extends BaseSetting {
 
     private enum Action {
         ADD, REMOVE;
+    }
+
+    private enum Type {
+        COMMAND, CATEGORY;
     }
 
     public RestrictedChannelsSetting() {
@@ -43,9 +49,28 @@ public class RestrictedChannelsSetting extends BaseSetting {
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(1), FormatUtils.options(Action.class))));
 
-        final CommandCategory category = Utils.parseEnum(CommandCategory.class, args.get(2),
-                new CommandException(String.format("`%s` is not a valid category. %s",
-                        args.get(2), FormatUtils.options(CommandCategory.class))));
+        final Type type = Utils.parseEnum(Type.class, args.get(2),
+                new CommandException(String.format("`%s` is not a valid type. %s",
+                        args.get(2), FormatUtils.options(Type.class))));
+
+        final Set<BaseCmd> commands = new HashSet<>();
+        switch (type) {
+            case COMMAND:
+                final BaseCmd command = CommandManager.getInstance().getCommand(args.get(3));
+                if (command == null) {
+                    return Mono.error(new CommandException(String.format("`%s` is not a valid command.", args.get(3))));
+                }
+                commands.add(command);
+                break;
+            case CATEGORY:
+                final CommandCategory category = Utils.parseEnum(CommandCategory.class, args.get(2),
+                        new CommandException(String.format("`%s` is not a valid category. %s",
+                                args.get(2), FormatUtils.options(CommandCategory.class))));
+                commands.addAll(CommandManager.getInstance().getCommands().values().stream()
+                        .filter(cmd -> cmd.getCategory() == category)
+                        .collect(Collectors.toSet()));
+                break;
+        }
 
         return context.getGuild()
                 .flatMapMany(guild -> DiscordUtils.extractChannels(guild, args.get(3)))
@@ -63,26 +88,25 @@ public class RestrictedChannelsSetting extends BaseSetting {
                     final DBGuild dbGuild = tuple.getT2();
 
                     final StringBuilder strBuilder = new StringBuilder();
-                    final Map<Snowflake, Set<CommandCategory>> restrictedCategories = dbGuild.getSettings()
+                    final Map<Snowflake, Set<BaseCmd>> restrictedCategories = dbGuild.getSettings()
                             .getRestrictedChannels();
                     switch (action) {
                         case ADD:
-                            restrictedCategories.computeIfAbsent(mentionedChannel.getId(),
-                                    ignored -> EnumSet.noneOf(CommandCategory.class))
-                                    .add(category);
+                            restrictedCategories.computeIfAbsent(mentionedChannel.getId(), ignored -> new HashSet<>())
+                                    .addAll(commands);
                             strBuilder.append(
-                                    String.format("The command category `%s` can now be only used in channel **#%s**.",
-                                            category, mentionedChannel.getName()));
+                                    String.format("Command(s) %s can now be only used in channel **#%s**.",
+                                            FormatUtils.format(commands, cmd -> String.format("`%s`", cmd.getName()), " "),
+                                            mentionedChannel.getName()));
                             break;
                         case REMOVE:
                             if (restrictedCategories.containsKey(mentionedChannel.getId())) {
-                                restrictedCategories.get(mentionedChannel.getId()).remove(category);
+                                restrictedCategories.get(mentionedChannel.getId()).removeAll(commands);
                             }
                             strBuilder.append(
-                                    String.format("The command category `%s` can now be used everywhere.", category));
+                                    String.format("Command(s) %s can now be used everywhere.",
+                                            FormatUtils.format(commands, cmd -> String.format("`%s`", cmd.getName()), " ")));
                             break;
-                        default:
-                            throw new IllegalStateException(String.format("Unknown action: %s", action));
                     }
 
                     final Map<String, Set<String>> setting = restrictedCategories
@@ -91,7 +115,7 @@ public class RestrictedChannelsSetting extends BaseSetting {
                             .collect(Collectors.toMap(
                                     entry -> entry.getKey().asString(),
                                     entry -> entry.getValue().stream()
-                                            .map(Object::toString)
+                                            .map(BaseCmd::getName)
                                             .collect(Collectors.toSet())));
 
                     return dbGuild.setSetting(Setting.RESTRICTED_CHANNELS, setting)
@@ -105,9 +129,12 @@ public class RestrictedChannelsSetting extends BaseSetting {
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return SettingHelpBuilder.create(this, context)
                 .addArg("action", FormatUtils.format(Action.class, "/"), false)
-                .addArg("category", FormatUtils.format(CommandCategory.class, "/"), false)
+                .addArg("type", FormatUtils.format(Type.class, "/"), false)
+                .addArg("name", "command/category name", false)
                 .addArg("channel", String.format("the channel to %s", FormatUtils.format(Action.class, "/")), false)
-                .setExample(String.format("`%s%s add music #music`", context.getPrefix(), this.getCommandName()))
+                .setExample(String.format("`%s%s add category music #music`" +
+                                "%n`%s%s add command rule34 #nsfw`",
+                        context.getPrefix(), this.getCommandName(), context.getPrefix(), this.getCommandName()))
                 .build();
     }
 }
