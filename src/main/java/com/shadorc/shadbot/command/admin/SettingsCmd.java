@@ -18,6 +18,7 @@ import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -77,10 +78,20 @@ public class SettingsCmd extends BaseCmd {
         return Flux.fromIterable(SettingManager.getInstance().getSettings().values())
                 .distinct()
                 .flatMap(setting -> setting.show(context, settings))
-                .reduce("", (desc, text) -> desc + "\n" + text)
-                .map(text -> DiscordUtils.getDefaultEmbed()
-                        .andThen(embed -> embed.setAuthor("Settings", null, context.getAvatarUrl())
-                                .setDescription(text.isEmpty() ? "There is no custom settings for this server." : text)));
+                .collectList()
+                .map(fields -> DiscordUtils.getDefaultEmbed()
+                        .andThen(embed -> {
+                            embed.setAuthor("Settings", null, context.getAvatarUrl());
+
+                            if (fields.isEmpty()) {
+                                embed.setDescription("There is no custom settings for this server.");
+                            } else {
+                                for (final ImmutableEmbedFieldData field : fields) {
+                                    embed.addField("**" + field.name() + "**", field.value(),
+                                            field.inline().toOptional().orElse(false));
+                                }
+                            }
+                        }));
     }
 
     @Override

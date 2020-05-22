@@ -12,8 +12,8 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.rest.util.Permission;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -31,8 +31,8 @@ public class NSFWSetting extends BaseSetting {
     }
 
     @Override
-    public Flux<String> show(Context context, Settings settings) {
-        return Flux.empty();
+    public Mono<ImmutableEmbedFieldData> show(Context context, Settings settings) {
+        return Mono.empty();
     }
 
     @Override

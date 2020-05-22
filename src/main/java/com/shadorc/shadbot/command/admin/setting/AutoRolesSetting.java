@@ -15,6 +15,7 @@ import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -36,14 +37,17 @@ public class AutoRolesSetting extends BaseSetting {
     }
 
     @Override
-    public Flux<String> show(Context context, Settings settings) {
+    public Mono<ImmutableEmbedFieldData> show(Context context, Settings settings) {
         return Flux.fromIterable(settings.getAutoRoleIds())
                 .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
                 .map(Role::getMention)
                 .collectList()
                 .filter(roles -> !roles.isEmpty())
-                .map(roles -> String.format("**Auto-roles:**%n\t%s", String.join("\n\t", roles)))
-                .flux();
+                .map(roles -> String.join(", ", roles))
+                .map(value -> ImmutableEmbedFieldData.builder()
+                        .name("Auto-roles")
+                        .value(value)
+                        .build());
     }
 
     @Override

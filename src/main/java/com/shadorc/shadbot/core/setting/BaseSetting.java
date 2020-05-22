@@ -5,7 +5,8 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
-import reactor.core.publisher.Flux;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -32,6 +33,6 @@ public abstract class BaseSetting extends BaseCmd {
         return String.format("setting %s", this.getName());
     }
 
-    public abstract Flux<String> show(Context context, Settings settings);
+    public abstract Mono<ImmutableEmbedFieldData> show(Context context, Settings settings);
 
 }

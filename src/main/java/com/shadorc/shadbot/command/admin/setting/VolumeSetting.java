@@ -12,7 +12,7 @@ import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.core.spec.EmbedCreateSpec;
-import reactor.core.publisher.Flux;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -29,11 +29,13 @@ public class VolumeSetting extends BaseSetting {
     }
 
     @Override
-    public Flux<String> show(Context context, Settings settings) {
-        if (settings.getDefaultVol() != Config.DEFAULT_VOLUME) {
-            return Flux.just(String.format("**Default volume:** %d%%", settings.getDefaultVol()));
-        }
-        return Flux.empty();
+    public Mono<ImmutableEmbedFieldData> show(Context context, Settings settings) {
+        return Mono.just(settings.getDefaultVol())
+                .filter(volume -> volume != Config.DEFAULT_VOLUME)
+                .map(volume -> ImmutableEmbedFieldData.builder()
+                        .name("Default volume")
+                        .value(String.format("%d%%", volume))
+                        .build());
     }
 
     @Override

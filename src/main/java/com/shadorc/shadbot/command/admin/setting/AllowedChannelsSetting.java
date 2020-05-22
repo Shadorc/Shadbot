@@ -16,9 +16,9 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 
 import java.util.List;
 import java.util.Set;
@@ -37,24 +37,27 @@ public class AllowedChannelsSetting extends BaseSetting {
     }
 
     @Override
-    public Flux<String> show(Context context, Settings settings) {
-        final Mono<String> textChannels = Flux.fromIterable(settings.getAllowedTextChannelIds())
+    public Mono<ImmutableEmbedFieldData> show(Context context, Settings settings) {
+        final Mono<String> getTextChannels = Flux.fromIterable(settings.getAllowedTextChannelIds())
                 .flatMap(context.getClient()::getChannelById)
                 .map(Channel::getMention)
                 .collectList()
                 .filter(channels -> !channels.isEmpty())
-                .map(channels -> String.format("**Allowed text channels:**%n\t%s",
-                        String.join("\n\t", channels)));
+                .map(channels -> String.format("Text channels: %s", String.join(", ", channels)));
 
-        final Mono<String> voiceChannels = Flux.fromIterable(settings.getAllowedVoiceChannelIds())
+        final Mono<String> getVoiceChannels = Flux.fromIterable(settings.getAllowedVoiceChannelIds())
                 .flatMap(context.getClient()::getChannelById)
                 .map(Channel::getMention)
                 .collectList()
                 .filter(channels -> !channels.isEmpty())
-                .map(channels -> String.format("**Allowed voice channels:**%n\t%s",
-                        String.join("\n\t", channels)));
+                .map(channels -> String.format("Voice channels: %s", String.join(", ", channels)));
 
-        return Flux.merge(textChannels, voiceChannels);
+        return Flux.merge(getTextChannels, getVoiceChannels)
+                .reduce("", (value, text) -> value + "\n" + text)
+                .map(value -> ImmutableEmbedFieldData.builder()
+                        .name("Allowed channels")
+                        .value(value)
+                        .build());
     }
 
     @Override

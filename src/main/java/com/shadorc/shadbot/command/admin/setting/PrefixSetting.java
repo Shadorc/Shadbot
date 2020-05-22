@@ -11,7 +11,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.spec.EmbedCreateSpec;
-import reactor.core.publisher.Flux;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -27,11 +27,13 @@ public class PrefixSetting extends BaseSetting {
     }
 
     @Override
-    public Flux<String> show(Context context, Settings settings) {
-        if (!settings.getPrefix().equals(Config.DEFAULT_PREFIX)) {
-            return Flux.just(String.format("**Prefix:** %s", context.getPrefix()));
-        }
-        return Flux.empty();
+    public Mono<ImmutableEmbedFieldData> show(Context context, Settings settings) {
+        return Mono.just(settings.getPrefix())
+                .filter(prefix -> !prefix.equals(Config.DEFAULT_PREFIX))
+                .map(prefix -> ImmutableEmbedFieldData.builder()
+                        .name("Prefix")
+                        .value(prefix)
+                        .build());
     }
 
     @Override

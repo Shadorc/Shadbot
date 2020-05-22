@@ -18,7 +18,7 @@ import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.spec.EmbedCreateSpec;
-import reactor.core.publisher.Flux;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
@@ -44,9 +44,9 @@ public class RestrictedChannelsSetting extends BaseSetting {
     }
 
     @Override
-    public Flux<String> show(Context context, Settings settings) {
+    public Mono<ImmutableEmbedFieldData> show(Context context, Settings settings) {
         // TODO
-        return Flux.empty();
+        return Mono.empty();
     }
 
     @Override

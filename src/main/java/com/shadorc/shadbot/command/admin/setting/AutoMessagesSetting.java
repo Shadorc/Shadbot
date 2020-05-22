@@ -17,6 +17,7 @@ import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -39,19 +40,25 @@ public class AutoMessagesSetting extends BaseSetting {
     }
 
     @Override
-    public Flux<String> show(Context context, Settings settings) {
+    public Mono<ImmutableEmbedFieldData> show(Context context, Settings settings) {
         final Mono<String> getJoinMessage = Mono.justOrEmpty(settings.getJoinMessage())
-                .map(joinMessage -> String.format("**Join message:**%n%s", joinMessage));
+                .map(joinMessage -> String.format("Join message: %s", joinMessage));
 
         final Mono<String> getLeaveMessage = Mono.justOrEmpty(settings.getLeaveMessage())
-                .map(leaveMessage -> String.format("**Leave message:**%n%s", leaveMessage));
+                .map(leaveMessage -> String.format("Leave message: %s", leaveMessage));
 
         final Mono<String> getAutoMessage = Mono.justOrEmpty(settings.getMessageChannelId())
                 .flatMap(context.getClient()::getChannelById)
                 .map(Channel::getMention)
-                .map(channel -> String.format("**Auto message channel:**%n%s", channel));
+                .map(channel -> String.format("Channel: %s", channel));
 
-        return Flux.merge(getJoinMessage, getLeaveMessage, getAutoMessage);
+        final ImmutableEmbedFieldData.Builder builder = ImmutableEmbedFieldData.builder()
+                .name("Auto-messages");
+
+        return Flux.merge(getJoinMessage, getLeaveMessage, getAutoMessage)
+                .reduce("", (value, text) -> value + "\n" + text)
+                .map(builder::value)
+                .map(ImmutableEmbedFieldData.Builder::build);
     }
 
     @Override

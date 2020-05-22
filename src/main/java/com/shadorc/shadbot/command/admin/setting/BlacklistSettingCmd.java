@@ -16,7 +16,7 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
-import reactor.core.publisher.Flux;
+import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
@@ -41,12 +41,14 @@ public class BlacklistSettingCmd extends BaseSetting {
     }
 
     @Override
-    public Flux<String> show(Context context, Settings settings) {
-        if (!settings.getBlacklistedCmds().isEmpty()) {
-            return Flux.just(String.format("**Blacklisted commands:**%n\t%s",
-                    String.join("\n\t", settings.getBlacklistedCmds())));
-        }
-        return Flux.empty();
+    public Mono<ImmutableEmbedFieldData> show(Context context, Settings settings) {
+        return Mono.just(settings.getBlacklistedCmds())
+                .filter(blacklistedCmds -> !blacklistedCmds.isEmpty())
+                .map(blacklistedCmds -> ImmutableEmbedFieldData.builder()
+                        .name("Blacklisted commands")
+                        .value(String.join(", ", blacklistedCmds))
+                        .inline(false)
+                        .build());
     }
 
     @Override
