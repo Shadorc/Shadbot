@@ -65,6 +65,7 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return allowedVoiceChannelIds.contains(channelId);
     }
 
+    // TODO: Change to isCommandAllowedToChannel
     public boolean isCategoryAllowed(Snowflake channelId, CommandCategory category) {
         final Map<Snowflake, Set<CommandCategory>> map = this.getRestrictedCategories();
         // If no permission has been set
@@ -76,6 +77,19 @@ public class Settings extends SerializableEntity<SettingsBean> {
             return true;
         }
         return map.values().stream().noneMatch(set -> set.contains(category));
+    }
+
+    public boolean isCommandAllowedToRole(BaseCmd cmd, Snowflake roleId) {
+        final Map<Snowflake, Set<BaseCmd>> map = this.getRestrictedRoles();
+        // If no permission has been set
+        if (map.isEmpty()) {
+            return true;
+        }
+        // If this command has explicitly been allowed to this role
+        if (map.containsKey(roleId) && map.get(roleId).contains(cmd)) {
+            return true;
+        }
+        return map.values().stream().noneMatch(set -> set.contains(cmd));
     }
 
     public Set<Snowflake> getAllowedTextChannelIds() {

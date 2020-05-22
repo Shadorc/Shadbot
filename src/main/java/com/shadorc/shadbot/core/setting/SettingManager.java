@@ -22,7 +22,7 @@ public class SettingManager {
         this.settingsMap = this.initialize(
                 new AllowedChannelsSetting(), new AllowedRolesSetting(), new AutoMessagesSetting(),
                 new AutoRolesSetting(), new BlacklistSettingCmd(), new NSFWSetting(), new PrefixSetting(),
-                new VolumeSetting(), new RestrictedCategoriesSetting());
+                new VolumeSetting(), new RestrictedCategoriesSetting(), new RestrictedRolesSetting());
     }
 
     private Map<String, BaseSetting> initialize(BaseSetting... settings) {

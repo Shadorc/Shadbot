@@ -121,6 +121,11 @@ public class MessageProcessor {
         if (!dbGuild.getSettings().isCategoryAllowed(context.getChannelId(), command.getCategory())) {
             return Mono.empty();
         }
+        // This command is not allowed to this role
+        if (context.getMember().getRoleIds().stream()
+                .noneMatch(roleId -> dbGuild.getSettings().isCommandAllowedToRole(command, roleId))) {
+            return Mono.empty();
+        }
 
         COMMAND_USAGE_COUNTER.labels(command.getName()).inc();
 
