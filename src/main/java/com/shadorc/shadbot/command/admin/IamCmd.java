@@ -10,14 +10,12 @@ import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.bean.setting.IamBean;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.setting.Iam;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.ReactionMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
-import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.reaction.ReactionEmoji.Unicode;
@@ -25,6 +23,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.util.List;
@@ -80,10 +79,7 @@ public class IamCmd extends BaseCmd {
                             return new ReactionMessage(context.getClient(), context.getChannelId(), List.of(REACTION))
                                     .send(embedConsumer)
                                     .zipWith(DatabaseManager.getGuilds().getDBGuild(context.getGuildId()))
-                                    .flatMap(tuple -> {
-                                        final Message message = tuple.getT1();
-                                        final DBGuild dbGuild = tuple.getT2();
-
+                                    .flatMap(TupleUtils.function((message, dbGuild) -> {
                                         // Converts the new message to an IamBean
                                         final List<IamBean> iamList = roles.stream()
                                                 .map(Role::getId)
@@ -99,7 +95,7 @@ public class IamCmd extends BaseCmd {
                                                 .collect(Collectors.toList()));
 
                                         return dbGuild.setSetting(Setting.IAM_MESSAGES, iamList);
-                                    });
+                                    }));
                         }))
                 .then();
     }

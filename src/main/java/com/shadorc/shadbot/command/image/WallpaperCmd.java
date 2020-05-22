@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.wallhaven.WallhavenResponse;
-import com.shadorc.shadbot.api.json.image.wallhaven.Wallpaper;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -16,6 +15,7 @@ import com.shadorc.shadbot.utils.TextUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,10 +59,7 @@ public class WallpaperCmd extends BaseCmd {
                 .filter(wallpapers -> !wallpapers.isEmpty())
                 .map(Utils::randValue)
                 .zipWith(context.isChannelNsfw())
-                .map(tuple -> {
-                    final Wallpaper wallpaper = tuple.getT1();
-                    final boolean isNsfw = tuple.getT2();
-
+                .map(TupleUtils.function((wallpaper, isNsfw) -> {
                     if (!"sfw".equals(wallpaper.getPurity()) && !isNsfw) {
                         return updatableMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
                     }
@@ -72,7 +69,7 @@ public class WallpaperCmd extends BaseCmd {
                                     arg.isBlank() ? "random" : arg), wallpaper.getUrl(), context.getAvatarUrl())
                                     .setImage(wallpaper.getPath())
                                     .addField("Resolution", wallpaper.getResolution(), false)));
-                })
+                }))
                 .switchIfEmpty(Mono.just(updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
                                 context.getUsername(), arg))))

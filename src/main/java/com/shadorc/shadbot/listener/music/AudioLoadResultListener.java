@@ -19,6 +19,7 @@ import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -115,10 +116,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     private void onPlaylistLoaded(AudioPlaylist playlist) {
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .zipWith(DatabaseManager.getPremium().isPremium(this.guildId, this.djId))
-                .flatMap(tuple -> {
-                    final GuildMusic guildMusic = tuple.getT1();
-                    final boolean isPremium = tuple.getT2();
-
+                .flatMap(TupleUtils.function((guildMusic, isPremium) -> {
                     final TrackScheduler trackScheduler = guildMusic.getTrackScheduler();
                     final StringBuilder strBuilder = new StringBuilder();
 
@@ -136,7 +134,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                     strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded));
                     return guildMusic.getMessageChannel()
                             .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel));
-                })
+                }))
                 .then(this.terminate())
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, ExceptionHandler::handleUnknownError);

@@ -16,6 +16,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.util.HashSet;
@@ -40,7 +41,7 @@ public class AudioLoadResultInputs extends Inputs {
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
         return Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.listener.getGuildId()))
                 .zipWith(Mono.justOrEmpty(event.getMember()))
-                .map(tuple -> tuple.getT1().getDjId().equals(tuple.getT2().getId()));
+                .map(TupleUtils.function((guildMusic, member) -> guildMusic.getDjId().equals(member.getId())));
     }
 
     @Override
@@ -54,9 +55,7 @@ public class AudioLoadResultInputs extends Inputs {
                 .map(Settings::getPrefix);
 
         return Mono.zip(getGuildMusic, getPrefix)
-                .flatMap(tuple -> {
-                    final GuildMusic guildMusic = tuple.getT1();
-                    final String prefix = tuple.getT2();
+                .flatMap(TupleUtils.function((guildMusic, prefix) -> {
                     final String content = event.getMessage().getContent();
 
                     if (content.equals(String.format("%scancel", prefix))) {
@@ -92,7 +91,7 @@ public class AudioLoadResultInputs extends Inputs {
                     choices.forEach(choice -> this.listener.trackLoaded(this.listener.getResultTracks().get(choice - 1)));
                     guildMusic.setWaitingForChoice(false);
                     return Mono.empty();
-                });
+                }));
     }
 
     @Override

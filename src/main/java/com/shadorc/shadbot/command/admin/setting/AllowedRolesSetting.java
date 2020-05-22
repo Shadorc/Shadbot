@@ -5,7 +5,6 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
@@ -18,6 +17,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -68,10 +68,7 @@ public class AllowedRolesSetting extends BaseSetting {
                     return Mono.zip(Mono.just(mentionedRoles),
                             DatabaseManager.getGuilds().getDBGuild(context.getGuildId()));
                 })
-                .flatMap(tuple -> {
-                    final List<Role> mentionedRoles = tuple.getT1();
-                    final DBGuild dbGuild = tuple.getT2();
-
+                .flatMap(TupleUtils.function((mentionedRoles, dbGuild) -> {
                     final Set<Snowflake> allowedRoles = dbGuild.getSettings().getAllowedRoleIds();
                     final Set<Snowflake> mentionedRoleIds = mentionedRoles.stream()
                             .map(Role::getId)
@@ -95,7 +92,7 @@ public class AllowedRolesSetting extends BaseSetting {
 
                     return dbGuild.setSetting(this.getSetting(), allowedRoles)
                             .thenReturn(strBuilder);
-                })
+                }))
                 .map(StringBuilder::toString)
                 .flatMap(text -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))

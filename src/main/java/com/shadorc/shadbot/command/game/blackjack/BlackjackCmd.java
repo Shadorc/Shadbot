@@ -8,6 +8,7 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 import reactor.util.function.Tuples;
 
 import java.util.List;
@@ -35,10 +36,7 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
                                 .zipWith(Mono.just(bet));
                     }
                 })
-                .flatMap(tuple -> {
-                    final BlackjackGame blackjackGame = tuple.getT1();
-                    final long bet = tuple.getT2();
-
+                .flatMap(TupleUtils.function((blackjackGame, bet) -> {
                     final BlackjackPlayer player = new BlackjackPlayer(context.getGuildId(), context.getAuthorId(), bet);
                     // If the user was successfully added as a player
                     if (blackjackGame.addPlayerIfAbsent(player)) {
@@ -57,7 +55,7 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
                                     String.format(Emoji.INFO + " (**%s**) You're already participating.",
                                             context.getUsername()), channel))
                             .then();
-                });
+                }));
     }
 
     @Override

@@ -5,7 +5,6 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
@@ -14,11 +13,11 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.channel.Channel;
-import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -80,10 +79,7 @@ public class AllowedChannelsSetting extends BaseSetting {
                     return Mono.zip(Mono.just(mentionedChannels),
                             DatabaseManager.getGuilds().getDBGuild(context.getGuildId()));
                 })
-                .flatMap(tuple -> {
-                    final List<GuildChannel> mentionedChannels = tuple.getT1();
-                    final DBGuild dbGuild = tuple.getT2();
-
+                .flatMap(TupleUtils.function((mentionedChannels, dbGuild) -> {
                     final Set<Snowflake> allowedTextChannelIds = dbGuild.getSettings().getAllowedTextChannelIds();
                     final Set<Snowflake> allowedVoiceChannelIds = dbGuild.getSettings().getAllowedVoiceChannelIds();
 
@@ -136,7 +132,7 @@ public class AllowedChannelsSetting extends BaseSetting {
                     return dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds)
                             .then(dbGuild.setSetting(Setting.ALLOWED_VOICE_CHANNELS, allowedVoiceChannelIds))
                             .thenReturn(strBuilder);
-                })
+                }))
                 .map(StringBuilder::toString)
                 .flatMap(text -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))

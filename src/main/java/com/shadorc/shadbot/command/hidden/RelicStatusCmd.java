@@ -17,6 +17,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 import reactor.util.function.Tuple2;
 
 import java.time.Duration;
@@ -36,10 +37,7 @@ public class RelicStatusCmd extends BaseCmd {
         return DatabaseManager.getPremium()
                 .getUserRelics(context.getAuthorId())
                 .flatMap(relic -> RelicStatusCmd.getRelicAndGuild(context, relic))
-                .map(tuple -> {
-                    final Relic relic = tuple.getT1();
-                    final Optional<Guild> optGuild = tuple.getT2();
-
+                .map(TupleUtils.function((relic, optGuild) -> {
                     final StringBuilder descBuilder = new StringBuilder(String.format("**ID:** %s", relic.getId()));
 
                     optGuild.ifPresent(guild ->
@@ -66,7 +64,7 @@ public class RelicStatusCmd extends BaseCmd {
                     titleBuilder.append(String.format("Relic (%s)", relic.isExpired() ? "Expired" : "Activated"));
 
                     return ImmutableEmbedFieldData.of(titleBuilder.toString(), descBuilder.toString(), Possible.of(false));
-                })
+                }))
                 .collectList()
                 .filter(list -> !list.isEmpty())
                 .map(fields -> DiscordUtils.getDefaultEmbed()

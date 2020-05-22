@@ -11,6 +11,7 @@ import com.shadorc.shadbot.utils.TimeUtils;
 import io.prometheus.client.Summary;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
@@ -47,9 +48,7 @@ public class DiceGame extends MultiplayerGame<DiceCmd, DicePlayer> {
         final int winningNum = ThreadLocalRandom.current().nextInt(1, 7);
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
-                .flatMap(tuple -> {
-                    final DicePlayer player = tuple.getT1();
-                    final String username = tuple.getT2();
+                .flatMap(TupleUtils.function((player, username) -> {
                     if (player.getNumber() == winningNum) {
                         final long gains = Math.min((long) (this.bet * (this.getPlayers().size() + Constants.WIN_MULTIPLICATOR)),
                                 Config.MAX_COINS);
@@ -60,7 +59,7 @@ public class DiceGame extends MultiplayerGame<DiceCmd, DicePlayer> {
                         DICE_SUMMARY.labels("loss").observe(this.bet);
                         return Mono.just(String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(this.bet)));
                     }
-                })
+                }))
                 .collectList()
                 .doOnNext(list -> this.results = String.join("\n", list))
                 .then(this.getContext().getChannel())

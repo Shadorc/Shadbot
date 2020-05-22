@@ -11,6 +11,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -31,10 +32,11 @@ public class UserInfoCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         final Mono<Member> getMemberOrAuthor = context.getGuild()
-                .flatMap(guild -> DiscordUtils.extractMemberOrAuthor(guild, context.getMessage()));
+                .flatMap(guild -> DiscordUtils.extractMemberOrAuthor(guild, context.getMessage()))
+                .cache();
 
         return Mono.zip(getMemberOrAuthor, getMemberOrAuthor.flatMapMany(Member::getRoles).collectList())
-                .map(tuple -> this.getEmbed(tuple.getT1(), tuple.getT2(), context.getAvatarUrl()))
+                .map(TupleUtils.function((user, roles) -> this.getEmbed(user, roles, context.getAvatarUrl())))
                 .flatMap(embed -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
                 .then();

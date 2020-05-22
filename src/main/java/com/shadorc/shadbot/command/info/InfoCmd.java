@@ -16,11 +16,11 @@ import com.shadorc.shadbot.utils.ProcessUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.common.GitProperties;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.gateway.GatewayClient;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.util.List;
@@ -45,10 +45,7 @@ public class InfoCmd extends BaseCmd {
         return Mono.zip(
                 context.getClient().getUserById(Shadbot.getOwnerId()),
                 context.getChannel())
-                .flatMap(tuple -> {
-                    final User owner = tuple.getT1();
-                    final MessageChannel channel = tuple.getT2();
-
+                .flatMap(TupleUtils.function((owner, channel) -> {
                     final long start = System.currentTimeMillis();
                     return DiscordUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Testing ping...",
                             context.getUsername()), channel)
@@ -58,7 +55,7 @@ public class InfoCmd extends BaseCmd {
                                     + this.getInternetSection(context, start)
                                     + this.getShadbotSection(context, owner)
                                     + "```")));
-                })
+                }))
                 .then();
     }
 

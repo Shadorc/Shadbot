@@ -10,6 +10,7 @@ import com.shadorc.shadbot.utils.*;
 import io.prometheus.client.Summary;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.util.List;
@@ -56,9 +57,7 @@ public class RouletteGame extends MultiplayerGame<RouletteCmd, RoulettePlayer> {
         final int winningPlace = ThreadLocalRandom.current().nextInt(1, 37);
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
-                .flatMap(tuple -> {
-                    final RoulettePlayer player = tuple.getT1();
-                    final String username = tuple.getT2();
+                .flatMap(TupleUtils.function((player, username) -> {
                     final Place place = Utils.parseEnum(Place.class, player.getPlace());
 
                     final int multiplier = RouletteGame.getMultiplier(player, place, winningPlace);
@@ -71,7 +70,7 @@ public class RouletteGame extends MultiplayerGame<RouletteCmd, RoulettePlayer> {
                         ROULETTE_SUMMARY.labels("loss").observe(player.getBet());
                         return Mono.just(String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(player.getBet())));
                     }
-                })
+                }))
                 .collectSortedList()
                 .doOnNext(list -> this.results = String.join(", ", list))
                 .then(this.getContext().getChannel())
@@ -104,9 +103,9 @@ public class RouletteGame extends MultiplayerGame<RouletteCmd, RoulettePlayer> {
                                     this.getContext().getPrefix(), this.getContext().getCommandName(),
                                     FormatUtils.format(Place.values(),
                                             value -> String.format("`%s`", value.toString().toLowerCase()), ", "));
-                            final String player = FormatUtils.format(list,
-                                    tuple -> String.format("**%s** (%s)",
-                                            tuple.getT2(), FormatUtils.coins(tuple.getT1().getBet())), "\n");
+                            final String desc = FormatUtils.format(list,
+                                    TupleUtils.function((player, username) -> String.format("**%s** (%s)",
+                                            username, FormatUtils.coins(player.getBet()))), "\n");
                             final String place = this.getPlayers().values().stream()
                                     .map(RoulettePlayer::getPlace)
                                     .collect(Collectors.joining("\n"));
@@ -114,7 +113,7 @@ public class RouletteGame extends MultiplayerGame<RouletteCmd, RoulettePlayer> {
                             embed.setAuthor("Roulette Game", null, this.getContext().getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/D7xZd6C.png")
                                     .setDescription(description)
-                                    .addField("Player (Bet)", player, true)
+                                    .addField("Player (Bet)", desc, true)
                                     .addField("Place", place, true);
 
                             if (this.results != null) {

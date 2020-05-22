@@ -13,7 +13,6 @@ import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.rest.http.client.ClientException;
@@ -21,6 +20,7 @@ import discord4j.rest.util.Permission;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.util.Set;
@@ -64,37 +64,30 @@ public class ReactionListener {
     private static Mono<Boolean> canManageRole(Message message, Snowflake roleId) {
         return message.getGuild()
                 .flatMap(guild -> Mono.zip(guild.getMemberById(Shadbot.getSelfId()), guild.getRoleById(roleId)))
-                .flatMap(tuple -> {
-                    final Member selfMember = tuple.getT1();
-                    final Role role = tuple.getT2();
+                .flatMap(TupleUtils.function((selfMember, role) -> Mono.zip(
+                        selfMember.getBasePermissions().map(set -> set.contains(Permission.MANAGE_ROLES)),
+                        selfMember.hasHigherRoles(Set.of(role.getId())))
+                        .flatMap(TupleUtils.function((canManageRoles, hasHigherRoles) -> {
+                            if (!canManageRoles) {
+                                return new TemporaryMessage(message.getClient(), message.getChannelId(), Duration.ofSeconds(15))
+                                        .send(String.format(Emoji.ACCESS_DENIED
+                                                        + " I can't add/remove a role due to a lack of permission."
+                                                        + "%nPlease, check my permissions to verify that %s is checked.",
+                                                String.format("**%s**", StringUtils.capitalizeEnum(Permission.MANAGE_ROLES))))
+                                        .thenReturn(false);
+                            }
 
-                    return Mono.zip(selfMember.getBasePermissions().map(set -> set.contains(Permission.MANAGE_ROLES)),
-                            selfMember.hasHigherRoles(Set.of(role.getId())))
-                            .flatMap(tuple2 -> {
-                                final boolean canManageRoles = tuple2.getT1();
-                                final boolean hasHigherRoles = tuple2.getT2();
+                            if (!hasHigherRoles) {
+                                return new TemporaryMessage(message.getClient(), message.getChannelId(), Duration.ofSeconds(15))
+                                        .send(String.format(Emoji.ACCESS_DENIED +
+                                                        " I can't add/remove role `%s` because I'm lower or " +
+                                                        "at the same level in the role hierarchy than this role.",
+                                                role.getName()))
+                                        .thenReturn(false);
+                            }
 
-                                if (!canManageRoles) {
-                                    return new TemporaryMessage(message.getClient(), message.getChannelId(), Duration.ofSeconds(15))
-                                            .send(String.format(Emoji.ACCESS_DENIED
-                                                            + " I can't add/remove a role due to a lack of permission."
-                                                            + "%nPlease, check my permissions to verify that %s is checked.",
-                                                    String.format("**%s**", StringUtils.capitalizeEnum(Permission.MANAGE_ROLES))))
-                                            .thenReturn(false);
-                                }
-
-                                if (!hasHigherRoles) {
-                                    return new TemporaryMessage(message.getClient(), message.getChannelId(), Duration.ofSeconds(15))
-                                            .send(String.format(Emoji.ACCESS_DENIED +
-                                                            " I can't add/remove role `%s` because I'm lower or " +
-                                                            "at the same level in the role hierarchy than this role.",
-                                                    role.getName()))
-                                            .thenReturn(false);
-                                }
-
-                                return Mono.just(true);
-                            });
-                });
+                            return Mono.just(true);
+                        }))));
     }
 
     private static Mono<Void> execute(Message message, Member member, Action action) {

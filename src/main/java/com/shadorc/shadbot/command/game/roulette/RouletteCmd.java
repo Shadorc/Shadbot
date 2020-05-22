@@ -10,6 +10,7 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 import reactor.util.function.Tuples;
 
 import java.util.List;
@@ -53,10 +54,7 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                                 .thenReturn(Tuples.of(game, bet));
                     }
                 })
-                .flatMap(tuple -> {
-                    final RouletteGame rouletteGame = tuple.getT1();
-                    final long bet = tuple.getT2();
-
+                .flatMap(TupleUtils.function((rouletteGame, bet) -> {
                     final RoulettePlayer player = new RoulettePlayer(context.getGuildId(), context.getAuthorId(), bet, place);
                     if (rouletteGame.addPlayerIfAbsent(player)) {
                         return player.bet().then(rouletteGame.show());
@@ -67,7 +65,7 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                                                 context.getUsername()), channel))
                                 .then();
                     }
-                });
+                }));
     }
 
     @Override

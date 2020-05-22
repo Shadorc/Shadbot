@@ -13,7 +13,6 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -21,6 +20,7 @@ import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -90,11 +90,7 @@ public class LotteryCmd extends BaseCmd {
                 .defaultIfEmpty(Optional.empty());
 
         return Mono.zip(getGamblers, getJackpot, getHistoric)
-                .map(tuple -> {
-                    final List<LotteryGambler> gamblers = tuple.getT1();
-                    final long jackpot = tuple.getT2();
-                    final Optional<LotteryHistoric> historic = tuple.getT3();
-
+                .map(TupleUtils.function((gamblers, jackpot, historic) -> {
                     final LotteryEmbedBuilder builder = LotteryEmbedBuilder.create(context)
                             .withGamblers(gamblers)
                             .withJackpot(jackpot);
@@ -102,7 +98,7 @@ public class LotteryCmd extends BaseCmd {
                     return historic.map(builder::withHistoric)
                             .orElse(builder)
                             .build();
-                })
+                }))
                 .flatMap(embed -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)));
     }
@@ -130,10 +126,7 @@ public class LotteryCmd extends BaseCmd {
                 .flatMap(winner -> gateway.getMemberById(winner.getGuildId(), winner.getUserId()))
                 .collectList()
                 .zipWith(DatabaseManager.getLottery().getJackpot())
-                .flatMap(tuple -> {
-                    final List<Member> winners = tuple.getT1();
-                    final long jackpot = tuple.getT2();
-
+                .flatMap(TupleUtils.function((winners, jackpot) -> {
                     DEFAULT_LOGGER.info("Lottery draw done (Winning number: {} | {} winner(s) | Prize pool: {})",
                             winningNum, winners.size(), jackpot);
 
@@ -160,7 +153,7 @@ public class LotteryCmd extends BaseCmd {
                                 }
                                 return DatabaseManager.getLottery().resetJackpot();
                             }));
-                })
+                }))
                 .then();
     }
 

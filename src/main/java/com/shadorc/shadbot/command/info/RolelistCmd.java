@@ -13,6 +13,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -52,21 +53,22 @@ public class RolelistCmd extends BaseCmd {
 
                     return Mono.zip(Mono.just(mentionedRoles), usernames);
                 })
-                .map(tuple -> DiscordUtils.getDefaultEmbed()
+                .map(TupleUtils.function((mentionedRoles, usernames) -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor(
-                                    String.format("Rolelist: %s", FormatUtils.format(tuple.getT1(), Role::getName, ", ")),
+                                    String.format("Rolelist: %s", FormatUtils.format(mentionedRoles, Role::getName, ", ")),
                                     null, context.getAvatarUrl());
 
-                            if (tuple.getT2().isEmpty()) {
+                            if (usernames.isEmpty()) {
                                 embed.setDescription(
-                                        String.format("There is nobody with %s.", tuple.getT1().size() == 1 ? "this role" : "these roles"));
+                                        String.format("There is nobody with %s.", mentionedRoles.size() == 1 ? "this role" : "these " +
+                                                "roles"));
                                 return;
                             }
 
-                            FormatUtils.createColumns(tuple.getT2(), 25)
+                            FormatUtils.createColumns(usernames, 25)
                                     .forEach(field -> embed.addField(field.name(), field.value(), true));
-                        }))
+                        })))
                 .flatMap(embedConsumer -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
                 .then();

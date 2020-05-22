@@ -16,6 +16,7 @@ import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Image.Format;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -35,11 +36,13 @@ public class ServerInfoCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        return Mono.zip(context.getGuild(),
-                context.getGuild().flatMap(Guild::getOwner),
-                context.getGuild().flatMapMany(Guild::getChannels).collectList(),
-                context.getGuild().flatMap(Guild::getRegion))
-                .map(tuple -> this.getEmbed(tuple.getT1(), tuple.getT3(), tuple.getT2(), tuple.getT4(), context.getAvatarUrl()))
+        final Mono<Guild> getGuild = context.getGuild().cache();
+        return Mono.zip(getGuild,
+                getGuild.flatMapMany(Guild::getChannels).collectList(),
+                getGuild.flatMap(Guild::getOwner),
+                getGuild.flatMap(Guild::getRegion),
+                Mono.just(context.getAvatarUrl()))
+                .map(TupleUtils.function(this::getEmbed))
                 .flatMap(embed -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
                 .then();

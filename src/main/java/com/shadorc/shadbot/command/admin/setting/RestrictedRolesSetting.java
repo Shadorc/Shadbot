@@ -8,7 +8,6 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
@@ -21,6 +20,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -47,9 +47,10 @@ public class RestrictedRolesSetting extends BaseSetting {
     @Override
     public Mono<ImmutableEmbedFieldData> show(Context context, Settings settings) {
         return Flux.fromIterable(settings.getRestrictedRoles().entrySet())
-                .flatMap(entry -> Mono.zip(context.getClient().getRoleById(context.getGuildId(), entry.getKey()),
+                .flatMap(entry -> Mono.zip(
+                        context.getClient().getRoleById(context.getGuildId(), entry.getKey()).map(Role::getMention),
                         Mono.just(FormatUtils.format(entry.getValue(), BaseCmd::getName, ", "))))
-                .map(tuple -> String.format("%s: %s", tuple.getT1().getMention(), tuple.getT2()))
+                .map(TupleUtils.function((roleMention, cmds) -> String.format("%s: %s", roleMention, cmds)))
                 .reduce("", (value, text) -> value + "\n" + text)
                 .filter(value -> !value.isBlank())
                 .map(value -> ImmutableEmbedFieldData.builder()
@@ -100,10 +101,7 @@ public class RestrictedRolesSetting extends BaseSetting {
                     return Mono.zip(Mono.just(mentionedRoles.get(0)),
                             DatabaseManager.getGuilds().getDBGuild(context.getGuildId()));
                 })
-                .flatMap(tuple -> {
-                    final Role mentionedRole = tuple.getT1();
-                    final DBGuild dbGuild = tuple.getT2();
-
+                .flatMap(TupleUtils.function((mentionedRole, dbGuild) -> {
                     final StringBuilder strBuilder = new StringBuilder();
                     final Map<Snowflake, Set<BaseCmd>> restrictedRoles = dbGuild.getSettings()
                             .getRestrictedRoles();
@@ -139,7 +137,7 @@ public class RestrictedRolesSetting extends BaseSetting {
                     return dbGuild.setSetting(Setting.RESTRICTED_ROLES, setting)
                             .and(context.getChannel()
                                     .flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " " + strBuilder, channel)));
-                })
+                }))
                 .then();
     }
 

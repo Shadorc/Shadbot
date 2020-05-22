@@ -12,6 +12,7 @@ import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -30,9 +31,9 @@ public class PrefixCmd extends BaseCmd {
                 .map(DBGuild::getSettings)
                 .map(Settings::getPrefix)
                 .zipWith(context.getChannel())
-                .flatMap(tuple -> DiscordUtils.sendMessage(
+                .flatMap(TupleUtils.function((prefix, channel) -> DiscordUtils.sendMessage(
                         String.format(Emoji.INFO + " The prefix for this server is `%s`. For example: `%shelp`",
-                                tuple.getT1(), tuple.getT1()), tuple.getT2()))
+                                prefix, prefix), channel)))
                 .then();
     }
 

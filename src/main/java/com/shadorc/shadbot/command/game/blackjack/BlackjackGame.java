@@ -15,6 +15,7 @@ import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import io.prometheus.client.Summary;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -68,10 +69,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackCmd, BlackjackPlayer
     public Mono<Void> end() {
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
-                .flatMap(tuple -> {
-                    final BlackjackPlayer player = tuple.getT1();
-                    final String username = tuple.getT2();
-
+                .flatMap(TupleUtils.function((player, username) -> {
                     final int dealerValue = this.dealerHand.getValue();
                     final int playerValue = player.getHand().getValue();
 
@@ -92,7 +90,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackCmd, BlackjackPlayer
                             return player.cancelBet()
                                     .thenReturn(String.format("**%s** (Draw)", username));
                     }
-                })
+                }))
                 .collectList()
                 .flatMap(results -> this.getContext().getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(

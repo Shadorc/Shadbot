@@ -27,6 +27,7 @@ import io.netty.channel.unix.Errors;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 import reactor.netty.http.client.PrematureCloseException;
 import reactor.util.retry.Retry;
 
@@ -104,10 +105,7 @@ public class DiscordUtils {
         return Mono.zip(
                 DiscordUtils.hasPermission(channel, Shadbot.getSelfId(), Permission.SEND_MESSAGES),
                 DiscordUtils.hasPermission(channel, Shadbot.getSelfId(), Permission.EMBED_LINKS))
-                .flatMap(tuple -> {
-                    final boolean canSendMessage = tuple.getT1();
-                    final boolean canSendEmbed = tuple.getT2();
-
+                .flatMap(TupleUtils.function((canSendMessage, canSendEmbed) -> {
                     if (!canSendMessage) {
                         DEFAULT_LOGGER.info("{Channel ID: {}} Missing permission: {}",
                                 channel.getId().asLong(), StringUtils.capitalizeEnum(Permission.SEND_MESSAGES));
@@ -124,7 +122,7 @@ public class DiscordUtils {
                     }
 
                     return channel.createMessage(spec);
-                })
+                }))
                 // 403 Forbidden means that the bot is not in the guild
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(1))
@@ -254,11 +252,7 @@ public class DiscordUtils {
                 .map(DBGuild::getSettings);
 
         return Mono.zip(getBotVoiceChannelId, getUserVoiceChannelId, getSetting)
-                .map(tuple -> {
-                    final Optional<Snowflake> botVoiceChannelId = tuple.getT1();
-                    final Optional<Snowflake> userVoiceChannelId = tuple.getT2();
-                    final Settings settings = tuple.getT3();
-
+                .map(TupleUtils.function((botVoiceChannelId, userVoiceChannelId, settings) -> {
                     // If the user is in a voice channel but the bot is not allowed to join
                     if (userVoiceChannelId.isPresent()
                             && !settings.isVoiceChannelAllowed(userVoiceChannelId.get())) {
@@ -278,7 +272,7 @@ public class DiscordUtils {
                     }
 
                     return userVoiceChannelId.orElseThrow();
-                })
+                }))
                 .flatMap(context.getClient()::getChannelById)
                 .cast(VoiceChannel.class)
                 .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.CONNECT, Permission.SPEAK, Permission.VIEW_CHANNEL)

@@ -11,6 +11,7 @@ import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -88,7 +89,7 @@ public class HelpCmd extends BaseCmd {
                         getSettings.map(settings -> settings.isCommandAllowed(cmd)
                                 && settings.isCommandAllowedInChannel(cmd, context.getChannelId()))
                                 .defaultIfEmpty(true))
-                        .map(tuple -> tuple.getT1() || tuple.getT2()))
+                        .map(TupleUtils.function((isDm, isCmdAllowed) -> isDm || isCmdAllowed)))
                 .collectMultimap(BaseCmd::getCategory, cmd -> String.format("`%s%s`", context.getPrefix(), cmd.getName()));
     }
 
