@@ -12,7 +12,7 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.bean.setting.IamBean;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.setting.Iam;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.ReactionMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
@@ -106,7 +106,7 @@ public class IamCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription(String.format("Send a message with a reaction, users will be able to get the role(s) "
                         + "associated with the message by clicking on %s", REACTION.getRaw()))
                 .addArg("@role(s)", false)

@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
@@ -140,7 +140,7 @@ public class WeatherCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription("Show weather report for a city.")
                 .setDelimiter(", ")
                 .addArg("city", false)

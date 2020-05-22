@@ -5,7 +5,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
@@ -86,7 +86,7 @@ public class SlotMachineCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription("Play slot machine.")
                 .addField("Cost", String.format("A game costs **%s**.", FormatUtils.coins(Constants.PAID_COST)), false)
                 .addField("Gains", String.format("%s: **%s**, %s: **%s**, %s: **%s**, %s: **%s**." +

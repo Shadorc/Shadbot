@@ -7,7 +7,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.core.object.entity.Message;
@@ -67,7 +67,7 @@ public class SkipCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription("Skip current music and play the next one if it exists."
                         + "\nYou can also directly skip to a music in the playlist by specifying its number.")
                 .addArg("num", "the number of the music in the playlist to play", true)

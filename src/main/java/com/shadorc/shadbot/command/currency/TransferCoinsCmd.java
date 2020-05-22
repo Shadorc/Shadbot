@@ -8,7 +8,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
@@ -84,7 +84,7 @@ public class TransferCoinsCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription("Transfer coins to a user.")
                 .addArg("coins", false)
                 .addArg("@user", false)

@@ -9,7 +9,7 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.DBUser;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -66,7 +66,7 @@ public class BassBoostCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription("Drop the bass.")
                 .addArg("percentage",
                         String.format("must be between **%d%%** and **%d%%**.", VALUE_MIN, VALUE_MAX), false)

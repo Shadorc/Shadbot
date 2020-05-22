@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.object.help;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -15,13 +14,17 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class HelpBuilder {
+public abstract class HelpBuilder {
 
-    private final Context context;
-    private final BaseCmd cmd;
+    protected final Context context;
+
     private final List<Argument> args;
     private final List<ImmutableEmbedFieldData> fields;
 
+    @Nullable
+    private String authorName;
+    @Nullable
+    private String authorUrl;
     @Nullable
     private String thumbnail;
     @Nullable
@@ -32,18 +35,21 @@ public class HelpBuilder {
     private String example;
     @Nullable
     private String source;
+    @Nullable
+    private String footer;
     private String delimiter;
 
-    private HelpBuilder(BaseCmd cmd, Context context) {
+    protected HelpBuilder(Context context) {
         this.context = context;
-        this.cmd = cmd;
         this.args = new ArrayList<>();
         this.fields = new ArrayList<>();
         this.delimiter = Config.COMMAND_DELIMITER;
     }
 
-    public static HelpBuilder create(BaseCmd cmd, Context context) {
-        return new HelpBuilder(cmd, context);
+    public HelpBuilder setAuthor(String authorName, String authorUrl) {
+        this.authorName = authorName;
+        this.authorUrl = authorUrl;
+        return this;
     }
 
     public HelpBuilder setThumbnail(String thumbnail) {
@@ -61,10 +67,6 @@ public class HelpBuilder {
         return this;
     }
 
-    public HelpBuilder setUsage(String usage) {
-        return this.setFullUsage(String.format("%s%s %s", this.context.getPrefix(), this.cmd.getName(), usage));
-    }
-
     public HelpBuilder setExample(String example) {
         this.example = example;
         return this;
@@ -77,6 +79,11 @@ public class HelpBuilder {
 
     public HelpBuilder setDelimiter(String delimiter) {
         this.delimiter = delimiter;
+        return this;
+    }
+
+    public HelpBuilder setFooter(String footer) {
+        this.footer = footer;
         return this;
     }
 
@@ -97,8 +104,9 @@ public class HelpBuilder {
     public Consumer<EmbedCreateSpec> build() {
         return DiscordUtils.getDefaultEmbed()
                 .andThen(embed -> {
-                    embed.setAuthor(String.format("Help for command: %s", this.cmd.getName()),
-                            "https://github.com/Shadorc/Shadbot/wiki/Commands", this.context.getAvatarUrl());
+                    if (this.authorName != null && !this.authorName.isBlank()) {
+                        embed.setAuthor(this.authorName, this.authorUrl, this.context.getAvatarUrl());
+                    }
                     embed.addField("Usage", this.getUsage(), false);
 
                     if (this.description != null && !this.description.isBlank()) {
@@ -125,11 +133,13 @@ public class HelpBuilder {
                         embed.addField(field.name(), field.value(), field.inline().get());
                     }
 
-                    this.cmd.getAlias()
-                            .filter(alias -> !alias.isBlank())
-                            .ifPresent(alias -> embed.setFooter(String.format("Alias: %s", alias), null));
+                    if (this.footer != null && !this.footer.isBlank()) {
+                        embed.setFooter(this.footer, null);
+                    }
                 });
     }
+
+    protected abstract String getCommandName();
 
     private String getUsage() {
         if (this.usage != null && !this.usage.isBlank()) {
@@ -137,10 +147,10 @@ public class HelpBuilder {
         }
 
         if (this.args.isEmpty()) {
-            return String.format("`%s%s`", this.context.getPrefix(), this.cmd.getName());
+            return String.format("`%s%s`", this.context.getPrefix(), this.getCommandName());
         }
 
-        return String.format("`%s%s %s`", this.context.getPrefix(), this.cmd.getName(),
+        return String.format("`%s%s %s`", this.context.getPrefix(), this.getCommandName(),
                 FormatUtils.format(this.args,
                         arg -> String.format(arg.isOptional() ? "[<%s>]" : "<%s>", arg.getName()), this.delimiter));
     }

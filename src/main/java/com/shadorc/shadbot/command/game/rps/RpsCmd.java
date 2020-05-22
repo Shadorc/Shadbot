@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
@@ -82,7 +82,7 @@ public class RpsCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription("Play a Rock–paper–scissors game.")
                 .addArg("handsign", FormatUtils.format(Handsign.values(), Handsign::getHandsign, ", "), false)
                 .addField("Gains", String.format("The winner gets **%s** multiplied by his win-streak.",

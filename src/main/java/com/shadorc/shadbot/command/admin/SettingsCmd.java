@@ -14,6 +14,7 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.object.entity.Role;
@@ -55,7 +56,7 @@ public class SettingsCmd extends BaseCmd {
         final String arg = args.size() == 2 ? args.get(1) : null;
         if ("help".equals(arg)) {
             return context.getChannel()
-                    .flatMap(channel -> DiscordUtils.sendMessage(SettingsCmd.getHelp(context, setting), channel))
+                    .flatMap(channel -> DiscordUtils.sendMessage(setting.getHelp(context), channel))
                     .then();
         }
 
@@ -68,7 +69,7 @@ public class SettingsCmd extends BaseCmd {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.sendMessage(
                             Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this setting.",
-                            SettingsCmd.getHelp(context, setting), channel))
+                            setting.getHelp(context), channel))
                     .then();
         }
     }
@@ -148,17 +149,9 @@ public class SettingsCmd extends BaseCmd {
                                                 settingsStr.toString())));
     }
 
-    private static Consumer<EmbedCreateSpec> getHelp(Context context, BaseSetting setting) {
-        return setting.getHelp(context)
-                .andThen(embed -> embed.setAuthor(
-                        String.format("Help for setting: %s", setting.getName()),
-                        "https://github.com/Shadorc/Shadbot/wiki/Settings", context.getAvatarUrl())
-                        .setDescription(String.format("**%s**", setting.getDescription())));
-    }
-
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        final HelpBuilder embed = HelpBuilder.create(this, context)
+        final HelpBuilder embed = CommandHelpBuilder.create(this, context)
                 .setThumbnail("https://i.imgur.com/QA2PUjM.png")
                 .setDescription("Change Shadbot's settings for this server.")
                 .addArg("name", false)

@@ -5,6 +5,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
@@ -56,13 +57,10 @@ public class NSFWSetting extends BaseSetting {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action>`",
-                        context.getPrefix(), this.getCommandName()), false)
-                        .addField("Argument", String.format("**action** - %s",
-                                FormatUtils.format(Action.class, "/")), false)
-                        .addField("Example", String.format("`%s%s toggle`",
-                                context.getPrefix(), this.getCommandName()), false));
+        return SettingHelpBuilder.create(this, context)
+                .addArg("action", FormatUtils.format(Action.class, "/"), false)
+                .setExample(String.format("`%s%s toggle`", context.getPrefix(), this.getCommandName()))
+                .build();
     }
 
 }

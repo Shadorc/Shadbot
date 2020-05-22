@@ -9,6 +9,7 @@ import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
@@ -159,16 +160,15 @@ public class BlacklistSettingCmd extends BaseSetting {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <type> <name(s)>`",
-                        context.getPrefix(), this.getCommandName()), false)
-                        .addField("Argument",
-                                String.format("**action** - %s", FormatUtils.format(Action.class, "/"))
-                                        + String.format("%n**type** - %s", FormatUtils.format(Type.class, "/")), false)
-                        .addField("Example", String.format("`%s%s add command rule34 russian_roulette`" +
-                                        "%n`%s%s add category NSFW`",
-                                context.getPrefix(), this.getCommandName(),
-                                context.getPrefix(), this.getCommandName()), false));
+        return SettingHelpBuilder.create(this, context)
+                .addArg("action", FormatUtils.format(Action.class, "/"), false)
+                .addArg("type", FormatUtils.format(Type.class, "/"), false)
+                .addArg("name(s)", "command/category name", false)
+                .setExample(String.format("`%s%s add command rule34 russian_roulette`" +
+                                "%n`%s%s add category NSFW`",
+                        context.getPrefix(), this.getCommandName(),
+                        context.getPrefix(), this.getCommandName()))
+                .build();
     }
 
 }

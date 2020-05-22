@@ -3,7 +3,7 @@ package com.shadorc.shadbot.command.game.blackjack;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -62,7 +62,7 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription("Start or join a blackjack game.")
                 .addArg("bet", false)
                 .addField("Info", "**double down** - increase the initial bet by 100% in exchange for "

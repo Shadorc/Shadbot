@@ -7,7 +7,7 @@ import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
@@ -117,7 +117,7 @@ public class PruneCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription("Delete messages (include embeds).")
                 .addArg("@user(s)", "from these users", true)
                 .addArg("\"words\"", "containing these words", true)
