@@ -23,15 +23,15 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class RestrictedCategoriesSetting extends BaseSetting {
+public class RestrictedChannelsSetting extends BaseSetting {
 
     private enum Action {
         ADD, REMOVE;
     }
 
-    public RestrictedCategoriesSetting() {
-        super(List.of("restricted_categories", "restricted_category"),
-                Setting.RESTRICTED_CATEGORIES, "Restrict categories to specific channels.");
+    public RestrictedChannelsSetting() {
+        super(List.of("restricted_channels", "restricted_channel"),
+                Setting.RESTRICTED_CHANNELS, "Restrict commands to specific channels.");
     }
 
     @Override
@@ -63,7 +63,7 @@ public class RestrictedCategoriesSetting extends BaseSetting {
 
                     final StringBuilder strBuilder = new StringBuilder();
                     final Map<Snowflake, Set<CommandCategory>> restrictedCategories = dbGuild.getSettings()
-                            .getRestrictedCategories();
+                            .getRestrictedChannels();
                     switch (action) {
                         case ADD:
                             restrictedCategories.computeIfAbsent(mentionedChannel.getId(),
@@ -93,7 +93,7 @@ public class RestrictedCategoriesSetting extends BaseSetting {
                                             .map(Object::toString)
                                             .collect(Collectors.toSet())));
 
-                    return dbGuild.setSetting(Setting.RESTRICTED_CATEGORIES, setting)
+                    return dbGuild.setSetting(Setting.RESTRICTED_CHANNELS, setting)
                             .and(context.getChannel()
                                     .flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " " + strBuilder, channel)));
                 })

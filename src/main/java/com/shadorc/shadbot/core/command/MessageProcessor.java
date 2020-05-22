@@ -118,7 +118,7 @@ public class MessageProcessor {
         }
 
         // This category is not allowed in this channel
-        if (!dbGuild.getSettings().isCategoryAllowed(context.getChannelId(), command.getCategory())) {
+        if (!dbGuild.getSettings().isCommandAllowedInChannel(command, context.getChannelId())) {
             return Mono.empty();
         }
         // This command is not allowed to this role
