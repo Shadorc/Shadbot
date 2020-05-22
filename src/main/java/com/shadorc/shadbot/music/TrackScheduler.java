@@ -100,13 +100,16 @@ public class TrackScheduler {
     }
 
     public void bassBoost(int percentage) {
+        final int previousPercentage = this.boostPercentage;
+        this.boostPercentage = percentage;
+
         // Disable filter factory
-        if (this.boostPercentage > 0 && percentage == 0) {
+        if (previousPercentage > 0 && percentage == 0) {
             this.audioPlayer.setFilterFactory(null);
             return;
         }
         // Enable filter factory
-        if (this.boostPercentage == 0 && percentage > 0) {
+        if (previousPercentage == 0 && percentage > 0) {
             if (this.equalizer == null) {
                 this.equalizer = new EqualizerFactory();
             }
