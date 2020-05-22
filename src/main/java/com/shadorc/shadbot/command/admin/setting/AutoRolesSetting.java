@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
@@ -98,13 +99,11 @@ public class AutoRolesSetting extends BaseSetting {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <@role(s)>`",
-                        context.getPrefix(), this.getCommandName()), false)
-                        .addField("Argument", String.format("**action** - %s",
-                                FormatUtils.format(Action.class, "/")), false)
-                        .addField("Example", String.format("`%s%s add @newbie`",
-                                context.getPrefix(), this.getCommandName()), false));
+        return SettingHelpBuilder.create(this, context)
+                .addArg("action", FormatUtils.format(Action.class, "/"), false)
+                .addArg("role(s)", "role names", false)
+                .setExample(String.format("`%s%s add @newbie`", context.getPrefix(), this.getCommandName()))
+                .build();
     }
 
 }

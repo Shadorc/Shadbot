@@ -9,7 +9,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.listener.GuildCreateListener;
 import com.shadorc.shadbot.listener.VoiceStateUpdateListener;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ProcessUtils;
@@ -104,7 +104,7 @@ public class InfoCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription("Show Shadbot's info.")
                 .build();
     }

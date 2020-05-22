@@ -10,7 +10,7 @@ import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
 import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Member;
@@ -166,7 +166,7 @@ public class LotteryCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription("Buy a ticket for the lottery or display the current lottery status.")
                 .addArg("num", String.format("must be between %d and %d", Constants.MIN_NUM, Constants.MAX_NUM), true)
                 .addField("Info", "One winner is randomly drawn every Sunday at noon (English time)."

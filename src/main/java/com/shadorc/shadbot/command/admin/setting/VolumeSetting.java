@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -47,13 +48,12 @@ public class VolumeSetting extends BaseSetting {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <volume>`", context.getPrefix(),
-                        this.getCommandName()), false)
-                        .addField("Argument", String.format("**volume** - min: %d / max: %d / default: %d",
-                                MIN_VOLUME, MAX_VOLUME, Config.DEFAULT_VOLUME), false)
-                        .addField("Example", String.format("`%s%s 42`", context.getPrefix(), this.getCommandName()),
-                                false));
+        return SettingHelpBuilder.create(this, context)
+                .addArg("volume", "new default volume", false)
+                .setExample(String.format("`%s%s 42`", context.getPrefix(), this.getCommandName()))
+                .addField("Restrictions", String.format("min: %d / max: %d / default: %d",
+                        MIN_VOLUME, MAX_VOLUME, Config.DEFAULT_VOLUME), false)
+                .build();
     }
 
 }

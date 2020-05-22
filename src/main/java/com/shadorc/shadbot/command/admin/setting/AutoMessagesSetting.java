@@ -8,6 +8,7 @@ import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
@@ -123,23 +124,20 @@ public class AutoMessagesSetting extends BaseSetting {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <type> [<value>]`",
-                        context.getPrefix(), this.getCommandName()), false)
-                        .addField("Argument", String.format("**action** - %s"
-                                        + "%n**type** - %s"
-                                        + "%n**value** - a message for *%s* and *%s* or a #channel for *%s*",
-                                FormatUtils.format(Action.class, "/"),
-                                FormatUtils.format(Type.class, "/"),
-                                Type.JOIN_MESSAGE.toString().toLowerCase(),
-                                Type.LEAVE_MESSAGE.toString().toLowerCase(),
-                                Type.CHANNEL.toString().toLowerCase()), false)
-                        .addField("Info", "You don't need to specify *value* to disable a type.", false)
-                        .addField("Formatting", "**{mention}** - the mention of the user who joined/left"
-                                + "\n**{username}** - the username of the user who joined/left"
-                                + "\n**{userId}** - the id of the user who joined/left", false)
-                        .addField("Example", String.format("`%s%s enable join_message Hello {mention} (:`"
-                                        + "%n`%s%s disable leave_message`",
-                                context.getPrefix(), this.getCommandName(), context.getPrefix(), this.getCommandName()), false));
+        return SettingHelpBuilder.create(this, context)
+                .addArg("action", FormatUtils.format(Action.class, "/"), false)
+                .addArg("type", FormatUtils.format(Type.class, "/"), false)
+                .addArg("value", String.format("a message for *%s* and *%s* or a #channel for *%s*",
+                        Type.JOIN_MESSAGE.toString().toLowerCase(),
+                        Type.LEAVE_MESSAGE.toString().toLowerCase(),
+                        Type.CHANNEL.toString().toLowerCase()), true)
+                .addField("Info", "You don't need to specify *value* to disable a type.", false)
+                .addField("Formatting", "**{mention}** - the mention of the user who joined/left"
+                        + "\n**{username}** - the username of the user who joined/left"
+                        + "\n**{userId}** - the id of the user who joined/left", false)
+                .setExample(String.format("`%s%s enable join_message Hello {mention} (:`"
+                                + "%n`%s%s disable leave_message`",
+                        context.getPrefix(), this.getCommandName(), context.getPrefix(), this.getCommandName()))
+                .build();
     }
 }
