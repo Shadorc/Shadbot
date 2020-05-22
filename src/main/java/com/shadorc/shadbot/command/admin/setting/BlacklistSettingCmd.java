@@ -8,6 +8,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -15,6 +16,7 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
@@ -36,6 +38,15 @@ public class BlacklistSettingCmd extends BaseSetting {
     public BlacklistSettingCmd() {
         super(List.of("blacklist"),
                 Setting.BLACKLIST, "Manage blacklisted command(s).");
+    }
+
+    @Override
+    public Flux<String> show(Context context, Settings settings) {
+        if (!settings.getBlacklistedCmds().isEmpty()) {
+            return Flux.just(String.format("**Blacklisted commands:**%n\t%s",
+                    String.join("\n\t", settings.getBlacklistedCmds())));
+        }
+        return Flux.empty();
     }
 
     @Override

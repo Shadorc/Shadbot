@@ -6,6 +6,7 @@ import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -15,7 +16,9 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.util.List;
 import java.util.Set;
@@ -31,6 +34,27 @@ public class AllowedChannelsSetting extends BaseSetting {
     public AllowedChannelsSetting() {
         super(List.of("allowed_channels", "allowed_channel"),
                 Setting.ALLOWED_CHANNELS, "Manage in which channel(s) Shadbot can talk in.");
+    }
+
+    @Override
+    public Flux<String> show(Context context, Settings settings) {
+        final Mono<String> textChannels = Flux.fromIterable(settings.getAllowedTextChannelIds())
+                .flatMap(context.getClient()::getChannelById)
+                .map(Channel::getMention)
+                .collectList()
+                .filter(channels -> !channels.isEmpty())
+                .map(channels -> String.format("**Allowed text channels:**%n\t%s",
+                        String.join("\n\t", channels)));
+
+        final Mono<String> voiceChannels = Flux.fromIterable(settings.getAllowedVoiceChannelIds())
+                .flatMap(context.getClient()::getChannelById)
+                .map(Channel::getMention)
+                .collectList()
+                .filter(channels -> !channels.isEmpty())
+                .map(channels -> String.format("**Allowed voice channels:**%n\t%s",
+                        String.join("\n\t", channels)));
+
+        return Flux.merge(textChannels, voiceChannels);
     }
 
     @Override

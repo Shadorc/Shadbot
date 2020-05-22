@@ -6,6 +6,7 @@ import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -15,6 +16,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Permission;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -31,6 +33,17 @@ public class AutoRolesSetting extends BaseSetting {
     public AutoRolesSetting() {
         super(List.of("auto_roles", "auto_role"),
                 Setting.AUTO_ROLES, "Manage auto assigned role(s).");
+    }
+
+    @Override
+    public Flux<String> show(Context context, Settings settings) {
+        return Flux.fromIterable(settings.getAutoRoleIds())
+                .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
+                .map(Role::getMention)
+                .collectList()
+                .filter(roles -> !roles.isEmpty())
+                .map(roles -> String.format("**Auto-roles:**%n\t%s", String.join("\n\t", roles)))
+                .flux();
     }
 
     @Override

@@ -3,6 +3,9 @@ package com.shadorc.shadbot.core.setting;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
+import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -28,5 +31,7 @@ public abstract class BaseSetting extends BaseCmd {
     public String getCommandName() {
         return String.format("setting %s", this.getName());
     }
+
+    public abstract Flux<String> show(Context context, Settings settings);
 
 }

@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -16,6 +17,7 @@ import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -34,6 +36,22 @@ public class AutoMessagesSetting extends BaseSetting {
     public AutoMessagesSetting() {
         super(List.of("auto_messages", "auto_message"),
                 Setting.AUTO_MESSAGE, "Manage auto-message(s) on user join/leave.");
+    }
+
+    @Override
+    public Flux<String> show(Context context, Settings settings) {
+        final Mono<String> getJoinMessage = Mono.justOrEmpty(settings.getJoinMessage())
+                .map(joinMessage -> String.format("**Join message:**%n%s", joinMessage));
+
+        final Mono<String> getLeaveMessage = Mono.justOrEmpty(settings.getLeaveMessage())
+                .map(leaveMessage -> String.format("**Leave message:**%n%s", leaveMessage));
+
+        final Mono<String> getAutoMessage = Mono.justOrEmpty(settings.getMessageChannelId())
+                .flatMap(context.getClient()::getChannelById)
+                .map(Channel::getMention)
+                .map(channel -> String.format("**Auto message channel:** %s", channel));
+
+        return Flux.merge(getJoinMessage, getLeaveMessage, getAutoMessage);
     }
 
     @Override

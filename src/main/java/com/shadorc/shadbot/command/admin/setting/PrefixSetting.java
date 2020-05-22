@@ -4,11 +4,14 @@ import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -21,6 +24,14 @@ public class PrefixSetting extends BaseSetting {
     public PrefixSetting() {
         super(List.of("prefix"),
                 Setting.PREFIX, "Manage Shadbot's prefix.");
+    }
+
+    @Override
+    public Flux<String> show(Context context, Settings settings) {
+        if (!settings.getPrefix().equals(Config.DEFAULT_PREFIX)) {
+            return Flux.just(String.format("**Prefix:** %s", context.getPrefix()));
+        }
+        return Flux.empty();
     }
 
     @Override
@@ -53,5 +64,4 @@ public class PrefixSetting extends BaseSetting {
                 .addField("Restrictions", "The prefix cannot contain spaces nor more than 6 characters.", false)
                 .build();
     }
-
 }

@@ -9,16 +9,14 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.SettingManager;
-import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.object.entity.Role;
-import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -41,7 +39,8 @@ public class SettingsCmd extends BaseCmd {
         if ("show".equals(args.get(0))) {
             return DatabaseManager.getGuilds()
                     .getDBGuild(context.getGuildId())
-                    .flatMap(dbGuild -> SettingsCmd.show(context, dbGuild))
+                    .map(DBGuild::getSettings)
+                    .flatMap(settings -> SettingsCmd.show(context, settings))
                     .flatMap(embed -> context.getChannel()
                             .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
                     .then();
@@ -74,79 +73,13 @@ public class SettingsCmd extends BaseCmd {
         }
     }
 
-    private static Mono<Consumer<EmbedCreateSpec>> show(Context context, DBGuild dbGuild) {
-        final StringBuilder settingsStr = new StringBuilder();
-
-        if (!dbGuild.getSettings().getPrefix().equals(Config.DEFAULT_PREFIX)) {
-            settingsStr.append(String.format("**Prefix:** %s", context.getPrefix()));
-        }
-
-        if (dbGuild.getSettings().getDefaultVol() != Config.DEFAULT_VOLUME) {
-            settingsStr.append(String.format("%n**Default volume:** %d%%", dbGuild.getSettings().getDefaultVol()));
-        }
-
-        if (!dbGuild.getSettings().getBlacklistedCmds().isEmpty()) {
-            settingsStr.append(String.format("%n**Blacklisted commands:**%n\t%s",
-                    String.join("\n\t", dbGuild.getSettings().getBlacklistedCmds())));
-        }
-
-        dbGuild.getSettings().getJoinMessage()
-                .ifPresent(joinMessage -> settingsStr.append(String.format("%n**Join message:**%n%s", joinMessage)));
-        dbGuild.getSettings().getLeaveMessage()
-                .ifPresent(leaveMessage -> settingsStr.append(String.format("%n**Leave message:**%n%s", leaveMessage)));
-
-        final Mono<Void> autoMessageChannelStr = Mono.justOrEmpty(dbGuild.getSettings().getMessageChannelId())
-                .flatMap(context.getClient()::getChannelById)
-                .map(Channel::getMention)
-                .map(channel -> settingsStr.append(String.format("%n**Auto message channel:** %s", channel)))
-                .then();
-
-        final Mono<Void> allowedTextChannelsStr = Flux.fromIterable(dbGuild.getSettings().getAllowedTextChannelIds())
-                .flatMap(context.getClient()::getChannelById)
-                .map(Channel::getMention)
-                .collectList()
-                .filter(channels -> !channels.isEmpty())
-                .map(channels -> settingsStr.append(String.format("%n**Allowed text channels:**%n\t%s",
-                        String.join("\n\t", channels))))
-                .then();
-
-        final Mono<Void> allowedVoiceChannelsStr = Flux.fromIterable(dbGuild.getSettings().getAllowedVoiceChannelIds())
-                .flatMap(context.getClient()::getChannelById)
-                .map(Channel::getMention)
-                .collectList()
-                .filter(channels -> !channels.isEmpty())
-                .map(channels -> settingsStr.append(String.format("%n**Allowed voice channels:**%n\t%s",
-                        String.join("\n\t", channels))))
-                .then();
-
-        final Mono<Void> autoRolesStr = Flux.fromIterable(dbGuild.getSettings().getAutoRoleIds())
-                .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-                .map(Role::getMention)
-                .collectList()
-                .filter(roles -> !roles.isEmpty())
-                .map(roles -> settingsStr.append(String.format("%n**Auto-roles:**%n\t%s",
-                        String.join("\n\t", roles))))
-                .then();
-
-        final Mono<Void> allowedRolesStr = Flux.fromIterable(dbGuild.getSettings().getAllowedRoleIds())
-                .flatMap(roleId -> context.getClient().getRoleById(context.getGuildId(), roleId))
-                .map(Role::getMention)
-                .collectList()
-                .filter(roles -> !roles.isEmpty())
-                .map(roles -> settingsStr.append(String.format("%n**Allowed roles:**%n\t%s",
-                        String.join("\n\t", roles))))
-                .then();
-
-        return autoMessageChannelStr
-                .then(allowedTextChannelsStr)
-                .then(allowedVoiceChannelsStr)
-                .then(autoRolesStr)
-                .then(allowedRolesStr)
-                .thenReturn(DiscordUtils.getDefaultEmbed()
+    private static Mono<Consumer<EmbedCreateSpec>> show(Context context, Settings settings) {
+        return Flux.fromIterable(SettingManager.getInstance().getSettings().values())
+                .flatMap(setting -> setting.show(context, settings))
+                .reduce("", (desc, text) -> desc + "\n" + text)
+                .map(text -> DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Settings", null, context.getAvatarUrl())
-                                .setDescription(
-                                        settingsStr.length() == 0 ? "There is no custom settings for this server." :
-                                                settingsStr.toString())));
+                                .setDescription(text.isEmpty() ? "There is no custom settings for this server." : text)));
     }
 
     @Override

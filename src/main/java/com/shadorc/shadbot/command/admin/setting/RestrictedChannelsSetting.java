@@ -9,6 +9,7 @@ import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -17,6 +18,7 @@ import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
@@ -39,6 +41,12 @@ public class RestrictedChannelsSetting extends BaseSetting {
     public RestrictedChannelsSetting() {
         super(List.of("restricted_channels", "restricted_channel"),
                 Setting.RESTRICTED_CHANNELS, "Restrict commands to specific channels.");
+    }
+
+    @Override
+    public Flux<String> show(Context context, Settings settings) {
+        // TODO
+        return Flux.empty();
     }
 
     @Override

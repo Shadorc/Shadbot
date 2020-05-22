@@ -6,11 +6,13 @@ import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -24,6 +26,14 @@ public class VolumeSetting extends BaseSetting {
     public VolumeSetting() {
         super(List.of("default_volume", "volume"),
                 Setting.DEFAULT_VOLUME, "Manage music's default volume.");
+    }
+
+    @Override
+    public Flux<String> show(Context context, Settings settings) {
+        if (settings.getDefaultVol() != Config.DEFAULT_VOLUME) {
+            return Flux.just(String.format("**Default volume:** %d%%", settings.getDefaultVol()));
+        }
+        return Flux.empty();
     }
 
     @Override
@@ -55,5 +65,4 @@ public class VolumeSetting extends BaseSetting {
                         MIN_VOLUME, MAX_VOLUME, Config.DEFAULT_VOLUME), false)
                 .build();
     }
-
 }

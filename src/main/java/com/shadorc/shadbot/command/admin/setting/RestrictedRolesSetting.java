@@ -9,6 +9,7 @@ import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -17,6 +18,7 @@ import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
@@ -39,6 +41,12 @@ public class RestrictedRolesSetting extends BaseSetting {
     public RestrictedRolesSetting() {
         super(List.of("restricted_roles", "restricted_ole"),
                 Setting.RESTRICTED_ROLES, "Restrict commands to specific roles.");
+    }
+
+    @Override
+    public Flux<String> show(Context context, Settings settings) {
+        // TODO
+        return Flux.empty();
     }
 
     @Override
