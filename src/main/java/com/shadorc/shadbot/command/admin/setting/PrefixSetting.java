@@ -6,6 +6,7 @@ import com.shadorc.shadbot.core.setting.BaseSetting;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -46,13 +47,11 @@ public class PrefixSetting extends BaseSetting {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <prefix>`", context.getPrefix(),
-                        this.getCommandName()), false)
-                        .addField("Argument", "**prefix** - Max length: 5, must not contain spaces",
-                                false)
-                        .addField("Example", String.format("`%s%s !`", context.getPrefix(), this.getCommandName()),
-                                false));
+        return SettingHelpBuilder.create(this, context)
+                .addArg("prefix", "new prefix", false)
+                .setExample(String.format("`%s%s !`", context.getPrefix(), this.getCommandName()))
+                .addField("Restrictions", "The prefix cannot contain spaces nor more than 6 characters.", false)
+                .build();
     }
 
 }

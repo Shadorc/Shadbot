@@ -8,7 +8,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.*;
 import discord4j.common.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -70,7 +70,7 @@ public class ManageAchievementsCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .addArg("action", FormatUtils.options(Action.class), false)
                 .addArg("achievement", FormatUtils.options(Achievement.class), false)
                 .addArg("userId", false)

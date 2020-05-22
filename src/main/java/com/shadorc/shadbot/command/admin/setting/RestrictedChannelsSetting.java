@@ -8,6 +8,7 @@ import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
@@ -102,15 +103,11 @@ public class RestrictedChannelsSetting extends BaseSetting {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <category> <channel>`",
-                        context.getPrefix(), this.getCommandName()), false)
-                        .addField("Argument",
-                                String.format("**action** - %s", FormatUtils.format(Action.class, "/"))
-                                        + String.format("%n**category** - %s", FormatUtils.format(CommandCategory.class, "/"))
-                                        + String.format("%n**channel** - the channel to %s", FormatUtils.format(Action.class, "/")),
-                                false)
-                        .addField("Example", String.format("`%s%s add music #music`",
-                                context.getPrefix(), this.getCommandName()), false));
+        return SettingHelpBuilder.create(this, context)
+                .addArg("action", FormatUtils.format(Action.class, "/"), false)
+                .addArg("category", FormatUtils.format(CommandCategory.class, "/"), false)
+                .addArg("channel", String.format("the channel to %s", FormatUtils.format(Action.class, "/")), false)
+                .setExample(String.format("`%s%s add music #music`", context.getPrefix(), this.getCommandName()))
+                .build();
     }
 }

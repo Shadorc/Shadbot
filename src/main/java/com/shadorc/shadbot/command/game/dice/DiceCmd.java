@@ -5,7 +5,7 @@ import com.shadorc.shadbot.command.MissingArgumentException;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.Utils;
@@ -110,7 +110,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription("Start a dice game with a common bet.")
                 .addArg("num", "number between 1 and 6\nYou can't bet on a number that has already " +
                         "been chosen by another player.", false)

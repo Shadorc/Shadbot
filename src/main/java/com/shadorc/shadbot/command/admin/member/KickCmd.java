@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.admin.member;
 
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import discord4j.core.object.entity.Member;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Permission;
@@ -22,7 +22,7 @@ public class KickCmd extends RemoveMemberCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription("Kick a user.")
                 .addArg("@user", false)
                 .addArg("reason", true)

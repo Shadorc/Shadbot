@@ -8,7 +8,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.TrackScheduler;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.HelpBuilder;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -60,7 +60,7 @@ public class VolumeCmd extends BaseCmd {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return HelpBuilder.create(this, context)
+        return CommandHelpBuilder.create(this, context)
                 .setDescription("Show or change current volume level.")
                 .addArg("volume", String.format("must be between 1%% and %d%%", Config.VOLUME_MAX), true)
                 .build();

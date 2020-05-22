@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.Utils;
@@ -80,7 +81,7 @@ public class AllowedChannelsSetting extends BaseSetting {
                             final Snowflake channelId = channel.getId();
                             if (channel.getType() == Channel.Type.GUILD_TEXT && !allowedTextChannelIds.contains(channelId)) {
                                 allowedTextChannelIds.add(channelId);
-                            } else if (channel.getType() == Channel.Type.GUILD_VOICE && !allowedVoiceChannelIds.contains(channelId)) {
+                            } else if (channel.getType() == Channel.Type.GUILD_VOICE) {
                                 allowedVoiceChannelIds.add(channelId);
                             }
                         }
@@ -116,15 +117,12 @@ public class AllowedChannelsSetting extends BaseSetting {
 
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return DiscordUtils.getDefaultEmbed()
-                .andThen(embed -> embed.addField("Usage", String.format("`%s%s <action> <#channel(s)>`",
-                        context.getPrefix(), this.getCommandName()), false)
-                        .addField("Argument", String.format("**action** - %s",
-                                FormatUtils.format(Action.class, "/"))
-                                + String.format("%n**channel(s)** - the (voice) channel(s) to %s",
-                                FormatUtils.format(Action.class, "/")), false)
-                        .addField("Example", String.format("`%s%s add #general`",
-                                context.getPrefix(), this.getCommandName()), false));
+        return SettingHelpBuilder.create(this, context)
+                .addArg("action", FormatUtils.format(Action.class, "/"), false)
+                .addArg("channel(s)", String.format("the (voice) channel(s) to %s",
+                        FormatUtils.format(Action.class, "/")), false)
+                .setExample(String.format("`%s%s add #general`", context.getPrefix(), this.getCommandName()))
+                .build();
     }
 
 }
