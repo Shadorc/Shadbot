@@ -76,16 +76,20 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return map.values().stream().noneMatch(set -> set.contains(cmd));
     }
 
-    public boolean isCommandAllowedToRole(BaseCmd cmd, Snowflake roleId) {
+    public boolean isCommandAllowedToRole(BaseCmd cmd, Set<Snowflake> roleIds) {
         final Map<Snowflake, Set<BaseCmd>> map = this.getRestrictedRoles();
         // If no permission has been set
         if (map.isEmpty()) {
             return true;
         }
-        // If this command has explicitly been allowed to this role
-        if (map.containsKey(roleId) && map.get(roleId).contains(cmd)) {
-            return true;
+
+        for (final Snowflake roleId : roleIds) {
+            // If this command has explicitly been allowed to this role
+            if (map.containsKey(roleId) && map.get(roleId).contains(cmd)) {
+                return true;
+            }
         }
+
         return map.values().stream().noneMatch(set -> set.contains(cmd));
     }
 

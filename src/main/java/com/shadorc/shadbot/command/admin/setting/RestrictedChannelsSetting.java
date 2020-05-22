@@ -43,7 +43,7 @@ public class RestrictedChannelsSetting extends BaseSetting {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final List<String> args = context.requireArgs(4);
+        final List<String> args = context.requireArgs(5);
 
         final Action action = Utils.parseEnum(Action.class, args.get(1),
                 new CommandException(String.format("`%s` is not a valid action. %s",
@@ -53,19 +53,20 @@ public class RestrictedChannelsSetting extends BaseSetting {
                 new CommandException(String.format("`%s` is not a valid type. %s",
                         args.get(2), FormatUtils.options(Type.class))));
 
+        final String name = args.get(3);
         final Set<BaseCmd> commands = new HashSet<>();
         switch (type) {
             case COMMAND:
-                final BaseCmd command = CommandManager.getInstance().getCommand(args.get(3));
+                final BaseCmd command = CommandManager.getInstance().getCommand(name);
                 if (command == null) {
-                    return Mono.error(new CommandException(String.format("`%s` is not a valid command.", args.get(3))));
+                    return Mono.error(new CommandException(String.format("`%s` is not a valid command.", name)));
                 }
                 commands.add(command);
                 break;
             case CATEGORY:
-                final CommandCategory category = Utils.parseEnum(CommandCategory.class, args.get(2),
+                final CommandCategory category = Utils.parseEnum(CommandCategory.class, name,
                         new CommandException(String.format("`%s` is not a valid category. %s",
-                                args.get(2), FormatUtils.options(CommandCategory.class))));
+                                name, FormatUtils.options(CommandCategory.class))));
                 commands.addAll(CommandManager.getInstance().getCommands().values().stream()
                         .filter(cmd -> cmd.getCategory() == category)
                         .collect(Collectors.toSet()));
@@ -73,11 +74,11 @@ public class RestrictedChannelsSetting extends BaseSetting {
         }
 
         return context.getGuild()
-                .flatMapMany(guild -> DiscordUtils.extractChannels(guild, args.get(3)))
+                .flatMapMany(guild -> DiscordUtils.extractChannels(guild, args.get(4)))
                 .collectList()
                 .flatMap(mentionedChannels -> {
                     if (mentionedChannels.isEmpty()) {
-                        return Mono.error(new CommandException(String.format("Channel `%s` not found.", args.get(3))));
+                        return Mono.error(new CommandException(String.format("Channel `%s` not found.", args.get(4))));
                     }
 
                     return Mono.zip(Mono.just(mentionedChannels.get(0)),
@@ -95,7 +96,7 @@ public class RestrictedChannelsSetting extends BaseSetting {
                             restrictedCategories.computeIfAbsent(mentionedChannel.getId(), ignored -> new HashSet<>())
                                     .addAll(commands);
                             strBuilder.append(
-                                    String.format("Command(s) %s can now be only used in channel **#%s**.",
+                                    String.format("Command(s) %s can now only be used in channel **#%s**.",
                                             FormatUtils.format(commands, cmd -> String.format("`%s`", cmd.getName()), " "),
                                             mentionedChannel.getName()));
                             break;

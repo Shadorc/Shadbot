@@ -122,8 +122,7 @@ public class MessageProcessor {
             return Mono.empty();
         }
         // This command is not allowed to this role
-        if (context.getMember().getRoleIds().stream()
-                .anyMatch(roleId -> !dbGuild.getSettings().isCommandAllowedToRole(command, roleId))) {
+        if (!dbGuild.getSettings().isCommandAllowedToRole(command, context.getMember().getRoleIds())) {
             return Mono.empty();
         }
 

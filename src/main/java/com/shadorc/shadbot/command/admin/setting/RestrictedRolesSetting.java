@@ -43,7 +43,7 @@ public class RestrictedRolesSetting extends BaseSetting {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final List<String> args = context.requireArgs(4);
+        final List<String> args = context.requireArgs(5);
 
         final Action action = Utils.parseEnum(Action.class, args.get(1),
                 new CommandException(String.format("`%s` is not a valid action. %s",
@@ -53,19 +53,20 @@ public class RestrictedRolesSetting extends BaseSetting {
                 new CommandException(String.format("`%s` is not a valid type. %s",
                         args.get(2), FormatUtils.options(Type.class))));
 
+        final String name = args.get(3);
         final Set<BaseCmd> commands = new HashSet<>();
         switch (type) {
             case COMMAND:
-                final BaseCmd command = CommandManager.getInstance().getCommand(args.get(3));
+                final BaseCmd command = CommandManager.getInstance().getCommand(name);
                 if (command == null) {
-                    return Mono.error(new CommandException(String.format("`%s` is not a valid command.", args.get(3))));
+                    return Mono.error(new CommandException(String.format("`%s` is not a valid command.", name)));
                 }
                 commands.add(command);
                 break;
             case CATEGORY:
-                final CommandCategory category = Utils.parseEnum(CommandCategory.class, args.get(2),
+                final CommandCategory category = Utils.parseEnum(CommandCategory.class, name,
                         new CommandException(String.format("`%s` is not a valid category. %s",
-                                args.get(2), FormatUtils.options(CommandCategory.class))));
+                                name, FormatUtils.options(CommandCategory.class))));
                 commands.addAll(CommandManager.getInstance().getCommands().values().stream()
                         .filter(cmd -> cmd.getCategory() == category)
                         .collect(Collectors.toSet()));
@@ -73,11 +74,11 @@ public class RestrictedRolesSetting extends BaseSetting {
         }
 
         return context.getGuild()
-                .flatMapMany(guild -> DiscordUtils.extractRoles(guild, args.get(3)))
+                .flatMapMany(guild -> DiscordUtils.extractRoles(guild, args.get(4)))
                 .collectList()
                 .flatMap(mentionedRoles -> {
                     if (mentionedRoles.isEmpty()) {
-                        return Mono.error(new CommandException(String.format("Role `%s` not found.", args.get(3))));
+                        return Mono.error(new CommandException(String.format("Role `%s` not found.", args.get(4))));
                     }
                     return Mono.zip(Mono.just(mentionedRoles.get(0)),
                             DatabaseManager.getGuilds().getDBGuild(context.getGuildId()));
@@ -95,7 +96,7 @@ public class RestrictedRolesSetting extends BaseSetting {
                             restrictedRoles.computeIfAbsent(mentionedRole.getId(), ignored -> new HashSet<>())
                                     .addAll(commands);
                             strBuilder.append(
-                                    String.format("Command(s) %s can now be only used by role **#%s**.",
+                                    String.format("Command(s) %s can now only be used by role **%s**.",
                                             FormatUtils.format(commands, cmd -> String.format("`%s`", cmd.getName()), " "),
                                             mentionedRole.getName()));
                             break;
@@ -133,8 +134,8 @@ public class RestrictedRolesSetting extends BaseSetting {
                 .addArg("name", "command/category name", false)
                 .addArg("role", String.format("the role to %s", FormatUtils.format(Action.class, "/")), false)
                 .setExample(String.format("`%s%s add command play @admin`" +
-                                "%n`%s%s add category nsfw @nsfw`",
-                        context.getPrefix(), this.getCommandName(), context.getPrefix(), context.getCommandName()))
+                                "%n`%s%s add category music @dj`",
+                        context.getPrefix(), this.getCommandName(), context.getPrefix(), this.getCommandName()))
                 .build();
     }
 }

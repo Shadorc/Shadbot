@@ -48,7 +48,7 @@ public class SettingsBean implements Bean {
     @JsonProperty("restricted_channels")
     private Map<String, Set<String>> restrictedChannels;
     @Nullable
-    @JsonProperty
+    @JsonProperty("restricted_roles")
     private Map<String, Set<String>> restrictedRoles;
 
     public SettingsBean() {
