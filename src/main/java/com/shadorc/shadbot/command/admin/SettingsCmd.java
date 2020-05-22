@@ -75,6 +75,7 @@ public class SettingsCmd extends BaseCmd {
 
     private static Mono<Consumer<EmbedCreateSpec>> show(Context context, Settings settings) {
         return Flux.fromIterable(SettingManager.getInstance().getSettings().values())
+                .distinct()
                 .flatMap(setting -> setting.show(context, settings))
                 .reduce("", (desc, text) -> desc + "\n" + text)
                 .map(text -> DiscordUtils.getDefaultEmbed()

@@ -49,7 +49,7 @@ public class AutoMessagesSetting extends BaseSetting {
         final Mono<String> getAutoMessage = Mono.justOrEmpty(settings.getMessageChannelId())
                 .flatMap(context.getClient()::getChannelById)
                 .map(Channel::getMention)
-                .map(channel -> String.format("**Auto message channel:** %s", channel));
+                .map(channel -> String.format("**Auto message channel:**%n%s", channel));
 
         return Flux.merge(getJoinMessage, getLeaveMessage, getAutoMessage);
     }
