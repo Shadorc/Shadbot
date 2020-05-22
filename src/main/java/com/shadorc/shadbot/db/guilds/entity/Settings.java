@@ -1,12 +1,11 @@
 package com.shadorc.shadbot.db.guilds.entity;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
+import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.guilds.bean.SettingsBean;
 import com.shadorc.shadbot.db.guilds.entity.setting.Iam;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Role;
 import discord4j.rest.util.Permission;
@@ -64,17 +63,34 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return allowedVoiceChannelIds.contains(channelId);
     }
 
-    public boolean isCategoryAllowed(Snowflake channelId, CommandCategory category) {
-        final Map<Snowflake, Set<CommandCategory>> map = this.getRestrictedCategories();
+    public boolean isCommandAllowedInChannel(BaseCmd cmd, Snowflake channelId) {
+        final Map<Snowflake, Set<BaseCmd>> map = this.getRestrictedChannels();
         // If no permission has been set
         if (map.isEmpty()) {
             return true;
         }
         // If this category has explicitly been allowed in this channel
-        if (map.containsKey(channelId) && map.get(channelId).contains(category)) {
+        if (map.containsKey(channelId) && map.get(channelId).contains(cmd)) {
             return true;
         }
-        return map.values().stream().noneMatch(set -> set.contains(category));
+        return map.values().stream().noneMatch(set -> set.contains(cmd));
+    }
+
+    public boolean isCommandAllowedToRole(BaseCmd cmd, Set<Snowflake> roleIds) {
+        final Map<Snowflake, Set<BaseCmd>> map = this.getRestrictedRoles();
+        // If no permission has been set
+        if (map.isEmpty()) {
+            return true;
+        }
+
+        for (final Snowflake roleId : roleIds) {
+            // If this command has explicitly been allowed to this role
+            if (map.containsKey(roleId) && map.get(roleId).contains(cmd)) {
+                return true;
+            }
+        }
+
+        return map.values().stream().noneMatch(set -> set.contains(cmd));
     }
 
     public Set<Snowflake> getAllowedTextChannelIds() {
@@ -137,16 +153,29 @@ public class Settings extends SerializableEntity<SettingsBean> {
                 .orElse(Config.DEFAULT_PREFIX);
     }
 
-    public Map<Snowflake, Set<CommandCategory>> getRestrictedCategories() {
+    public Map<Snowflake, Set<BaseCmd>> getRestrictedChannels() {
         return Optional.ofNullable(this.getBean())
-                .map(SettingsBean::getRestrictedCategories)
+                .map(SettingsBean::getRestrictedChannels)
                 .orElse(new HashMap<>())
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(entry -> Snowflake.of(entry.getKey()),
                         entry -> entry.getValue()
                                 .stream()
-                                .map(value -> Utils.parseEnum(CommandCategory.class, value))
+                                .map(CommandManager.getInstance()::getCommand)
+                                .collect(Collectors.toSet())));
+    }
+
+    public Map<Snowflake, Set<BaseCmd>> getRestrictedRoles() {
+        return Optional.ofNullable(this.getBean())
+                .map(SettingsBean::getRestrictedRoles)
+                .orElse(new HashMap<>())
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> Snowflake.of(entry.getKey()),
+                        entry -> entry.getValue()
+                                .stream()
+                                .map(CommandManager.getInstance()::getCommand)
                                 .collect(Collectors.toSet())));
     }
 

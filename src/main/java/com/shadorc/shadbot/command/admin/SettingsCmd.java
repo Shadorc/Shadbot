@@ -166,8 +166,7 @@ public class SettingsCmd extends BaseCmd {
                 .stream()
                 .distinct()
                 .forEach(setting -> embed.addField(String.format("Name: %s", setting.getName()),
-                        setting.getDescription(),
-                        false));
+                        setting.getDescription(), false));
 
         return embed.build();
     }

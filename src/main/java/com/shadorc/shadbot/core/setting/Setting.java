@@ -16,7 +16,8 @@ public enum Setting {
     LEAVE_MESSAGE,
     AUTO_ROLES,
     IAM_MESSAGES,
-    RESTRICTED_CATEGORIES;
+    RESTRICTED_CHANNELS,
+    RESTRICTED_ROLES;
 
     @Override
     public String toString() {
