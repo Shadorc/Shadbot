@@ -89,15 +89,23 @@ public class FormatUtilsTest {
     @Test
     public void testTrackName() {
         assertEquals("author - title (1:00)", FormatUtils.trackName(
-                new AudioTrackInfo("title", "author", 60 * 1000, "identifier", false, "uri")));
+                new AudioTrackInfo("title", "author", 60 * 1000,
+                        "identifier", false, "uri")));
         assertEquals("title (1:00)", FormatUtils.trackName(
-                new AudioTrackInfo("title", "Unknown artist", 60 * 1000, "identifier", false, "uri")));
+                new AudioTrackInfo("title", "Unknown artist", 60 * 1000,
+                        "identifier", false, "uri")));
         assertEquals("author - title (Stream)", FormatUtils.trackName(
-                new AudioTrackInfo("title", "author", 60 * 1000, "identifier", true, "uri")));
+                new AudioTrackInfo("title", "author", 60 * 1000,
+                        "identifier", true, "uri")));
         assertEquals("title (Stream)", FormatUtils.trackName(
-                new AudioTrackInfo("title", "Unknown artist", 60 * 1000, "identifier", true, "uri")));
+                new AudioTrackInfo("title", "Unknown artist", 60 * 1000,
+                        "identifier", true, "uri")));
         assertEquals("author - title (Stream)", FormatUtils.trackName(
-                new AudioTrackInfo("   title  ", "  author    ", 60 * 1000, "identifier", true, "uri")));
+                new AudioTrackInfo("   title  ", "  author    ", 60 * 1000,
+                        "identifier", true, "uri")));
+        assertEquals("author - title (1:00)", FormatUtils.trackName(
+                new AudioTrackInfo("author - title", "author", 60 * 1000,
+                        "identifier", false, "uri")));
     }
 
 }
