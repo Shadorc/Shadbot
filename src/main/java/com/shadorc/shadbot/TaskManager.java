@@ -108,7 +108,7 @@ public class TaskManager {
 
     public void schedulePostStats() {
         this.logger.info("Starting bot list stats scheduler...");
-        final Disposable task = Flux.interval(Duration.ofHours(3), Duration.ofHours(3), this.defaultScheduler)
+        final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofHours(3), this.defaultScheduler)
                 .flatMap(ignored -> this.botListStats.postStats())
                 .subscribe(null, ExceptionHandler::handleUnknownError);
         this.tasks.add(task);
