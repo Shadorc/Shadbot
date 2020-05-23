@@ -22,6 +22,7 @@ import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.Permission;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -89,15 +90,15 @@ public abstract class RemoveMemberCmd extends BaseCmd {
 
     private Mono<Boolean> canInteract(MessageChannel channel, Member self, Member author, Member memberToRemove) {
         return Mono.zip(self.isHigher(memberToRemove), author.isHigher(memberToRemove))
-                .flatMap(tuple -> {
-                    if (!tuple.getT1()) {
+                .flatMap(TupleUtils.function((isSelfHigher, isAuthorHigher) -> {
+                    if (!isSelfHigher) {
                         return DiscordUtils.sendMessage(
                                 String.format(Emoji.WARNING + " (**%s**) I cannot %s **%s** because he is higher in " +
                                                 "the role hierarchy than me.",
                                         author.getUsername(), this.getName(), memberToRemove.getUsername()), channel)
                                 .thenReturn(false);
                     }
-                    if (!tuple.getT2()) {
+                    if (!isAuthorHigher) {
                         return DiscordUtils.sendMessage(
                                 String.format(Emoji.WARNING + " (**%s**) You cannot %s **%s** because he is higher " +
                                                 "in the role hierarchy than you.",
@@ -105,7 +106,7 @@ public abstract class RemoveMemberCmd extends BaseCmd {
                                 .thenReturn(false);
                     }
                     return Mono.just(true);
-                });
+                }));
     }
 
     private Mono<Message> sendMessage(Guild guild, MessageChannel channel, Member author, Member memberToRemove, String reason) {

@@ -20,6 +20,7 @@ import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.rest.util.Permission;
+import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
@@ -108,8 +109,9 @@ public class Context {
 
         // The member is an administrator or it's a private message
         final Mono<CommandPermission> adminPerm = this.getChannel()
-                .filterWhen(channel -> DiscordUtils.hasPermission(channel, this.getAuthorId(), Permission.ADMINISTRATOR)
-                        .map(isAdmin -> isAdmin || channel.getType() == Channel.Type.DM))
+                .filterWhen(channel -> BooleanUtils.or(
+                        DiscordUtils.hasPermission(channel, this.getAuthorId(), Permission.ADMINISTRATOR),
+                        Mono.just(channel.getType() == Channel.Type.DM)))
                 .map(ignored -> CommandPermission.ADMIN);
 
         return Flux.merge(ownerPerm, adminPerm, Mono.just(CommandPermission.USER));

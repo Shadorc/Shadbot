@@ -24,6 +24,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.select.Elements;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 import reactor.util.function.Tuples;
 import reactor.util.retry.Retry;
 
@@ -107,12 +108,12 @@ public class LyricsCmd extends BaseCmd {
                 .responseSingle((res, con) -> con.asString(StandardCharsets.UTF_8)
                         .map(body -> Tuples.of(res, body)))
                 .timeout(Config.TIMEOUT)
-                .flatMap(responseSingle -> {
-                    if (url.endsWith(responseSingle.getT1().uri())) {
-                        return Mono.just(Jsoup.parse(responseSingle.getT2()));
+                .flatMap(TupleUtils.function((res, body) -> {
+                    if (url.endsWith(res.uri())) {
+                        return Mono.just(Jsoup.parse(body));
                     }
                     return Mono.error(new IOException("Musixmatch redirected to wrong page."));
-                })
+                }))
                 .retryWhen(Retry.max(MAX_RETRY)
                         .filter(err -> "Musixmatch redirected to wrong page.".equals(err.getMessage())))
                 .onErrorMap(IOException.class, err -> {

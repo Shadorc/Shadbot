@@ -12,6 +12,7 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import io.prometheus.client.Counter;
+import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -69,10 +70,10 @@ public class MessageProcessor {
 
     private static Mono<Void> processCommand(MessageCreateEvent event, DBGuild dbGuild) {
         return Mono.justOrEmpty(event.getMember())
-                .flatMap(member -> Mono.zip(member.getRoles().collectList(),
-                        event.getGuild().map(Guild::getOwnerId).map(member.getId()::equals)))
                 // The role is allowed or the author is the guild's owner
-                .filter(tuple -> dbGuild.getSettings().hasAllowedRole(tuple.getT1()) || tuple.getT2())
+                .filterWhen(member -> BooleanUtils.or(
+                        member.getRoles().collectList().map(dbGuild.getSettings()::hasAllowedRole),
+                        event.getGuild().map(Guild::getOwnerId).map(member.getId()::equals)))
                 // The channel is allowed
                 .flatMap(ignored -> event.getMessage().getChannel())
                 .filter(channel -> dbGuild.getSettings().isTextChannelAllowed(channel.getId()))

@@ -13,6 +13,7 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.util.Set;
 
@@ -32,8 +33,8 @@ public class MemberJoinListener implements EventListener<MemberJoinEvent> {
                 .flatMap(settings -> Mono.zip(
                         Mono.justOrEmpty(settings.getMessageChannelId()),
                         Mono.justOrEmpty(settings.getJoinMessage())))
-                .flatMap(tuple -> MemberJoinListener.sendAutoMessage(event.getClient(), event.getMember(),
-                        tuple.getT1(), tuple.getT2()));
+                .flatMap(TupleUtils.function((messageChannelId, joinMessage) ->
+                        MemberJoinListener.sendAutoMessage(event.getClient(), event.getMember(), messageChannelId, joinMessage)));
 
         // Add auto-roles when a user joins if they are configured
         final Flux<Void> addAutoRoles = event.getGuild()

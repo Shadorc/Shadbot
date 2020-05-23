@@ -48,7 +48,8 @@ public class LeaderboardCmd extends BaseCmd {
                     return FormatUtils.numberedList(USER_COUNT, list.size(),
                             count -> {
                                 final Tuple2<String, Long> tuple = list.get(count - 1);
-                                return String.format("%d. **%s** - %s", count, tuple.getT1(), FormatUtils.coins(tuple.getT2()));
+                                return String.format("%d. **%s** - %s",
+                                        count, tuple.getT1(), FormatUtils.coins(tuple.getT2()));
                             });
                 })
                 .map(description -> DiscordUtils.getDefaultEmbed()
