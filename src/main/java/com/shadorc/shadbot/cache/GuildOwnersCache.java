@@ -7,18 +7,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GuildOwnersCache {
 
-    private final Map<Long, Long> map;
+    private static final Map<Long, Long> MAP = new ConcurrentHashMap<>();
 
-    public GuildOwnersCache() {
-        this.map = new ConcurrentHashMap<>();
+    public static void put(Snowflake guildId, Snowflake ownerId) {
+        MAP.put(guildId.asLong(), ownerId.asLong());
     }
 
-    public void put(Snowflake guildId, Snowflake ownerId) {
-        this.map.put(guildId.asLong(), ownerId.asLong());
+    public static void remove(Snowflake guildId) {
+        MAP.remove(guildId.asLong());
     }
 
-    public Snowflake get(Snowflake guildId) {
-        return Snowflake.of(this.map.get(guildId.asLong()));
+    public static Snowflake get(Snowflake guildId) {
+        return Snowflake.of(MAP.get(guildId.asLong()));
+    }
+
+    public static long count() {
+        return MAP.size();
     }
 
 }

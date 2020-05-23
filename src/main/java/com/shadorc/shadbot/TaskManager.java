@@ -1,6 +1,7 @@
 package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
+import com.shadorc.shadbot.cache.GuildOwnersCache;
 import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
@@ -77,6 +78,8 @@ public class TaskManager {
                 .help("Garbage collector total time in ms").register();
         final Gauge responseTimeGauge = Gauge.build().namespace("shard").name("response_time")
                 .help("Shard response time").labelNames("shard_id").register();
+        final Gauge guildCountGauge = Gauge.build().namespace("shadbot")
+                .name("guild_count").help("Guild count").register();
 
         final GatewayClientGroup group = this.gateway.getGatewayClientGroup();
         final Mono<Map<Integer, Long>> getResponseTimes = Flux.range(0, group.getShardCount())
@@ -93,6 +96,7 @@ public class TaskManager {
                     threadCountGauge.set(Thread.activeCount());
                     gcCountGauge.set(ProcessUtils.getGCCount());
                     gcTimeGauge.set(ProcessUtils.getGCTime());
+                    guildCountGauge.set(GuildOwnersCache.count());
                 })
                 .flatMap(ignored -> getResponseTimes)
                 .doOnNext(responseTimeMap -> responseTimeMap
