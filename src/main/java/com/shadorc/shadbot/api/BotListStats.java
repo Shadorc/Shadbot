@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.api;
 
-import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.api.json.dbl.VoterResponse;
 import com.shadorc.shadbot.cache.GuildOwnersCache;
 import com.shadorc.shadbot.data.credential.Credential;
@@ -65,7 +64,7 @@ public class BotListStats {
     private Mono<String> postOnBotlistDotSpace(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
-        final String url = String.format("https://api.botlist.space/v1/bots/%d", Shadbot.getSelfId().asLong());
+        final String url = String.format("https://api.botlist.space/v1/bots/%d", this.gateway.getSelfId().asLong());
         return this.post(url, CredentialManager.getInstance().get(Credential.BOTLIST_DOT_SPACE_TOKEN), content);
     }
 
@@ -76,7 +75,7 @@ public class BotListStats {
     private Mono<String> postOnBotsOndiscordDotXyz(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("guildCount", guildCount);
-        final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", Shadbot.getSelfId().asLong());
+        final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", this.gateway.getSelfId().asLong());
         return this.post(url, CredentialManager.getInstance().get(Credential.BOTS_ONDISCORD_DOT_XYZ_TOKEN), content);
     }
 
@@ -91,7 +90,7 @@ public class BotListStats {
                             .put("shard_id", shardId)
                             .put("guilds ", guildCount / shardCount);
                     final String url = String.format("https://discordbotlist.com/api/bots/%d/stats",
-                            Shadbot.getSelfId().asLong());
+                            this.gateway.getSelfId().asLong());
                     return this.post(url, String.format("Bot %s",
                             CredentialManager.getInstance().get(Credential.DISCORDBOTLIST_DOT_COM_TOKEN)), content);
                 });
@@ -108,7 +107,7 @@ public class BotListStats {
                             .put("shardId", shardId)
                             .put("shardCount", shardCount)
                             .put("guildCount", guildCount / shardCount);
-                    final String url = String.format("https://discord.bots.gg/api/v1/bots/%d/stats", Shadbot.getSelfId().asLong());
+                    final String url = String.format("https://discord.bots.gg/api/v1/bots/%d/stats", this.gateway.getSelfId().asLong());
                     return this.post(url, CredentialManager.getInstance().get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
                 });
     }
@@ -124,7 +123,7 @@ public class BotListStats {
                             .put("shard_id", shardId)
                             .put("shard_count", shardCount)
                             .put("server_count", guildCount / shardCount);
-                    final String url = String.format("https://top.gg/api/bots/%d/stats", Shadbot.getSelfId().asLong());
+                    final String url = String.format("https://top.gg/api/bots/%d/stats", this.gateway.getSelfId().asLong());
                     return this.post(url, CredentialManager.getInstance().get(Credential.TOP_DOT_GG_TOKEN), content);
                 });
     }
@@ -137,7 +136,7 @@ public class BotListStats {
         final JSONObject content = new JSONObject()
                 .put("serveurs", guildCount)
                 .put("shards", shardCount);
-        final String url = String.format("https://api.wonderbotlist.com/v1/bot/%d", Shadbot.getSelfId().asLong());
+        final String url = String.format("https://api.wonderbotlist.com/v1/bot/%d", this.gateway.getSelfId().asLong());
         return this.post(url, CredentialManager.getInstance().get(Credential.WONDERBOTLIST_DOT_COM_TOKEN), content);
     }
 
@@ -148,7 +147,7 @@ public class BotListStats {
         final Consumer<HttpHeaders> headersConsumer = header -> header.add(HttpHeaderNames.AUTHORIZATION,
                 CredentialManager.getInstance().get(Credential.TOP_DOT_GG_TOKEN));
         return NetUtils.get(headersConsumer, String.format("https://top.gg/api/bots/%d/votes",
-                Shadbot.getSelfId().asLong()), VoterResponse[].class)
+                this.gateway.getSelfId().asLong()), VoterResponse[].class)
                 .flatMapMany(Flux::fromArray)
                 .map(VoterResponse::getId)
                 .map(Snowflake::of)

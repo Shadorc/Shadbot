@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.command.admin.IamCmd;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
@@ -63,7 +62,7 @@ public class ReactionListener {
 
     private static Mono<Boolean> canManageRole(Message message, Snowflake roleId) {
         return message.getGuild()
-                .flatMap(guild -> Mono.zip(guild.getMemberById(Shadbot.getSelfId()), guild.getRoleById(roleId)))
+                .flatMap(guild -> Mono.zip(guild.getMemberById(message.getClient().getSelfId()), guild.getRoleById(roleId)))
                 .flatMap(TupleUtils.function((selfMember, role) -> Mono.zip(
                         selfMember.getBasePermissions().map(set -> set.contains(Permission.MANAGE_ROLES)),
                         selfMember.hasHigherRoles(Set.of(role.getId())))
@@ -109,7 +108,7 @@ public class ReactionListener {
             return Mono.empty();
         }
 
-        return Mono.just(Shadbot.getSelfId())
+        return Mono.just(message.getClient().getSelfId())
                 // It wasn't the bot that reacted
                 .filter(selfId -> !userId.equals(selfId))
                 // If the bot is not the author of the message, this is not an Iam message

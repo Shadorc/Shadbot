@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.cache.GuildOwnersCache;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
@@ -28,7 +27,7 @@ public class MemberLeaveListener implements EventListener<MemberLeaveEvent> {
 
     @Override
     public Mono<Void> execute(MemberLeaveEvent event) {
-        if (event.getUser().getId().equals(Shadbot.getSelfId())) {
+        if (event.getUser().getId().equals(event.getClient().getSelfId())) {
             final Snowflake guildOwnerId = GuildOwnersCache.get(event.getGuildId());
             return event.getClient()
                     .getUserById(guildOwnerId)

@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.command.owner;
 
-import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
@@ -36,7 +35,7 @@ public class SendMessageCmd extends BaseCmd {
                     args.get(0))));
         }
 
-        if (Snowflake.of(userId).equals(Shadbot.getSelfId())) {
+        if (Snowflake.of(userId).equals(context.getSelfId())) {
             return Mono.error(new CommandException("I can't send a private message to myself."));
         }
 

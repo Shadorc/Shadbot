@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -34,7 +33,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
         final Snowflake guildId = event.getCurrent().getGuildId();
 
         // If the voice state update comes from the bot...
-        if (userId.equals(Shadbot.getSelfId())) {
+        if (userId.equals(event.getClient().getSelfId())) {
             LOGGER.trace("{Guild ID: {}} Voice state update event: {}", guildId.asLong(), event);
             if (event.getCurrent().getChannelId().isEmpty() && event.getOld().isPresent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel left", guildId.asLong());
@@ -64,7 +63,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
             return Mono.empty();
         }
 
-        return event.getClient().getMemberById(guildId, Shadbot.getSelfId())
+        return event.getClient().getMemberById(guildId, event.getClient().getSelfId())
                 .flatMap(Member::getVoiceState)
                 .flatMap(VoiceState::getChannel)
                 .flatMapMany(VoiceChannel::getVoiceStates)

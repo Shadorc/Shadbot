@@ -44,7 +44,6 @@ public class Shadbot {
 
     private static final Instant LAUNCH_TIME = Instant.now();
     private static final AtomicLong OWNER_ID = new AtomicLong();
-    private static final AtomicLong SELF_ID = new AtomicLong();
 
     private static GatewayDiscordClient gateway;
     private static TaskManager taskManager;
@@ -58,7 +57,7 @@ public class Shadbot {
 
         final String port = CredentialManager.getInstance().get(Credential.PROMETHEUS_PORT);
         if (port != null) {
-            DEFAULT_LOGGER.info("Initializing Prometheus on port {}...", port);
+            DEFAULT_LOGGER.info("Initializing Prometheus on port {}", port);
             try {
                 Shadbot.prometheusServer = new HTTPServer(Integer.parseInt(port));
             } catch (final IOException err) {
@@ -67,7 +66,7 @@ public class Shadbot {
         }
 
         if (!Config.IS_SNAPSHOT) {
-            DEFAULT_LOGGER.info("Initializing Sentry...");
+            DEFAULT_LOGGER.info("Initializing Sentry");
             Sentry.init(CredentialManager.getInstance().get(Credential.SENTRY_DSN))
                     .addShouldSendEventCallback(event -> !event.getLogger().startsWith("com.sedmelluq")
                             && !event.getMessage().contains("discord4j.common.close.CloseException"));
@@ -75,7 +74,7 @@ public class Shadbot {
 
         // BlockHound is used to detect blocking actions in non-blocking threads
         if (Config.IS_SNAPSHOT) {
-            DEFAULT_LOGGER.info("Initializing BlockHound...");
+            DEFAULT_LOGGER.info("Initializing BlockHound");
             BlockHound.builder()
                     .allowBlockingCallsInside("java.io.FileInputStream", "readBytes")
                     .install();
@@ -86,7 +85,7 @@ public class Shadbot {
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
                 .build();
 
-        DEFAULT_LOGGER.info("Acquiring owner ID and self ID...");
+        DEFAULT_LOGGER.info("Acquiring owner ID");
         client.getApplicationInfo()
                 .map(ApplicationInfoData::owner)
                 .map(UserData::id)
@@ -97,11 +96,7 @@ public class Shadbot {
                 })
                 .block();
 
-        final long selfId = DiscordUtils.extractSelfId(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN));
-        DEFAULT_LOGGER.info("Self ID acquired: {}", selfId);
-        Shadbot.SELF_ID.set(selfId);
-
-        DEFAULT_LOGGER.info("Connecting to Discord...");
+        DEFAULT_LOGGER.info("Connecting to Discord");
         client.gateway()
                 .setAwaitConnections(false)
                 .setEntityRetrievalStrategy(gateway -> new DistinctFallbackEntityRetriever(
@@ -132,7 +127,7 @@ public class Shadbot {
                         Shadbot.taskManager.scheduleVotersCheck();
                     }
 
-                    DEFAULT_LOGGER.info("Registering listeners...");
+                    DEFAULT_LOGGER.info("Registering listeners");
                     Shadbot.register(gateway, new TextChannelDeleteListener());
                     Shadbot.register(gateway, new GuildCreateListener());
                     Shadbot.register(gateway, new GuildDeleteListener());
@@ -144,6 +139,7 @@ public class Shadbot {
                     Shadbot.register(gateway, new ReactionListener.ReactionAddListener());
                     Shadbot.register(gateway, new ReactionListener.ReactionRemoveListener());
 
+                    DEFAULT_LOGGER.info("Shadbot is ready");
                     return gateway.onDisconnect();
                 })
                 .block();
@@ -177,13 +173,6 @@ public class Shadbot {
      */
     public static Snowflake getOwnerId() {
         return Snowflake.of(Shadbot.OWNER_ID.get());
-    }
-
-    /**
-     * @return The ID of the bot.
-     */
-    public static Snowflake getSelfId() {
-        return Snowflake.of(Shadbot.SELF_ID.get());
     }
 
     public static Mono<Void> quit() {

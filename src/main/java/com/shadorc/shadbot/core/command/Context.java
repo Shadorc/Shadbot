@@ -125,6 +125,10 @@ public class Context {
         return this.getClient().getSelf();
     }
 
+    public Snowflake getSelfId() {
+        return this.getClient().getSelfId();
+    }
+
     public Mono<Member> getSelfAsMember() {
         return this.getSelf().flatMap(self -> self.asMember(this.getGuildId()));
     }

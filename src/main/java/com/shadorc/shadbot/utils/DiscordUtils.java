@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.utils;
 
-import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.command.MissingPermissionException;
 import com.shadorc.shadbot.core.command.Context;
@@ -31,9 +30,7 @@ import reactor.function.TupleUtils;
 import reactor.netty.http.client.PrematureCloseException;
 import reactor.util.retry.Retry;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -50,17 +47,6 @@ public class DiscordUtils {
         final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX,
                 TextUtils.TIPS.getRandomTextFormatted());
         return Presence.online(Activity.playing(presence));
-    }
-
-    /**
-     * @param token Discord's token.
-     * @return The extracted self ID from the Discord token.
-     */
-    public static long extractSelfId(String token) {
-        if (token.indexOf('.') == -1) {
-            throw new IllegalArgumentException("Invalid token.");
-        }
-        return Long.parseLong(new String(Base64.getDecoder().decode(token.split("\\.")[0]), StandardCharsets.UTF_8));
     }
 
     /**
@@ -103,8 +89,8 @@ public class DiscordUtils {
      */
     public static Mono<Message> sendMessage(Consumer<MessageCreateSpec> spec, MessageChannel channel, boolean hasEmbed) {
         return Mono.zip(
-                DiscordUtils.hasPermission(channel, Shadbot.getSelfId(), Permission.SEND_MESSAGES),
-                DiscordUtils.hasPermission(channel, Shadbot.getSelfId(), Permission.EMBED_LINKS))
+                DiscordUtils.hasPermission(channel, channel.getClient().getSelfId(), Permission.SEND_MESSAGES),
+                DiscordUtils.hasPermission(channel, channel.getClient().getSelfId(), Permission.EMBED_LINKS))
                 .flatMap(TupleUtils.function((canSendMessage, canSendEmbed) -> {
                     if (!canSendMessage) {
                         DEFAULT_LOGGER.info("{Channel ID: {}} Missing permission: {}",
@@ -224,7 +210,7 @@ public class DiscordUtils {
      */
     public static Mono<Void> requirePermissions(Channel channel, Permission... permissions) {
         return Flux.fromArray(permissions)
-                .flatMap(permission -> DiscordUtils.hasPermission(channel, Shadbot.getSelfId(), permission)
+                .flatMap(permission -> DiscordUtils.hasPermission(channel, channel.getClient().getSelfId(), permission)
                         .filter(Boolean.TRUE::equals)
                         .switchIfEmpty(Mono.error(new MissingPermissionException(permission))))
                 .then();
