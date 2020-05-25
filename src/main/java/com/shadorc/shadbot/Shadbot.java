@@ -28,6 +28,7 @@ import discord4j.store.jdk.JdkStoreService;
 import io.prometheus.client.exporter.HTTPServer;
 import io.sentry.Sentry;
 import reactor.blockhound.BlockHound;
+import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
@@ -81,10 +82,12 @@ public class Shadbot {
             BlockHound.builder()
                     .allowBlockingCallsInside("java.io.FileInputStream", "readBytes")
                     .install();
+
+            DEFAULT_LOGGER.info("Initializing Reactor operator stack recorder");
+            Hooks.onOperatorDebug();
         }
 
         final DiscordClient client = DiscordClient.builder(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN))
-                .setDebugMode(Config.IS_SNAPSHOT)
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
                 .build();
 
