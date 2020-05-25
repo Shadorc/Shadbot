@@ -37,8 +37,8 @@ public class WallpaperCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading wallpaper...", context.getUsername()))
                 .send()
-                .thenReturn(new StringBuilder(HOME_URL))
-                .map(urlBuilder -> {
+                .then(Mono.fromCallable(() -> {
+                    final StringBuilder urlBuilder = new StringBuilder(HOME_URL);
                     urlBuilder.append(String.format("?apikey=%s",
                             CredentialManager.getInstance().get(Credential.WALLHAVEN_API_KEY)));
 
@@ -53,7 +53,7 @@ public class WallpaperCmd extends BaseCmd {
                     }
 
                     return urlBuilder.toString();
-                })
+                }))
                 .flatMap(url -> NetUtils.get(url, WallhavenResponse.class))
                 .map(WallhavenResponse::getWallpapers)
                 .filter(wallpapers -> !wallpapers.isEmpty())
@@ -70,7 +70,7 @@ public class WallpaperCmd extends BaseCmd {
                                     .setImage(wallpaper.getPath())
                                     .addField("Resolution", wallpaper.getResolution(), false)));
                 }))
-                .switchIfEmpty(Mono.just(updatableMsg.setContent(
+                .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
                                 context.getUsername(), arg))))
                 .flatMap(UpdatableMessage::send)
