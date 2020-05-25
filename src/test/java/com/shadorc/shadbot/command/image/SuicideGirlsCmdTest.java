@@ -24,6 +24,7 @@ public class SuicideGirlsCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetRandomSuicideGirl() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         final Method method = SuicideGirlsCmd.class.getDeclaredMethod("getRandomSuicideGirl");
         method.setAccessible(true);

@@ -29,6 +29,7 @@ public class WikipediaCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetWikipediaPage() throws InvocationTargetException, IllegalAccessException {
         final WikipediaPage result = ((Mono<WikipediaPage>) method.invoke(cmd, "21 guns")).block();
         logger.debug("testGetWikipediaPage: {}", result);
@@ -37,6 +38,7 @@ public class WikipediaCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetWikipediaPageSpecial() throws InvocationTargetException, IllegalAccessException {
         final WikipediaPage result = ((Mono<WikipediaPage>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block();
         logger.debug("testGetWikipediaPageSpecial: {}", result);

@@ -28,6 +28,7 @@ public class UrbanCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetUrbanDefinition() throws InvocationTargetException, IllegalAccessException {
         final UrbanDefinition result = ((Mono<UrbanDefinition>) method.invoke(cmd, "dab")).block();
         logger.debug("testGetUrbanDefinition: {}", result);
@@ -38,9 +39,10 @@ public class UrbanCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetUrbanDefinitionSpecial() throws InvocationTargetException, IllegalAccessException {
-        final UrbanDefinition result =
-                ((Mono<UrbanDefinition>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block();
+        final UrbanDefinition result = ((Mono<UrbanDefinition>) method.invoke(cmd,
+                "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block();
         logger.debug("testGetUrbanDefinitionSpecial: {}", result);
         assertNotNull(result);
     }

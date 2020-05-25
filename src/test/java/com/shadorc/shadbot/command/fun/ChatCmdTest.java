@@ -28,6 +28,7 @@ public class ChatCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetResponse() throws InvocationTargetException, IllegalAccessException {
         final String result = ((Mono<String>) method.invoke(cmd, Snowflake.of(1234L), "Hello World!")).block();
         logger.debug("testGetResponse: {}", result);
@@ -35,9 +36,10 @@ public class ChatCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetResponseSpecial() throws InvocationTargetException, IllegalAccessException {
-        final String result =
-                ((Mono<String>) method.invoke(cmd, Snowflake.of(1234L), "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block();
+        final String result = ((Mono<String>) method.invoke(cmd, Snowflake.of(1234L),
+                "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block();
         logger.debug("testGetResponseSpecial: {}", result);
         assertNotNull(result);
     }
