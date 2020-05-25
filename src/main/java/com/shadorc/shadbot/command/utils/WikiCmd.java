@@ -53,9 +53,9 @@ public class WikiCmd extends BaseCmd {
                                     .setThumbnail("https://i.imgur.com/7X7Cvhf.png")
                                     .setDescription(extract)));
                 })
-                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(
+                .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
-                                context.getUsername(), arg)))))
+                                context.getUsername(), arg))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();

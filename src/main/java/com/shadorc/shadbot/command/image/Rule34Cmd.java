@@ -74,9 +74,9 @@ public class Rule34Cmd extends BaseCmd {
                                         }));
                             });
                 })
-                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(
+                .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
-                                context.getUsername(), arg)))))
+                                context.getUsername(), arg))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();

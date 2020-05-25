@@ -50,8 +50,9 @@ public class CounterStrikeCmd extends BaseCmd {
                 .flatMap(this::getSteamId)
                 .flatMap(this::getPlayerSummary)
                 .flatMap(player -> this.getStats(context, updatableMsg, player))
-                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(
-                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Steam player not found.", context.getUsername())))))
+                .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
+                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Steam player not found.",
+                                context.getUsername()))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();

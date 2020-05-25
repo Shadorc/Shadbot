@@ -41,9 +41,9 @@ public class GifCmd extends BaseCmd {
                 .then(this.getGif(NetUtils.encode(context.getArg().orElse(""))))
                 .map(gifUrl -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setImage(gifUrl))))
-                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(
+                .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
-                                context.getUsername(), context.getArg().orElse("random search"))))))
+                                context.getUsername(), context.getArg().orElse("random search")))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();

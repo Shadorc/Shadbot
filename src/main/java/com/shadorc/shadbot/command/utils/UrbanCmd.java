@@ -54,9 +54,9 @@ public class UrbanCmd extends BaseCmd {
                                 }
                             }));
                 })
-                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(
+                .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Urban Dictionary definition found for `%s`",
-                                context.getUsername(), arg)))))
+                                context.getUsername(), arg))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();

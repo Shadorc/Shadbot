@@ -65,9 +65,9 @@ public class LyricsCmd extends BaseCmd {
                                 .setDescription(musixmatch.getLyrics())
                                 .setFooter("Click on the title to see the full version",
                                         "https://i.imgur.com/G7q6Hmq.png"))))
-                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(
+                .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
-                                context.getUsername(), search)))))
+                                context.getUsername(), search))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();

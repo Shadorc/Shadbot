@@ -61,9 +61,9 @@ public class ImageCmd extends BaseCmd {
                                 .addField("Author", image.getAuthor().getUsername(), false)
                                 .addField("Category", image.getCategoryPath(), false)
                                 .setImage(image.getContent().map(Content::getSource).orElseThrow()))))
-                .switchIfEmpty(Mono.defer(() -> Mono.just(updatableMsg.setContent(String.format(
+                .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(String.format(
                         Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
-                        context.getUsername(), arg)))))
+                        context.getUsername(), arg))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
