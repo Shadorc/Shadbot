@@ -41,6 +41,7 @@ public class CounterStrikeCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetSteamId() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         final Method method = CounterStrikeCmd.class.getDeclaredMethod("getSteamId", String.class);
         method.setAccessible(true);
@@ -54,6 +55,7 @@ public class CounterStrikeCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetPlayerSummary() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         final Method method = CounterStrikeCmd.class.getDeclaredMethod("getPlayerSummary", String.class);
         method.setAccessible(true);

@@ -24,6 +24,7 @@ public class DtcCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetRandomQuote() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         final Method method = DtcCmd.class.getDeclaredMethod("getRandomQuote");
         method.setAccessible(true);

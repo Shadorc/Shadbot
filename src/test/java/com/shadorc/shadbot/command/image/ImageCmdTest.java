@@ -30,6 +30,7 @@ public class ImageCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetPopularImage() throws InvocationTargetException, IllegalAccessException {
         final Image result = ((Mono<Image>) method.invoke(cmd, "dab")).block();
         logger.debug("testGetPopularImage: {}", result);
@@ -41,6 +42,7 @@ public class ImageCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetPopularImageSpecial() throws InvocationTargetException, IllegalAccessException {
         final Image result = ((Mono<Image>) method.invoke(cmd,
                 NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/"))).block();

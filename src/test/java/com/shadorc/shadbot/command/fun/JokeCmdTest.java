@@ -23,6 +23,7 @@ public class JokeCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetRandomJoke() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         final Method method = JokeCmd.class.getDeclaredMethod("getRandomJoke");
         method.setAccessible(true);

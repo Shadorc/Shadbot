@@ -24,6 +24,7 @@ public class ThisDayTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetThisDay() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         final Method method = ThisDayCmd.class.getDeclaredMethod("getThisDay");
         method.setAccessible(true);

@@ -25,6 +25,7 @@ public class OverwatchCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetResponse() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         final Method method = OverwatchCmd.class.getDeclaredMethod("getOverwatchProfile", String.class, OverwatchCmd.Platform.class);
         method.setAccessible(true);
@@ -44,6 +45,7 @@ public class OverwatchCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetResponseWrongBattletag() throws NoSuchMethodException {
         final Method method = OverwatchCmd.class.getDeclaredMethod("getOverwatchProfile", String.class, OverwatchCmd.Platform.class);
         method.setAccessible(true);

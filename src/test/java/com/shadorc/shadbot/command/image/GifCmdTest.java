@@ -29,6 +29,7 @@ public class GifCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetGifRandom() throws InvocationTargetException, IllegalAccessException {
         final String result = ((Mono<String>) method.invoke(cmd, "")).block();
         logger.debug("testGetGifRandom: {}", result);
@@ -36,6 +37,7 @@ public class GifCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetGifSearch() throws InvocationTargetException, IllegalAccessException {
         final String result = ((Mono<String>) method.invoke(cmd, "doom")).block();
         logger.debug("testGetGifSearch: {}", result);
@@ -43,6 +45,7 @@ public class GifCmdTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetGifSearchSpecial() {
         assertDoesNotThrow(() -> {
             final String result = ((Mono<String>) method.invoke(cmd,
