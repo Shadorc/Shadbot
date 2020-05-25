@@ -91,7 +91,6 @@ public class Shadbot {
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
                 .build();
 
-        DEFAULT_LOGGER.info("Acquiring owner ID");
         client.getApplicationInfo()
                 .map(ApplicationInfoData::owner)
                 .map(UserData::id)

@@ -45,7 +45,7 @@ public class TaskManager {
     }
 
     public void schedulePresenceUpdates() {
-        this.logger.info("Scheduling presence updates...");
+        this.logger.info("Scheduling presence updates");
         final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofMinutes(15), this.defaultScheduler)
                 .map(ignored -> DiscordUtils.getRandomStatus())
                 .flatMap(this.gateway::updatePresence)
@@ -55,7 +55,7 @@ public class TaskManager {
     }
 
     public void scheduleLottery() {
-        this.logger.info("Starting lottery... Next lottery draw in {}", FormatUtils.customDate(LotteryCmd.getDelay()));
+        this.logger.info("Starting lottery (next draw in {})", FormatUtils.customDate(LotteryCmd.getDelay()));
         final Disposable task = Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), this.defaultScheduler)
                 .flatMap(ignored -> LotteryCmd.draw(this.gateway))
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
@@ -64,7 +64,7 @@ public class TaskManager {
     }
 
     public void schedulePeriodicStats() {
-        this.logger.info("Scheduling periodic stats log...");
+        this.logger.info("Scheduling periodic stats log");
 
         final Gauge ramUsageGauge = Gauge.build().namespace("process").name("ram_usage_mb")
                 .help("Ram usage in MB").register();
@@ -107,7 +107,7 @@ public class TaskManager {
     }
 
     public void schedulePostStats() {
-        this.logger.info("Starting bot list stats scheduler...");
+        this.logger.info("Starting bot list stats scheduler");
         final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofHours(3), this.defaultScheduler)
                 .flatMap(ignored -> this.botListStats.postStats())
                 .subscribe(null, ExceptionHandler::handleUnknownError);
@@ -115,7 +115,7 @@ public class TaskManager {
     }
 
     public void scheduleVotersCheck() {
-        this.logger.info("Starting voters checker scheduler...");
+        this.logger.info("Starting voters checker scheduler");
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofMinutes(30), this.defaultScheduler)
                 .flatMap(ignored -> this.botListStats.getStats())
                 .flatMap(DatabaseManager.getUsers()::getDBUser)

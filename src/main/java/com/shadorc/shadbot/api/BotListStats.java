@@ -29,7 +29,7 @@ public class BotListStats {
     }
 
     public Mono<Void> postStats() {
-        DEFAULT_LOGGER.info("Posting statistics...");
+        DEFAULT_LOGGER.info("Posting statistics");
         final int shardCount = this.gateway.getGatewayClientGroup().getShardCount();
         return Mono.just(GuildOwnersCache.count())
                 .flatMap(guildCount -> this.postOnBotlistDotSpace(guildCount)
