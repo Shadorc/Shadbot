@@ -198,7 +198,7 @@
             <artifactId>javaluator</artifactId>
             <version>3.0.3</version>
         </dependency>
-        <!-- BiMap, Lists -->
+        <!-- HashBiMap, Lists -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
