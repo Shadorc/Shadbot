@@ -142,8 +142,20 @@ public class CounterStrikeCmd extends BaseCmd {
                                 final int kills = statsMap.get("total_kills");
                                 final int deaths = statsMap.get("total_deaths");
                                 final float ratio = (float) kills / deaths;
+
                                 final int wins = statsMap.get("total_wins");
+                                final int roundsPlayed = statsMap.get("total_rounds_played");
+                                final float win = (float) wins / roundsPlayed * 100;
+
                                 final int mvps = statsMap.get("total_mvps");
+                                final float timePlayed = statsMap.get("total_time_played") / 3600f;
+
+                                final int shotsHit = statsMap.get("total_shots_hit");
+                                final int shotsFired = statsMap.get("total_shots_fired");
+                                final float accuracy = (float) shotsHit / shotsFired * 100;
+
+                                final int killsHeadshot = statsMap.get("total_kills_headshot");
+                                final float headshot = (float) killsHeadshot / kills * 100;
 
                                 return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
                                         .andThen(embed -> embed.setAuthor("Counter-Strike: Global Offensive Stats",
@@ -152,10 +164,12 @@ public class CounterStrikeCmd extends BaseCmd {
                                                 .setThumbnail(player.getAvatarFull())
                                                 .setDescription(String.format("Stats for **%s**", player.getPersonaName()))
                                                 .addField("Kills", FormatUtils.number(kills), true)
-                                                .addField("Deaths", FormatUtils.number(deaths), true)
-                                                .addField("Ratio", String.format("%.2f", ratio), true)
-                                                .addField("Total wins", FormatUtils.number(wins), true)
-                                                .addField("Total MVP", FormatUtils.number(mvps), true)));
+                                                .addField("Time played", String.format("%.1fh", timePlayed), true)
+                                                .addField("MVPs", FormatUtils.number(mvps), true)
+                                                .addField("Win", String.format("%.1f%%", win), true)
+                                                .addField("Accuracy", String.format("%.1f%%", accuracy), true)
+                                                .addField("Headshot", String.format("%.1f%%", headshot), true)
+                                                .addField("K/D Ratio", String.format("%.2f", ratio), true)));
                             });
                 });
     }
