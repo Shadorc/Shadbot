@@ -73,7 +73,9 @@ public abstract class RemoveMemberCmd extends BaseCmd {
                     String.format("Reason cannot exceed **%d characters**.", AuditLogEntry.MAX_REASON_LENGTH)));
         }
 
-        return Mono.zip(context.getGuild(), context.getChannel(), context.getSelfAsMember(),
+        return Mono.zip(context.getGuild(),
+                context.getChannel(),
+                context.getSelfAsMember(),
                 context.getClient().getMemberById(context.getGuildId(), mentionUserId))
                 .filterWhen(tuple -> DiscordUtils.requirePermissions(tuple.getT2(), this.permission).thenReturn(true))
                 .filterWhen(tuple -> this.canInteract(tuple.getT2(), tuple.getT3(), context.getMember(), tuple.getT4()))

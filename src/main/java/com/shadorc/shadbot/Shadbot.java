@@ -30,6 +30,7 @@ import io.sentry.Sentry;
 import reactor.blockhound.BlockHound;
 import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
@@ -156,12 +157,12 @@ public class Shadbot {
         gateway.getEventDispatcher()
                 .on(eventListener.getEventType())
                 .flatMap(event -> eventListener.execute(event)
-                        .thenReturn(event.toString())
+                        .thenReturn(eventListener.getEventType().getSimpleName())
                         .filter(ignored -> DEFAULT_LOGGER.isTraceEnabled())
                         .elapsed()
-                        .doOnNext(tuple -> DEFAULT_LOGGER.trace("{} took {} to be processed: {}",
-                                eventListener.getEventType().getSimpleName(), FormatUtils.shortDuration(tuple.getT1()),
-                                tuple.getT2()))
+                        .doOnNext(TupleUtils.consumer((elapsed, eventType) ->
+                                DEFAULT_LOGGER.trace("{} took {} to be processed: {}",
+                                        eventType, FormatUtils.shortDuration(elapsed), event.toString())))
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }

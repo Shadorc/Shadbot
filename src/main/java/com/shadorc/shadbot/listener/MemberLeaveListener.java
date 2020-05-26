@@ -12,6 +12,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.rest.http.client.ClientException;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 public class MemberLeaveListener implements EventListener<MemberLeaveEvent> {
 
@@ -50,8 +51,9 @@ public class MemberLeaveListener implements EventListener<MemberLeaveEvent> {
                 .flatMap(settings -> Mono.zip(
                         Mono.justOrEmpty(settings.getMessageChannelId()),
                         Mono.justOrEmpty(settings.getLeaveMessage())))
-                .flatMap(tuple -> MemberJoinListener.sendAutoMessage(event.getClient(), event.getUser(),
-                        tuple.getT1(), tuple.getT2()));
+                .flatMap(TupleUtils.function((channelId, leaveMessage) ->
+                        MemberJoinListener.sendAutoMessage(event.getClient(), event.getUser(),
+                                channelId, leaveMessage)));
 
         return deleteMember.and(sendLeaveMessage);
     }

@@ -8,6 +8,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.util.Optional;
 
@@ -40,10 +41,10 @@ public class MessageUpdateListener implements EventListener<MessageUpdateEvent> 
                 .orElse(null);
 
         return Mono.zip(getMessage, getMember)
-                .doOnNext(tuple -> event.getClient()
+                .doOnNext(TupleUtils.consumer((message, member) -> event.getClient()
                         .getEventDispatcher()
-                        .publish(new MessageCreateEvent(event.getClient(), event.getShardInfo(), tuple.getT1(),
-                                guildId, tuple.getT2().orElse(null))))
+                        .publish(new MessageCreateEvent(event.getClient(), event.getShardInfo(), message,
+                                guildId, member.orElse(null)))))
                 .then();
     }
 
