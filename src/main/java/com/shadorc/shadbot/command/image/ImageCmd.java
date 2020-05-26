@@ -17,7 +17,6 @@ import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -80,8 +79,7 @@ public class ImageCmd extends BaseCmd {
                         BROWSE_POPULAR_URL, encodedSearch, ThreadLocalRandom.current().nextInt(150),
                         this.token.getAccessToken()))))
                 .flatMap(url -> NetUtils.get(url, DeviantArtResponse.class))
-                .map(DeviantArtResponse::getResults)
-                .flatMapMany(Flux::fromIterable)
+                .flatMapIterable(DeviantArtResponse::getResults)
                 .filter(image -> image.getContent().isPresent())
                 .collectList()
                 .map(list -> Optional.ofNullable(Utils.randValue(list)))

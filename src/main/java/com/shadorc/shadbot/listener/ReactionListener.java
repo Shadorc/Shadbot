@@ -17,7 +17,6 @@ import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.Permission;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
@@ -93,8 +92,7 @@ public class ReactionListener {
         return DatabaseManager.getGuilds()
                 .getDBGuild(member.getGuildId())
                 .map(DBGuild::getSettings)
-                .map(Settings::getIam)
-                .flatMapMany(Flux::fromIterable)
+                .flatMapIterable(Settings::getIam)
                 .filter(iam -> iam.getMessageId().equals(message.getId()))
                 // If the bot can manage the role
                 .filterWhen(iam -> ReactionListener.canManageRole(message, iam.getRoleId()))

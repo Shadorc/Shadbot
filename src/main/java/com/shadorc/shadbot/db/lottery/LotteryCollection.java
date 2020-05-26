@@ -39,8 +39,7 @@ public class LotteryCollection extends DatabaseCollection {
                 .first();
 
         return Mono.from(request)
-                .map(document -> document.getList("gamblers", Document.class))
-                .flatMapMany(Flux::fromIterable)
+                .flatMapIterable(document -> document.getList("gamblers", Document.class))
                 .map(Document::toJson)
                 .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, LotteryGamblerBean.class)))
                 .map(LotteryGambler::new)

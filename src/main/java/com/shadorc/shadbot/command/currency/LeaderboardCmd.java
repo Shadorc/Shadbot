@@ -11,7 +11,6 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
@@ -32,8 +31,7 @@ public class LeaderboardCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         return DatabaseManager.getGuilds()
                 .getDBGuild(context.getGuildId())
-                .map(DBGuild::getMembers)
-                .flatMapMany(Flux::fromIterable)
+                .flatMapIterable(DBGuild::getMembers)
                 .filter(dbMember -> dbMember.getCoins() > 0)
                 .sort(Comparator.comparingLong(DBMember::getCoins).reversed())
                 .take(USER_COUNT)

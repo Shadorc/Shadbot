@@ -19,7 +19,6 @@ import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -102,8 +101,7 @@ public class CounterStrikeCmd extends BaseCmd {
         return NetUtils.get(url, PlayerSummariesResponse.class)
                 .map(PlayerSummariesResponse::getResponse)
                 // Users matching the steamId
-                .map(PlayerSummaries::getPlayers)
-                .flatMapMany(Flux::fromIterable)
+                .flatMapIterable(PlayerSummaries::getPlayers)
                 .next();
     }
 

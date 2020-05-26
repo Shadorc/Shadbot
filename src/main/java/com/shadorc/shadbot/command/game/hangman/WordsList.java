@@ -4,7 +4,6 @@ import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.Utils;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -26,8 +25,7 @@ public class WordsList {
     public Mono<Void> load() {
         if (this.words.isEmpty()) {
             return NetUtils.get(this.url)
-                    .map(str -> StringUtils.split(str, "\n"))
-                    .flatMapMany(Flux::fromIterable)
+                    .flatMapIterable(str -> StringUtils.split(str, "\n"))
                     .filter(word -> NumberUtils.isBetween(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
                     .take(500)
                     .collectList()

@@ -14,7 +14,6 @@ import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.apache.commons.lang3.StringUtils;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -77,8 +76,7 @@ public class WikiCmd extends BaseCmd {
         return NetUtils.get(url, WikipediaResponse.class)
                 .map(WikipediaResponse::getQuery)
                 .map(WikipediaQuery::getPages)
-                .map(Map::entrySet)
-                .flatMapMany(Flux::fromIterable)
+                .flatMapIterable(Map::entrySet)
                 .next()
                 .filter(entry -> !"-1".equals(entry.getKey()) && entry.getValue().getExtract() != null)
                 .map(Map.Entry::getValue);

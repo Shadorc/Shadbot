@@ -59,17 +59,15 @@ public class GuildsCollection extends DatabaseCollection {
         LOGGER.debug("[DBMember {} / {}] Request", Arrays.toString(memberIds), guildId.asLong());
 
         return this.getDBGuild(guildId)
-                .map(DBGuild::getMembers)
-                .flatMapMany(Flux::fromIterable)
+                .flatMapIterable(DBGuild::getMembers)
                 .collectMap(DBMember::getId)
-                .map(dbMembers -> {
+                .flatMapIterable(dbMembers -> {
                     final Set<DBMember> members = new HashSet<>();
                     for (final Snowflake memberId : memberIds) {
                         members.add(dbMembers.getOrDefault(memberId, new DBMember(guildId, memberId)));
                     }
                     return members;
                 })
-                .flatMapMany(Flux::fromIterable)
                 .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 

@@ -15,7 +15,6 @@ import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.core.spec.EmbedCreateSpec;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -60,8 +59,7 @@ public class GifCmd extends BaseCmd {
         }
 
         return NetUtils.get(url, GiphyResponse.class)
-                .map(GiphyResponse::getData)
-                .flatMapMany(Flux::fromIterable)
+                .flatMapIterable(GiphyResponse::getData)
                 .next()
                 .map(Data::getImages)
                 .map(Images::getOriginal)
