@@ -71,7 +71,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
                                 || memberCount != 0 && guildMusic.isLeavingScheduled())
                         .map(memberCount -> {
                             LOGGER.debug("{Guild ID: {}} On user event, memberCount: {}, leavingScheduled: {}",
-                                    guildId, memberCount, guildMusic.isLeavingScheduled());
+                                    guildId.asLong(), memberCount, guildMusic.isLeavingScheduled());
                             final StringBuilder strBuilder = new StringBuilder(Emoji.INFO.toString());
                             // The bot is now alone: pause, schedule leave and warn users
                             if (memberCount == 0 && !guildMusic.isLeavingScheduled()) {
@@ -79,14 +79,14 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
                                 guildMusic.scheduleLeave();
                                 strBuilder.append(" Nobody is listening anymore, music paused. I will leave the " +
                                         "voice channel in 1 minute.");
-                                LOGGER.debug("{Guild ID: {}} Nobody is listening anymore, music paused, leave scheduled", guildId);
+                                LOGGER.debug("{Guild ID: {}} Nobody is listening anymore, music paused, leave scheduled", guildId.asLong());
                             }
                             // The bot is no more alone: unpause, cancel leave and warn users
                             else if (memberCount != 0 && guildMusic.isLeavingScheduled()) {
                                 guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
                                 guildMusic.cancelLeave();
                                 strBuilder.append(" Somebody joined me, music resumed.");
-                                LOGGER.debug("{Guild ID: {}} Somebody joined, music resumed", guildId);
+                                LOGGER.debug("{Guild ID: {}} Somebody joined, music resumed", guildId.asLong());
                             }
                             return strBuilder.toString();
                         })
