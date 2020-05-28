@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -11,8 +10,8 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import io.prometheus.client.Gauge;
 import reactor.core.publisher.Mono;
-
-import static com.shadorc.shadbot.music.MusicManager.LOGGER;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 
 public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateEvent> {
 
@@ -21,6 +20,8 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
             .name("voice_count")
             .help("Connected voice channel count")
             .register();
+
+    private static final Logger LOGGER = Loggers.getLogger("shadbot.music.VoiceStateUpdateListener");
 
     @Override
     public Class<VoiceStateUpdateEvent> getEventType() {
@@ -56,38 +57,42 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
 
     private static Mono<Void> onUserEvent(VoiceStateUpdateEvent event) {
         final Snowflake guildId = event.getCurrent().getGuildId();
-
-        final GuildMusic guildMusic = MusicManager.getInstance().getGuildMusic(guildId).orElse(null);
-        // The bot is not playing music, ignore the event
-        if (guildMusic == null) {
-            return Mono.empty();
-        }
-
-        return event.getClient().getMemberById(guildId, event.getClient().getSelfId())
-                .flatMap(Member::getVoiceState)
-                .flatMap(VoiceState::getChannel)
-                .flatMapMany(VoiceChannel::getVoiceStates)
-                .count()
-                .flatMap(memberCount -> {
-                    // The bot is now alone: pause, schedule leave and warn users
-                    if (memberCount == 1 && !guildMusic.isLeavingScheduled()) {
-                        guildMusic.getTrackScheduler().getAudioPlayer().setPaused(true);
-                        guildMusic.scheduleLeave();
-                        return Mono.just(Emoji.INFO + " Nobody is listening anymore, music paused. I will leave the " +
-                                "voice channel in 1 minute.");
-                    }
-                    // The bot is no more alone: unpause, cancel leave and warn users
-                    else if (memberCount != 1 && guildMusic.isLeavingScheduled()) {
-                        guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
-                        guildMusic.cancelLeave();
-                        return Mono.just(Emoji.INFO + " Somebody joined me, music resumed.");
-                    }
-                    // Ignore the event
-                    return Mono.empty();
-                })
-                .flatMap(content -> guildMusic.getMessageChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(content, channel)))
-                .then();
+        return Mono.defer(() -> Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(guildId)))
+                .flatMap(guildMusic -> event.getClient()
+                        .getMemberById(guildId, event.getClient().getSelfId())
+                        .flatMap(Member::getVoiceState)
+                        .flatMap(VoiceState::getChannel)
+                        .flatMapMany(VoiceChannel::getVoiceStates)
+                        .flatMap(VoiceState::getMember)
+                        .filter(member -> !member.isBot())
+                        .count()
+                        // Everyone left or somebody joined
+                        .filter(memberCount -> memberCount == 0 && !guildMusic.isLeavingScheduled()
+                                || memberCount != 0 && guildMusic.isLeavingScheduled())
+                        .map(memberCount -> {
+                            LOGGER.debug("{Guild ID: {}} On user event, memberCount: {}, leavingScheduled: {}",
+                                    guildId, memberCount, guildMusic.isLeavingScheduled());
+                            final StringBuilder strBuilder = new StringBuilder(Emoji.INFO.toString());
+                            // The bot is now alone: pause, schedule leave and warn users
+                            if (memberCount == 0 && !guildMusic.isLeavingScheduled()) {
+                                guildMusic.getTrackScheduler().getAudioPlayer().setPaused(true);
+                                guildMusic.scheduleLeave();
+                                strBuilder.append(" Nobody is listening anymore, music paused. I will leave the " +
+                                        "voice channel in 1 minute.");
+                                LOGGER.debug("{Guild ID: {}} Nobody is listening anymore, music paused, leave scheduled", guildId);
+                            }
+                            // The bot is no more alone: unpause, cancel leave and warn users
+                            else if (memberCount != 0 && guildMusic.isLeavingScheduled()) {
+                                guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
+                                guildMusic.cancelLeave();
+                                strBuilder.append(" Somebody joined me, music resumed.");
+                                LOGGER.debug("{Guild ID: {}} Somebody joined, music resumed", guildId);
+                            }
+                            return strBuilder.toString();
+                        })
+                        .flatMap(content -> guildMusic.getMessageChannel()
+                                .flatMap(channel -> DiscordUtils.sendMessage(content, channel)))
+                        .then());
     }
 
 }
