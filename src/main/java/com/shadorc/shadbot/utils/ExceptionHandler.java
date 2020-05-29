@@ -10,6 +10,7 @@ import com.shadorc.shadbot.object.Emoji;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
@@ -85,8 +86,9 @@ public class ExceptionHandler {
     }
 
     private static Mono<Void> onUnknown(Throwable err, BaseCmd cmd, Context context) {
-        DEFAULT_LOGGER.error(String.format("{Guild ID: %d} [%s] An unknown error occurred. (Input: %s)",
-                context.getGuildId().asLong(), cmd.getClass().getSimpleName(), context.getContent()), err);
+        DEFAULT_LOGGER.error(String.format("{Guild ID: %d} [%s] An unknown error occurred (input: %s): %s",
+                context.getGuildId().asLong(), cmd.getClass().getSimpleName(), context.getContent(),
+                Objects.requireNonNullElse(err.getMessage(), "")), err);
 
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(
@@ -97,7 +99,8 @@ public class ExceptionHandler {
     }
 
     public static void handleUnknownError(Throwable err) {
-        DEFAULT_LOGGER.error("An unknown error occurred", err);
+        DEFAULT_LOGGER.error(String.format("An unknown error occurred: %s",
+                Objects.requireNonNullElse(err.getMessage(), "")), err);
     }
 
 }
