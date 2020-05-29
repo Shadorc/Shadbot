@@ -1,5 +1,6 @@
 package com.shadorc.shadbot;
 
+import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.core.retriever.DistinctFallbackEntityRetriever;
 import com.shadorc.shadbot.core.retriever.SpyRestEntityRetriever;
 import com.shadorc.shadbot.data.Config;
@@ -50,6 +51,7 @@ public class Shadbot {
     private static GatewayDiscordClient gateway;
     private static TaskManager taskManager;
     private static HTTPServer prometheusServer;
+    private static BotListStats botListStats;
 
     public static void main(String[] args) {
         // Set default to Locale US
@@ -80,12 +82,12 @@ public class Shadbot {
 
         // BlockHound is used to detect blocking actions in non-blocking threads
         if (Config.IS_SNAPSHOT) {
-            DEFAULT_LOGGER.info("Initializing BlockHound");
+            DEFAULT_LOGGER.info("[SNAPSHOT] Initializing BlockHound");
             BlockHound.builder()
                     .allowBlockingCallsInside("java.io.FileInputStream", "readBytes")
                     .install();
 
-            DEFAULT_LOGGER.info("Initializing Reactor operator stack recorder");
+            DEFAULT_LOGGER.info("[SNAPSHOT] Initializing Reactor operator stack recorder");
             Hooks.onOperatorDebug();
         }
 
@@ -125,13 +127,16 @@ public class Shadbot {
                 .withGateway(gateway -> {
                     Shadbot.gateway = gateway;
 
-                    Shadbot.taskManager = new TaskManager(gateway);
-                    Shadbot.taskManager.scheduleLottery();
-                    Shadbot.taskManager.schedulePeriodicStats();
-                    Shadbot.taskManager.schedulePresenceUpdates();
+                    Shadbot.taskManager = new TaskManager();
+                    Shadbot.taskManager.scheduleLottery(gateway);
+                    Shadbot.taskManager.schedulePeriodicStats(gateway);
+                    Shadbot.taskManager.schedulePresenceUpdates(gateway);
+
                     if (!Config.IS_SNAPSHOT) {
-                        Shadbot.taskManager.schedulePostStats();
-                        Shadbot.taskManager.scheduleVotersCheck();
+                        DEFAULT_LOGGER.info("Initializing BotListStats");
+                        Shadbot.botListStats = new BotListStats(gateway);
+
+                        Shadbot.taskManager.schedulePostStats(Shadbot.botListStats);
                     }
 
                     DEFAULT_LOGGER.info("Registering listeners");
@@ -188,6 +193,9 @@ public class Shadbot {
         }
         if (Shadbot.taskManager != null) {
             Shadbot.taskManager.stop();
+        }
+        if (Shadbot.botListStats != null) {
+            Shadbot.botListStats.stop();
         }
 
         return Shadbot.gateway.logout()

@@ -3,8 +3,6 @@ package com.shadorc.shadbot;
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.cache.GuildOwnersCache;
 import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
@@ -30,41 +28,36 @@ import java.util.Map;
 
 public class TaskManager {
 
-    private final GatewayDiscordClient gateway;
-    private final Scheduler defaultScheduler;
-    private final Logger logger;
-    private final BotListStats botListStats;
+    private static final Scheduler DEFAULT_SCHEDULER = Schedulers.boundedElastic();
+    private static final Logger LOGGER = Loggers.getLogger("shadbot.TaskManager");
+
     private final List<Disposable> tasks;
 
-    public TaskManager(GatewayDiscordClient gateway) {
-        this.gateway = gateway;
-        this.defaultScheduler = Schedulers.boundedElastic();
-        this.logger = Loggers.getLogger("shadbot.taskmanager");
-        this.botListStats = new BotListStats(gateway);
+    public TaskManager() {
         this.tasks = new ArrayList<>(4);
     }
 
-    public void schedulePresenceUpdates() {
-        this.logger.info("Scheduling presence updates");
-        final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofMinutes(15), this.defaultScheduler)
+    public void schedulePresenceUpdates(GatewayDiscordClient gateway) {
+        LOGGER.info("Scheduling presence updates");
+        final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofMinutes(15), DEFAULT_SCHEDULER)
                 .map(ignored -> DiscordUtils.getRandomStatus())
-                .flatMap(this.gateway::updatePresence)
+                .flatMap(gateway::updatePresence)
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
         this.tasks.add(task);
     }
 
-    public void scheduleLottery() {
-        this.logger.info("Starting lottery (next draw in {})", FormatUtils.customDate(LotteryCmd.getDelay()));
-        final Disposable task = Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), this.defaultScheduler)
-                .flatMap(ignored -> LotteryCmd.draw(this.gateway))
+    public void scheduleLottery(GatewayDiscordClient gateway) {
+        LOGGER.info("Starting lottery (next draw in {})", FormatUtils.customDate(LotteryCmd.getDelay()));
+        final Disposable task = Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), DEFAULT_SCHEDULER)
+                .flatMap(ignored -> LotteryCmd.draw(gateway))
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
         this.tasks.add(task);
     }
 
-    public void schedulePeriodicStats() {
-        this.logger.info("Scheduling periodic stats log");
+    public void schedulePeriodicStats(GatewayDiscordClient gateway) {
+        LOGGER.info("Scheduling periodic stats log");
 
         final Gauge ramUsageGauge = Gauge.build().namespace("process").name("ram_usage_mb")
                 .help("Ram usage in MB").register();
@@ -81,7 +74,7 @@ public class TaskManager {
         final Gauge guildCountGauge = Gauge.build().namespace("shadbot")
                 .name("guild_count").help("Guild count").register();
 
-        final GatewayClientGroup group = this.gateway.getGatewayClientGroup();
+        final GatewayClientGroup group = gateway.getGatewayClientGroup();
         final Mono<Map<Integer, Long>> getResponseTimes = Flux.range(0, group.getShardCount())
                 .flatMap(i -> Mono.justOrEmpty(group.find(i))
                         .map(GatewayClient::getResponseTime)
@@ -89,7 +82,7 @@ public class TaskManager {
                         .map(millis -> Tuples.of(i, millis)))
                 .collectMap(Tuple2::getT1, Tuple2::getT2);
 
-        final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(15), this.defaultScheduler)
+        final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(15), DEFAULT_SCHEDULER)
                 .doOnNext(ignored -> {
                     ramUsageGauge.set(ProcessUtils.getMemoryUsed());
                     cpuUsageGauge.set(ProcessUtils.getCpuUsage());
@@ -106,20 +99,10 @@ public class TaskManager {
         this.tasks.add(task);
     }
 
-    public void schedulePostStats() {
-        this.logger.info("Starting bot list stats scheduler");
-        final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofHours(3), this.defaultScheduler)
-                .flatMap(ignored -> this.botListStats.postStats())
-                .subscribe(null, ExceptionHandler::handleUnknownError);
-        this.tasks.add(task);
-    }
-
-    public void scheduleVotersCheck() {
-        this.logger.info("Starting voters checker scheduler");
-        final Disposable task = Flux.interval(Duration.ZERO, Duration.ofMinutes(30), this.defaultScheduler)
-                .flatMap(ignored -> this.botListStats.getStats())
-                .flatMap(DatabaseManager.getUsers()::getDBUser)
-                .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.VOTER))
+    public void schedulePostStats(BotListStats botListStats) {
+        LOGGER.info("Starting bot list stats scheduler");
+        final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofHours(3), DEFAULT_SCHEDULER)
+                .flatMap(ignored -> botListStats.postStats())
                 .subscribe(null, ExceptionHandler::handleUnknownError);
         this.tasks.add(task);
     }

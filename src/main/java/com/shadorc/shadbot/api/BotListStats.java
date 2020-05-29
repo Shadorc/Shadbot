@@ -1,10 +1,14 @@
 package com.shadorc.shadbot.api;
 
-import com.shadorc.shadbot.api.json.dbl.VoterResponse;
+import com.shadorc.shadbot.api.json.dbl.TopGgWebhookResponse;
 import com.shadorc.shadbot.cache.GuildOwnersCache;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
+import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -13,23 +17,61 @@ import io.netty.handler.codec.http.HttpHeaders;
 import org.json.JSONObject;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.netty.DisposableServer;
+import reactor.netty.http.server.HttpServer;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
-import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
-
 public class BotListStats {
 
+    private static final Logger LOGGER = Loggers.getLogger("shadbot.BotListStats");
+
     private final GatewayDiscordClient gateway;
+    private final AtomicReference<DisposableServer> webhookServer;
 
     public BotListStats(GatewayDiscordClient gateway) {
         this.gateway = gateway;
+        this.webhookServer = new AtomicReference<>();
+
+        this.setupTopGgWebhook();
+    }
+
+    private void setupTopGgWebhook() {
+        final String authorization = CredentialManager.getInstance().get(Credential.TOP_DOT_GG_WEBHOOK_AUTHORIZATION);
+        final String port = CredentialManager.getInstance().get(Credential.TOP_DOT_GG_WEBHOOK_PORT);
+        if (authorization != null && port != null) {
+            LOGGER.info("Initializing top.gg WebHook server");
+            HttpServer.create()
+                    .port(Integer.parseInt(port))
+                    .route(routes -> routes.post("/webhook",
+                            (request, response) -> {
+                                if (authorization.equals(request.requestHeaders().get(HttpHeaderNames.AUTHORIZATION))) {
+                                    return request.receive()
+                                            .asString()
+                                            .doOnNext(content -> LOGGER.debug("Webhook event received: {}", content))
+                                            .flatMap(content -> Mono.fromCallable(() ->
+                                                    Utils.MAPPER.readValue(content, TopGgWebhookResponse.class)))
+                                            .map(TopGgWebhookResponse::getUserId)
+                                            .map(Snowflake::of)
+                                            .flatMap(DatabaseManager.getUsers()::getDBUser)
+                                            .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.VOTER))
+                                            .then();
+                                }
+                                return Mono.empty();
+                            }))
+                    .bind()
+                    .doOnNext(this.webhookServer::set)
+                    .subscribe(null, ExceptionHandler::handleUnknownError);
+        }
     }
 
     public Mono<Void> postStats() {
-        DEFAULT_LOGGER.info("Posting statistics");
+        LOGGER.info("Posting statistics");
         final int shardCount = this.gateway.getGatewayClientGroup().getShardCount();
         return Mono.just(GuildOwnersCache.count())
                 .flatMap(guildCount -> this.postOnBotlistDotSpace(guildCount)
@@ -38,7 +80,7 @@ public class BotListStats {
                         .and(this.postOnDiscordBotsDotGg(shardCount, guildCount))
                         .and(this.postOnTopDotGg(shardCount, guildCount))
                         .and(this.postOnWonderbotlistDotCom(shardCount, guildCount)))
-                .doOnSuccess(ignored -> DEFAULT_LOGGER.info("Statistics posted"));
+                .doOnSuccess(ignored -> LOGGER.info("Statistics posted"));
     }
 
     private Mono<String> post(String url, String authorization, JSONObject content) {
@@ -49,11 +91,11 @@ public class BotListStats {
                 .onErrorResume(err -> {
                     if (err instanceof TimeoutException) {
                         return Mono.fromRunnable(() ->
-                                DEFAULT_LOGGER.warn("A timeout occurred while posting statistics on {}", url));
+                                LOGGER.warn("A timeout occurred while posting statistics on {}", url));
 
                     }
                     return Mono.fromRunnable(() ->
-                            DEFAULT_LOGGER.warn("An error occurred while posting statistics on {}: {}", url, err.getMessage()));
+                            LOGGER.warn("An error occurred while posting statistics on {}: {}", url, err.getMessage()));
                 });
     }
 
@@ -140,18 +182,10 @@ public class BotListStats {
         return this.post(url, CredentialManager.getInstance().get(Credential.WONDERBOTLIST_DOT_COM_TOKEN), content);
     }
 
-    /**
-     * @return Monthly voter IDs from https://top.gg/
-     */
-    public Flux<Snowflake> getStats() {
-        final Consumer<HttpHeaders> headersConsumer = header -> header.add(HttpHeaderNames.AUTHORIZATION,
-                CredentialManager.getInstance().get(Credential.TOP_DOT_GG_TOKEN));
-        return NetUtils.get(headersConsumer, String.format("https://top.gg/api/bots/%d/votes",
-                this.gateway.getSelfId().asLong()), VoterResponse[].class)
-                .flatMapMany(Flux::fromArray)
-                .map(VoterResponse::getId)
-                .map(Snowflake::of)
-                .distinct();
+    public void stop() {
+        if (this.webhookServer.get() != null) {
+            this.webhookServer.get().disposeNow();
+        }
     }
 
 }
