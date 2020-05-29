@@ -14,6 +14,7 @@ import discord4j.core.GatewayDiscordClient;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -60,9 +61,9 @@ public class BotListStats {
                                             .map(Snowflake::of)
                                             .flatMap(DatabaseManager.getUsers()::getDBUser)
                                             .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.VOTER))
-                                            .then();
+                                            .then(response.status(HttpResponseStatus.OK).send());
                                 }
-                                return Mono.empty();
+                                return response.status(HttpResponseStatus.FORBIDDEN).send();
                             }))
                     .bind()
                     .doOnNext(this.webhookServer::set)
