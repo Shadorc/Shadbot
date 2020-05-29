@@ -74,7 +74,8 @@ public class Shadbot {
                             && !event.getMessage().contains("discord4j.common.close.CloseException")
                             && !event.getMessage().contains("discord4j.gateway.retry.GatewayException")
                             && !event.getMessage().contains("The connection observed an error")
-                            && !event.getMessage().contains("Voice gateway exception"));
+                            && !event.getMessage().contains("Voice gateway exception")
+                            && !event.getMessage().contains("Connection reset by peer"));
         }
 
         // BlockHound is used to detect blocking actions in non-blocking threads
