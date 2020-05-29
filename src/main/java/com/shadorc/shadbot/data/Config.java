@@ -11,7 +11,7 @@ import java.util.Properties;
 
 public class Config {
 
-    private static final Logger LOGGER = Loggers.getLogger("shadbot.config");
+    private static final Logger LOGGER = Loggers.getLogger("shadbot.Config");
 
     private static final Properties PROPERTIES = Config.loadProperties();
 

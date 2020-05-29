@@ -11,7 +11,7 @@ import java.util.Properties;
 
 public class CredentialManager {
 
-    private static final Logger LOGGER = Loggers.getLogger("shadbot.credentials");
+    private static final Logger LOGGER = Loggers.getLogger("shadbot.CredentialManager");
 
     private static CredentialManager instance;
 
