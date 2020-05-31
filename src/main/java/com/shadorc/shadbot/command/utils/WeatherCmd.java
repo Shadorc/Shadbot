@@ -8,10 +8,10 @@ import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.EnumUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import net.aksingh.owmjapis.api.APIException;
 import net.aksingh.owmjapis.core.OWM;
@@ -55,7 +55,7 @@ public class WeatherCmd extends BaseCmd {
                 .then(Mono.fromCallable(() -> {
                     final CurrentWeather currentWeather;
                     if (args.size() == 2) {
-                        final Country country = Utils.parseEnum(Country.class, args.get(1).replace(" ", "_"));
+                        final Country country = EnumUtils.parseEnum(Country.class, args.get(1).replace(" ", "_"));
                         if (country == null) {
                             return updatableMessage.setContent(
                                     String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Country `%s` not found.",
@@ -82,7 +82,7 @@ public class WeatherCmd extends BaseCmd {
                     final String humidity = String.format("%.1f%%", main.getHumidity());
                     final String temperature = String.format("%.1f°C", main.getTemp());
 
-                    return updatableMessage.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMessage.setEmbed(ShadbotUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor(title, url, context.getAvatarUrl())
                                     .setThumbnail(weather.getIconLink())
                                     .setDescription(String.format("Last updated %s", lastUpdated))

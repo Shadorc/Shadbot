@@ -28,18 +28,6 @@ public class StringUtils {
     }
 
     /**
-     * @param enumeration The enumeration to format, may be {@code null}.
-     * @return The enumeration converted as a capitalized string with underscores replaced with spaces.
-     */
-    @Nullable
-    public static <E extends Enum<E>> String capitalizeEnum(@Nullable E enumeration) {
-        if (enumeration == null) {
-            return null;
-        }
-        return StringUtils.capitalize(enumeration.toString().toLowerCase().replace("_", " "));
-    }
-
-    /**
      * @param text The string to get quoted elements from.
      * @return A {@link List} containing the quoted elements from the provided text.
      */

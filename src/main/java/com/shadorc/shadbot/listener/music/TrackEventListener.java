@@ -8,10 +8,10 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.TextUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -60,7 +60,7 @@ public class TrackEventListener extends AudioEventAdapter {
                 .flatMap(guildMusic -> {
                     this.errorCount.incrementAndGet();
 
-                    final String errMessage = TextUtils.cleanLavaplayerErr(exception);
+                    final String errMessage = ShadbotUtils.cleanLavaplayerErr(exception);
                     LOGGER.info("{Guild ID: {}} {}Track exception: {}", this.guildId.asLong(),
                             this.errorCount.get() > 3 ? "(Ignored) " : "", errMessage);
 

@@ -9,8 +9,8 @@ import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.EnumUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -64,7 +64,7 @@ public class AllowedChannelsSetting extends BaseSetting {
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(3);
 
-        final Action action = Utils.parseEnum(Action.class, args.get(1),
+        final Action action = EnumUtils.parseEnum(Action.class, args.get(1),
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(1), FormatUtils.options(Action.class))));
 

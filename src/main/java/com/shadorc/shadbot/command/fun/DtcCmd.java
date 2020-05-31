@@ -10,10 +10,10 @@ import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.RandUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -37,7 +37,7 @@ public class DtcCmd extends BaseCmd {
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading quote...", context.getUsername()))
                 .send()
                 .then(this.getRandomQuote())
-                .map(quote -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                .map(quote -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Quote DansTonChat",
                                 String.format("https://danstonchat.com/%s.html", quote.getId()), context.getAvatarUrl())
                                 .setThumbnail("https://i.imgur.com/5YvTlAA.png")
@@ -48,13 +48,13 @@ public class DtcCmd extends BaseCmd {
     }
 
     private Mono<Quote> getRandomQuote() {
-        final JavaType valueType = Utils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
+        final JavaType valueType = NetUtils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
         return NetUtils
                 .<List<Quote>>get(RANDOM_QUOTE_URL, valueType)
                 .map(quotes -> {
                     Quote quote;
                     do {
-                        quote = Utils.randValue(quotes);
+                        quote = RandUtils.randValue(quotes);
                     } while (quote.getContent().length() > 1000);
                     return quote;
                 });

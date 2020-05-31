@@ -7,6 +7,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import io.prometheus.client.Summary;
 import reactor.core.publisher.Flux;
@@ -74,7 +75,7 @@ public class DiceGame extends MultiplayerGame<DiceCmd, DicePlayer> {
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> player.getUsername(this.getContext().getClient()))
                 .collectList()
-                .map(usernames -> DiscordUtils.getDefaultEmbed()
+                .map(usernames -> ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Dice Game", null, this.getContext().getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/XgOilIW.png")

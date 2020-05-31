@@ -54,7 +54,7 @@ public class LotteryCmd extends BaseCmd {
                 .switchIfEmpty(Mono.error(new CommandException("You're already participating.")))
                 .flatMap(dbMember -> {
                     if (dbMember.getCoins() < Constants.PAID_COST) {
-                        return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
+                        return Mono.error(new CommandException(ShadbotUtils.NOT_ENOUGH_COINS));
                     }
 
                     final Integer num = NumberUtils.toIntBetweenOrNull(arg, Constants.MIN_NUM, Constants.MAX_NUM);

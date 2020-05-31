@@ -9,7 +9,7 @@ import com.shadorc.shadbot.music.TrackScheduler;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.EnumUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -32,7 +32,7 @@ public class RepeatCmd extends BaseCmd {
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
                     final TrackScheduler.RepeatMode oldMode = scheduler.getRepeatMode();
                     final TrackScheduler.RepeatMode newMode = context.getArg()
-                            .map(str -> Utils.parseEnum(TrackScheduler.RepeatMode.class, str,
+                            .map(str -> EnumUtils.parseEnum(TrackScheduler.RepeatMode.class, str,
                                     new CommandException(String.format("`%s` is not a valid mode.", str))))
                             .orElse(oldMode == TrackScheduler.RepeatMode.NONE ?
                                     TrackScheduler.RepeatMode.SONG : TrackScheduler.RepeatMode.NONE);

@@ -1,10 +1,10 @@
 package com.shadorc.shadbot.utils;
 
-import com.google.common.collect.Lists;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import reactor.util.annotation.Nullable;
 
 import java.text.NumberFormat;
 import java.time.Duration;
@@ -31,8 +31,20 @@ public class FormatUtils {
         return String.format("%s coin%s", FormatUtils.number(coins), Math.abs(coins) > 1 ? "s" : "");
     }
 
+    /**
+     * @param enumeration The enumeration to format, may be {@code null}.
+     * @return The enumeration converted as a capitalized string with underscores replaced with spaces.
+     */
+    @Nullable
+    public static <E extends Enum<E>> String capitalizeEnum(@Nullable E enumeration) {
+        if (enumeration == null) {
+            return null;
+        }
+        return StringUtils.capitalize(enumeration.toString().toLowerCase().replace("_", " "));
+    }
+
     public static List<ImmutableEmbedFieldData> createColumns(List<String> list, int rowSize) {
-        return Lists.partition(list, rowSize)
+        return ListUtils.partition(list, rowSize)
                 .stream()
                 .map(sublist -> ImmutableEmbedFieldData.of(
                         "\u200C",

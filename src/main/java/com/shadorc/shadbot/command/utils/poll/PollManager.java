@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.utils.poll;
 
-import com.google.common.collect.HashBiMap;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.object.message.ReactionMessage;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.object.entity.Message;
@@ -54,7 +54,7 @@ public class PollManager {
             representation.append(String.format("%n\t**%d.** %s", i + 1, this.spec.getChoices().keySet().toArray()[i]));
         }
 
-        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
+        final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor(String.format("Poll by %s", this.context.getUsername()),
                         null, this.context.getAvatarUrl())
                         .setDescription(String.format("Vote by clicking on the corresponding number.%n%n__**%s**__%s",
@@ -93,7 +93,7 @@ public class PollManager {
 
     private Mono<Message> sendResults(Set<Reaction> reactionSet) {
         // Reactions are not in the same order as they were when added to the message, they need to be ordered
-        final Map<ReactionEmoji, String> reactionsChoices = HashBiMap.create(this.spec.getChoices()).inverse();
+        final Map<ReactionEmoji, String> reactionsChoices = MapUtils.inverse(this.spec.getChoices());
         final Map<String, Integer> choiceVoteMap = new HashMap<>(reactionSet.size());
         for (final Reaction reaction : reactionSet) {
             final String choice = reactionsChoices.get(reaction.getEmoji());
@@ -106,7 +106,7 @@ public class PollManager {
 
         // Sort votes map by value in the ascending order
         final Map<String, Integer> choiceVoteOrderedMap =
-                Utils.sortMap(choiceVoteMap, Collections.reverseOrder(Entry.comparingByValue()));
+                MapUtils.sort(choiceVoteMap, Collections.reverseOrder(Entry.comparingByValue()));
 
         final StringBuilder representation = new StringBuilder();
         int count = 1;
@@ -120,7 +120,7 @@ public class PollManager {
             representation.append("\nAll choices have been removed.");
         }
 
-        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
+        final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor(String.format("Poll results (Author: %s)", this.context.getUsername()),
                         null, this.context.getAvatarUrl())
                         .setDescription(String.format("__**%s**__%s", this.spec.getQuestion(), representation)));

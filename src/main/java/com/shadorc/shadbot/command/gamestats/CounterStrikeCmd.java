@@ -124,7 +124,7 @@ public class CounterStrikeCmd extends BaseCmd {
                                         context.getUsername(), PRIVACY_HELP_URL)));
                     }
 
-                    return Mono.fromCallable(() -> Utils.MAPPER.readValue(body, UserStatsForGameResponse.class))
+                    return Mono.fromCallable(() -> NetUtils.MAPPER.readValue(body, UserStatsForGameResponse.class))
                             .map(userStats -> {
                                 if (userStats.getPlayerStats().flatMap(PlayerStats::getStats).isEmpty()) {
                                     return updatableMsg.setContent(
@@ -157,7 +157,7 @@ public class CounterStrikeCmd extends BaseCmd {
                                 final int killsHeadshot = statsMap.get("total_kills_headshot");
                                 final float headshot = (float) killsHeadshot / kills * 100;
 
-                                return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                                return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                                         .andThen(embed -> embed.setAuthor("Counter-Strike: Global Offensive Stats",
                                                 String.format("http://steamcommunity.com/profiles/%s", player.getSteamId()),
                                                 context.getAvatarUrl())

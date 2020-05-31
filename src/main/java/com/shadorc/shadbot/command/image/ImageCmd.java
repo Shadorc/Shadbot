@@ -12,10 +12,10 @@ import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.RandUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -52,7 +52,7 @@ public class ImageCmd extends BaseCmd {
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading image...", context.getUsername()))
                 .send()
                 .then(this.getPopularImage(NetUtils.encode(arg)))
-                .map(image -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                .map(image -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor(
                                 String.format("DeviantArt: %s", arg), image.getUrl(), context.getAvatarUrl())
                                 .setThumbnail("https://i.imgur.com/gT4hHUB.png")
@@ -82,7 +82,7 @@ public class ImageCmd extends BaseCmd {
                 .flatMapIterable(DeviantArtResponse::getResults)
                 .filter(image -> image.getContent().isPresent())
                 .collectList()
-                .map(list -> Optional.ofNullable(Utils.randValue(list)))
+                .map(list -> Optional.ofNullable(RandUtils.randValue(list)))
                 .flatMap(Mono::justOrEmpty);
     }
 

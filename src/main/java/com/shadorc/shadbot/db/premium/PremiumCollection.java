@@ -6,7 +6,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.premium.bean.RelicBean;
 import com.shadorc.shadbot.db.premium.entity.Relic;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
@@ -43,8 +43,8 @@ public class PremiumCollection extends DatabaseCollection {
                 .first();
 
         return Mono.from(request)
-                .map(document -> document.toJson(Utils.JSON_WRITER_SETTINGS))
-                .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, RelicBean.class)))
+                .map(document -> document.toJson(JSON_WRITER_SETTINGS))
+                .flatMap(json -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(json, RelicBean.class)))
                 .map(Relic::new)
                 .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(PremiumCollection.NAME).inc());
     }
@@ -60,8 +60,8 @@ public class PremiumCollection extends DatabaseCollection {
                 .find(Filters.eq("user_id", userId.asString()));
 
         return Flux.from(request)
-                .map(document -> document.toJson(Utils.JSON_WRITER_SETTINGS))
-                .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, RelicBean.class)))
+                .map(document -> document.toJson(JSON_WRITER_SETTINGS))
+                .flatMap(json -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(json, RelicBean.class)))
                 .map(Relic::new)
                 .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(PremiumCollection.NAME).inc());
     }

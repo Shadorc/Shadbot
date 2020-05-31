@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
@@ -53,7 +54,7 @@ public class RolelistCmd extends BaseCmd {
 
                     return Mono.zip(Mono.just(mentionedRoles), usernames);
                 })
-                .map(TupleUtils.function((mentionedRoles, usernames) -> DiscordUtils.getDefaultEmbed()
+                .map(TupleUtils.function((mentionedRoles, usernames) -> ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor(
                                     String.format("Rolelist: %s", FormatUtils.format(mentionedRoles, Role::getName, ", ")),

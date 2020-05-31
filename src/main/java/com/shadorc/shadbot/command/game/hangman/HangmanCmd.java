@@ -6,8 +6,8 @@ import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.EnumUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -36,7 +36,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final Difficulty difficulty = Utils.parseEnum(Difficulty.class, context.getArg().orElse("easy"),
+        final Difficulty difficulty = EnumUtils.parseEnum(Difficulty.class, context.getArg().orElse("easy"),
                 new CommandException(String.format("`%s` is not a valid difficulty. %s",
                         context.getArg().orElse(""), FormatUtils.options(Difficulty.class))));
 

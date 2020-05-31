@@ -52,7 +52,7 @@ public class DiabloCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(2);
 
-        final Region region = Utils.parseEnum(Region.class, args.get(0),
+        final Region region = EnumUtils.parseEnum(Region.class, args.get(0),
                 new CommandException(String.format("`%s` is not a valid Region. %s",
                         args.get(0), FormatUtils.options(Region.class))));
 
@@ -105,7 +105,7 @@ public class DiabloCmd extends BaseCmd {
         final String damages = FormatUtils.format(heroResponses,
                 hero -> String.format("%s DPS", FormatUtils.number(hero.getStats().getDamage())), "\n");
 
-        return DiscordUtils.getDefaultEmbed()
+        return ShadbotUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor("Diablo 3 Stats", null, avatarUrl)
                         .setThumbnail("https://i.imgur.com/QUS9QkX.png")
                         .setDescription(description)

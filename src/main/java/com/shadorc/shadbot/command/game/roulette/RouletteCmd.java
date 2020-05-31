@@ -6,8 +6,9 @@ import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.EnumUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -35,10 +36,10 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
         final List<String> args = context.requireArgs(2);
 
         final String place = args.get(1).toLowerCase();
-        return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), args.get(0))
+        return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), args.get(0))
                 .flatMap(bet -> {
                     // Match [1-36], red, black, odd, even, high or low
-                    if (!NUMBER_PATTERN.matcher(place).matches() && Utils.parseEnum(Place.class, place) == null) {
+                    if (!NUMBER_PATTERN.matcher(place).matches() && EnumUtils.parseEnum(Place.class, place) == null) {
                         return Mono.error(new CommandException(
                                 String.format("`%s` is not a valid place, must be a number between **1 and 36**, %s.",
                                         place, FormatUtils.format(Place.values(),

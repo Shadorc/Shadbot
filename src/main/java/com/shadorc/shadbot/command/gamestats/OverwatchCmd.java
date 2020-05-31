@@ -10,10 +10,10 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.EnumUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -53,7 +53,7 @@ public class OverwatchCmd extends BaseCmd {
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        final Platform platform = Utils.parseEnum(Platform.class, args.get(0),
+        final Platform platform = EnumUtils.parseEnum(Platform.class, args.get(0),
                 new CommandException(String.format("`%s` is not a valid Platform. %s",
                         args.get(0), FormatUtils.options(Platform.class))));
         final String battletag = args.get(1);
@@ -67,7 +67,7 @@ public class OverwatchCmd extends BaseCmd {
                                 String.format(Emoji.ACCESS_DENIED + " (**%s**) This profile is private.",
                                         context.getUsername()));
                     }
-                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Overwatch Stats (Quickplay)",
                                     String.format("https://playoverwatch.com/en-gb/career/%s/%s",
                                             platform.getName(), profile.getProfile().getUsername()), context.getAvatarUrl())

@@ -3,10 +3,10 @@ package com.shadorc.shadbot;
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.cache.GuildOwnersCache;
 import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.ExceptionHandler;
+import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ProcessUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.gateway.GatewayClient;
 import discord4j.gateway.GatewayClientGroup;
@@ -40,7 +40,7 @@ public class TaskManager {
     public void schedulePresenceUpdates(GatewayDiscordClient gateway) {
         LOGGER.info("Scheduling presence updates");
         final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofMinutes(15), DEFAULT_SCHEDULER)
-                .map(ignored -> DiscordUtils.getRandomStatus())
+                .map(ignored -> ShadbotUtils.getRandomStatus())
                 .flatMap(gateway::updatePresence)
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);

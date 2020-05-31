@@ -9,10 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class StringUtilsTest {
 
-    private enum TestEnum {
-        TEST_ONE, test_Two, testThree;
-    }
-
     @Test
     public void testCapitalize() {
         assertEquals("", StringUtils.capitalize(""));
@@ -22,14 +18,6 @@ public class StringUtilsTest {
         assertEquals("Foo", StringUtils.capitalize("Foo"));
         assertEquals("Foo", StringUtils.capitalize("foO"));
         assertNull(StringUtils.capitalize(null));
-    }
-
-    @Test
-    public void testCapitalizeEnum() {
-        assertEquals("Test one", StringUtils.capitalizeEnum(TestEnum.TEST_ONE));
-        assertEquals("Test two", StringUtils.capitalizeEnum(TestEnum.test_Two));
-        assertEquals("Testthree", StringUtils.capitalizeEnum(TestEnum.testThree));
-        assertNull(StringUtils.capitalizeEnum(null));
     }
 
     @Test

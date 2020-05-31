@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.api.html.suicidegirl;
 
+import com.shadorc.shadbot.utils.RandUtils;
 import com.shadorc.shadbot.utils.StringUtils;
-import com.shadorc.shadbot.utils.Utils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -10,7 +10,7 @@ public class SuicideGirl {
     private final Element element;
 
     public SuicideGirl(Document document) {
-        this.element = Utils.randValue(document.getElementsByTag("article"));
+        this.element = RandUtils.randValue(document.getElementsByTag("article"));
     }
 
     public String getName() {

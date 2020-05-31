@@ -6,6 +6,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.core.object.Region;
 import discord4j.core.object.entity.Guild;
@@ -55,7 +56,7 @@ public class ServerInfoCmd extends BaseCmd {
         final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
         final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
 
-        return DiscordUtils.getDefaultEmbed()
+        return ShadbotUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, avatarUrl)
                         .setThumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
                         .addField("Owner", owner.getUsername(), false)

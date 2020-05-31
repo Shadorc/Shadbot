@@ -7,8 +7,8 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -33,7 +33,7 @@ public class XkcdCmd extends BaseCmd {
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading XKCD comic...", context.getUsername()))
                 .send()
                 .then(XkcdCmd.getRandomXkcd())
-                .map(xkcd -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                .map(xkcd -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor(String.format("XKCD: %s", xkcd.getTitle()),
                                 String.format("%s/%d", HOME_URL, xkcd.getNum()), context.getAvatarUrl())
                                 .setImage(xkcd.getImg()))))

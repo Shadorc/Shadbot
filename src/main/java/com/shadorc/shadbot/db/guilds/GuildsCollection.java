@@ -6,7 +6,7 @@ import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.guilds.bean.DBGuildBean;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.common.util.Snowflake;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
@@ -39,7 +39,7 @@ public class GuildsCollection extends DatabaseCollection {
 
         return Mono.from(request)
                 .flatMap(document -> Mono.fromCallable(() ->
-                        new DBGuild(Utils.MAPPER.readValue(document.toJson(Utils.JSON_WRITER_SETTINGS), DBGuildBean.class))))
+                        new DBGuild(NetUtils.MAPPER.readValue(document.toJson(JSON_WRITER_SETTINGS), DBGuildBean.class))))
                 .doOnSuccess(consumer -> {
                     if (consumer == null) {
                         LOGGER.debug("[DBGuild {}] Not found", guildId.asLong());

@@ -2,8 +2,8 @@ package com.shadorc.shadbot.command.game.hangman;
 
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
+import com.shadorc.shadbot.utils.RandUtils;
 import com.shadorc.shadbot.utils.StringUtils;
-import com.shadorc.shadbot.utils.Utils;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class WordsList {
     }
 
     public String getRandomWord() {
-        return Utils.randValue(this.words);
+        return RandUtils.randValue(this.words);
     }
 
     public boolean isLoaded() {

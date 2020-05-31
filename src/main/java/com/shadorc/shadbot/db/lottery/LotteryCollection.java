@@ -11,7 +11,7 @@ import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
 import com.shadorc.shadbot.db.lottery.bean.LotteryHistoricBean;
 import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
 import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.common.util.Snowflake;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
@@ -41,7 +41,7 @@ public class LotteryCollection extends DatabaseCollection {
         return Mono.from(request)
                 .flatMapIterable(document -> document.getList("gamblers", Document.class))
                 .map(Document::toJson)
-                .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, LotteryGamblerBean.class)))
+                .flatMap(json -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(json, LotteryGamblerBean.class)))
                 .map(LotteryGambler::new)
                 .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
@@ -55,7 +55,7 @@ public class LotteryCollection extends DatabaseCollection {
 
         return Mono.from(request)
                 .map(Document::toJson)
-                .flatMap(json -> Mono.fromCallable(() -> Utils.MAPPER.readValue(json, LotteryHistoricBean.class)))
+                .flatMap(json -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(json, LotteryHistoricBean.class)))
                 .map(LotteryHistoric::new)
                 .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }

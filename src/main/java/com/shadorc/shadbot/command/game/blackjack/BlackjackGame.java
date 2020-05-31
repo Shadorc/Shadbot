@@ -10,6 +10,7 @@ import com.shadorc.shadbot.object.casino.Hand;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import io.prometheus.client.Summary;
@@ -115,7 +116,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackCmd, BlackjackPlayer
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> player.format(this.getContext().getClient()))
                 .collectList()
-                .map(hands -> DiscordUtils.getDefaultEmbed()
+                .map(hands -> ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             final Hand visibleDealerHand = this.isScheduled() ?
                                     new Hand(this.dealerHand.getCards().subList(0, 1)) : this.dealerHand;

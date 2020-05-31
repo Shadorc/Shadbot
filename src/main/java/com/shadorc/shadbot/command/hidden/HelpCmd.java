@@ -7,6 +7,7 @@ import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
@@ -42,7 +43,7 @@ public class HelpCmd extends BaseCmd {
         return context.getPermissions()
                 .collectList()
                 .flatMap(authorPermissions -> this.getMultiMap(context, authorPermissions))
-                .map(map -> DiscordUtils.getDefaultEmbed()
+                .map(map -> ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Shadbot Help", "https://github.com/Shadorc/Shadbot/wiki/Commands",
                                     context.getAvatarUrl());

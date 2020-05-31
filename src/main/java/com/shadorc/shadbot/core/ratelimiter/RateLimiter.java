@@ -1,10 +1,10 @@
 package com.shadorc.shadbot.core.ratelimiter;
 
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.object.message.TemporaryMessage;
-import com.shadorc.shadbot.utils.ExceptionHandler;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
-import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Member;
@@ -64,7 +64,7 @@ public class RateLimiter {
         gateway.getUserById(userId)
                 .map(author -> {
                     final String username = author.getUsername();
-                    final String message = TextUtils.SPAMS.getRandomText();
+                    final String message = ShadbotUtils.SPAMS.getRandomText();
                     final String maxNum = StringUtils.pluralOf(this.bandwidth.getCapacity(), "time");
                     final String durationStr = DurationFormatUtils.formatDurationWords(
                             this.bandwidth.getRefillPeriodNanos() / 1_000_000, true, true);

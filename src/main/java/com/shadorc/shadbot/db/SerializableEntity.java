@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.db;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.NetUtils;
 import org.bson.Document;
 import org.bson.codecs.DocumentCodec;
 
@@ -19,8 +19,8 @@ public abstract class SerializableEntity<T extends Bean> {
 
     public Document toDocument() {
         try {
-            return Document.parse(Utils.MAPPER.writeValueAsString(this.getBean()),
-                    new DocumentCodec(Utils.CODEC_REGISTRY));
+            return Document.parse(NetUtils.MAPPER.writeValueAsString(this.getBean()),
+                    new DocumentCodec(DatabaseManager.CODEC_REGISTRY));
         } catch (final JsonProcessingException err) {
             throw new RuntimeException(err);
         }

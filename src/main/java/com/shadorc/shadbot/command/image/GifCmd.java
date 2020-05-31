@@ -12,8 +12,8 @@ import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -38,7 +38,7 @@ public class GifCmd extends BaseCmd {
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading gif...", context.getUsername()))
                 .send()
                 .then(this.getGif(NetUtils.encode(context.getArg().orElse(""))))
-                .map(gifUrl -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                .map(gifUrl -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setImage(gifUrl))))
                 .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",

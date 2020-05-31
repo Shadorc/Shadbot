@@ -6,9 +6,8 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
-import com.shadorc.shadbot.utils.ExceptionHandler;
+import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -56,7 +55,7 @@ public class BotListStats {
                                             .asString()
                                             .doOnNext(content -> LOGGER.debug("Webhook event received: {}", content))
                                             .flatMap(content -> Mono.fromCallable(() ->
-                                                    Utils.MAPPER.readValue(content, TopGgWebhookResponse.class)))
+                                                    NetUtils.MAPPER.readValue(content, TopGgWebhookResponse.class)))
                                             .map(TopGgWebhookResponse::getUserId)
                                             .map(Snowflake::of)
                                             .flatMap(DatabaseManager.getUsers()::getDBUser)

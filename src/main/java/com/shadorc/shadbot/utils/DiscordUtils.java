@@ -3,7 +3,6 @@ package com.shadorc.shadbot.utils;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.command.MissingPermissionException;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
@@ -15,11 +14,8 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.channel.*;
-import discord4j.core.object.presence.Activity;
-import discord4j.core.object.presence.Presence;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
-import discord4j.discordjson.json.gateway.StatusUpdate;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.Permission;
 import io.netty.channel.unix.Errors;
@@ -39,15 +35,6 @@ import java.util.function.Consumer;
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class DiscordUtils {
-
-    /**
-     * @return A random status update showing "Playing {prefix}help | {tip}"
-     */
-    public static StatusUpdate getRandomStatus() {
-        final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX,
-                TextUtils.TIPS.getRandomTextFormatted());
-        return Presence.online(Activity.playing(presence));
-    }
 
     /**
      * @param content The string to send.
@@ -94,17 +81,17 @@ public class DiscordUtils {
                 .flatMap(TupleUtils.function((canSendMessage, canSendEmbed) -> {
                     if (!canSendMessage) {
                         DEFAULT_LOGGER.info("{Channel ID: {}} Missing permission: {}",
-                                channel.getId().asLong(), StringUtils.capitalizeEnum(Permission.SEND_MESSAGES));
+                                channel.getId().asLong(), FormatUtils.capitalizeEnum(Permission.SEND_MESSAGES));
                         return Mono.empty();
                     }
 
                     if (!canSendEmbed && hasEmbed) {
                         DEFAULT_LOGGER.info("{Channel ID: {}} Missing permission: {}",
-                                channel.getId().asLong(), StringUtils.capitalizeEnum(Permission.EMBED_LINKS));
+                                channel.getId().asLong(), FormatUtils.capitalizeEnum(Permission.EMBED_LINKS));
                         return DiscordUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed" +
                                         " links.%nPlease, check my permissions "
                                         + "and channel-specific ones to verify that **%s** is checked.",
-                                StringUtils.capitalizeEnum(Permission.EMBED_LINKS)), channel);
+                                FormatUtils.capitalizeEnum(Permission.EMBED_LINKS)), channel);
                     }
 
                     return channel.createMessage(spec);
@@ -263,13 +250,6 @@ public class DiscordUtils {
                 .cast(VoiceChannel.class)
                 .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.CONNECT, Permission.SPEAK, Permission.VIEW_CHANNEL)
                         .thenReturn(channel));
-    }
-
-    /**
-     * @return A default {@link EmbedCreateSpec} with the default color set.
-     */
-    public static Consumer<EmbedCreateSpec> getDefaultEmbed() {
-        return spec -> spec.setColor(Config.BOT_COLOR);
     }
 
 }

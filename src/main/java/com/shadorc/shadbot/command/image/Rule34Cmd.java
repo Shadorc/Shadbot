@@ -9,7 +9,10 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.RandUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.json.JSONObject;
 import org.json.XML;
@@ -38,7 +41,7 @@ public class Rule34Cmd extends BaseCmd {
                 .then(context.isChannelNsfw())
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return Mono.just(updatableMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix())));
+                        return Mono.just(updatableMsg.setContent(ShadbotUtils.mustBeNsfw(context.getPrefix())));
                     }
 
                     return this.getR34Post(arg)
@@ -53,7 +56,7 @@ public class Rule34Cmd extends BaseCmd {
                                                     context.getUsername()));
                                 }
 
-                                return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                                return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                                         .andThen(embed -> {
                                             if (!post.getSource().isEmpty()) {
                                                 if (post.getSource().startsWith("http")) {
@@ -89,12 +92,12 @@ public class Rule34Cmd extends BaseCmd {
         return NetUtils.get(url)
                 .map(XML::toJSONObject)
                 .map(JSONObject::toString)
-                .flatMap(value -> Mono.fromCallable(() -> Utils.MAPPER.readValue(value, R34Response.class)))
+                .flatMap(value -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(value, R34Response.class)))
                 .map(R34Response::getPosts)
                 .flatMap(Mono::justOrEmpty)
                 .map(R34Posts::getPosts)
                 .flatMap(Mono::justOrEmpty)
-                .map(Utils::randValue);
+                .map(RandUtils::randValue);
     }
 
     private String formatTags(List<String> tags) {

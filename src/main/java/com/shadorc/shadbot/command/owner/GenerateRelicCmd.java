@@ -10,9 +10,9 @@ import com.shadorc.shadbot.db.premium.RelicType;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.EnumUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -29,7 +29,7 @@ public class GenerateRelicCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        final RelicType type = Utils.parseEnum(RelicType.class, context.getArg().orElseThrow(),
+        final RelicType type = EnumUtils.parseEnum(RelicType.class, context.getArg().orElseThrow(),
                 new CommandException(String.format("`%s` in not a valid type. %s",
                         arg, FormatUtils.options(RelicType.class))));
 

@@ -5,6 +5,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -20,7 +21,7 @@ public class BaguetteCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
+        final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
                 .andThen(embed -> embed.setImage("https://i.imgur.com/2Ean5iI.jpg"));
 
         return context.getChannel()

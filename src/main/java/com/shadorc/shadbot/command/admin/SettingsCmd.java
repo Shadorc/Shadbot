@@ -17,6 +17,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.help.HelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import reactor.core.publisher.Flux;
@@ -79,7 +80,7 @@ public class SettingsCmd extends BaseCmd {
                 .distinct()
                 .flatMap(setting -> setting.show(context, settings))
                 .collectList()
-                .map(fields -> DiscordUtils.getDefaultEmbed()
+                .map(fields -> ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Settings", null, context.getAvatarUrl());
 

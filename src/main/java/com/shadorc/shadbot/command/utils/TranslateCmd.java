@@ -1,7 +1,5 @@
 package com.shadorc.shadbot.command.utils;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.command.MissingArgumentException;
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -10,34 +8,38 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.MapUtils;
 import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.json.JSONArray;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class TranslateCmd extends BaseCmd {
 
     private static final String AUTO = "auto";
     private static final int CHARACTERS_LIMIT = 150;
 
-    private final BiMap<String, String> langIsoMap;
+    private final Map<String, String> langIsoMap;
+    private final Map<String, String> isoLangMap;
 
     public TranslateCmd() {
         super(CommandCategory.UTILS, List.of("translate"));
         this.setDefaultRateLimiter();
 
-        this.langIsoMap = HashBiMap.create();
-        Arrays.stream(Locale.getISOLanguages())
-                .forEach(iso -> this.langIsoMap.put(new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(), iso));
-        this.langIsoMap.put(AUTO, AUTO);
+        final Map<String, String> map = Arrays.stream(Locale.getISOLanguages())
+                .collect(Collectors.toMap(
+                        iso -> new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(),
+                        iso -> iso));
+        map.put(AUTO, AUTO);
+
+        this.langIsoMap = Collections.unmodifiableMap(map);
+        this.isoLangMap = MapUtils.inverse(map);
     }
 
     @Override
@@ -112,11 +114,11 @@ public class TranslateCmd extends BaseCmd {
                                 context.getPrefix(), this.getName()));
                     }
 
-                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Translation", null, context.getAvatarUrl())
                                     .setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
-                                            StringUtils.capitalize(this.langIsoMap.inverse().get(langFrom)), sourceText,
-                                            StringUtils.capitalize(this.langIsoMap.inverse().get(langTo)), translatedText))));
+                                            StringUtils.capitalize(this.isoLangMap.get(langFrom)), sourceText,
+                                            StringUtils.capitalize(this.isoLangMap.get(langTo)), translatedText))));
 
                 })
                 .flatMap(UpdatableMessage::send)

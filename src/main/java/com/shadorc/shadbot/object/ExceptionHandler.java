@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.utils;
+package com.shadorc.shadbot.object;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.command.MissingArgumentException;
@@ -6,7 +6,8 @@ import com.shadorc.shadbot.command.MissingPermissionException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.music.NoMusicException;
-import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.FormatUtils;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -44,14 +45,14 @@ public class ExceptionHandler {
     }
 
     private static Mono<Void> onMissingPermissionException(MissingPermissionException err, Context context) {
-        final String missingPerm = StringUtils.capitalizeEnum(err.getPermission());
+        final String missingPerm = FormatUtils.capitalizeEnum(err.getPermission());
         DEFAULT_LOGGER.info("{Guild ID: {}} Missing permission: {}", context.getGuildId().asLong(), missingPerm);
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of "
                                         + "permission.%nPlease, check my permissions and channel-specific "
                                         + "ones to verify that %s is checked.", context.getUsername(),
-                                String.format("**%s**", StringUtils.capitalizeEnum(err.getPermission()))), channel))
+                                String.format("**%s**", FormatUtils.capitalizeEnum(err.getPermission()))), channel))
                 .then();
     }
 

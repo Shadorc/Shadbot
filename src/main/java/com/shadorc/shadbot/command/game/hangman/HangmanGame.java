@@ -5,10 +5,7 @@ import com.shadorc.shadbot.core.game.Game;
 import com.shadorc.shadbot.core.game.player.Player;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.StringUtils;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.*;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -100,7 +97,7 @@ public class HangmanGame extends Game<HangmanCmd> {
                 .map(String::toUpperCase)
                 .collect(Collectors.toList());
 
-        final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
+        final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
                 .andThen(embed -> {
                     embed.setAuthor("Hangman Game", null, this.getContext().getAvatarUrl());
                     embed.setThumbnail("https://i.imgur.com/Vh9WyaU.png");

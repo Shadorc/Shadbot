@@ -9,6 +9,7 @@ import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -28,7 +29,7 @@ public class AchievementsCmd extends BaseCmd {
                 .flatMap(guild -> DiscordUtils.extractMemberOrAuthor(guild, context.getMessage()))
                 .flatMap(member -> DatabaseManager.getUsers().getDBUser(member.getId())
                         .map(DBUser::getAchievements)
-                        .map(achievements -> DiscordUtils.getDefaultEmbed()
+                        .map(achievements -> ShadbotUtils.getDefaultEmbed()
                                 .andThen(embed -> {
                                     embed.setAuthor(String.format("%s's Achievements", member.getUsername()),
                                             null, member.getAvatarUrl());

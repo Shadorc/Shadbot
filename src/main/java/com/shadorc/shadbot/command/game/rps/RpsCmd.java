@@ -8,8 +8,9 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.EnumUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.RandUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.prometheus.client.Summary;
@@ -41,11 +42,11 @@ public class RpsCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        final Handsign userHandsign = Utils.parseEnum(Handsign.class, arg,
+        final Handsign userHandsign = EnumUtils.parseEnum(Handsign.class, arg,
                 new CommandException(String.format("`%s` is not a valid handsign. %s.",
                         arg, FormatUtils.options(Handsign.class))));
 
-        final Handsign botHandsign = Utils.randValue(Handsign.values());
+        final Handsign botHandsign = RandUtils.randValue(Handsign.values());
 
         final StringBuilder strBuilder = new StringBuilder(String.format("**%s**: %s %s **VS** %s %s :**Shadbot**%n",
                 context.getUsername(), userHandsign.getHandsign(), userHandsign.getEmoji(),

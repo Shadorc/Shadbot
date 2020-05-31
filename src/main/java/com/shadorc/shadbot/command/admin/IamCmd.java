@@ -15,6 +15,7 @@ import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.ReactionMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.reaction.ReactionEmoji;
@@ -70,7 +71,7 @@ public class IamCmd extends BaseCmd {
                                 description.append(quotedElements.get(0));
                             }
 
-                            final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
+                            final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
                                     .andThen(embed -> embed.setAuthor(String.format("Iam: %s",
                                             FormatUtils.format(roles, role -> String.format("@%s", role.getName()), ", ")),
                                             null, context.getAvatarUrl())

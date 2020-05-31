@@ -7,7 +7,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.prometheus.client.Summary;
@@ -38,7 +38,7 @@ public class RussianRouletteCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
+        return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
                 .map(ignored -> this.getPlayer(context.getGuildId(), context.getAuthorId()))
                 .filter(RussianRoulettePlayer::isAlive)
                 .switchIfEmpty(context.getChannel()
@@ -51,7 +51,7 @@ public class RussianRouletteCmd extends BaseCmd {
                 .flatMap(player -> {
                     player.fire();
 
-                    final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
+                    final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Russian Roulette", null, context.getAvatarUrl())
                                     .addField("Tries", String.format("%d/6", player.getRemaining()), false));
 

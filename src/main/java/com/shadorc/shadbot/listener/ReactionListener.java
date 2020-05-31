@@ -6,7 +6,7 @@ import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.message.TemporaryMessage;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.FormatUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
@@ -71,7 +71,7 @@ public class ReactionListener {
                                         .send(String.format(Emoji.ACCESS_DENIED
                                                         + " I can't add/remove a role due to a lack of permission."
                                                         + "%nPlease, check my permissions to verify that %s is checked.",
-                                                String.format("**%s**", StringUtils.capitalizeEnum(Permission.MANAGE_ROLES))))
+                                                String.format("**%s**", FormatUtils.capitalizeEnum(Permission.MANAGE_ROLES))))
                                         .thenReturn(false);
                             }
 

@@ -9,7 +9,10 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.EnumUtils;
+import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.http.client.ClientException;
@@ -34,11 +37,11 @@ public class ManageAchievementsCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(3);
 
-        final Action action = Utils.parseEnum(Action.class, args.get(0),
+        final Action action = EnumUtils.parseEnum(Action.class, args.get(0),
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(0), FormatUtils.options(Action.class))));
 
-        final Achievement achievement = Utils.parseEnum(Achievement.class, args.get(1),
+        final Achievement achievement = EnumUtils.parseEnum(Achievement.class, args.get(1),
                 new CommandException(String.format("`%s` is not a valid achievement. %s",
                         args.get(1), FormatUtils.options(Achievement.class))));
 
@@ -63,7 +66,7 @@ public class ManageAchievementsCmd extends BaseCmd {
                         })
                         .then(context.getChannel())
                         .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s **%s** to **%s** done.",
-                                StringUtils.capitalizeEnum(action), achievement.getTitle(), user.getTag()), channel)))
+                                FormatUtils.capitalizeEnum(action), achievement.getTitle(), user.getTag()), channel)))
                 .switchIfEmpty(Mono.error(new CommandException("User not found.")))
                 .then();
     }

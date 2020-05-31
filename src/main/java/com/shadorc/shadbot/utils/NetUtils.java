@@ -1,6 +1,10 @@
 package com.shadorc.shadbot.utils;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.shadorc.shadbot.data.Config;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -23,6 +27,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
 public class NetUtils {
+
+    public static final ObjectMapper MAPPER = new ObjectMapper()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+            .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 
     private static final HttpClient HTTP_CLIENT = HttpClient.create()
             .followRedirect(true);
@@ -73,7 +84,7 @@ public class NetUtils {
         }
 
         return body.asInputStream()
-                .flatMap(input -> Mono.fromCallable(() -> Utils.MAPPER.readValue(input, type)));
+                .flatMap(input -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(input, type)));
     }
 
     public static RequestSender request(Consumer<HttpHeaders> headerBuilder, HttpMethod method, String url) {

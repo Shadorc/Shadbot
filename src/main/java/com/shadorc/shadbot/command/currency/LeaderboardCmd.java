@@ -9,6 +9,7 @@ import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -50,7 +51,7 @@ public class LeaderboardCmd extends BaseCmd {
                                         count, tuple.getT1(), FormatUtils.coins(tuple.getT2()));
                             });
                 })
-                .map(description -> DiscordUtils.getDefaultEmbed()
+                .map(description -> ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Leaderboard", null, context.getAvatarUrl())
                                 .setDescription(description)))
                 .flatMap(embed -> context.getChannel()

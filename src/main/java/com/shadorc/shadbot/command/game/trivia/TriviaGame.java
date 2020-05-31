@@ -6,10 +6,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
 import com.shadorc.shadbot.core.game.player.Player;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.*;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
@@ -89,7 +86,7 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
                     FormatUtils.numberedList(this.answers.size(), this.answers.size(),
                             count -> String.format("\t**%d**. %s", count, this.answers.get(count - 1))));
 
-            final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
+            final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
                     .andThen(embed -> embed.setAuthor("Trivia", null, this.getContext().getAvatarUrl())
                             .setDescription(description)
                             .addField("Category", String.format("`%s`", this.trivia.getCategory()), true)

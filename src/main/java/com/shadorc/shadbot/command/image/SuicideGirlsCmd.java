@@ -7,9 +7,8 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.TextUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
@@ -36,11 +35,11 @@ public class SuicideGirlsCmd extends BaseCmd {
                 .then(context.isChannelNsfw())
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return Mono.just(updatableMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix())));
+                        return Mono.just(updatableMsg.setContent(ShadbotUtils.mustBeNsfw(context.getPrefix())));
                     }
 
                     return this.getRandomSuicideGirl()
-                            .map(girl -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                            .map(girl -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                                     .andThen(embed -> embed.setAuthor("SuicideGirls", girl.getUrl(), context.getAvatarUrl())
                                             .setDescription(String.format("Name: **%s**", girl.getName()))
                                             .setImage(girl.getImageUrl()))));

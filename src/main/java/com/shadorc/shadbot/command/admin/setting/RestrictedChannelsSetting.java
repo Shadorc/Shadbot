@@ -12,8 +12,8 @@ import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.EnumUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -63,11 +63,11 @@ public class RestrictedChannelsSetting extends BaseSetting {
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(5);
 
-        final Action action = Utils.parseEnum(Action.class, args.get(1),
+        final Action action = EnumUtils.parseEnum(Action.class, args.get(1),
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(1), FormatUtils.options(Action.class))));
 
-        final Type type = Utils.parseEnum(Type.class, args.get(2),
+        final Type type = EnumUtils.parseEnum(Type.class, args.get(2),
                 new CommandException(String.format("`%s` is not a valid type. %s",
                         args.get(2), FormatUtils.options(Type.class))));
 
@@ -82,7 +82,7 @@ public class RestrictedChannelsSetting extends BaseSetting {
                 commands.add(command);
                 break;
             case CATEGORY:
-                final CommandCategory category = Utils.parseEnum(CommandCategory.class, name,
+                final CommandCategory category = EnumUtils.parseEnum(CommandCategory.class, name,
                         new CommandException(String.format("`%s` is not a valid category. %s",
                                 name, FormatUtils.options(CommandCategory.class))));
                 commands.addAll(CommandManager.getInstance().getCommands().values().stream()

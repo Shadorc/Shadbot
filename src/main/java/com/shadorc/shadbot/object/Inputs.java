@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.object;
 
-import com.shadorc.shadbot.utils.ExceptionHandler;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;

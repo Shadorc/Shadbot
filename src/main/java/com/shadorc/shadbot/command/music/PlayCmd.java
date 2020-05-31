@@ -12,8 +12,8 @@ import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
-import com.shadorc.shadbot.utils.TextUtils;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -96,7 +96,7 @@ public class PlayCmd extends BaseCmd {
                     guildMusic.setMessageChannelId(context.getChannelId());
                     guildMusic.addAudioLoadResultListener(resultListener, identifier);
                 })
-                .switchIfEmpty(DiscordUtils.sendMessage(TextUtils.PLAYLIST_LIMIT_REACHED, channel)
+                .switchIfEmpty(DiscordUtils.sendMessage(ShadbotUtils.PLAYLIST_LIMIT_REACHED, channel)
                         .then(Mono.empty()))
                 .then();
     }

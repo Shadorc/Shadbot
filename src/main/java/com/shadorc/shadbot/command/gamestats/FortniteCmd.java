@@ -11,10 +11,10 @@ import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.EnumUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.netty.handler.codec.http.HttpHeaders;
 import reactor.core.Exceptions;
@@ -39,7 +39,7 @@ public class FortniteCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(2);
 
-        final Platform platform = Utils.parseEnum(Platform.class, args.get(0),
+        final Platform platform = EnumUtils.parseEnum(Platform.class, args.get(0),
                 new CommandException(String.format("`%s` is not a valid Platform. %s",
                         args.get(0), FormatUtils.options(Platform.class))));
 
@@ -75,7 +75,7 @@ public class FortniteCmd extends BaseCmd {
                             stats.getDuoStats().getRatio(), stats.getSquadStats().getRatio())
                             + "```";
 
-                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor("Fortnite Stats",
                                     String.format("https://fortnitetracker.com/profile/%s/%s",
                                             platform.toString().toLowerCase(), encodedNickname),

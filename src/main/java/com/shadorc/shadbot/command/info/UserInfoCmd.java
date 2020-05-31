@@ -6,6 +6,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
@@ -59,7 +60,7 @@ public class UserInfoCmd extends BaseCmd {
             usernameBuilder.append(" (Booster)");
         }
 
-        return DiscordUtils.getDefaultEmbed()
+        return ShadbotUtils.getDefaultEmbed()
                 .andThen(embed -> {
                     embed.setAuthor(String.format("User Info: %s", usernameBuilder), null, avatarUrl)
                             .setThumbnail(member.getAvatarUrl())

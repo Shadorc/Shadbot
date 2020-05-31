@@ -13,8 +13,8 @@ import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.netty.handler.codec.http.HttpMethod;
 import org.apache.http.HttpStatus;
@@ -58,7 +58,7 @@ public class LyricsCmd extends BaseCmd {
                 context.getUsername()))
                 .send()
                 .then(this.getMusixmatch(search))
-                .map(musixmatch -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                .map(musixmatch -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
                                 musixmatch.getArtist(), musixmatch.getTitle()), musixmatch.getUrl(), context.getAvatarUrl())
                                 .setThumbnail(musixmatch.getImageUrl())

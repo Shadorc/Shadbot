@@ -8,8 +8,8 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.object.Embed;
 import discord4j.core.object.Embed.Field;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -42,7 +42,7 @@ public class UrbanCmd extends BaseCmd {
                     final String definition = StringUtils.abbreviate(urbanDefinition.getDefinition(), Embed.MAX_DESCRIPTION_LENGTH);
                     final String example = StringUtils.abbreviate(urbanDefinition.getExample(), Field.MAX_VALUE_LENGTH);
 
-                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                             .andThen(embed -> {
                                 embed.setAuthor(String.format("Urban Dictionary: %s",
                                         urbanDefinition.getWord()), urbanDefinition.getPermalink(), context.getAvatarUrl())

@@ -3,8 +3,8 @@ package com.shadorc.shadbot.command.game.lottery;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
 import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class LotteryEmbedBuilder {
 
     private LotteryEmbedBuilder(Context context) {
         this.context = context;
-        this.embedConsumer = DiscordUtils.getDefaultEmbed().andThen(embed ->
+        this.embedConsumer = ShadbotUtils.getDefaultEmbed().andThen(embed ->
                 embed.setAuthor("Lottery", null, context.getAvatarUrl())
                         .setThumbnail("https://i.imgur.com/peLGtkS.png")
                         .setDescription(String.format("The next draw will take place in **%s**%nTo " +

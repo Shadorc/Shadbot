@@ -5,7 +5,7 @@ import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -24,7 +24,7 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
     public Mono<Void> execute(Context context) {
         final String arg = context.requireArg();
 
-        return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), arg)
+        return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), arg)
                 .flatMap(bet -> {
                     if (this.getManagers().containsKey(context.getChannelId())) {
                         return Mono.just(Tuples.of(this.getManagers().get(context.getChannelId()), bet));

@@ -11,6 +11,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -67,7 +68,7 @@ public class RelicStatusCmd extends BaseCmd {
                 }))
                 .collectList()
                 .filter(list -> !list.isEmpty())
-                .map(fields -> DiscordUtils.getDefaultEmbed()
+                .map(fields -> ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Contributor Status", null, context.getAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/R0N6kW3.png");

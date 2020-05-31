@@ -9,7 +9,6 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.json.XML;
@@ -71,7 +70,7 @@ public class ChatCmd extends BaseCmd {
         return NetUtils.get(url)
                 .map(XML::toJSONObject)
                 .map(jsonObj -> jsonObj.getJSONObject("result"))
-                .flatMap(resultObj -> Mono.fromCallable(() -> Utils.MAPPER.readValue(resultObj.toString(), ChatBotResponse.class)))
+                .flatMap(resultObj -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(resultObj.toString(), ChatBotResponse.class)))
                 .doOnNext(chat -> this.channelsCustid.put(channelId, chat.getCustId()))
                 .map(ChatBotResponse::getResponse)
                 .onErrorResume(err -> Mono.fromRunnable(() ->

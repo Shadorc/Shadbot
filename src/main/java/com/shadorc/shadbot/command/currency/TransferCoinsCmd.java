@@ -12,7 +12,7 @@ import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
-import com.shadorc.shadbot.utils.TextUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -58,7 +58,7 @@ public class TransferCoinsCmd extends BaseCmd {
                             .flatMap(dbMembers -> {
                                 final DBMember dbSender = dbMembers.get(senderUserId);
                                 if (dbSender.getCoins() < coins) {
-                                    return Mono.error(new CommandException(TextUtils.NOT_ENOUGH_COINS));
+                                    return Mono.error(new CommandException(ShadbotUtils.NOT_ENOUGH_COINS));
                                 }
 
                                 final DBMember dbReceiver = dbMembers.get(receiverUser.getId());

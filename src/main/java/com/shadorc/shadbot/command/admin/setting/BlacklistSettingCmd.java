@@ -12,9 +12,9 @@ import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.SettingHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.EnumUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
-import com.shadorc.shadbot.utils.Utils;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import reactor.core.publisher.Mono;
@@ -55,11 +55,11 @@ public class BlacklistSettingCmd extends BaseSetting {
     public Mono<Void> execute(Context context) {
         final List<String> args = context.requireArgs(4);
 
-        final Action action = Utils.parseEnum(Action.class, args.get(1),
+        final Action action = EnumUtils.parseEnum(Action.class, args.get(1),
                 new CommandException(String.format("`%s` is not a valid action. %s",
                         args.get(1), FormatUtils.options(Action.class))));
 
-        final Type type = Utils.parseEnum(Type.class, args.get(2),
+        final Type type = EnumUtils.parseEnum(Type.class, args.get(2),
                 new CommandException(String.format("`%s` is not a valid type. %s",
                         args.get(2), FormatUtils.options(Type.class))));
 
@@ -77,7 +77,7 @@ public class BlacklistSettingCmd extends BaseSetting {
 
     private Mono<Void> blacklistCategories(Context context, Action action, List<String> categoryNames) {
         final Set<String> unknownCategories = categoryNames.stream()
-                .filter(category -> Utils.parseEnum(CommandCategory.class, category) == null)
+                .filter(category -> EnumUtils.parseEnum(CommandCategory.class, category) == null)
                 .collect(Collectors.toSet());
 
         if (!unknownCategories.isEmpty()) {
@@ -86,7 +86,7 @@ public class BlacklistSettingCmd extends BaseSetting {
         }
 
         final Set<CommandCategory> categories = categoryNames.stream()
-                .map(category -> Utils.parseEnum(CommandCategory.class, category))
+                .map(category -> EnumUtils.parseEnum(CommandCategory.class, category))
                 .collect(Collectors.toSet());
 
         // Do not allow to blacklist admin category

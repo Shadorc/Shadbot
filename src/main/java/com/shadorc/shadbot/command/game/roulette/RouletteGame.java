@@ -58,7 +58,7 @@ public class RouletteGame extends MultiplayerGame<RouletteCmd, RoulettePlayer> {
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
                 .flatMap(TupleUtils.function((player, username) -> {
-                    final Place place = Utils.parseEnum(Place.class, player.getPlace());
+                    final Place place = EnumUtils.parseEnum(Place.class, player.getPlace());
 
                     final int multiplier = RouletteGame.getMultiplier(player, place, winningPlace);
                     if (multiplier > 0) {
@@ -96,7 +96,7 @@ public class RouletteGame extends MultiplayerGame<RouletteCmd, RoulettePlayer> {
         return Flux.fromIterable(this.getPlayers().values())
                 .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
                 .collectList()
-                .map(list -> DiscordUtils.getDefaultEmbed()
+                .map(list -> ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             final String description = String.format("**Use `%s%s <bet> <place>` to join the game.**"
                                             + "%n%n**place** is a `number between 1 and 36`, %s",

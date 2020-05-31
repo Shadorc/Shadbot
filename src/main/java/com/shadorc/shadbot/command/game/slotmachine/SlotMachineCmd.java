@@ -8,8 +8,8 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.StringUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.RandUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.prometheus.client.Summary;
 import reactor.core.publisher.Mono;
@@ -31,7 +31,7 @@ public class SlotMachineCmd extends BaseCmd {
 
     @Override
     public Mono<Void> execute(Context context) {
-        return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
+        return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
                 .map(ignored -> new GamblerPlayer(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST))
                 .flatMap(player -> player.bet().thenReturn(player))
                 .flatMap(player -> {
@@ -76,7 +76,7 @@ public class SlotMachineCmd extends BaseCmd {
 
         final List<SlotOptions> list = new ArrayList<>();
         do {
-            final SlotOptions slot = Utils.randValue(SlotOptions.values());
+            final SlotOptions slot = RandUtils.randValue(SlotOptions.values());
             if (!list.contains(slot)) {
                 list.add(slot);
             }
@@ -91,10 +91,10 @@ public class SlotMachineCmd extends BaseCmd {
                 .addField("Cost", String.format("A game costs **%s**.", FormatUtils.coins(Constants.PAID_COST)), false)
                 .addField("Gains", String.format("%s: **%s**, %s: **%s**, %s: **%s**, %s: **%s**." +
                                 "%nYou also gain a small random bonus.",
-                        StringUtils.capitalizeEnum(SlotOptions.APPLE), FormatUtils.coins(SlotOptions.APPLE.getGains()),
-                        StringUtils.capitalizeEnum(SlotOptions.CHERRIES), FormatUtils.coins(SlotOptions.CHERRIES.getGains()),
-                        StringUtils.capitalizeEnum(SlotOptions.BELL), FormatUtils.coins(SlotOptions.BELL.getGains()),
-                        StringUtils.capitalizeEnum(SlotOptions.GIFT), FormatUtils.coins(SlotOptions.GIFT.getGains())), false)
+                        FormatUtils.capitalizeEnum(SlotOptions.APPLE), FormatUtils.coins(SlotOptions.APPLE.getGains()),
+                        FormatUtils.capitalizeEnum(SlotOptions.CHERRIES), FormatUtils.coins(SlotOptions.CHERRIES.getGains()),
+                        FormatUtils.capitalizeEnum(SlotOptions.BELL), FormatUtils.coins(SlotOptions.BELL.getGains()),
+                        FormatUtils.capitalizeEnum(SlotOptions.GIFT), FormatUtils.coins(SlotOptions.GIFT.getGains())), false)
                 .build();
     }
 

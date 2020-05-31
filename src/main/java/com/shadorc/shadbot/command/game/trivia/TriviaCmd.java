@@ -6,10 +6,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
+import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -41,7 +38,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
                         if ("categories".equalsIgnoreCase(context.getArg().orElseThrow())) {
                             final String ids = FormatUtils.format(this.categories.getIds(), Object::toString, "\n");
                             final String names = String.join("\n", this.categories.getNames());
-                            final Consumer<EmbedCreateSpec> embedConsumer = DiscordUtils.getDefaultEmbed()
+                            final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
                                     .andThen(embed -> embed.setAuthor("Trivia categories", null, context.getAvatarUrl())
                                             .addField("ID", ids, true)
                                             .addField("Name", names, true));

@@ -9,10 +9,9 @@ import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.TextUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.RandUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -57,14 +56,14 @@ public class WallpaperCmd extends BaseCmd {
                 .flatMap(url -> NetUtils.get(url, WallhavenResponse.class))
                 .map(WallhavenResponse::getWallpapers)
                 .filter(wallpapers -> !wallpapers.isEmpty())
-                .map(Utils::randValue)
+                .map(RandUtils::randValue)
                 .zipWith(context.isChannelNsfw())
                 .map(TupleUtils.function((wallpaper, isNsfw) -> {
                     if (!"sfw".equals(wallpaper.getPurity()) && !isNsfw) {
-                        return updatableMsg.setContent(TextUtils.mustBeNsfw(context.getPrefix()));
+                        return updatableMsg.setContent(ShadbotUtils.mustBeNsfw(context.getPrefix()));
                     }
 
-                    return updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                    return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                             .andThen(embed -> embed.setAuthor(String.format("Wallpaper: %s",
                                     arg.isBlank() ? "random" : arg), wallpaper.getUrl(), context.getAvatarUrl())
                                     .setImage(wallpaper.getPath())

@@ -7,8 +7,8 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
@@ -32,7 +32,7 @@ public class JokeCmd extends BaseCmd {
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading joke...", context.getUsername()))
                 .send()
                 .then(this.getRandomJoke())
-                .map(joke -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                .map(joke -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Joke", HOME_URL, context.getAvatarUrl())
                                 .setDescription(joke))))
                 .flatMap(UpdatableMessage::send)

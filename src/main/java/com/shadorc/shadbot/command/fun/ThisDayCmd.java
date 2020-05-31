@@ -7,8 +7,8 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +34,7 @@ public class ThisDayCmd extends BaseCmd {
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading events...", context.getUsername()))
                 .send()
                 .then(this.getThisDay())
-                .map(thisDay -> updatableMsg.setEmbed(DiscordUtils.getDefaultEmbed()
+                .map(thisDay -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor(String.format("On This Day: %s",
                                 thisDay.getDate()), HOME_URL, context.getAvatarUrl())
                                 .setThumbnail("https://i.imgur.com/FdfyJDD.png")

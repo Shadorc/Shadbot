@@ -5,7 +5,7 @@ import com.mongodb.reactivestreams.client.MongoDatabase;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.users.bean.DBUserBean;
 import com.shadorc.shadbot.db.users.entity.DBUser;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.common.util.Snowflake;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
@@ -33,7 +33,7 @@ public class UsersCollection extends DatabaseCollection {
 
         return Mono.from(request)
                 .flatMap(document -> Mono.fromCallable(() ->
-                        new DBUser(Utils.MAPPER.readValue(document.toJson(Utils.JSON_WRITER_SETTINGS), DBUserBean.class))))
+                        new DBUser(NetUtils.MAPPER.readValue(document.toJson(JSON_WRITER_SETTINGS), DBUserBean.class))))
                 .doOnSuccess(consumer -> {
                     if (consumer == null) {
                         LOGGER.debug("[DBUser {}] Not found", id.asLong());

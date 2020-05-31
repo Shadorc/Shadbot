@@ -13,7 +13,11 @@ import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.music.TrackScheduler;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.object.ExceptionHandler;
+import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -126,7 +130,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                         musicsAdded++;
                         // The playlist limit is reached and the user / guild is not premium
                         if (trackScheduler.getPlaylist().size() >= Config.PLAYLIST_SIZE - 1 && !isPremium) {
-                            strBuilder.append(TextUtils.PLAYLIST_LIMIT_REACHED + "\n");
+                            strBuilder.append(ShadbotUtils.PLAYLIST_LIMIT_REACHED + "\n");
                             break;
                         }
                     }
@@ -152,7 +156,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 .getDBGuild(this.guildId)
                 .map(DBGuild::getSettings)
                 .map(Settings::getPrefix)
-                .map(prefix -> DiscordUtils.getDefaultEmbed()
+                .map(prefix -> ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor(playlistName, null, avatarUrl)
                                 .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
                                 .setDescription("**Select a music by typing the corresponding number.**"
@@ -168,7 +172,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
         LOGGER.debug("{Guild ID: {}} Load failed: {}", this.guildId.asLong(), err);
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .flatMap(guildMusic -> {
-                    final String errMessage = TextUtils.cleanLavaplayerErr(err);
+                    final String errMessage = ShadbotUtils.cleanLavaplayerErr(err);
                     LOGGER.info("{Guild ID: {}} Load failed: {}", this.guildId.asLong(), errMessage);
                     return guildMusic.getMessageChannel()
                             .flatMap(channel -> DiscordUtils.sendMessage(

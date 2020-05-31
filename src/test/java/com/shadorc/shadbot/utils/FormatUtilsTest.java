@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FormatUtilsTest {
 
@@ -17,6 +16,18 @@ public class FormatUtilsTest {
         assertEquals("-1 coin", FormatUtils.coins(-1));
         assertEquals("150,000 coins", FormatUtils.coins(150000));
         assertEquals("-150,000 coins", FormatUtils.coins(-150000));
+    }
+
+    private enum TestEnum {
+        TEST_ONE, test_Two, testThree;
+    }
+
+    @Test
+    public void testCapitalizeEnum() {
+        assertEquals("Test one", FormatUtils.capitalizeEnum(TestEnum.TEST_ONE));
+        assertEquals("Test two", FormatUtils.capitalizeEnum(TestEnum.test_Two));
+        assertEquals("Testthree", FormatUtils.capitalizeEnum(TestEnum.testThree));
+        assertNull(FormatUtils.capitalizeEnum(null));
     }
 
     @Test

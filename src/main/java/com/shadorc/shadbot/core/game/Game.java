@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.core.game;
 
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.ExceptionHandler;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.rest.util.Permission;

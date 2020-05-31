@@ -8,9 +8,9 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.ExceptionHandler;
+import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -122,7 +122,7 @@ public class Shadbot {
                         .setMapping(new CaffeineStoreService(
                                 builder -> builder.expireAfterWrite(Duration.ofMinutes(30))), MessageData.class)
                         .setFallback(new JdkStoreService()))
-                .setInitialStatus(ignored -> DiscordUtils.getRandomStatus())
+                .setInitialStatus(ignored -> ShadbotUtils.getRandomStatus())
                 .setMemberRequestFilter(MemberRequestFilter.none())
                 .withGateway(gateway -> {
                     Shadbot.gateway = gateway;

@@ -2,8 +2,8 @@ package com.shadorc.shadbot.music;
 
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.ExceptionHandler;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.MessageChannel;

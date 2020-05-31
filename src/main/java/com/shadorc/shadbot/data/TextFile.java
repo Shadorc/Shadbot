@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.data;
 
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.RandUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,11 +32,11 @@ public class TextFile {
     }
 
     public String getRandomText() {
-        return Objects.requireNonNull(Utils.randValue(this.texts));
+        return Objects.requireNonNull(RandUtils.randValue(this.texts));
     }
 
     public String getRandomTextFormatted() {
-        return Objects.requireNonNull(Utils.randValue(this.texts))
+        return Objects.requireNonNull(RandUtils.randValue(this.texts))
                 .replace("{default_prefix}", Config.DEFAULT_PREFIX)
                 .replace("{patreon_url}", Config.PATREON_URL)
                 .replace("{support_server_url}", Config.SUPPORT_SERVER_URL);

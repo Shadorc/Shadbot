@@ -8,7 +8,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
-import com.shadorc.shadbot.utils.Utils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
@@ -73,7 +73,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
                         .then();
             }
 
-            return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), diceManager.getBet())
+            return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), diceManager.getBet())
                     .flatMap(bet -> {
                         final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(), bet, number);
                         if (diceManager.addPlayerIfAbsent(player)) {
@@ -90,7 +90,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
                 return Mono.error(new MissingArgumentException());
             }
 
-            return Utils.requireValidBet(context.getGuildId(), context.getAuthorId(), args.get(1))
+            return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), args.get(1))
                     .map(bet -> this.getManagers().computeIfAbsent(context.getChannelId(),
                             ignored -> new DiceGame(this, context, bet)))
                     .flatMap(diceManager -> {
