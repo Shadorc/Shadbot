@@ -16,6 +16,82 @@ public class StringUtils {
     private static final Pattern SPACES_PATTERN = Pattern.compile(" +");
 
     /**
+     * @param str The string to check.
+     * @param sub The char to count.
+     * @return The number of occurrences.
+     */
+    public static int countMatches(String str, char sub) {
+        int count = 0;
+        for (final char c : str.toCharArray()) {
+            if (c == sub) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * @param str The string containing the substrings.
+     * @param open The string identifying the start of the substring.
+     * @param close The string identifying the end of the substring.
+     * @return A string list of substrings.
+     */
+    public static List<String> substringsBetween(@Nullable String str, String open, String close) {
+        final List<String> list = new ArrayList<>();
+        if (str == null || str.isEmpty()) {
+            return list;
+        }
+
+        int pos = 0;
+        while (pos < str.length() - close.length()) {
+            int start = str.indexOf(open, pos);
+            if (start < 0) {
+                break;
+            }
+            start += open.length();
+            final int end = str.indexOf(close, start);
+            if (end < 0) {
+                break;
+            }
+            list.add(str.substring(start, end));
+            pos = end + close.length();
+        }
+        return list;
+    }
+
+    /**
+     * @param str The string to check, may be {@code null}.
+     * @param maxWidth Maximum length of result string, must be at least 4.
+     * @return Abbreviated string, {@code null} if null string input.
+     * @throws IllegalArgumentException If the width is too small.
+     */
+    @Nullable
+    public static String abbreviate(@Nullable String str, int maxWidth) {
+        return abbreviate(str, "...", maxWidth);
+    }
+
+    /**
+     * @param str The string to check, may be {@code null}.
+     * @param abbrevMarker The string used as replacement marker.
+     * @param maxWidth Maximum length of result string.
+     * @return Abbreviated string, {@code null} if null string input.
+     * @throws IllegalArgumentException If the width is too small.
+     */
+    @Nullable
+    public static String abbreviate(@Nullable String str, String abbrevMarker, int maxWidth) {
+        if (str == null) {
+            return null;
+        }
+        if (str.length() <= maxWidth) {
+            return str;
+        }
+        if (str.length() - abbrevMarker.length() <= 0) {
+            throw new IllegalArgumentException(String.format("Minimum abbreviation width is %d", abbrevMarker.length() + 1));
+        }
+        return str.substring(0, maxWidth - abbrevMarker.length()) + abbrevMarker;
+    }
+
+    /**
      * @param str The string to capitalize, may be {@code null}.
      * @return The capitalized string.
      */

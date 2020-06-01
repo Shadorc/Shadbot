@@ -52,7 +52,7 @@ public class ServerInfoCmd extends BaseCmd {
     private Consumer<EmbedCreateSpec> getEmbed(Guild guild, List<GuildChannel> channels, Member owner, Region region, String avatarUrl) {
         final String creationDate = String.format("%s%n(%s)",
                 TimeUtils.toLocalDate(guild.getId().getTimestamp()).format(this.dateFormatter),
-                FormatUtils.longDuration(guild.getId().getTimestamp()));
+                FormatUtils.formatLongDuration(guild.getId().getTimestamp()));
         final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
         final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
 

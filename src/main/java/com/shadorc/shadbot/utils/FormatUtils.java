@@ -3,7 +3,6 @@ package com.shadorc.shadbot.utils;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 import reactor.util.annotation.Nullable;
 
 import java.text.NumberFormat;
@@ -15,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -55,9 +53,10 @@ public class FormatUtils {
 
     /**
      * @param duration The duration to format.
-     * @return The formatted duration as D days H hours S minutes.
+     * @return The formatted duration as D day(s) H hour(s) S minute(s).
      */
-    public static String customDate(Duration duration) {
+    public static String formatDurationWords(Duration duration) {
+        final long seconds = duration.toSecondsPart();
         final long minutes = duration.toMinutesPart();
         final long hours = duration.toHoursPart();
         final long days = duration.toDaysPart();
@@ -69,8 +68,11 @@ public class FormatUtils {
         if (hours > 0) {
             strBuilder.append(String.format("%s ", StringUtils.pluralOf(hours, "hour")));
         }
-        if (minutes > 0 || days == 0 && hours == 0) {
+        if (minutes > 0) {
             strBuilder.append(StringUtils.pluralOf(minutes, "minute"));
+        }
+        if(seconds > 0 || days == 0 && hours == 0 && minutes == 0) {
+            strBuilder.append(StringUtils.pluralOf(seconds, "second"));
         }
 
         return strBuilder.toString().trim();
@@ -80,7 +82,7 @@ public class FormatUtils {
      * @param instant The instant to format.
      * @return The formatted instant (e.g X days, Y hours, Z seconds).
      */
-    public static String longDuration(Instant instant) {
+    public static String formatLongDuration(Instant instant) {
         final Period period = Period.between(TimeUtils.toLocalDate(instant).toLocalDate(), LocalDate.now());
         final String str = period.getUnits().stream()
                 .filter(unit -> period.get(unit) != 0)
@@ -88,21 +90,32 @@ public class FormatUtils {
                 .collect(Collectors.joining(", "));
 
         if (str.isEmpty()) {
-            return FormatUtils.shortDuration(Instant.now().toEpochMilli() - instant.toEpochMilli());
+            return FormatUtils.formatDuration(Instant.now().toEpochMilli() - instant.toEpochMilli());
         }
 
         return str;
     }
 
     /**
-     * @param durationMillis The duration to format (in milliseconds).
-     * @return The formatted duration as H:mm:ss.
+     * @param millis The duration to format (in milliseconds).
+     * @return The formatted duration as (H:)(mm:)ss.
      */
-    public static String shortDuration(long durationMillis) {
-        if (TimeUnit.MILLISECONDS.toHours(durationMillis) > 0) {
-            return DurationFormatUtils.formatDuration(durationMillis, "H:mm:ss", true);
+    public static String formatDuration(long millis) {
+        return FormatUtils.formatDuration(Duration.ofMillis(millis));
+    }
+
+    /**
+     * @param duration The duration to format.
+     * @return The formatted duration as (H:)mm:ss.
+     */
+    public static String formatDuration(Duration duration) {
+        if (duration.isNegative()) {
+            throw new IllegalArgumentException("duration must be positive");
         }
-        return DurationFormatUtils.formatDuration(durationMillis, "m:ss", true);
+        if (duration.toHours() > 0) {
+            return String.format("%d:%02d:%02d", duration.toHoursPart(), duration.toMinutesPart(), duration.toSecondsPart());
+        }
+        return String.format("%d:%02d", duration.toMinutesPart(), duration.toSecondsPart());
     }
 
     public static <T extends Enum<T>> String format(Class<T> enumClass, CharSequence delimiter) {
@@ -174,7 +187,7 @@ public class FormatUtils {
         if (info.isStream) {
             strBuilder.append(" (Stream)");
         } else {
-            strBuilder.append(String.format(" (%s)", FormatUtils.shortDuration(info.length)));
+            strBuilder.append(String.format(" (%s)", FormatUtils.formatDuration(info.length)));
         }
 
         return strBuilder.toString();

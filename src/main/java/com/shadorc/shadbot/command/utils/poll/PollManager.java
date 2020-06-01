@@ -60,7 +60,7 @@ public class PollManager {
                         .setDescription(String.format("Vote by clicking on the corresponding number.%n%n__**%s**__%s",
                                 this.spec.getQuestion(), representation))
                         .setFooter(String.format("You have %s to vote. Use %spoll cancel to cancel.",
-                                FormatUtils.shortDuration(this.spec.getDuration().toMillis()), this.context.getPrefix()),
+                                FormatUtils.formatDuration(this.spec.getDuration()), this.context.getPrefix()),
                                 "https://i.imgur.com/jcrUDLY.png"));
 
         return this.voteMessage.send(embedConsumer)

@@ -10,6 +10,23 @@ import static org.junit.jupiter.api.Assertions.*;
 public class StringUtilsTest {
 
     @Test
+    public void testCountMatches() {
+        assertEquals(0, StringUtils.countMatches("foo", 'b'));
+        assertEquals(1, StringUtils.countMatches("foo", 'f'));
+        assertEquals(2, StringUtils.countMatches("foo", 'o'));
+        assertEquals(2, StringUtils.countMatches(" hello world", ' '));
+        assertEquals(2, StringUtils.countMatches("hello \"hi\"", '"'));
+    }
+
+    @Test
+    public void testAbbreviate() {
+        assertNull(StringUtils.abbreviate(null, "...", 3));
+        assertThrows(IllegalArgumentException.class, () -> StringUtils.abbreviate("hi", "...", 1));
+        assertEquals("hi", StringUtils.abbreviate("hi", "...", 3));
+        assertEquals("hello...", StringUtils.abbreviate("hello world", "...", 8));
+    }
+
+    @Test
     public void testCapitalize() {
         assertEquals("", StringUtils.capitalize(""));
         assertEquals("F", StringUtils.capitalize("f"));
@@ -54,17 +71,7 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testRemoveList() {
-        assertEquals("bar", StringUtils.remove("foo bar", List.of("foo ")));
-        assertEquals(" ", StringUtils.remove("foo bar", List.of("foo", "bar")));
-        assertEquals("foo bar", StringUtils.remove("foo bar", Collections.emptyList()));
-        assertEquals("foo bar", StringUtils.remove("foo bar", List.of("*")));
-        assertEquals("foo bar", StringUtils.remove("foo bar", List.of("")));
-        assertNull(StringUtils.remove(null, Collections.emptyList()));
-    }
-
-    @Test
-    public void testRemoveArray() {
+    public void testRemove() {
         assertEquals("bar", StringUtils.remove("foo bar", "foo "));
         assertEquals(" ", StringUtils.remove("foo bar", "foo", "bar"));
         assertEquals("foo bar", StringUtils.remove("foo bar"));

@@ -151,7 +151,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                     return String.format("\t**%d.** [%s](%s)", count, FormatUtils.trackName(info), info.uri);
                 });
 
-        final String playlistName = org.apache.commons.lang3.StringUtils.abbreviate(playlist.getName(), MAX_PLAYLIST_NAME_LENGTH);
+        final String playlistName = StringUtils.abbreviate(playlist.getName(), MAX_PLAYLIST_NAME_LENGTH);
         return DatabaseManager.getGuilds()
                 .getDBGuild(this.guildId)
                 .map(DBGuild::getSettings)

@@ -31,35 +31,30 @@ public class FormatUtilsTest {
     }
 
     @Test
-    public void testCustomDate() {
-        assertEquals("5 days 3 hours 2 minutes", FormatUtils.customDate(Duration.ofMinutes(5 * 24 * 60 + 3 * 60 + 2)));
-        assertEquals("5 days 3 hours", FormatUtils.customDate(Duration.ofHours(5 * 24 + 3)));
-        assertEquals("3 hours 2 minutes", FormatUtils.customDate(Duration.ofMinutes(3 * 60 + 2)));
-        assertEquals("5 days 2 minutes", FormatUtils.customDate(Duration.ofMinutes(5 * 24 * 60 + 2)));
-        assertEquals("5 days", FormatUtils.customDate(Duration.ofDays(5)));
-        assertEquals("3 hours", FormatUtils.customDate(Duration.ofHours(3)));
-        assertEquals("2 minutes", FormatUtils.customDate(Duration.ofMinutes(2)));
-        assertEquals("0 minute", FormatUtils.customDate(Duration.ZERO));
-        assertEquals("1 minute", FormatUtils.customDate(Duration.ofMinutes(1)));
-        assertEquals("1 hour", FormatUtils.customDate(Duration.ofHours(1)));
-        assertEquals("1 day", FormatUtils.customDate(Duration.ofDays(1)));
-        assertEquals("1,000,000,000 days", FormatUtils.customDate(Duration.ofDays(1000000000L)));
+    public void testFormatDurationWords() {
+        assertEquals("5 days 3 hours 2 minutes", FormatUtils.formatDurationWords(Duration.ofMinutes(5 * 24 * 60 + 3 * 60 + 2)));
+        assertEquals("5 days 3 hours", FormatUtils.formatDurationWords(Duration.ofHours(5 * 24 + 3)));
+        assertEquals("3 hours 2 minutes", FormatUtils.formatDurationWords(Duration.ofMinutes(3 * 60 + 2)));
+        assertEquals("5 days 2 minutes", FormatUtils.formatDurationWords(Duration.ofMinutes(5 * 24 * 60 + 2)));
+        assertEquals("5 days", FormatUtils.formatDurationWords(Duration.ofDays(5)));
+        assertEquals("3 hours", FormatUtils.formatDurationWords(Duration.ofHours(3)));
+        assertEquals("2 minutes", FormatUtils.formatDurationWords(Duration.ofMinutes(2)));
+        assertEquals("0 minute", FormatUtils.formatDurationWords(Duration.ZERO));
+        assertEquals("1 minute", FormatUtils.formatDurationWords(Duration.ofMinutes(1)));
+        assertEquals("1 hour", FormatUtils.formatDurationWords(Duration.ofHours(1)));
+        assertEquals("1 day", FormatUtils.formatDurationWords(Duration.ofDays(1)));
+        assertEquals("1,000,000,000 days", FormatUtils.formatDurationWords(Duration.ofDays(1000000000L)));
     }
 
     @Test
-    public void testLongDuration() {
-        // TODO
-    }
-
-    @Test
-    public void testShortDuration() {
-        assertEquals("5:04:03", FormatUtils.shortDuration(5 * 60 * 60 * 1000 + 4 * 60 * 1000 + 3 * 1000));
-        assertEquals("0:00", FormatUtils.shortDuration(0));
-        assertEquals("0:01", FormatUtils.shortDuration(1000));
-        assertEquals("1:00", FormatUtils.shortDuration(60_000));
-        assertEquals("59:59", FormatUtils.shortDuration(59 * 60 * 1000 + 59 * 1000));
-        assertEquals("1:00:00", FormatUtils.shortDuration(60 * 60 * 1000));
-        assertThrows(IllegalArgumentException.class, () -> FormatUtils.shortDuration(-1000));
+    public void testFormatDuration() {
+        assertEquals("5:04:03", FormatUtils.formatDuration(5 * 60 * 60 * 1000 + 4 * 60 * 1000 + 3 * 1000));
+        assertEquals("0:00", FormatUtils.formatDuration(0));
+        assertEquals("0:01", FormatUtils.formatDuration(1000));
+        assertEquals("1:00", FormatUtils.formatDuration(60_000));
+        assertEquals("59:59", FormatUtils.formatDuration(59 * 60 * 1000 + 59 * 1000));
+        assertEquals("1:00:00", FormatUtils.formatDuration(60 * 60 * 1000));
+        assertThrows(IllegalArgumentException.class, () -> FormatUtils.formatDuration(-1000));
     }
 
     @Test

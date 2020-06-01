@@ -168,7 +168,7 @@ public class Shadbot {
                         .elapsed()
                         .doOnNext(TupleUtils.consumer((elapsed, eventType) ->
                                 DEFAULT_LOGGER.trace("{} took {} to be processed: {}",
-                                        eventType, FormatUtils.shortDuration(elapsed), event.toString())))
+                                        eventType, FormatUtils.formatDuration(elapsed), event.toString())))
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }

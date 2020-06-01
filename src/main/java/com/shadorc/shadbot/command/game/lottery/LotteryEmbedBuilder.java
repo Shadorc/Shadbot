@@ -22,7 +22,7 @@ public class LotteryEmbedBuilder {
                         .setThumbnail("https://i.imgur.com/peLGtkS.png")
                         .setDescription(String.format("The next draw will take place in **%s**%nTo " +
                                         "participate, type: `%s%s %d-%d`",
-                                FormatUtils.customDate(LotteryCmd.getDelay()),
+                                FormatUtils.formatDurationWords(LotteryCmd.getDelay()),
                                 context.getPrefix(), context.getCommandName(), Constants.MIN_NUM, Constants.MAX_NUM)));
     }
 

@@ -3,6 +3,7 @@ package com.shadorc.shadbot.core.ratelimiter;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.object.message.TemporaryMessage;
+import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.common.util.Snowflake;
@@ -10,7 +11,6 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Member;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.time.Duration;
 import java.util.Map;
@@ -66,8 +66,8 @@ public class RateLimiter {
                     final String username = author.getUsername();
                     final String message = ShadbotUtils.SPAMS.getRandomText();
                     final String maxNum = StringUtils.pluralOf(this.bandwidth.getCapacity(), "time");
-                    final String durationStr = DurationFormatUtils.formatDurationWords(
-                            this.bandwidth.getRefillPeriodNanos() / 1_000_000, true, true);
+                    final String durationStr = FormatUtils.formatDurationWords(
+                            Duration.ofNanos(this.bandwidth.getRefillPeriodNanos()));
                     return String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
                             username, message, maxNum, durationStr);
                 })

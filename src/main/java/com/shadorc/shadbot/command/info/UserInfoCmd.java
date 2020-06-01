@@ -46,11 +46,11 @@ public class UserInfoCmd extends BaseCmd {
     private Consumer<EmbedCreateSpec> getEmbed(Member member, List<Role> roles, String avatarUrl) {
         final String creationDate = String.format("%s%n(%s)",
                 TimeUtils.toLocalDate(member.getId().getTimestamp()).format(this.dateFormatter),
-                FormatUtils.longDuration(member.getId().getTimestamp()));
+                FormatUtils.formatLongDuration(member.getId().getTimestamp()));
 
         final String joinDate = String.format("%s%n(%s)",
                 TimeUtils.toLocalDate(member.getJoinTime()).format(this.dateFormatter),
-                FormatUtils.longDuration(member.getJoinTime()));
+                FormatUtils.formatLongDuration(member.getJoinTime()));
 
         final StringBuilder usernameBuilder = new StringBuilder(member.getUsername());
         if (member.isBot()) {

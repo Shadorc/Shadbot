@@ -71,7 +71,7 @@ public class LotteryCmd extends BaseCmd {
                             .flatMap(channel -> DiscordUtils.sendMessage(
                                     String.format(Emoji.TICKET + " (**%s**) You bought a lottery ticket and bet " +
                                                     "on number **%d**. Good luck ! The next draw will take place in **%s**.",
-                                            context.getUsername(), num, FormatUtils.customDate(LotteryCmd.getDelay())), channel));
+                                            context.getUsername(), num, FormatUtils.formatDurationWords(LotteryCmd.getDelay())), channel));
                 })
                 .then();
     }

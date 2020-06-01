@@ -18,7 +18,6 @@ import discord4j.common.GitProperties;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.gateway.GatewayClient;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
@@ -88,8 +87,8 @@ public class InfoCmd extends BaseCmd {
     }
 
     private String getShadbotSection(Context context, User owner) {
-        final String uptime = DurationFormatUtils.formatDuration(TimeUtils.getMillisUntil(Shadbot.getLaunchTime()),
-                "d 'day(s),' HH 'hour(s) and' mm 'minute(s)'", true);
+        final String uptime = FormatUtils.formatDurationWords(
+                Duration.ofMillis(TimeUtils.getMillisUntil(Shadbot.getLaunchTime())));
 
         return String.format("%n%n-= Shadbot =-")
                 + String.format("%nUptime: %s", uptime)

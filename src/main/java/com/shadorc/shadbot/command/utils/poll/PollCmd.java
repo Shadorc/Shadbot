@@ -9,16 +9,15 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
+import com.shadorc.shadbot.utils.StringUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Permission;
-import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +83,7 @@ public class PollCmd extends BaseCmd {
     private PollManager createPoll(Context context) {
         final List<String> args = context.requireArgs(2);
 
-        final int countMatches = StringUtils.countMatches(args.get(1), "\"");
+        final int countMatches = StringUtils.countMatches(args.get(1), '"');
         if (countMatches == 0 || countMatches % 2 != 0) {
             throw new CommandException("Question and choices must be enclosed in quotation marks.");
         }
@@ -108,7 +107,7 @@ public class PollCmd extends BaseCmd {
             }
         }
 
-        final List<String> substrings = Arrays.asList(StringUtils.substringsBetween(args.get(1), "\"", "\""));
+        final List<String> substrings = StringUtils.substringsBetween(args.get(1), "\"", "\"");
         if (substrings.size() != substrings.stream().filter(str -> !str.isBlank()).count()) {
             throw new CommandException("Question or choice cannot be blank.");
         }

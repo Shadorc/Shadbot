@@ -46,7 +46,7 @@ public class BackwardCmd extends BaseCmd {
                     final long newPosition = guildMusic.getTrackScheduler()
                             .changePosition(-TimeUnit.SECONDS.toMillis(num));
                     return String.format(Emoji.CHECK_MARK + " New position set to **%s** by **%s**.",
-                            FormatUtils.shortDuration(newPosition), context.getUsername());
+                            FormatUtils.formatDuration(newPosition), context.getUsername());
                 })
                 .flatMap(message -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(message, channel)))

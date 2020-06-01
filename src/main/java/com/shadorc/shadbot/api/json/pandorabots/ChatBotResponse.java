@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.api.json.pandorabots;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.StringUtils;
+import com.shadorc.shadbot.utils.StringUtils;
 
 public class ChatBotResponse {
 
