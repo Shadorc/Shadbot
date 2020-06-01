@@ -11,7 +11,6 @@ import com.shadorc.shadbot.db.users.UsersCollection;
 import com.shadorc.shadbot.db.users.bean.DBUserBean;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import discord4j.common.util.Snowflake;
-import org.apache.commons.lang3.NotImplementedException;
 import reactor.core.publisher.Mono;
 
 import java.util.EnumSet;
@@ -71,12 +70,12 @@ public class DBUser extends SerializableEntity<DBUserBean> implements DatabaseEn
 
     @Override
     public Mono<Void> insert() {
-        throw new NotImplementedException();
+        throw new IllegalStateException();
     }
 
     @Override
     public Mono<Void> delete() {
-        throw new NotImplementedException();
+        throw new IllegalStateException();
     }
 
     @Override
