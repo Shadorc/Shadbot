@@ -71,6 +71,7 @@ public class RussianRouletteCmd extends BaseCmd {
                     }
 
                     descBuilder.append("\n**\\*PAN\\*** ... Sorry, you died...");
+                    RUSSIAN_ROULETTE_SUMMARY.labels("loss").observe(player.getBet());
                     return Mono.just(embedConsumer.andThen(embed -> embed.setDescription(descBuilder.toString())));
                 })
                 .flatMap(embed -> context.getChannel()
