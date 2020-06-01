@@ -18,7 +18,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class TranslateCmd extends BaseCmd {
 
@@ -32,14 +31,14 @@ public class TranslateCmd extends BaseCmd {
         super(CommandCategory.UTILS, List.of("translate"));
         this.setDefaultRateLimiter();
 
-        final Map<String, String> map = Arrays.stream(Locale.getISOLanguages())
-                .collect(Collectors.toMap(
-                        iso -> new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(),
-                        iso -> iso));
+        final Map<String, String> map = new HashMap<>();
+        for (final String iso : Locale.getISOLanguages()) {
+            map.put(new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(), iso);
+        }
         map.put(AUTO, AUTO);
 
         this.langIsoMap = Collections.unmodifiableMap(map);
-        this.isoLangMap = MapUtils.inverse(map);
+        this.isoLangMap = Collections.unmodifiableMap(MapUtils.inverse(map));
     }
 
     @Override
