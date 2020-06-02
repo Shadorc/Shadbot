@@ -71,7 +71,7 @@ public class FormatUtils {
         if (minutes > 0) {
             strBuilder.append(StringUtils.pluralOf(minutes, "minute"));
         }
-        if(seconds > 0 || days == 0 && hours == 0 && minutes == 0) {
+        if (seconds > 0 || days == 0 && hours == 0 && minutes == 0) {
             strBuilder.append(StringUtils.pluralOf(seconds, "second"));
         }
 
@@ -80,13 +80,13 @@ public class FormatUtils {
 
     /**
      * @param instant The instant to format.
-     * @return The formatted instant (e.g X days, Y hours, Z seconds).
+     * @return The formatted instant (e.g Y year(s), M month(s), D day(s)).
      */
     public static String formatLongDuration(Instant instant) {
         final Period period = Period.between(TimeUtils.toLocalDate(instant).toLocalDate(), LocalDate.now());
         final String str = period.getUnits().stream()
                 .filter(unit -> period.get(unit) != 0)
-                .map(unit -> String.format("%s %s", FormatUtils.number(period.get(unit)), unit.toString().toLowerCase()))
+                .map(unit -> StringUtils.pluralOf(period.get(unit), StringUtils.removeLastLetter(unit.toString().toLowerCase())))
                 .collect(Collectors.joining(", "));
 
         if (str.isEmpty()) {

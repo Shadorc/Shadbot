@@ -10,6 +10,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class StringUtilsTest {
 
     @Test
+    public void testRemoveLastLetter() {
+        assertEquals("", StringUtils.removeLastLetter(""));
+        assertNull(StringUtils.removeLastLetter(null));
+        assertEquals("a", StringUtils.removeLastLetter("a"));
+        assertEquals("a", StringUtils.removeLastLetter("ab"));
+        assertEquals("ab", StringUtils.removeLastLetter("abc"));
+    }
+
+    @Test
     public void testCountMatches() {
         assertEquals(0, StringUtils.countMatches("foo", 'b'));
         assertEquals(1, StringUtils.countMatches("foo", 'f'));
@@ -19,11 +28,21 @@ public class StringUtilsTest {
     }
 
     @Test
+    public void testSubstringsBetween() {
+        assertEquals(List.of("o wo"), StringUtils.substringsBetween("hello world", "ll", "rl"));
+        assertEquals(Collections.emptyList(), StringUtils.substringsBetween(null, "ll", "rl"));
+        assertEquals(Collections.emptyList(), StringUtils.substringsBetween("", "ll", "rl"));
+        assertEquals(Collections.emptyList(), StringUtils.substringsBetween("null", "ll", "rl"));
+        assertEquals(Collections.emptyList(), StringUtils.substringsBetween("he\"llo", "\"", "\""));
+        assertEquals(List.of("hello"), StringUtils.substringsBetween("\"hello\"", "\"", "\""));
+    }
+
+    @Test
     public void testAbbreviate() {
-        assertNull(StringUtils.abbreviate(null, "...", 3));
-        assertThrows(IllegalArgumentException.class, () -> StringUtils.abbreviate("hi", "...", 1));
-        assertEquals("hi", StringUtils.abbreviate("hi", "...", 3));
-        assertEquals("hello...", StringUtils.abbreviate("hello world", "...", 8));
+        assertNull(StringUtils.abbreviate(null, 3));
+        assertThrows(IllegalArgumentException.class, () -> StringUtils.abbreviate("hi", 1));
+        assertEquals("hi", StringUtils.abbreviate("hi", 3));
+        assertEquals("hello...", StringUtils.abbreviate("hello world", 8));
     }
 
     @Test
@@ -72,7 +91,7 @@ public class StringUtilsTest {
 
     @Test
     public void testRemove() {
-        assertEquals("bar", StringUtils.remove("foo bar", "foo "));
+        assertEquals("bar", StringUtils.remove("foo bar", List.of("foo ")));
         assertEquals(" ", StringUtils.remove("foo bar", "foo", "bar"));
         assertEquals("foo bar", StringUtils.remove("foo bar"));
         assertEquals("foo bar", StringUtils.remove("foo bar", "*"));
@@ -115,7 +134,6 @@ public class StringUtilsTest {
         assertEquals(List.of("foo"), StringUtils.split("foo", 2, "-"));
         assertEquals(Collections.emptyList(), StringUtils.split("", 2, "-"));
         assertEquals(Collections.emptyList(), StringUtils.split(null, 2, "-"));
-        assertThrows(NullPointerException.class, () -> StringUtils.split("foo-bar", 2, null));
     }
 
     @Test
@@ -125,7 +143,6 @@ public class StringUtilsTest {
         assertEquals(List.of("foo"), StringUtils.split("foo", "-"));
         assertEquals(Collections.emptyList(), StringUtils.split("", "-"));
         assertEquals(Collections.emptyList(), StringUtils.split(null, "-"));
-        assertThrows(NullPointerException.class, () -> StringUtils.split("foo-bar", null));
     }
 
 }

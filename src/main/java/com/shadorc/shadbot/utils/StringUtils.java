@@ -17,6 +17,17 @@ public class StringUtils {
 
     /**
      * @param str The string to check.
+     * @return The string without its last letter.
+     */
+    public static String removeLastLetter(@Nullable String str) {
+        if (str == null || str.length() < 2) {
+            return str;
+        }
+        return str.substring(0, str.length() - 1);
+    }
+
+    /**
+     * @param str The string to check.
      * @param sub The char to count.
      * @return The number of occurrences.
      */
