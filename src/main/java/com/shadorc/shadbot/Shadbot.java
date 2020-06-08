@@ -1,7 +1,6 @@
 package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
-import com.shadorc.shadbot.core.retriever.DistinctFallbackEntityRetriever;
 import com.shadorc.shadbot.core.retriever.SpyRestEntityRetriever;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
@@ -16,6 +15,7 @@ import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
 import discord4j.core.retriever.EntityRetrievalStrategy;
+import discord4j.core.retriever.FallbackEntityRetriever;
 import discord4j.core.shard.MemberRequestFilter;
 import discord4j.discordjson.json.ApplicationInfoData;
 import discord4j.discordjson.json.MessageData;
@@ -108,7 +108,7 @@ public class Shadbot {
         DEFAULT_LOGGER.info("Connecting to Discord");
         client.gateway()
                 .setAwaitConnections(false)
-                .setEntityRetrievalStrategy(gateway -> new DistinctFallbackEntityRetriever(
+                .setEntityRetrievalStrategy(gateway -> new FallbackEntityRetriever(
                         EntityRetrievalStrategy.STORE.apply(gateway), new SpyRestEntityRetriever(gateway)))
                 .setEnabledIntents(IntentSet.of(
                         Intent.GUILDS,

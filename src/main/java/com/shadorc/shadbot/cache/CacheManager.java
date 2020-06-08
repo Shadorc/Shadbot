@@ -10,16 +10,10 @@ public class CacheManager {
         CacheManager.instance = new CacheManager();
     }
 
-    private final MapCache<Snowflake, String> prefixCache;
     private final MapCache<Snowflake, Snowflake> guildOwnersCache;
 
     private CacheManager() {
-        this.prefixCache = new MapCache<>();
         this.guildOwnersCache = new MapCache<>();
-    }
-
-    public MapCache<Snowflake, String> getPrefixCache() {
-        return this.prefixCache;
     }
 
     public MapCache<Snowflake, Snowflake> getGuildOwnersCache() {
