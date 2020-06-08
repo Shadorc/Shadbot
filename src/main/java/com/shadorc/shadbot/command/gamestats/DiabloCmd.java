@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.command.gamestats;
 
+import com.shadorc.shadbot.api.ServerAccessException;
 import com.shadorc.shadbot.api.json.TokenResponse;
 import com.shadorc.shadbot.api.json.gamestats.diablo.hero.HeroResponse;
 import com.shadorc.shadbot.api.json.gamestats.diablo.profile.ProfileResponse;
@@ -14,6 +15,7 @@ import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -76,7 +78,9 @@ public class DiabloCmd extends BaseCmd {
                     return Flux.fromIterable(profile.getHeroIds())
                             .map(heroId -> String.format("https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s",
                                     region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken()))
-                            .flatMap(heroUrl -> NetUtils.get(heroUrl, HeroResponse.class))
+                            .flatMap(heroUrl -> NetUtils.get(heroUrl, HeroResponse.class)
+                                    .onErrorResume(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR),
+                                            err -> Mono.empty()))
                             .filter(hero -> hero.getCode().isEmpty())
                             // Sort heroes by ascending damage
                             .sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()))
