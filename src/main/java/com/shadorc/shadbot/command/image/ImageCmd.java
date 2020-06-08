@@ -70,14 +70,14 @@ public class ImageCmd extends BaseCmd {
 
     private Mono<Image> getPopularImage(String encodedSearch) {
         return this.requestAccessToken()
-                .then(Mono.defer(() -> Mono.just(String.format("%s?"
+                .then(Mono.fromCallable(() -> String.format("%s?"
                                 + "q=%s"
                                 + "&timerange=alltime"
                                 + "&limit=25" // The pagination limit (min: 1 max: 50)
                                 + "&offset=%d" // The pagination offset (min: 0 max: 50000)
                                 + "&access_token=%s",
                         BROWSE_POPULAR_URL, encodedSearch, ThreadLocalRandom.current().nextInt(150),
-                        this.token.getAccessToken()))))
+                        this.token.getAccessToken())))
                 .flatMap(url -> NetUtils.get(url, DeviantArtResponse.class))
                 .flatMapIterable(DeviantArtResponse::getResults)
                 .filter(image -> image.getContent().isPresent())

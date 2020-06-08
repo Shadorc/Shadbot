@@ -63,8 +63,8 @@ public class DiabloCmd extends BaseCmd {
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Diablo III stats...", context.getUsername()))
                 .send()
                 .then(this.requestAccessToken())
-                .then(Mono.defer(() -> Mono.just(String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
-                        region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken()))))
+                .then(Mono.fromCallable(() -> String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
+                        region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken())))
                 .flatMap(url -> NetUtils.get(url, ProfileResponse.class))
                 .flatMap(profile -> {
                     if (profile.getCode().map("NOTFOUND"::equals).orElse(false)) {

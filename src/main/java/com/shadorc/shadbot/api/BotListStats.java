@@ -92,7 +92,6 @@ public class BotListStats {
                     if (err instanceof TimeoutException) {
                         return Mono.fromRunnable(() ->
                                 LOGGER.warn("A timeout occurred while posting statistics on {}", url));
-
                     }
                     return Mono.fromRunnable(() ->
                             LOGGER.warn("An error occurred while posting statistics on {}: {}", url, err.getMessage()));
