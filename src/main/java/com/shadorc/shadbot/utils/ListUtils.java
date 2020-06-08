@@ -7,8 +7,8 @@ public class ListUtils {
 
     private static class Partition<T> extends AbstractList<List<T>> {
 
-        final List<T> list;
-        final int size;
+        private final List<T> list;
+        private final int size;
 
         private Partition(List<T> list, int size) {
             if (size <= 0) {
