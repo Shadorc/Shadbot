@@ -33,6 +33,8 @@ public class FormatUtilsTest {
 
     @Test
     public void testFormatDurationWords() {
+        assertEquals("5 days 3 hours 2 minutes 1 second", FormatUtils.formatDurationWords(
+                Duration.ofSeconds(5 * 24 * 60 * 60 + 3 * 60 * 60 + 2 * 60 + 1)));
         assertEquals("5 days 3 hours 2 minutes", FormatUtils.formatDurationWords(Duration.ofMinutes(5 * 24 * 60 + 3 * 60 + 2)));
         assertEquals("5 days 3 hours", FormatUtils.formatDurationWords(Duration.ofHours(5 * 24 + 3)));
         assertEquals("3 hours 2 minutes", FormatUtils.formatDurationWords(Duration.ofMinutes(3 * 60 + 2)));
@@ -40,6 +42,7 @@ public class FormatUtilsTest {
         assertEquals("5 days", FormatUtils.formatDurationWords(Duration.ofDays(5)));
         assertEquals("3 hours", FormatUtils.formatDurationWords(Duration.ofHours(3)));
         assertEquals("2 minutes", FormatUtils.formatDurationWords(Duration.ofMinutes(2)));
+        assertEquals("2 seconds", FormatUtils.formatDurationWords(Duration.ofSeconds(2)));
         assertEquals("0 second", FormatUtils.formatDurationWords(Duration.ZERO));
         assertEquals("1 minute", FormatUtils.formatDurationWords(Duration.ofMinutes(1)));
         assertEquals("1 hour", FormatUtils.formatDurationWords(Duration.ofHours(1)));

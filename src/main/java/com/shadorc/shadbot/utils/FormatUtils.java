@@ -69,7 +69,7 @@ public class FormatUtils {
             strBuilder.append(String.format("%s ", StringUtils.pluralOf(hours, "hour")));
         }
         if (minutes > 0) {
-            strBuilder.append(StringUtils.pluralOf(minutes, "minute"));
+            strBuilder.append(String.format("%s ", StringUtils.pluralOf(minutes, "minute")));
         }
         if (seconds > 0 || days == 0 && hours == 0 && minutes == 0) {
             strBuilder.append(StringUtils.pluralOf(seconds, "second"));
