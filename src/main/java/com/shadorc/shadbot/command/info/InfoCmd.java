@@ -2,7 +2,7 @@ package com.shadorc.shadbot.command.info;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 import com.shadorc.shadbot.Shadbot;
-import com.shadorc.shadbot.cache.GuildOwnersCache;
+import com.shadorc.shadbot.cache.CacheManager;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -94,7 +94,7 @@ public class InfoCmd extends BaseCmd {
                 + String.format("%nUptime: %s", uptime)
                 + String.format("%nDeveloper: %s", owner.getTag())
                 + String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
-                + String.format("%nServers: %s", FormatUtils.number(GuildOwnersCache.count()))
+                + String.format("%nServers: %s", FormatUtils.number(CacheManager.getInstance().getGuildOwnersCache().count()))
                 + String.format("%nVoice Channels: %s", FormatUtils.number(VoiceStateUpdateListener.VOICE_COUNT_GAUGE.get()));
     }
 

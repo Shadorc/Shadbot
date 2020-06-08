@@ -1,7 +1,7 @@
 package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
-import com.shadorc.shadbot.cache.GuildOwnersCache;
+import com.shadorc.shadbot.cache.CacheManager;
 import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
@@ -89,7 +89,7 @@ public class TaskManager {
                     threadCountGauge.set(Thread.activeCount());
                     gcCountGauge.set(ProcessUtils.getGCCount());
                     gcTimeGauge.set(ProcessUtils.getGCTime());
-                    guildCountGauge.set(GuildOwnersCache.count());
+                    guildCountGauge.set(CacheManager.getInstance().getGuildOwnersCache().count());
                 })
                 .flatMap(ignored -> getResponseTimes)
                 .doOnNext(responseTimeMap -> responseTimeMap
