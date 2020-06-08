@@ -19,6 +19,7 @@ public class EnumUtilsTest {
     public void testParseEnum() {
         assertEquals(FakeEnum.VALUE_1, EnumUtils.parseEnum(FakeEnum.class, "VALUE_1"));
         assertEquals(FakeEnum.VALUE_1, EnumUtils.parseEnum(FakeEnum.class, "value_1"));
+        assertEquals(FakeEnum.VALUE_1, EnumUtils.parseEnum(FakeEnum.class, "vAluE_1"));
         assertNull(EnumUtils.parseEnum(FakeEnum.class, null));
         assertNull(EnumUtils.parseEnum(FakeEnum.class, "alue_1"));
     }
@@ -28,8 +29,9 @@ public class EnumUtilsTest {
         final RuntimeException err = new RuntimeException("Enum not found.");
         assertEquals(FakeEnum.VALUE_1, EnumUtils.parseEnum(FakeEnum.class, "VALUE_1", err));
         assertEquals(FakeEnum.VALUE_1, EnumUtils.parseEnum(FakeEnum.class, "value_1", err));
-        assertThrows(Exception.class, () -> EnumUtils.parseEnum(FakeEnum.class, null, err));
-        assertThrows(Exception.class, () -> EnumUtils.parseEnum(FakeEnum.class, "alue_1", err));
+        assertEquals(FakeEnum.VALUE_1, EnumUtils.parseEnum(FakeEnum.class, "vAluE_1", err));
+        assertThrows(err.getClass(), () -> EnumUtils.parseEnum(FakeEnum.class, null, err));
+        assertThrows(err.getClass(), () -> EnumUtils.parseEnum(FakeEnum.class, "alue_1", err));
     }
 
 }

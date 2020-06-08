@@ -17,6 +17,7 @@ public class FormatUtilsTest {
         assertEquals("-1 coin", FormatUtils.coins(-1));
         assertEquals("150,000 coins", FormatUtils.coins(150000));
         assertEquals("-150,000 coins", FormatUtils.coins(-150000));
+        assertEquals("9,223,372,036,854,775,807 coins", FormatUtils.coins(Long.MAX_VALUE));
     }
 
     private enum TestEnum {
@@ -39,6 +40,7 @@ public class FormatUtilsTest {
         assertEquals("5 days 3 hours", FormatUtils.formatDurationWords(Duration.ofHours(5 * 24 + 3)));
         assertEquals("3 hours 2 minutes", FormatUtils.formatDurationWords(Duration.ofMinutes(3 * 60 + 2)));
         assertEquals("5 days 2 minutes", FormatUtils.formatDurationWords(Duration.ofMinutes(5 * 24 * 60 + 2)));
+        assertEquals("5 days 1 second", FormatUtils.formatDurationWords(Duration.ofSeconds(5 * 24 * 60 * 60 + 1)));
         assertEquals("5 days", FormatUtils.formatDurationWords(Duration.ofDays(5)));
         assertEquals("3 hours", FormatUtils.formatDurationWords(Duration.ofHours(3)));
         assertEquals("2 minutes", FormatUtils.formatDurationWords(Duration.ofMinutes(2)));
@@ -58,6 +60,7 @@ public class FormatUtilsTest {
         final int day = 24 * hour;
         final int month = 31 * day;
         final int year = 12 * month;
+        assertEquals("0:01", FormatUtils.formatLongDuration(Instant.now().minusSeconds(second)));
         assertEquals("1:00:00", FormatUtils.formatLongDuration(Instant.now().minusSeconds(hour)));
         assertEquals("1:01:15", FormatUtils.formatLongDuration(Instant.now().minusSeconds(hour + minute + 15 * second)));
         assertEquals("1 day", FormatUtils.formatLongDuration(Instant.now().minusSeconds(day)));
