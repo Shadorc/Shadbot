@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.shadorc.shadbot.api.HeaderException;
+import com.shadorc.shadbot.api.ServerAccessException;
 import com.shadorc.shadbot.data.Config;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
@@ -21,7 +23,6 @@ import reactor.netty.http.client.HttpClient.RequestSender;
 import reactor.netty.http.client.HttpClientResponse;
 import reactor.util.annotation.Nullable;
 
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
@@ -73,14 +74,12 @@ public class NetUtils {
         if (statusCode / 100 != 2 && statusCode != 404) {
             return body.asString()
                     .defaultIfEmpty("Empty body")
-                    .flatMap(err -> Mono.error(new IOException(String.format("%s %s failed (%d) %s",
-                            resp.method().asciiName(), resp.uri(), statusCode, err))));
+                    .flatMap(err -> Mono.error(new ServerAccessException(resp, err)));
         }
         if (!resp.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE).startsWith(HttpHeaderValues.APPLICATION_JSON.toString())) {
             return body.asString()
                     .defaultIfEmpty("Empty body")
-                    .flatMap(err -> Mono.error(new IOException(String.format("%s %s wrong header (%s) %s",
-                            resp.method().asciiName(), resp.uri(), resp.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE), err))));
+                    .flatMap(err -> Mono.error(new HeaderException(resp, err)));
         }
 
         return body.asInputStream()
