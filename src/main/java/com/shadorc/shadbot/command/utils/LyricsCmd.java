@@ -2,6 +2,7 @@ package com.shadorc.shadbot.command.utils;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import com.shadorc.shadbot.api.ServerAccessException;
 import com.shadorc.shadbot.api.html.musixmatch.Musixmatch;
 import com.shadorc.shadbot.command.MissingArgumentException;
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -17,12 +18,11 @@ import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.netty.handler.codec.http.HttpMethod;
-import org.apache.http.HttpStatus;
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.select.Elements;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 import reactor.util.function.Tuples;
@@ -112,14 +112,14 @@ public class LyricsCmd extends BaseCmd {
                     if (url.endsWith(res.uri())) {
                         return Mono.just(Jsoup.parse(body));
                     }
-                    return Mono.error(new IOException("Musixmatch redirected to wrong page."));
+                    return Mono.error(new ServerAccessException(res, body));
                 }))
                 .retryWhen(Retry.max(MAX_RETRY)
-                        .filter(err -> "Musixmatch redirected to wrong page.".equals(err.getMessage())))
-                .onErrorMap(IOException.class, err -> {
-                    DEFAULT_LOGGER.warn("[{}] Too many retries, abort attempt to reload page", this.getClass().getSimpleName());
-                    return new HttpStatusException("Musixmatch does not redirect to the correct page.",
-                            HttpStatus.SC_SERVICE_UNAVAILABLE, url);
+                        .filter(ServerAccessException.class::isInstance))
+                .onErrorMap(Exceptions::isRetryExhausted, err -> {
+                    DEFAULT_LOGGER.warn("[{}] Retry exhausted, abort attempt to reload page: {}",
+                            this.getClass().getSimpleName(), url);
+                    return new IOException(String.format("Musixmatch does not redirect to the correct page: %s", url));
                 });
     }
 
