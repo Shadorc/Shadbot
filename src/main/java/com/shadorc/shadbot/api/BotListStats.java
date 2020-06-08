@@ -25,11 +25,19 @@ import reactor.util.Loggers;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 
 public class BotListStats {
 
     private static final Logger LOGGER = Loggers.getLogger("shadbot.BotListStats");
+
+    private static final String BOTLIST_DOT_SPACE = "https://botlist.space";
+    private static final String BOTS_ONDISCORD_DOT_XYZ = "https://bots.ondiscord.xyz";
+    private static final String WONDERBOTLIST_DOT_COM = "https://wonderbotlist.com";
+    private static final String DISCORDBOTLIST_DOT_COM = "https://discordbotlist.com";
+    private static final String DISCORD_BOTS_DOT_GG = "https://discord.bots.gg";
+    private static final String TOP_DOT_GG = "https://top.gg";
 
     private final GatewayDiscordClient gateway;
     private final AtomicReference<DisposableServer> webhookServer;
@@ -77,51 +85,47 @@ public class BotListStats {
                 .flatMap(guildCount -> this.postOnBotlistDotSpace(guildCount)
                         .and(this.postOnBotsOndiscordDotXyz(guildCount))
                         .and(this.postOnDiscordbotlistDotCom(shardCount, guildCount))
+                        .and(this.postOnWonderbotlistDotCom(shardCount, guildCount))
                         .and(this.postOnDiscordBotsDotGg(shardCount, guildCount))
-                        .and(this.postOnTopDotGg(shardCount, guildCount))
-                        .and(this.postOnWonderbotlistDotCom(shardCount, guildCount)))
+                        .and(this.postOnTopDotGg(shardCount, guildCount)))
                 .doOnSuccess(ignored -> LOGGER.info("Statistics posted"));
     }
 
-    private Mono<String> post(String url, String authorization, JSONObject content) {
-        final Consumer<HttpHeaders> headersConsumer =
-                header -> header.add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-                        .add(HttpHeaderNames.AUTHORIZATION, authorization);
-        return NetUtils.post(headersConsumer, url, content.toString())
-                .onErrorResume(err -> {
-                    if (err instanceof TimeoutException) {
-                        return Mono.fromRunnable(() ->
-                                LOGGER.warn("A timeout occurred while posting statistics on {}", url));
-                    }
-                    return Mono.fromRunnable(() ->
-                            LOGGER.warn("An error occurred while posting statistics on {}: {}", url, err.getMessage()));
-                });
-    }
-
     /**
-     * WebSite: https://botlist.space/bots <br>
      * Documentation: https://docs.botlist.space/bl-docs/bots
      */
     private Mono<String> postOnBotlistDotSpace(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
         final String url = String.format("https://api.botlist.space/v1/bots/%d", this.gateway.getSelfId().asLong());
-        return this.post(url, CredentialManager.getInstance().get(Credential.BOTLIST_DOT_SPACE_TOKEN), content);
+        return BotListStats.post(url, CredentialManager.getInstance().get(Credential.BOTLIST_DOT_SPACE_TOKEN), content)
+                .onErrorResume(BotListStats.handleError(BOTLIST_DOT_SPACE));
     }
 
     /**
-     * WebSite: https://bots.ondiscord.xyz/ <br>
      * Documentation: https://bots.ondiscord.xyz/info/api
      */
     private Mono<String> postOnBotsOndiscordDotXyz(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("guildCount", guildCount);
         final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", this.gateway.getSelfId().asLong());
-        return this.post(url, CredentialManager.getInstance().get(Credential.BOTS_ONDISCORD_DOT_XYZ_TOKEN), content);
+        return BotListStats.post(url, CredentialManager.getInstance().get(Credential.BOTS_ONDISCORD_DOT_XYZ_TOKEN), content)
+                .onErrorResume(BotListStats.handleError(BOTS_ONDISCORD_DOT_XYZ));
     }
 
     /**
-     * WebSite: https://discordbotlist.com/ <br>
+     * Documentation: https://api.wonderbotlist.com/fr/#bots
+     */
+    private Mono<String> postOnWonderbotlistDotCom(int shardCount, long guildCount) {
+        final JSONObject content = new JSONObject()
+                .put("serveurs", guildCount)
+                .put("shards", shardCount);
+        final String url = String.format("https://api.wonderbotlist.com/v1/bot/%d", this.gateway.getSelfId().asLong());
+        return BotListStats.post(url, CredentialManager.getInstance().get(Credential.WONDERBOTLIST_DOT_COM_TOKEN), content)
+                .onErrorResume(BotListStats.handleError(WONDERBOTLIST_DOT_COM));
+    }
+
+    /**
      * Documentation: https://discordbotlist.com/api-docs
      */
     private Flux<String> postOnDiscordbotlistDotCom(int shardCount, long guildCount) {
@@ -132,13 +136,13 @@ public class BotListStats {
                             .put("guilds ", guildCount / shardCount);
                     final String url = String.format("https://discordbotlist.com/api/bots/%d/stats",
                             this.gateway.getSelfId().asLong());
-                    return this.post(url, String.format("Bot %s",
+                    return BotListStats.post(url, String.format("Bot %s",
                             CredentialManager.getInstance().get(Credential.DISCORDBOTLIST_DOT_COM_TOKEN)), content);
-                });
+                })
+                .onErrorResume(BotListStats.handleError(DISCORDBOTLIST_DOT_COM));
     }
 
     /**
-     * WebSite: https://discord.bots.gg/ <br>
      * Documentation: https://discord.bots.gg/docs/endpoints
      */
     private Flux<String> postOnDiscordBotsDotGg(int shardCount, long guildCount) {
@@ -149,12 +153,12 @@ public class BotListStats {
                             .put("shardCount", shardCount)
                             .put("guildCount", guildCount / shardCount);
                     final String url = String.format("https://discord.bots.gg/api/v1/bots/%d/stats", this.gateway.getSelfId().asLong());
-                    return this.post(url, CredentialManager.getInstance().get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
-                });
+                    return BotListStats.post(url, CredentialManager.getInstance().get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
+                })
+                .onErrorResume(BotListStats.handleError(DISCORD_BOTS_DOT_GG));
     }
 
     /**
-     * WebSite: https://top.gg/ <br>
      * Documentation: https://top.gg/api/docs#bots
      */
     private Flux<String> postOnTopDotGg(int shardCount, long guildCount) {
@@ -165,26 +169,33 @@ public class BotListStats {
                             .put("shard_count", shardCount)
                             .put("server_count", guildCount / shardCount);
                     final String url = String.format("https://top.gg/api/bots/%d/stats", this.gateway.getSelfId().asLong());
-                    return this.post(url, CredentialManager.getInstance().get(Credential.TOP_DOT_GG_TOKEN), content);
-                });
-    }
-
-    /**
-     * WebSite: https://wonderbotlist.com <br>
-     * Documentation: https://api.wonderbotlist.com/fr/#bots
-     */
-    private Mono<String> postOnWonderbotlistDotCom(int shardCount, long guildCount) {
-        final JSONObject content = new JSONObject()
-                .put("serveurs", guildCount)
-                .put("shards", shardCount);
-        final String url = String.format("https://api.wonderbotlist.com/v1/bot/%d", this.gateway.getSelfId().asLong());
-        return this.post(url, CredentialManager.getInstance().get(Credential.WONDERBOTLIST_DOT_COM_TOKEN), content);
+                    return BotListStats.post(url, CredentialManager.getInstance().get(Credential.TOP_DOT_GG_TOKEN), content);
+                })
+                .onErrorResume(BotListStats.handleError(TOP_DOT_GG));
     }
 
     public void stop() {
         if (this.webhookServer.get() != null) {
             this.webhookServer.get().disposeNow();
         }
+    }
+
+    private static Mono<String> post(String url, String authorization, JSONObject content) {
+        final Consumer<HttpHeaders> headersConsumer =
+                header -> header.add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+                        .add(HttpHeaderNames.AUTHORIZATION, authorization);
+        return NetUtils.post(headersConsumer, url, content.toString());
+    }
+
+    private static <T> Function<? super Throwable, ? extends Mono<? extends T>> handleError(String url) {
+        return err -> {
+            if (err instanceof TimeoutException) {
+                return Mono.fromRunnable(() ->
+                        LOGGER.warn("A timeout occurred while posting statistics on {}", url));
+            }
+            return Mono.fromRunnable(() ->
+                    LOGGER.warn("An error occurred while posting statistics on {}: {}", url, err.getMessage()));
+        };
     }
 
 }
