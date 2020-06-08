@@ -2,8 +2,6 @@
 <!DOCTYPE xml>
 <configuration scan="true">
 
-    <logger name="shadbot.music.VoiceStateUpdateListener" level="DEBUG"/>
-
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} %level [%thread/%logger]: %msg%n</pattern>
