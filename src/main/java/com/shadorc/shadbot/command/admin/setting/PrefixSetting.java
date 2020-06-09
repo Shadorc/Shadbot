@@ -51,7 +51,7 @@ public class PrefixSetting extends BaseSetting {
 
         return DatabaseManager.getGuilds()
                 .getDBGuild(context.getGuildId())
-                .flatMap(dbGuild -> dbGuild.setSetting(this.getSetting(), args.get(1)))
+                .flatMap(dbGuild -> dbGuild.updateSetting(this.getSetting(), args.get(1)))
                 .then(context.getChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " Prefix set to `%s`",
                         args.get(1)), channel))

@@ -129,8 +129,8 @@ public class AllowedChannelsSetting extends BaseSetting {
                         }
                     }
 
-                    return dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds)
-                            .then(dbGuild.setSetting(Setting.ALLOWED_VOICE_CHANNELS, allowedVoiceChannelIds))
+                    return dbGuild.updateSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds)
+                            .then(dbGuild.updateSetting(Setting.ALLOWED_VOICE_CHANNELS, allowedVoiceChannelIds))
                             .thenReturn(strBuilder);
                 }))
                 .map(StringBuilder::toString)

@@ -95,7 +95,7 @@ public class IamCmd extends BaseCmd {
                                                 .map(Iam::getBean)
                                                 .collect(Collectors.toList()));
 
-                                        return dbGuild.setSetting(Setting.IAM_MESSAGES, iamList);
+                                        return dbGuild.updateSetting(Setting.IAM_MESSAGES, iamList);
                                     }));
                         }))
                 .then();

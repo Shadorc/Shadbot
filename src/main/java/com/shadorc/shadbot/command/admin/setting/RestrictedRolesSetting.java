@@ -134,7 +134,7 @@ public class RestrictedRolesSetting extends BaseSetting {
                                             .map(BaseCmd::getName)
                                             .collect(Collectors.toSet())));
 
-                    return dbGuild.setSetting(Setting.RESTRICTED_ROLES, setting)
+                    return dbGuild.updateSetting(Setting.RESTRICTED_ROLES, setting)
                             .and(context.getChannel()
                                     .flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " " + strBuilder, channel)));
                 }))

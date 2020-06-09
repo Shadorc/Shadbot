@@ -134,7 +134,7 @@ public class RestrictedChannelsSetting extends BaseSetting {
                                             .map(BaseCmd::getName)
                                             .collect(Collectors.toSet())));
 
-                    return dbGuild.setSetting(Setting.RESTRICTED_CHANNELS, setting)
+                    return dbGuild.updateSetting(Setting.RESTRICTED_CHANNELS, setting)
                             .and(context.getChannel()
                                     .flatMap(channel -> DiscordUtils.sendMessage(Emoji.CHECK_MARK + " " + strBuilder, channel)));
                 }))

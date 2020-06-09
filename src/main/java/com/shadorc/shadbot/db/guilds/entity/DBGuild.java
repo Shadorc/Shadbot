@@ -54,7 +54,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
     /**
      * {@code value} must be serializable or serialized.
      */
-    public <T> Mono<UpdateResult> setSetting(Setting setting, T value) {
+    public <T> Mono<UpdateResult> updateSetting(Setting setting, T value) {
         LOGGER.debug("[DBGuild {}] Setting update: {}={}", this.getId().asLong(), setting, value);
 
         return Mono.from(DatabaseManager.getGuilds()
@@ -90,8 +90,8 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                 .insertOne(this.toDocument()))
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Insertion result: {}",
                         this.getId().asLong(), result))
-                .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc())
+                .then();
     }
 
     @Override
@@ -102,8 +102,8 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                 .getCollection()
                 .deleteOne(Filters.eq("_id", this.getId().asString())))
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Deletion result: {}", this.getId().asLong(), result))
-                .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc())
+                .then();
     }
 
     @Override

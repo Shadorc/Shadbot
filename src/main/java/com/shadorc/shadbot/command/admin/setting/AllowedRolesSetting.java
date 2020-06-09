@@ -90,7 +90,7 @@ public class AllowedRolesSetting extends BaseSetting {
                         }
                     }
 
-                    return dbGuild.setSetting(this.getSetting(), allowedRoles)
+                    return dbGuild.updateSetting(this.getSetting(), allowedRoles)
                             .thenReturn(strBuilder);
                 }))
                 .map(StringBuilder::toString)

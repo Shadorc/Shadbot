@@ -24,7 +24,7 @@ public class TextChannelDeleteListener implements EventListener<TextChannelDelet
                     // If the channel was an allowed channel...
                     if (allowedTextChannelIds.remove(event.getChannel().getId())) {
                         // ...update settings to remove the deleted one
-                        return dbGuild.setSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds);
+                        return dbGuild.updateSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds);
                     }
                     return Mono.empty();
                 })

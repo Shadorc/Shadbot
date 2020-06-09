@@ -51,7 +51,7 @@ public class VolumeSetting extends BaseSetting {
 
         return DatabaseManager.getGuilds()
                 .getDBGuild(context.getGuildId())
-                .flatMap(dbGuild -> dbGuild.setSetting(this.getSetting(), volume))
+                .flatMap(dbGuild -> dbGuild.updateSetting(this.getSetting(), volume))
                 .then(context.getChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         String.format(Emoji.CHECK_MARK + " Default volume set to **%d%%**", volume), channel))

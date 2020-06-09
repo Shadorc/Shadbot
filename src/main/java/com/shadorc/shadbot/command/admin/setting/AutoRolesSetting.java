@@ -87,7 +87,7 @@ public class AutoRolesSetting extends BaseSetting {
                                 FormatUtils.format(mentionedRoles, role -> String.format("`@%s`", role.getName()), ", ")));
                     }
 
-                    return dbGuild.setSetting(this.getSetting(), autoRoleIds)
+                    return dbGuild.updateSetting(this.getSetting(), autoRoleIds)
                             .thenReturn(strBuilder.toString());
                 }))
                 .flatMap(text -> context.getChannel()

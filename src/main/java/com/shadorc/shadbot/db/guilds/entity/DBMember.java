@@ -121,8 +121,8 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Insertion result: {}",
                         this.getId().asLong(), this.getGuildId().asLong(), result))
-                .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc())
+                .then();
     }
 
     @Override
@@ -135,8 +135,8 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                         Updates.pull("members", Filters.eq("_id", this.getId().asString()))))
                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Deletion result: {}",
                         this.getId().asLong(), this.getGuildId().asLong(), result))
-                .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc())
+                .then();
     }
 
     @Override

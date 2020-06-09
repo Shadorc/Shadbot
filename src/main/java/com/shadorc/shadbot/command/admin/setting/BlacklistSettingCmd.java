@@ -117,7 +117,7 @@ public class BlacklistSettingCmd extends BaseSetting {
                         actionVerbose = "removed";
                     }
 
-                    return dbGuild.setSetting(this.getSetting(), blacklist)
+                    return dbGuild.updateSetting(this.getSetting(), blacklist)
                             .then(context.getChannel())
                             .flatMap(channel -> DiscordUtils.sendMessage(
                                     String.format(Emoji.CHECK_MARK + " Category %s %s to the blacklist.",
@@ -160,7 +160,7 @@ public class BlacklistSettingCmd extends BaseSetting {
                         actionVerbose = "removed";
                     }
 
-                    return dbGuild.setSetting(this.getSetting(), blacklist)
+                    return dbGuild.updateSetting(this.getSetting(), blacklist)
                             .then(context.getChannel())
                             .flatMap(channel -> DiscordUtils.sendMessage(
                                     String.format(Emoji.CHECK_MARK + " Command(s) %s %s to the blacklist.",

@@ -107,7 +107,7 @@ public class AutoMessagesSetting extends BaseSetting {
                     }
 
                     final Channel channel = mentionedChannels.get(0);
-                    return dbGuild.setSetting(Setting.MESSAGE_CHANNEL_ID, channel.getId().asLong())
+                    return dbGuild.updateSetting(Setting.MESSAGE_CHANNEL_ID, channel.getId().asLong())
                             .thenReturn(String.format(Emoji.CHECK_MARK + " %s is now the default channel for " +
                                     "join/leave messages.", channel.getMention()));
                 })
@@ -124,7 +124,7 @@ public class AutoMessagesSetting extends BaseSetting {
                         }
 
                         final String message = args.get(3);
-                        return dbGuild.setSetting(setting, message)
+                        return dbGuild.updateSetting(setting, message)
                                 .then(Mono.fromCallable(() -> {
                                     if (dbGuild.getSettings().getMessageChannelId().isEmpty()) {
                                         strBuilder.append(String.format(Emoji.WARNING + " You need to specify a channel "
