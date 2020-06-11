@@ -39,7 +39,7 @@
     <br>2. Fork the Shadbot repository: https://github.com/Shadorc/Shadbot/fork
     <br>3. Clone your forked repository, ie. <code>git clone http://github.com/&lt;YOUR-USERNAME&gt;/shadbot.git</code>
     <br>4. Read this: https://github.com/Shadorc/Shadbot/wiki/Build-&-Configure
-    <br>5. Run <code>mvn build</code>.
+    <br>5. Run <code><a href="https://maven.apache.org/">mvn</a> package</code>.
     <br>6. Locate the <code>shadbot-&lt;VERSION&gt;.jar</code>.  
     <br>7. Open command prompt and run <code>java -jar shadbot-&lt;VERSION&gt;.jar</code>.
     <br>8. You're done!
