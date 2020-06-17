@@ -4,7 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,19 +53,15 @@ public class FormatUtilsTest {
 
     @Test
     public void formatLongDuration() {
-        final int second = 1;
-        final int minute = 60 * second;
-        final int hour = 60 * minute;
-        final int day = 24 * hour;
-        final int month = 31 * day;
-        final int year = 12 * month;
-        assertEquals("0:01", FormatUtils.formatLongDuration(Instant.now().minusSeconds(second)));
-        assertEquals("1:00:00", FormatUtils.formatLongDuration(Instant.now().minusSeconds(hour)));
-        assertEquals("1:01:15", FormatUtils.formatLongDuration(Instant.now().minusSeconds(hour + minute + 15 * second)));
-        assertEquals("1 day", FormatUtils.formatLongDuration(Instant.now().minusSeconds(day)));
-        assertEquals("1 month", FormatUtils.formatLongDuration(Instant.now().minusSeconds(month)));
-        assertEquals("1 month, 7 days", FormatUtils.formatLongDuration(Instant.now().minusSeconds(month + 6 * day)));
-        assertEquals("2 years, 1 month, 20 days", FormatUtils.formatLongDuration(Instant.now().minusSeconds(2 * year + month + 6 * day)));
+        assertEquals("0:01", FormatUtils.formatLongDuration(LocalDateTime.now().minusSeconds(1)));
+        assertEquals("1:00:00", FormatUtils.formatLongDuration(LocalDateTime.now().minusHours(1)));
+        assertEquals("1:01:15",
+                FormatUtils.formatLongDuration(LocalDateTime.now().minusHours(1).minusMinutes(1).minusSeconds(15)));
+        assertEquals("1 day", FormatUtils.formatLongDuration(LocalDateTime.now().minusDays(1)));
+        assertEquals("1 month", FormatUtils.formatLongDuration(LocalDateTime.now().minusMonths(1)));
+        assertEquals("1 month, 7 days", FormatUtils.formatLongDuration(LocalDateTime.now().minusMonths(1).minusDays(7)));
+        assertEquals("2 years, 1 month, 20 days",
+                FormatUtils.formatLongDuration(LocalDateTime.now().minusYears(2).minusMonths(1).minusDays(20)));
     }
 
     @Test

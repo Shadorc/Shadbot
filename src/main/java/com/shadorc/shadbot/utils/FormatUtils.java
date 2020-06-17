@@ -7,8 +7,8 @@ import reactor.util.annotation.Nullable;
 
 import java.text.NumberFormat;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.Arrays;
 import java.util.Collection;
@@ -79,18 +79,18 @@ public class FormatUtils {
     }
 
     /**
-     * @param instant The instant to format.
+     * @param date The {@link LocalDateTime} to format.
      * @return The formatted instant (e.g Y year(s), M month(s), D day(s)).
      */
-    public static String formatLongDuration(Instant instant) {
-        final Period period = Period.between(TimeUtils.toLocalDate(instant).toLocalDate(), LocalDate.now());
+    public static String formatLongDuration(LocalDateTime date) {
+        final Period period = Period.between(date.toLocalDate(), LocalDate.now());
         final String str = period.getUnits().stream()
                 .filter(unit -> period.get(unit) != 0)
                 .map(unit -> StringUtils.pluralOf(period.get(unit), StringUtils.removeLastLetter(unit.toString().toLowerCase())))
                 .collect(Collectors.joining(", "));
 
         if (str.isEmpty()) {
-            return FormatUtils.formatDuration(Instant.now().toEpochMilli() - instant.toEpochMilli());
+            return FormatUtils.formatDuration(Duration.between(date, LocalDateTime.now()));
         }
 
         return str;

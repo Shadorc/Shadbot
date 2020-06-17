@@ -14,6 +14,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -44,13 +45,13 @@ public class UserInfoCmd extends BaseCmd {
     }
 
     private Consumer<EmbedCreateSpec> getEmbed(Member member, List<Role> roles, String avatarUrl) {
+        final LocalDateTime createTime = TimeUtils.toLocalDateTime(member.getId().getTimestamp());
         final String creationDate = String.format("%s%n(%s)",
-                TimeUtils.toLocalDate(member.getId().getTimestamp()).format(this.dateFormatter),
-                FormatUtils.formatLongDuration(member.getId().getTimestamp()));
+                createTime.format(this.dateFormatter), FormatUtils.formatLongDuration(createTime));
 
+        final LocalDateTime joinTime = TimeUtils.toLocalDateTime(member.getJoinTime());
         final String joinDate = String.format("%s%n(%s)",
-                TimeUtils.toLocalDate(member.getJoinTime()).format(this.dateFormatter),
-                FormatUtils.formatLongDuration(member.getJoinTime()));
+                joinTime.format(this.dateFormatter), FormatUtils.formatLongDuration(joinTime));
 
         final StringBuilder usernameBuilder = new StringBuilder(member.getUsername());
         if (member.isBot()) {

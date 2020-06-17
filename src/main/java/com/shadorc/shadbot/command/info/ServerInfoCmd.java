@@ -19,6 +19,7 @@ import discord4j.rest.util.Image.Format;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -50,9 +51,9 @@ public class ServerInfoCmd extends BaseCmd {
     }
 
     private Consumer<EmbedCreateSpec> getEmbed(Guild guild, List<GuildChannel> channels, Member owner, Region region, String avatarUrl) {
+        final LocalDateTime creationTime = TimeUtils.toLocalDateTime(guild.getId().getTimestamp());
         final String creationDate = String.format("%s%n(%s)",
-                TimeUtils.toLocalDate(guild.getId().getTimestamp()).format(this.dateFormatter),
-                FormatUtils.formatLongDuration(guild.getId().getTimestamp()));
+                creationTime.format(this.dateFormatter), FormatUtils.formatLongDuration(creationTime));
         final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
         final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
 
