@@ -26,6 +26,7 @@ import reactor.util.annotation.Nullable;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 public class NetUtils {
 
@@ -38,6 +39,18 @@ public class NetUtils {
 
     private static final HttpClient HTTP_CLIENT = HttpClient.create()
             .followRedirect(true);
+
+    // Source: https://urlregex.com/
+    private static final Pattern URL_MATCH = Pattern.compile(
+            "((https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])");
+
+    /**
+     * @param str The string to check.
+     * @return {@code true} if the string is a valid URL, {@code false} otherwise.
+     */
+    public static boolean isUrl(String str) {
+        return URL_MATCH.matcher(str).matches();
+    }
 
     /**
      * @param html The HTML to convert to text with new lines preserved, may be {@code null}.

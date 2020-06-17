@@ -12,6 +12,7 @@ import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.object.entity.User;
@@ -19,7 +20,6 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
-import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
@@ -54,15 +54,14 @@ public class PlayCmd extends BaseCmd {
         // If this is a SoundCloud search...
         if (arg.startsWith(SC_QUERY)) {
             return AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, SC_QUERY);
-        } else {
-            try {
-                // ... else if the argument is a valid URL...
-                new URL(arg);
-                return arg;
-            } catch (final Exception ignored) {
-                // ...else, search on YouTube
-                return AudioLoadResultListener.YT_SEARCH + arg;
-            }
+        }
+        // ... else if the argument is a valid URL...
+        else if (NetUtils.isUrl(arg)) {
+            return arg;
+        }
+        // ...else, search on YouTube
+        else {
+            return AudioLoadResultListener.YT_SEARCH + arg;
         }
     }
 
