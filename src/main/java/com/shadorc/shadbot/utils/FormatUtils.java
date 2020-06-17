@@ -6,10 +6,7 @@ import discord4j.discordjson.possible.Possible;
 import reactor.util.annotation.Nullable;
 
 import java.text.NumberFormat;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
+import java.time.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -83,17 +80,16 @@ public class FormatUtils {
      * @return The formatted instant (e.g Y year(s), M month(s), D day(s)).
      */
     public static String formatLongDuration(LocalDateTime date) {
-        final Period period = Period.between(date.toLocalDate(), LocalDate.now());
-        final String str = period.getUnits().stream()
+        final Duration diff = Duration.between(date, LocalDateTime.now(ZoneId.systemDefault()));
+        if (diff.toHours() < Duration.ofDays(1).toHours()) {
+            return FormatUtils.formatDuration(diff);
+        }
+
+        final Period period = Period.between(date.toLocalDate(), LocalDate.now(ZoneId.systemDefault()));
+        return period.getUnits().stream()
                 .filter(unit -> period.get(unit) != 0)
                 .map(unit -> StringUtils.pluralOf(period.get(unit), StringUtils.removeLastLetter(unit.toString().toLowerCase())))
                 .collect(Collectors.joining(", "));
-
-        if (str.isEmpty()) {
-            return FormatUtils.formatDuration(Duration.between(date, LocalDateTime.now()));
-        }
-
-        return str;
     }
 
     /**

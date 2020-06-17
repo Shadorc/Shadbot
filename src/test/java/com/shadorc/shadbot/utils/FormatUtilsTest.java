@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,15 +54,16 @@ public class FormatUtilsTest {
 
     @Test
     public void formatLongDuration() {
-        assertEquals("0:01", FormatUtils.formatLongDuration(LocalDateTime.now().minusSeconds(1)));
-        assertEquals("1:00:00", FormatUtils.formatLongDuration(LocalDateTime.now().minusHours(1)));
+        final LocalDateTime localDateTime = LocalDateTime.now(ZoneId.systemDefault());
+        assertEquals("0:01", FormatUtils.formatLongDuration(localDateTime.minusSeconds(1)));
+        assertEquals("1:00:00", FormatUtils.formatLongDuration(localDateTime.minusHours(1)));
         assertEquals("1:01:15",
-                FormatUtils.formatLongDuration(LocalDateTime.now().minusHours(1).minusMinutes(1).minusSeconds(15)));
-        assertEquals("1 day", FormatUtils.formatLongDuration(LocalDateTime.now().minusDays(1)));
-        assertEquals("1 month", FormatUtils.formatLongDuration(LocalDateTime.now().minusMonths(1)));
-        assertEquals("1 month, 7 days", FormatUtils.formatLongDuration(LocalDateTime.now().minusMonths(1).minusDays(7)));
-        assertEquals("2 years, 1 month, 20 days",
-                FormatUtils.formatLongDuration(LocalDateTime.now().minusYears(2).minusMonths(1).minusDays(20)));
+                FormatUtils.formatLongDuration(localDateTime.minusHours(1).minusMinutes(1).minusSeconds(15)));
+        assertEquals("1 day", FormatUtils.formatLongDuration(localDateTime.minusDays(1)));
+        assertEquals("1 month", FormatUtils.formatLongDuration(localDateTime.minusMonths(1)));
+        assertEquals("1 month, 7 days", FormatUtils.formatLongDuration(localDateTime.minusMonths(1).minusDays(7)));
+        assertEquals("2 years, 2 months, 20 days",
+                FormatUtils.formatLongDuration(localDateTime.minusYears(2).minusMonths(2).minusDays(20)));
     }
 
     @Test
