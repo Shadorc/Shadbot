@@ -33,7 +33,7 @@ public class TimeUtils {
      * @return The amount of milliseconds elapsed since {@code instant}.
      */
     public static long getMillisUntil(@NonNull Instant instant) {
-        return Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), TimeUtils.toLocalDate(instant)));
+        return Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), TimeUtils.toLocalDateTime(instant)));
     }
 
     /**
@@ -93,7 +93,7 @@ public class TimeUtils {
      * @param instant The instant to create the date-time from.
      * @return {@code instant} converted as a {@link LocalDateTime} using the {@code ZoneId.systemDefault()} time-zone.
      */
-    public static LocalDateTime toLocalDate(@NonNull Instant instant) {
+    public static LocalDateTime toLocalDateTime(@NonNull Instant instant) {
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
 

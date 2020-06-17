@@ -51,9 +51,9 @@ public class TimeUtilsTest {
     }
 
     @Test
-    public void testToLocalDate() {
+    public void testToLocalDateTime() {
         final Instant now = Instant.now();
-        assertEquals(LocalDateTime.ofInstant(now, ZoneId.systemDefault()), TimeUtils.toLocalDate(now));
-        assertThrows(NullPointerException.class, () -> TimeUtils.toLocalDate(null));
+        assertEquals(LocalDateTime.ofInstant(now, ZoneId.systemDefault()), TimeUtils.toLocalDateTime(now));
+        assertThrows(NullPointerException.class, () -> TimeUtils.toLocalDateTime(null));
     }
 }
