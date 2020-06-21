@@ -48,12 +48,10 @@ public class MessageProcessor {
 
         return event.getMessage()
                 .getChannel()
-                .filterWhen(channel -> channel.getMessagesBefore(Snowflake.of(Instant.now()))
+                .filterWhen(channel -> BooleanUtils.not(channel.getMessagesBefore(Snowflake.of(Instant.now()))
                         .take(20)
                         .map(Message::getContent)
-                        .filter(DM_TEXT::equals)
-                        .hasElements()
-                        .map(hasElements -> !hasElements))
+                        .any(DM_TEXT::equals)))
                 .flatMap(channel -> DiscordUtils.sendMessage(DM_TEXT, channel))
                 .then();
     }
