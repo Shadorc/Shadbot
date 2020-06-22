@@ -38,6 +38,7 @@ import reactor.util.Loggers;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -71,13 +72,16 @@ public class Shadbot {
 
         if (!Config.IS_SNAPSHOT) {
             DEFAULT_LOGGER.info("Initializing Sentry");
+            final List<String> exclusionList = List.of(
+                    "com.sedmelluq",
+                    "discord4j.common.close.CloseException",
+                    "discord4j.gateway.retry.GatewayException",
+                    "discord4j.gateway.retry.InvalidSessionException",
+                    "The connection observed an error",
+                    "Voice gateway exception",
+                    "Connection reset by peer");
             Sentry.init(CredentialManager.getInstance().get(Credential.SENTRY_DSN))
-                    .addShouldSendEventCallback(event -> !event.getLogger().startsWith("com.sedmelluq")
-                            && !event.getMessage().contains("discord4j.common.close.CloseException")
-                            && !event.getMessage().contains("discord4j.gateway.retry.GatewayException")
-                            && !event.getMessage().contains("The connection observed an error")
-                            && !event.getMessage().contains("Voice gateway exception")
-                            && !event.getMessage().contains("Connection reset by peer"));
+                    .addShouldSendEventCallback(event -> exclusionList.stream().noneMatch(event.getMessage()::contains));
         }
 
         // BlockHound is used to detect blocking actions in non-blocking threads
