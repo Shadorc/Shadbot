@@ -36,8 +36,8 @@ public class GuildDeleteListener implements EventListener<GuildDeleteEvent> {
                 .flatMap(DBGuild::delete);
 
         final Snowflake guildOwnerId = CacheManager.getInstance().getGuildOwnersCache().delete(event.getGuildId());
-        final Mono<Message> sendMessage = event.getClient()
-                .getUserById(guildOwnerId)
+        final Mono<Message> sendMessage = Mono.justOrEmpty(guildOwnerId)
+                .flatMap(event.getClient()::getUserById)
                 .flatMap(User::getPrivateChannel)
                 .flatMap(channel -> DiscordUtils.sendMessage(TEXT, channel))
                 .onErrorResume(ClientException.class, err -> Mono.empty());
