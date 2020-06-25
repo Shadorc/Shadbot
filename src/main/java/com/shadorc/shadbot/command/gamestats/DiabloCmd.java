@@ -86,6 +86,11 @@ public class DiabloCmd extends BaseCmd {
                             .sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()))
                             .collectList()
                             .map(heroResponses -> {
+                                if (heroResponses.isEmpty()) {
+                                    return updatableMsg.setContent(String.format(
+                                            Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't have any heroes or they are not found.",
+                                            context.getUsername()));
+                                }
                                 Collections.reverse(heroResponses);
                                 return updatableMsg.setEmbed(this.getEmbed(context.getAvatarUrl(), profile, heroResponses));
                             });
