@@ -21,6 +21,8 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
+
 public class Rule34Cmd extends BaseCmd {
 
     private static final String HOME_URL = "https://rule34.xxx/index.php";
@@ -58,19 +60,24 @@ public class Rule34Cmd extends BaseCmd {
 
                                 return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                                         .andThen(embed -> {
-                                            if (!post.getSource().isEmpty()) {
-                                                if (post.getSource().startsWith("http")) {
-                                                    embed.setDescription(String.format("%n[**Source**](%s)", post.getSource()));
+                                            post.getSource().ifPresent(source -> {
+                                                if (NetUtils.isUrl(source)) {
+                                                    embed.setDescription(String.format("%n[**Source**](%s)", source));
                                                 } else {
-                                                    embed.addField("Source", post.getSource(), false);
+                                                    embed.addField("Source", source, false);
                                                 }
-                                            }
+                                            });
 
+                                            final String resolution = String.format("%dx%d", post.getWidth(), post.getHeight());
+                                            final String formattedTags = this.formatTags(tags);
+                                            // TODO: Remove once fixed
+                                            if (formattedTags.isBlank()) {
+                                                DEFAULT_LOGGER.error("[Rule34] Formatted tags are blank: {}", post);
+                                            }
                                             embed.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), context.getAvatarUrl())
                                                     .setThumbnail("https://i.imgur.com/t6JJWFN.png")
-                                                    .addField("Resolution", String.format("%dx%s",
-                                                            post.getWidth(), post.getHeight()), false)
-                                                    .addField("Tags", this.formatTags(tags), false)
+                                                    .addField("Resolution", resolution, false)
+                                                    .addField("Tags", formattedTags, false)
                                                     .setImage(post.getFileUrl())
                                                     .setFooter("If there is no preview, click on the title to " +
                                                             "see the media (probably a video)", null);

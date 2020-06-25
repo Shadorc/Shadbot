@@ -2,6 +2,9 @@ package com.shadorc.shadbot.api.json.image.r34;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Optional;
+import java.util.function.Predicate;
+
 public class R34Post {
 
     @JsonProperty("tags")
@@ -25,8 +28,8 @@ public class R34Post {
         return this.fileUrl;
     }
 
-    public String getSource() {
-        return this.source;
+    public Optional<String> getSource() {
+        return Optional.of(this.source).filter(Predicate.not(String::isBlank));
     }
 
     public int getWidth() {
