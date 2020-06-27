@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.cache;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 public interface Cache<K, V> {
@@ -11,7 +12,7 @@ public interface Cache<K, V> {
 
     long count();
 
-    V delete(K key);
+    Optional<V> delete(K key);
 
     void deleteAll();
 

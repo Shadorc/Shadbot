@@ -6,7 +6,6 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
@@ -35,8 +34,9 @@ public class GuildDeleteListener implements EventListener<GuildDeleteEvent> {
                 .getDBGuild(event.getGuildId())
                 .flatMap(DBGuild::delete);
 
-        final Snowflake guildOwnerId = CacheManager.getInstance().getGuildOwnersCache().delete(event.getGuildId());
-        final Mono<Message> sendMessage = Mono.justOrEmpty(guildOwnerId)
+        final Mono<Message> sendMessage = Mono.defer(() ->
+                Mono.justOrEmpty(
+                        CacheManager.getInstance().getGuildOwnersCache().delete(event.getGuildId())))
                 .flatMap(event.getClient()::getUserById)
                 .flatMap(User::getPrivateChannel)
                 .flatMap(channel -> DiscordUtils.sendMessage(TEXT, channel))

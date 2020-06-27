@@ -2,6 +2,7 @@ package com.shadorc.shadbot.cache;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,8 +30,8 @@ public class MapCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V delete(K key) {
-        return this.map.remove(key);
+    public Optional<V> delete(K key) {
+        return Optional.ofNullable(this.map.remove(key));
     }
 
     @Override
