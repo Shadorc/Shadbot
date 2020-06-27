@@ -18,6 +18,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -101,7 +102,9 @@ public class OverwatchCmd extends BaseCmd {
                 NetUtils.get(this.getUrl("stats", platform, username), StatsResponse.class);
 
         return Mono.zip(Mono.just(platform), getProfile, getStats)
-                .map(TupleUtils.function(OverwatchProfile::new));
+                .map(TupleUtils.function(OverwatchProfile::new))
+                .filter(overwatchProfile -> overwatchProfile.getProfile().getPortrait() != null)
+                .switchIfEmpty(Mono.error(new IOException("Overwatch API returned malformed JSON")));
     }
 
     private String getUrl(String endpoint, Platform platform, String username) {
