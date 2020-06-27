@@ -37,22 +37,30 @@ public class UrbanCmd extends BaseCmd {
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Urban Dictionary definition...",
                 context.getUsername()))
                 .send()
-                .then(this.getUrbanDefinition(arg))
-                .map(urbanDefinition -> {
-                    final String definition = StringUtils.abbreviate(urbanDefinition.getDefinition(), Embed.MAX_DESCRIPTION_LENGTH);
-                    final String example = StringUtils.abbreviate(urbanDefinition.getExample(), Field.MAX_VALUE_LENGTH);
+                .then(context.isChannelNsfw())
+                .flatMap(isNsfw -> {
+                    if (!isNsfw) {
+                        return Mono.just(updatableMsg.setContent(ShadbotUtils.mustBeNsfw(context.getPrefix())));
+                    }
 
-                    return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
-                            .andThen(embed -> {
-                                embed.setAuthor(String.format("Urban Dictionary: %s",
-                                        urbanDefinition.getWord()), urbanDefinition.getPermalink(), context.getAvatarUrl())
-                                        .setThumbnail("https://i.imgur.com/7KJtwWp.png")
-                                        .setDescription(definition);
+                    return this.getUrbanDefinition(arg)
+                            .map(urbanDefinition -> {
+                                final String definition = StringUtils.abbreviate(urbanDefinition.getDefinition(),
+                                        Embed.MAX_DESCRIPTION_LENGTH);
+                                final String example = StringUtils.abbreviate(urbanDefinition.getExample(), Field.MAX_VALUE_LENGTH);
 
-                                if (!example.isBlank()) {
-                                    embed.addField("Example", example, false);
-                                }
-                            }));
+                                return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
+                                        .andThen(embed -> {
+                                            embed.setAuthor(String.format("Urban Dictionary: %s",
+                                                    urbanDefinition.getWord()), urbanDefinition.getPermalink(), context.getAvatarUrl())
+                                                    .setThumbnail("https://i.imgur.com/7KJtwWp.png")
+                                                    .setDescription(definition);
+
+                                            if (!example.isBlank()) {
+                                                embed.addField("Example", example, false);
+                                            }
+                                        }));
+                            });
                 })
                 .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Urban Dictionary definition found for `%s`",
