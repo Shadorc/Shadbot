@@ -94,7 +94,10 @@ public class DiscordUtils {
                                 FormatUtils.capitalizeEnum(Permission.EMBED_LINKS)), channel);
                     }
 
-                    return channel.createMessage(spec);
+                    return channel.createMessage(spec
+                            .andThen(messageSpec -> messageSpec.setAllowedMentions(AllowedMentions.builder()
+                                    .parseType(AllowedMentions.Type.ROLE, AllowedMentions.Type.USER)
+                                    .build())));
                 }))
                 // 403 Forbidden means that the bot is not in the guild
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
