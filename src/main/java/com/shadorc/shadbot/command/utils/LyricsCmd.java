@@ -16,6 +16,8 @@ import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.StringUtils;
+import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.netty.handler.codec.http.HttpMethod;
 import org.jsoup.Jsoup;
@@ -37,6 +39,9 @@ import java.util.regex.Pattern;
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class LyricsCmd extends BaseCmd {
+
+    private static final int MAX_LYRICS_LENGTH = Embed.MAX_DESCRIPTION_LENGTH / 3;
+    private static final int MAX_TITLE_LENGTH = Embed.MAX_TITLE_LENGTH / 3;
 
     // Make html() preserve linebreak and spacing
     private static final OutputSettings PRESERVE_FORMAT = new OutputSettings().prettyPrint(false);
@@ -60,9 +65,10 @@ public class LyricsCmd extends BaseCmd {
                 .then(this.getMusixmatch(search))
                 .map(musixmatch -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
-                                musixmatch.getArtist(), musixmatch.getTitle()), musixmatch.getUrl(), context.getAvatarUrl())
+                                StringUtils.abbreviate(musixmatch.getArtist(), MAX_TITLE_LENGTH),
+                                musixmatch.getTitle()), musixmatch.getUrl(), context.getAvatarUrl())
                                 .setThumbnail(musixmatch.getImageUrl())
-                                .setDescription(musixmatch.getLyrics())
+                                .setDescription(StringUtils.abbreviate(musixmatch.getLyrics(), MAX_LYRICS_LENGTH))
                                 .setFooter("Click on the title to see the full version",
                                         "https://i.imgur.com/G7q6Hmq.png"))))
                 .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(

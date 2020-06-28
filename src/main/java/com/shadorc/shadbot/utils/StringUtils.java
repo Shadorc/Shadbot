@@ -76,7 +76,6 @@ public class StringUtils {
      * @return Abbreviated string, {@code null} if null string input.
      * @throws IllegalArgumentException If the width is too small.
      */
-    @Nullable
     public static String abbreviate(@Nullable String str, int maxWidth) {
         return abbreviate(str, "...", maxWidth);
     }

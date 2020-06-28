@@ -81,7 +81,7 @@ public class Shadbot {
                     "Connection reset by peer");
             Sentry.init(CredentialManager.getInstance().get(Credential.SENTRY_DSN))
                     .addShouldSendEventCallback(event -> exclusionList.stream().noneMatch(event.getMessage()::contains)
-                    && !event.getLogger().startsWith("com.sedmelluq"));
+                            && !event.getLogger().startsWith("com.sedmelluq"));
         }
 
         // BlockHound is used to detect blocking actions in non-blocking threads
