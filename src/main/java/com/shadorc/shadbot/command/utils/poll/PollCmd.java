@@ -32,7 +32,7 @@ public class PollCmd extends BaseCmd {
             "\u0036\u20E3", "\u0037\u20E3", "\u0038\u20E3", "\u0039\u20E3", "\u0040\u20E3");
 
     private static final int MIN_CHOICES_NUM = 2;
-    private static final int MAX_CHOICES_NUM = 10;
+    private static final int MAX_CHOICES_NUM = 9;
     private static final int MIN_DURATION = 10;
     private static final int MAX_DURATION = 3600;
 
