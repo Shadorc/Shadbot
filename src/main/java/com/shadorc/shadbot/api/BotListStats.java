@@ -38,6 +38,7 @@ public class BotListStats {
     private static final String DISCORDBOTLIST_DOT_COM = "https://discordbotlist.com";
     private static final String DISCORD_BOTS_DOT_GG = "https://discord.bots.gg";
     private static final String TOP_DOT_GG = "https://top.gg";
+    private static final String BOTSFORDISCORD_DOT_COM = "https://botsfordiscord.com";
 
     private final GatewayDiscordClient gateway;
     private final AtomicReference<DisposableServer> webhookServer;
@@ -86,6 +87,7 @@ public class BotListStats {
                         .and(this.postOnBotsOndiscordDotXyz(guildCount))
                         .and(this.postOnDiscordbotlistDotCom(shardCount, guildCount))
                         .and(this.postOnWonderbotlistDotCom(shardCount, guildCount))
+                        .and(this.postOnBotsfordiscordDotCom(guildCount))
                         .and(this.postOnDiscordBotsDotGg(shardCount, guildCount))
                         .and(this.postOnTopDotGg(shardCount, guildCount)))
                 .doOnSuccess(ignored -> LOGGER.info("Statistics posted"));
@@ -123,6 +125,17 @@ public class BotListStats {
         final String url = String.format("https://api.wonderbotlist.com/v1/bot/%d", this.gateway.getSelfId().asLong());
         return BotListStats.post(url, CredentialManager.getInstance().get(Credential.WONDERBOTLIST_DOT_COM_TOKEN), content)
                 .onErrorResume(BotListStats.handleError(WONDERBOTLIST_DOT_COM));
+    }
+
+    /**
+     * Documentation: https://docs.botsfordiscord.com/methods/bots
+     */
+    private Mono<String> postOnBotsfordiscordDotCom(long guildCount) {
+        final JSONObject content = new JSONObject()
+                .put("server_count", guildCount);
+        final String url = String.format("https://botsfordiscord.com/api/bot/%d", this.gateway.getSelfId().asLong());
+        return BotListStats.post(url, CredentialManager.getInstance().get(Credential.BOTSFORDISCORD_DOT_COM), content)
+                .onErrorResume(BotListStats.handleError(BOTSFORDISCORD_DOT_COM));
     }
 
     /**
