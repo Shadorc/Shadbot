@@ -40,6 +40,7 @@ public class BotListStats {
     private static final String TOP_DOT_GG = "https://top.gg";
     private static final String BOTSFORDISCORD_DOT_COM = "https://botsfordiscord.com";
     private static final String DISCORD_DOT_BOATS = "https://discord.boats";
+    private static final String GLENNBOTLIST_DOT_XYZ = "https://glennbotlist.xyz";
 
     private final GatewayDiscordClient gateway;
     private final AtomicReference<DisposableServer> webhookServer;
@@ -90,6 +91,7 @@ public class BotListStats {
                         .and(this.postOnWonderbotlistDotCom(shardCount, guildCount))
                         .and(this.postOnBotsfordiscordDotCom(guildCount))
                         .and(this.postOnDiscordDotBoats(guildCount))
+                        .and(this.postOnGlennbotlistDotXyz(guildCount))
                         .and(this.postOnDiscordBotsDotGg(shardCount, guildCount))
                         .and(this.postOnTopDotGg(shardCount, guildCount)))
                 .doOnSuccess(ignored -> LOGGER.info("Statistics posted"));
@@ -138,6 +140,17 @@ public class BotListStats {
         final String url = String.format("https://discord.boats/api/bot/%d", this.gateway.getSelfId().asLong());
         return BotListStats.post(url, CredentialManager.getInstance().get(Credential.DISCORD_DOT_BOATS), content)
                 .onErrorResume(BotListStats.handleError(DISCORD_DOT_BOATS));
+    }
+
+    /**
+     * Documentation: https://docs.glennbotlist.xyz/welcome/endpoints
+     */
+    private Mono<String> postOnGlennbotlistDotXyz(long guildCount) {
+        final JSONObject content = new JSONObject()
+                .put("serverCount", guildCount);
+        final String url = String.format("https://glennbotlist.xyz/api/bot/%d/stats", this.gateway.getSelfId().asLong());
+        return BotListStats.post(url, CredentialManager.getInstance().get(Credential.GLENNBOTLIST_DOT_XYZ), content)
+                .onErrorResume(BotListStats.handleError(GLENNBOTLIST_DOT_XYZ));
     }
 
     /**
