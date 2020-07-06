@@ -12,7 +12,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>logs/shadbot.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>25MB</maxFileSize>
-            <maxHistory>100</maxHistory>
+            <maxHistory>10</maxHistory>
         </rollingPolicy>
         <encoder>
             <charset>UTF-8</charset>
