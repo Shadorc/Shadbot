@@ -76,6 +76,10 @@ public class Shadbot {
                     "discord4j.common.close.CloseException",
                     "discord4j.gateway.retry.GatewayException",
                     "discord4j.gateway.retry.InvalidSessionException",
+                    "io.netty.handler.ssl.SslHandshakeTimeoutException",
+                    "io.netty.channel.ConnectTimeoutException",
+                    "java.net.UnknownHostException",
+                    "connection timed out",
                     "The connection observed an error",
                     "Voice gateway exception",
                     "Connection reset by peer");
