@@ -122,11 +122,8 @@ public class LyricsCmd extends BaseCmd {
                 }))
                 .retryWhen(Retry.max(MAX_RETRY)
                         .filter(ServerAccessException.class::isInstance))
-                .onErrorMap(Exceptions::isRetryExhausted, err -> {
-                    DEFAULT_LOGGER.warn("[{}] Retry exhausted, abort attempt to reload page: {}",
-                            this.getClass().getSimpleName(), url);
-                    return new IOException(String.format("Musixmatch does not redirect to the correct page: %s", url));
-                });
+                .onErrorMap(Exceptions::isRetryExhausted,
+                        err -> new IOException(String.format("Musixmatch does not redirect to the correct page: %s", url)));
     }
 
     private Mono<String> getCorrectedUrl(String search) {
