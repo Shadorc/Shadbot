@@ -36,8 +36,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
-import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
-
 public class LyricsCmd extends BaseCmd {
 
     private static final int MAX_LYRICS_LENGTH = Embed.MAX_DESCRIPTION_LENGTH / 3;
