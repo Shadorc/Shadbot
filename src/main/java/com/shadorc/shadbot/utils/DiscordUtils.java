@@ -17,6 +17,7 @@ import discord4j.core.object.entity.channel.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
 import discord4j.rest.http.client.ClientException;
+import discord4j.rest.util.AllowedMentions;
 import discord4j.rest.util.Permission;
 import io.netty.channel.unix.Errors;
 import io.netty.handler.codec.http.HttpResponseStatus;
