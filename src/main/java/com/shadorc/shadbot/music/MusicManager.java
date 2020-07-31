@@ -132,9 +132,13 @@ public class MusicManager {
                 .filterWhen(ignored -> isDisconnected)
                 .doOnNext(ignored -> LOGGER.info("{Guild ID: {}} Joining voice channel...", guildId.asLong()))
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
-                .doOnError(VoiceGatewayException.class, err -> LOGGER.warn(err.getMessage()))
                 .onErrorMap(VoiceGatewayException.class,
-                        err -> new CommandException("An unknown error occurred while joining the voice channel, please try again."))
+                        err -> {
+                            LOGGER.warn("{Guild ID: {}} An unknown error occurred while joining the voice channel: {}",
+                                    guildId.asLong(), err.getMessage());
+                            return new CommandException(
+                                    "An unknown error occurred while joining the voice channel, please try again.");
+                        })
                 .doOnTerminate(() -> this.guildJoining.remove(guildId));
     }
 
