@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.command.utils;
 
+import com.shadorc.shadbot.api.ServerAccessException;
 import com.shadorc.shadbot.api.json.urbandictionary.UrbanDefinition;
 import com.shadorc.shadbot.api.json.urbandictionary.UrbanDictionaryResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -14,8 +15,11 @@ import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.object.Embed;
 import discord4j.core.object.Embed.Field;
 import discord4j.core.spec.EmbedCreateSpec;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -73,9 +77,10 @@ public class UrbanCmd extends BaseCmd {
     private Mono<UrbanDefinition> getUrbanDefinition(String search) {
         final String url = String.format("%s?term=%s", HOME_URL, NetUtils.encode(search));
         return NetUtils.get(url, UrbanDictionaryResponse.class)
-                .filter(response -> !response.getDefinitions().isEmpty())
-                .map(UrbanDictionaryResponse::getDefinitions)
-                .map(list -> list.get(0));
+                .flatMapIterable(UrbanDictionaryResponse::getDefinitions)
+                .next()
+                .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
+                        .filter(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR)));
     }
 
     @Override
