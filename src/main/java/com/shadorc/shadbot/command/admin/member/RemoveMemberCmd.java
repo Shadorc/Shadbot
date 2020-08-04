@@ -111,6 +111,9 @@ public abstract class RemoveMemberCmd extends BaseCmd {
     }
 
     private Mono<Message> sendMessage(Guild guild, MessageChannel channel, Member author, Member memberToRemove, String reason) {
+        if (memberToRemove.isBot()) {
+            return Mono.empty();
+        }
         return memberToRemove.getPrivateChannel()
                 .flatMap(privateChannel -> DiscordUtils.sendMessage(
                         String.format(Emoji.WARNING + " You were %s from the server **%s** by **%s**. Reason: `%s`",
