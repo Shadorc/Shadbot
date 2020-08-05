@@ -78,7 +78,6 @@ public class Shadbot {
                     "discord4j.gateway.retry.InvalidSessionException",
                     "io.netty.handler.ssl.SslHandshakeTimeoutException",
                     "io.netty.channel.ConnectTimeoutException",
-                    "io.netty.handler.codec.http.websocketx.WebSocketHandshakeException",
                     "java.net.UnknownHostException",
                     "connection timed out",
                     "The connection observed an error",

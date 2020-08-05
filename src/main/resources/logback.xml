@@ -2,9 +2,6 @@
 <!DOCTYPE xml>
 <configuration scan="true">
 
-    <logger name="io.netty" level="DEBUG" />
-    <logger name="reactor" level="DEBUG" />
-
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} %level [%thread/%logger]: %msg%n</pattern>
