@@ -18,6 +18,7 @@ import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.voice.retry.VoiceGatewayException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -44,10 +45,17 @@ public class PlayCmd extends BaseCmd {
                         .flatMap(channel -> MusicManager.getInstance()
                                 .getOrCreate(context.getClient(), context.getGuildId(), voiceChannel.getId())
                                 .flatMap(guildMusic -> this.play(context, channel, guildMusic, this.getIdentifier(arg)))))
-                .doOnError(TimeoutException.class, err -> LOGGER.info("{Guild ID: {}} Voice channel connection timed out",
-                        context.getGuildId().asLong()))
-                .onErrorMap(TimeoutException.class, err -> new CommandException("An error occurred while joining the voice channel, " +
-                        "please try again later or in another voice channel."));
+                .onErrorMap(err -> {
+                    LOGGER.error("{Guild ID: {}} An error occurred while joining a voice channel: {}",
+                            context.getGuildId().asLong(), err.getMessage());
+                    if (err instanceof VoiceGatewayException) {
+                        return new CommandException("An unknown error occurred while joining the voice channel, please try again later.");
+                    }
+                    if (err instanceof TimeoutException) {
+                        return new CommandException("I can't establish a connection with this voice channel, please try again later.");
+                    }
+                    return err;
+                });
     }
 
     private String getIdentifier(String arg) {

@@ -12,7 +12,6 @@ import com.sedmelluq.lava.extensions.youtuberotator.planner.AbstractRoutePlanner
 import com.sedmelluq.lava.extensions.youtuberotator.planner.RotatingNanoIpRoutePlanner;
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.IpBlock;
 import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
-import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
@@ -25,7 +24,6 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.voice.AudioProvider;
 import discord4j.voice.VoiceConnection;
-import discord4j.voice.retry.VoiceGatewayException;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
@@ -113,7 +111,6 @@ public class MusicManager {
      */
     private Mono<VoiceConnection> joinVoiceChannel(GatewayDiscordClient gateway, Snowflake guildId, Snowflake voiceChannelId,
                                                    AudioProvider audioProvider) {
-
         // Do not join the voice channel if the bot is already joining one
         if (this.guildJoining.computeIfAbsent(guildId, id -> new AtomicBoolean()).getAndSet(true)) {
             return Mono.empty();
@@ -132,13 +129,6 @@ public class MusicManager {
                 .filterWhen(ignored -> isDisconnected)
                 .doOnNext(ignored -> LOGGER.info("{Guild ID: {}} Joining voice channel...", guildId.asLong()))
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
-                .onErrorMap(VoiceGatewayException.class,
-                        err -> {
-                            LOGGER.warn("{Guild ID: {}} An unknown error occurred while joining the voice channel: {}",
-                                    guildId.asLong(), err.getMessage());
-                            return new CommandException(
-                                    "An unknown error occurred while joining the voice channel, please try again.");
-                        })
                 .doOnTerminate(() -> this.guildJoining.remove(guildId));
     }
 
