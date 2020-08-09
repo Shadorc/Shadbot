@@ -75,14 +75,7 @@ public class Shadbot {
             final List<String> exclusionList = List.of(
                     "discord4j.common.close.CloseException",
                     "discord4j.gateway.retry.GatewayException",
-                    "discord4j.gateway.retry.InvalidSessionException",
-                    "io.netty.handler.ssl.SslHandshakeTimeoutException",
-                    "io.netty.channel.ConnectTimeoutException",
-                    "java.net.UnknownHostException",
-                    "connection timed out",
-                    "The connection observed an error",
-                    "Voice gateway exception",
-                    "Connection reset by peer");
+                    "discord4j.gateway.retry.InvalidSessionException");
             Sentry.init(CredentialManager.getInstance().get(Credential.SENTRY_DSN))
                     .addShouldSendEventCallback(event -> exclusionList.stream().noneMatch(event.getMessage()::contains)
                             && !event.getLogger().startsWith("com.sedmelluq"));
