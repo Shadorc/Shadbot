@@ -67,8 +67,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
                         .filter(member -> !member.isBot())
                         .count()
                         // Everyone left or somebody joined
-                        .filter(memberCount -> memberCount == 0 && !guildMusic.isLeavingScheduled()
-                                || memberCount != 0 && guildMusic.isLeavingScheduled())
+                        .filter(memberCount -> (memberCount == 0) != guildMusic.isLeavingScheduled())
                         .map(memberCount -> {
                             LOGGER.debug("{Guild ID: {}} On user event, memberCount: {}, leavingScheduled: {}",
                                     guildId.asLong(), memberCount, guildMusic.isLeavingScheduled());
