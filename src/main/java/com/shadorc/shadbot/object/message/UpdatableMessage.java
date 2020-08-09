@@ -15,6 +15,8 @@ import reactor.util.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
+
 public class UpdatableMessage {
 
     private final GatewayDiscordClient gateway;
@@ -91,6 +93,12 @@ public class UpdatableMessage {
                 .map(Snowflake::of)
                 .flatMap(messageId -> this.gateway.getMessageById(this.channelId, messageId))
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
-                .flatMap(Message::delete);
+                .flatMap(Message::delete)
+                // TODO: Remove once the empty on 404 issue is fixed
+                .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.NOT_FOUND.code()), err -> {
+                    DEFAULT_LOGGER.error("404 detected on Message::delete, " +
+                            "Channel ID: {}, Message ID: {}", this.channelId.asLong(), this.messageId.get());
+                    return Mono.empty();
+                });
     }
 }
