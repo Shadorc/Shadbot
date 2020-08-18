@@ -46,7 +46,7 @@ public class PlayCmd extends BaseCmd {
                                 .getOrCreate(context.getClient(), context.getGuildId(), voiceChannel.getId())
                                 .flatMap(guildMusic -> this.play(context, channel, guildMusic, this.getIdentifier(arg)))))
                 .onErrorMap(err -> {
-                    LOGGER.error("{Guild ID: {}} An error occurred while joining a voice channel: {}",
+                    LOGGER.info("{Guild ID: {}} An error occurred while joining a voice channel: {}",
                             context.getGuildId().asLong(), err.getMessage());
                     if (err instanceof VoiceGatewayException) {
                         return new CommandException("An unknown error occurred while joining the voice channel, please try again later.");
