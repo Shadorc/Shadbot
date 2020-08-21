@@ -32,7 +32,7 @@ public class BlackjackInputs extends Inputs {
         final String content = event.getMessage().getContent();
         return this.game.isCancelMessage(event.getMessage())
                 .map(isCancelCmd -> isCancelCmd || this.game.getPlayers().containsKey(member.getId())
-                        && this.game.getActions().containsKey(content)
+                        && this.game.getActions().containsKey(content.toLowerCase())
                         && !this.game.getRateLimiter().isLimitedAndWarn(event.getMessage().getChannelId(), member));
     }
 
