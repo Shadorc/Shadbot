@@ -132,6 +132,9 @@ public class FormatUtilsTest {
         assertEquals("author - title (1:00)", FormatUtils.trackName(
                 new AudioTrackInfo("author - title", "author", 60 * 1000,
                         "identifier", false, "uri")));
+        assertEquals("Unknown video name (1:00)", FormatUtils.trackName(
+                new AudioTrackInfo(null, "author", 60 * 1000,
+                        "identifier", false, "uri")));
     }
 
 }

@@ -174,7 +174,9 @@ public class FormatUtils {
      */
     public static String trackName(AudioTrackInfo info) {
         final StringBuilder strBuilder = new StringBuilder();
-        if ("Unknown artist".equals(info.author) || info.title.startsWith(info.author)) {
+        if (info.title == null) {
+            strBuilder.append("Unknown video name");
+        } else if ("Unknown artist".equals(info.author) || info.title.startsWith(info.author)) {
             strBuilder.append(info.title.trim());
         } else {
             strBuilder.append(String.format("%s - %s", info.author.trim(), info.title.trim()));
