@@ -77,7 +77,8 @@ public class Shadbot {
                     "discord4j.gateway.retry.GatewayException",
                     "discord4j.gateway.retry.InvalidSessionException",
                     "io.netty.handler.codec.http.websocketx.WebSocketHandshakeException",
-                    "io.netty.channel.unix.Errors$NativeIoException");
+                    "io.netty.channel.unix.Errors$NativeIoException",
+                    "Voice gateway exception");
             Sentry.init(CredentialManager.getInstance().get(Credential.SENTRY_DSN))
                     .addShouldSendEventCallback(event -> exclusionList.stream().noneMatch(event.getMessage()::contains)
                             && !event.getLogger().startsWith("com.sedmelluq"));
