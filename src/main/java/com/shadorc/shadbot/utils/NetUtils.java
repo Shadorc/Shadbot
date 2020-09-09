@@ -42,7 +42,7 @@ public class NetUtils {
 
     // Source: https://urlregex.com/
     private static final Pattern URL_MATCH = Pattern.compile(
-            "((https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])");
+            "((https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;()]*[-a-zA-Z0-9+&@#/%=~_|])");
 
     /**
      * @param str The string to check.

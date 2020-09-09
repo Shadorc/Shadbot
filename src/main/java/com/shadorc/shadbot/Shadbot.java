@@ -81,7 +81,7 @@ public class Shadbot {
                     "io.netty.channel.unix.Errors$NativeIoException",
                     "Voice gateway exception",
                     "A timeout occurred while posting statistics",
-                    "PrematureCloseException");
+                    "reactor.netty.http.client.PrematureCloseException");
             Sentry.init(CredentialManager.getInstance().get(Credential.SENTRY_DSN))
                     .addShouldSendEventCallback(event -> exclusionList.stream().noneMatch(event.getMessage()::contains)
                             && !event.getLogger().startsWith("com.sedmelluq"));
