@@ -70,10 +70,6 @@ public class Rule34Cmd extends BaseCmd {
 
                                             final String resolution = String.format("%dx%d", post.getWidth(), post.getHeight());
                                             final String formattedTags = this.formatTags(tags);
-                                            // TODO: Remove once fixed
-                                            if (formattedTags.isBlank()) {
-                                                DEFAULT_LOGGER.error("[Rule34] Formatted tags are blank: {}", post);
-                                            }
                                             embed.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), context.getAvatarUrl())
                                                     .setThumbnail("https://i.imgur.com/t6JJWFN.png")
                                                     .addField("Resolution", resolution, false)
