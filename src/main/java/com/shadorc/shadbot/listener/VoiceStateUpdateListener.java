@@ -43,7 +43,9 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
             } else if (event.getCurrent().getChannelId().isPresent() && event.getOld().isEmpty()) {
                 LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asLong());
                 return Mono.fromRunnable(VOICE_COUNT_GAUGE::inc);
-            } else {
+            } else if (!event.getCurrent().getChannelId()
+                    .flatMap(current -> event.getOld().flatMap(VoiceState::getChannelId).map(current::equals))
+                    .orElse(true)) {
                 LOGGER.info("{Guild ID: {}} Voice channel moved", guildId.asLong());
             }
         }
