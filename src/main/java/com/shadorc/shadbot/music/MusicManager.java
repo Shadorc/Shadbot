@@ -62,6 +62,7 @@ public class MusicManager {
         final String ipv6Block = CredentialManager.getInstance().get(Credential.IPV6_BLOCK);
         if (!Config.IS_SNAPSHOT && ipv6Block != null && !ipv6Block.isBlank()) {
             LOGGER.info("Configuring YouTube IP rotator");
+            @SuppressWarnings("rawtypes")
             final List<IpBlock> blocks = Collections.singletonList(new Ipv6Block(ipv6Block));
             final AbstractRoutePlanner planner = new RotatingNanoIpRoutePlanner(blocks);
 
