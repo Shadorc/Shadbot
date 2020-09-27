@@ -15,6 +15,7 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
+import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -22,7 +23,10 @@ import discord4j.voice.retry.VoiceGatewayException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.music.MusicManager.LOGGER;
@@ -30,6 +34,9 @@ import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 public class PlayCmd extends BaseCmd {
 
     private static final String SC_QUERY = "soundcloud ";
+
+    private static final int MAX_ERRORS = 5;
+    private static final Map<Snowflake, AtomicInteger> ERRORS_MAP = new ConcurrentHashMap<>();
 
     public PlayCmd() {
         super(CommandCategory.MUSIC, List.of("play", "add", "queue", "playfirst", "addfirst", "queuefirst"));
@@ -45,9 +52,18 @@ public class PlayCmd extends BaseCmd {
                         .flatMap(channel -> MusicManager.getInstance()
                                 .getOrCreate(context.getClient(), context.getGuildId(), voiceChannel.getId())
                                 .flatMap(guildMusic -> this.play(context, channel, guildMusic, this.getIdentifier(arg)))))
+                .doOnSuccess(ignored -> ERRORS_MAP.remove(context.getGuildId()))
                 .onErrorMap(err -> {
                     LOGGER.info("{Guild ID: {}} An error occurred while joining a voice channel: {}",
                             context.getGuildId().asLong(), err.getMessage());
+
+                    if (ERRORS_MAP.computeIfAbsent(context.getGuildId(), ignored -> new AtomicInteger())
+                            .incrementAndGet() >= MAX_ERRORS) {
+                        LOGGER.error("{Guild ID: {}} {} voice errors detected in a row!",
+                                context.getGuildId().asLong(), MAX_ERRORS);
+                        ERRORS_MAP.remove(context.getGuildId());
+                    }
+
                     if (err instanceof VoiceGatewayException) {
                         return new CommandException("An unknown error occurred while joining the voice channel, please try again later.");
                     }
