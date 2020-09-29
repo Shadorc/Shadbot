@@ -51,7 +51,7 @@ public class PlayCmd extends BaseCmd {
                 .flatMap(voiceChannel -> context.getChannel()
                         .flatMap(channel -> MusicManager.getInstance()
                                 .getOrCreate(context.getClient(), context.getGuildId(), voiceChannel.getId())
-                                .flatMap(guildMusic -> this.play(context, channel, guildMusic, this.getIdentifier(arg)))))
+                                .flatMap(guildMusic -> PlayCmd.play(context, channel, guildMusic, PlayCmd.getIdentifier(arg)))))
                 .doOnSuccess(ignored -> ERRORS_MAP.remove(context.getGuildId()))
                 .onErrorMap(err -> {
                     LOGGER.info("{Guild ID: {}} An error occurred while joining a voice channel: {}",
@@ -74,7 +74,7 @@ public class PlayCmd extends BaseCmd {
                 });
     }
 
-    private String getIdentifier(String arg) {
+    private static String getIdentifier(String arg) {
         // If this is a SoundCloud search...
         if (arg.startsWith(SC_QUERY)) {
             return AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, SC_QUERY);
@@ -89,7 +89,7 @@ public class PlayCmd extends BaseCmd {
         }
     }
 
-    private Mono<Void> play(Context context, MessageChannel channel, GuildMusic guildMusic, String identifier) {
+    private static Mono<Void> play(Context context, MessageChannel channel, GuildMusic guildMusic, String identifier) {
         // Someone is already selecting a music...
         if (guildMusic.isWaitingForChoice()) {
             if (guildMusic.getDjId().equals(context.getAuthorId())) {

@@ -65,14 +65,10 @@ public class BlacklistSettingCmd extends BaseSetting {
 
         final String names = args.get(3);
 
-        switch (type) {
-            case COMMAND:
-                return this.blacklistCommands(context, action, StringUtils.split(names.toLowerCase()));
-            case CATEGORY:
-                return this.blacklistCategories(context, action, StringUtils.split(names.toUpperCase()));
-            default:
-                return Mono.error(new IllegalStateException(String.format("Unknown type: %s", type)));
-        }
+        return switch (type) {
+            case COMMAND -> this.blacklistCommands(context, action, StringUtils.split(names.toLowerCase()));
+            case CATEGORY -> this.blacklistCategories(context, action, StringUtils.split(names.toUpperCase()));
+        };
     }
 
     private Mono<Void> blacklistCategories(Context context, Action action, List<String> categoryNames) {

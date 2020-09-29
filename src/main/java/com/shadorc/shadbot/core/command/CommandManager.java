@@ -52,7 +52,7 @@ public class CommandManager {
     private final Map<String, BaseCmd> commandsMap;
 
     private CommandManager() {
-        this.commandsMap = this.initialize(
+        this.commandsMap = CommandManager.initialize(
                 // Utility Commands
                 new WeatherCmd(), new MathCmd(), new TranslateCmd(), new WikiCmd(), new PollCmd(),
                 new UrbanCmd(), new LyricsCmd(),
@@ -87,7 +87,7 @@ public class CommandManager {
                 new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd(), new PrefixCmd());
     }
 
-    private Map<String, BaseCmd> initialize(BaseCmd... cmds) {
+    private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {
         final Map<String, BaseCmd> map = new LinkedHashMap<>();
         for (final BaseCmd cmd : cmds) {
             for (final String name : cmd.getNames()) {

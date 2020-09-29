@@ -72,17 +72,10 @@ public class TimeUtils {
             final long time = Long.parseLong(LETTER_PATTERN.matcher(match).replaceAll(""));
             final String unit = NUMBER_PATTERN.matcher(match).replaceAll("");
             switch (unit) {
-                case "s":
-                    seconds += TimeUnit.SECONDS.toSeconds(time);
-                    break;
-                case "m":
-                    seconds += TimeUnit.MINUTES.toSeconds(time);
-                    break;
-                case "h":
-                    seconds += TimeUnit.HOURS.toSeconds(time);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown unit: " + unit);
+                case "s" -> seconds += TimeUnit.SECONDS.toSeconds(time);
+                case "m" -> seconds += TimeUnit.MINUTES.toSeconds(time);
+                case "h" -> seconds += TimeUnit.HOURS.toSeconds(time);
+                default -> throw new IllegalArgumentException("Unknown unit: " + unit);
             }
         }
 

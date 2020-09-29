@@ -36,7 +36,7 @@ public class DtcCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading quote...", context.getUsername()))
                 .send()
-                .then(this.getRandomQuote())
+                .then(DtcCmd.getRandomQuote())
                 .map(quote -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Quote DansTonChat",
                                 String.format("https://danstonchat.com/%s.html", quote.getId()), context.getAvatarUrl())
@@ -47,7 +47,7 @@ public class DtcCmd extends BaseCmd {
                 .then();
     }
 
-    private Mono<Quote> getRandomQuote() {
+    private static Mono<Quote> getRandomQuote() {
         final JavaType valueType = NetUtils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
         return NetUtils
                 .<List<Quote>>get(RANDOM_QUOTE_URL, valueType)
@@ -62,10 +62,10 @@ public class DtcCmd extends BaseCmd {
 
     private String formatContent(String content) {
         final String formattedContent = content.replace("*", "\\*");
-        return FormatUtils.format(formattedContent.split("\n"), this::formatLine, "\n");
+        return FormatUtils.format(formattedContent.split("\n"), DtcCmd::formatLine, "\n");
     }
 
-    private String formatLine(String line) {
+    private static String formatLine(String line) {
         // Set the user name as bold
         if (line.contains(" ")) {
             final int index = line.indexOf(' ');

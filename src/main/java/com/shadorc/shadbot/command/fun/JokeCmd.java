@@ -31,7 +31,7 @@ public class JokeCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading joke...", context.getUsername()))
                 .send()
-                .then(this.getRandomJoke())
+                .then(JokeCmd.getRandomJoke())
                 .map(joke -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Joke", HOME_URL, context.getAvatarUrl())
                                 .setDescription(joke))))
@@ -40,7 +40,7 @@ public class JokeCmd extends BaseCmd {
                 .then();
     }
 
-    private Mono<String> getRandomJoke() {
+    private static Mono<String> getRandomJoke() {
         return NetUtils.get(header -> header.add(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON), HOME_URL, JokeResponse.class)
                 .map(JokeResponse::getJoke);
     }

@@ -39,11 +39,11 @@ public class AchievementsCmd extends BaseCmd {
 
                                     final StringBuilder description = new StringBuilder();
                                     for (final Achievement achievement : achievements) {
-                                        description.append(this.formatAchievement(achievement, true));
+                                        description.append(AchievementsCmd.formatAchievement(achievement, true));
                                     }
                                     for (final Achievement achievement : Achievement.values()) {
                                         if (!achievements.contains(achievement)) {
-                                            description.append(this.formatAchievement(achievement, false));
+                                            description.append(AchievementsCmd.formatAchievement(achievement, false));
                                         }
                                     }
                                     embed.setDescription(description.toString());
@@ -53,7 +53,7 @@ public class AchievementsCmd extends BaseCmd {
                 .then();
     }
 
-    private String formatAchievement(Achievement achievement, boolean unlocked) {
+    private static String formatAchievement(Achievement achievement, boolean unlocked) {
         return String.format("%s **%s**%n%s%n",
                 unlocked ? achievement.getEmoji() : Emoji.LOCK, achievement.getTitle(), achievement.getDescription());
     }

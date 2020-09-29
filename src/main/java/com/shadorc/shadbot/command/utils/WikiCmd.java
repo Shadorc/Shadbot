@@ -35,7 +35,7 @@ public class WikiCmd extends BaseCmd {
 
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Wikipedia...", context.getUsername()))
                 .send()
-                .then(this.getWikipediaPage(arg))
+                .then(WikiCmd.getWikipediaPage(arg))
                 .map(page -> {
                     if (page.getExtract().endsWith("may refer to:")) {
                         return updatableMsg.setContent(
@@ -60,7 +60,7 @@ public class WikiCmd extends BaseCmd {
                 .then();
     }
 
-    private Mono<WikipediaPage> getWikipediaPage(String search) {
+    private static Mono<WikipediaPage> getWikipediaPage(String search) {
         // Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
         final String url = String.format("https://en.wikipedia.org/w/api.php?"
                         + "format=json"

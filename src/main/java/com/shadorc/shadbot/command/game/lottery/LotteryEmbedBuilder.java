@@ -51,18 +51,11 @@ public class LotteryEmbedBuilder {
     }
 
     public LotteryEmbedBuilder withHistoric(LotteryHistoric historic) {
-        final String people;
-        switch (historic.getWinnerCount()) {
-            case 0:
-                people = "nobody";
-                break;
-            case 1:
-                people = "one person";
-                break;
-            default:
-                people = historic.getWinnerCount() + " people";
-                break;
-        }
+        final String people = switch (historic.getWinnerCount()) {
+            case 0 -> "nobody";
+            case 1 -> "one person";
+            default -> historic.getWinnerCount() + " people";
+        };
 
         this.embedConsumer = this.embedConsumer.andThen(embed -> embed.addField("Historic",
                 String.format("Last week, the prize pool contained **%s**, the winning " +

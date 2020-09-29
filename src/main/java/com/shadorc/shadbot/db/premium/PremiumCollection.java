@@ -70,7 +70,7 @@ public class PremiumCollection extends DatabaseCollection {
      * @param type The {@link RelicType} type of the {@link Relic} to generate.
      * @return The generated {@link Relic} inserted in the database.
      */
-    public Mono<Relic> generateRelic(RelicType type) {
+    public static Mono<Relic> generateRelic(RelicType type) {
         final Relic relic = new Relic(UUID.randomUUID(), type, Duration.ofDays(Config.RELIC_DURATION));
         LOGGER.info("Relic generated. Type: %s, ID: %s", relic.getType(), relic.getId());
         return relic.insert()

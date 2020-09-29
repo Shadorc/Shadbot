@@ -67,7 +67,7 @@ public class AutoRolesSetting extends BaseSetting {
                     }
                     return mentionedRoles;
                 })
-                .flatMap(mentionedRoles -> this.checkPermissions(context, mentionedRoles, action))
+                .flatMap(mentionedRoles -> AutoRolesSetting.checkPermissions(context, mentionedRoles, action))
                 .zipWith(DatabaseManager.getGuilds()
                         .getDBGuild(context.getGuildId()))
                 .flatMap(TupleUtils.function((mentionedRoles, dbGuild) -> {
@@ -95,7 +95,7 @@ public class AutoRolesSetting extends BaseSetting {
                 .then();
     }
 
-    private Mono<List<Role>> checkPermissions(Context context, List<Role> roles, Action action) {
+    private static Mono<List<Role>> checkPermissions(Context context, List<Role> roles, Action action) {
         if (action == Action.ADD) {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_ROLES)

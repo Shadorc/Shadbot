@@ -91,7 +91,7 @@ public class OverwatchCmd extends BaseCmd {
         final String username = NetUtils.encode(battletag.replace("#", "-"));
 
         final Mono<ProfileResponse> getProfile =
-                NetUtils.get(this.getUrl("profile", platform, username), ProfileResponse.class)
+                NetUtils.get(OverwatchCmd.getUrl("profile", platform, username), ProfileResponse.class)
                         .map(profile -> {
                             if (profile.getMessage().map("Error: Profile not found"::equals).orElse(false)) {
                                 throw new CommandException("Profile not found. The specified platform may be incorrect.");
@@ -99,7 +99,7 @@ public class OverwatchCmd extends BaseCmd {
                             return profile;
                         });
         final Mono<StatsResponse> getStats =
-                NetUtils.get(this.getUrl("stats", platform, username), StatsResponse.class);
+                NetUtils.get(OverwatchCmd.getUrl("stats", platform, username), StatsResponse.class);
 
         return Mono.zip(Mono.just(platform), getProfile, getStats)
                 .map(TupleUtils.function(OverwatchProfile::new))
@@ -107,7 +107,7 @@ public class OverwatchCmd extends BaseCmd {
                 .switchIfEmpty(Mono.error(new IOException("Overwatch API returned malformed JSON")));
     }
 
-    private String getUrl(String endpoint, Platform platform, String username) {
+    private static String getUrl(String endpoint, Platform platform, String username) {
         return String.format("%s/%s/%s/global/%s", HOME_URL, endpoint, platform.getName(), username);
     }
 

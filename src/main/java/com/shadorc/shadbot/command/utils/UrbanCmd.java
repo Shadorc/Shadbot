@@ -47,7 +47,7 @@ public class UrbanCmd extends BaseCmd {
                         return Mono.just(updatableMsg.setContent(ShadbotUtils.mustBeNsfw(context.getPrefix())));
                     }
 
-                    return this.getUrbanDefinition(arg)
+                    return UrbanCmd.getUrbanDefinition(arg)
                             .map(urbanDefinition -> {
                                 final String definition = StringUtils.abbreviate(urbanDefinition.getDefinition(),
                                         Embed.MAX_DESCRIPTION_LENGTH);
@@ -74,7 +74,7 @@ public class UrbanCmd extends BaseCmd {
                 .then();
     }
 
-    private Mono<UrbanDefinition> getUrbanDefinition(String search) {
+    private static Mono<UrbanDefinition> getUrbanDefinition(String search) {
         final String url = String.format("%s?term=%s", HOME_URL, NetUtils.encode(search));
         return NetUtils.get(url, UrbanDictionaryResponse.class)
                 .flatMapIterable(UrbanDictionaryResponse::getDefinitions)

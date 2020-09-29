@@ -49,16 +49,16 @@ public class InfoCmd extends BaseCmd {
                     return DiscordUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Testing ping...",
                             context.getUsername()), channel)
                             .flatMap(message -> message.edit(spec -> spec.setContent("```prolog"
-                                    + this.getVersionSection()
-                                    + this.getPerformanceSection()
-                                    + this.getInternetSection(context, start)
-                                    + this.getShadbotSection(context, owner)
+                                    + InfoCmd.getVersionSection()
+                                    + InfoCmd.getPerformanceSection()
+                                    + InfoCmd.getInternetSection(context, start)
+                                    + InfoCmd.getShadbotSection(context, owner)
                                     + "```")));
                 }))
                 .then();
     }
 
-    private String getVersionSection() {
+    private static String getVersionSection() {
         return String.format("%n-= Versions =-")
                 + String.format("%nJava: %s", JAVA_VERSION)
                 + String.format("%nShadbot: %s", Config.VERSION)
@@ -66,7 +66,7 @@ public class InfoCmd extends BaseCmd {
                 + String.format("%nLavaPlayer: %s", LAVAPLAYER_VERSION);
     }
 
-    private String getPerformanceSection() {
+    private static String getPerformanceSection() {
         return String.format("%n%n-= Performance =-")
                 + String.format("%nMemory: %s/%s MB",
                 FormatUtils.number(ProcessUtils.getMemoryUsed()), FormatUtils.number(ProcessUtils.getMaxMemory()))
@@ -74,7 +74,7 @@ public class InfoCmd extends BaseCmd {
                 + String.format("%nThreads: %s", FormatUtils.number(Thread.activeCount()));
     }
 
-    private String getInternetSection(Context context, long start) {
+    private static String getInternetSection(Context context, long start) {
         final long gatewayLatency = context.getClient().getGatewayClientGroup()
                 .find(context.getEvent().getShardInfo().getIndex())
                 .map(GatewayClient::getResponseTime)
@@ -86,7 +86,7 @@ public class InfoCmd extends BaseCmd {
                 + String.format("%nGateway Latency: %dms", gatewayLatency);
     }
 
-    private String getShadbotSection(Context context, User owner) {
+    private static String getShadbotSection(Context context, User owner) {
         final String uptime = FormatUtils.formatDurationWords(
                 Duration.ofMillis(TimeUtils.getMillisUntil(Shadbot.getLaunchTime())));
 

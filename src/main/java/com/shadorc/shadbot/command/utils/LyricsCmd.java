@@ -55,7 +55,7 @@ public class LyricsCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-        final String search = this.getSearch(context);
+        final String search = LyricsCmd.getSearch(context);
 
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading lyrics...",
                 context.getUsername()))
@@ -78,8 +78,8 @@ public class LyricsCmd extends BaseCmd {
     }
 
     private Mono<Musixmatch> getMusixmatch(String search) {
-        return this.getCorrectedUrl(search)
-                .flatMap(url -> this.getLyricsDocument(url)
+        return LyricsCmd.getCorrectedUrl(search)
+                .flatMap(url -> LyricsCmd.getLyricsDocument(url)
                         .map(doc -> doc.outputSettings(PRESERVE_FORMAT))
                         .map(doc -> new Musixmatch(doc, url)))
                 .filter(musixmatch -> !musixmatch.getLyrics().isBlank());
@@ -88,7 +88,7 @@ public class LyricsCmd extends BaseCmd {
     /**
      * @return The search term, either the current playing music title or the context argument.
      */
-    private String getSearch(Context context) {
+    private static String getSearch(Context context) {
         return context.getArg()
                 .orElseGet(() -> {
                     final GuildMusic guildMusic = MusicManager.getInstance()
@@ -105,7 +105,7 @@ public class LyricsCmd extends BaseCmd {
                 });
     }
 
-    private Mono<Document> getLyricsDocument(String url) {
+    private static Mono<Document> getLyricsDocument(String url) {
         // Sometimes Musixmatch redirects to a wrong page
         // If the response URL and the requested URL are different, retry
         return NetUtils.request(HttpMethod.GET, url)
@@ -124,7 +124,7 @@ public class LyricsCmd extends BaseCmd {
                         err -> new IOException(String.format("Musixmatch does not redirect to the correct page: %s", url)));
     }
 
-    private Mono<String> getCorrectedUrl(String search) {
+    private static Mono<String> getCorrectedUrl(String search) {
         final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtils.encode(search));
         // Make a search request on the site
         return NetUtils.get(url)

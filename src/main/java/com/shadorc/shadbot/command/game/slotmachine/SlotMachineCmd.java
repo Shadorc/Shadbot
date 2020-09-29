@@ -35,7 +35,7 @@ public class SlotMachineCmd extends BaseCmd {
                 .map(ignored -> new GamblerPlayer(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST))
                 .flatMap(player -> player.bet().thenReturn(player))
                 .flatMap(player -> {
-                    final List<SlotOptions> slots = this.randSlots();
+                    final List<SlotOptions> slots = SlotMachineCmd.randSlots();
 
                     final StringBuilder strBuilder = new StringBuilder(String.format("%s%n%s (**%s**) ",
                             FormatUtils.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getUsername()));
@@ -58,7 +58,7 @@ public class SlotMachineCmd extends BaseCmd {
                 .then();
     }
 
-    private List<SlotOptions> randSlots() {
+    private static List<SlotOptions> randSlots() {
         // Pseudo-random number between 0 and 100 inclusive
         final int rand = ThreadLocalRandom.current().nextInt(100 + 1);
         if (rand == 0) {

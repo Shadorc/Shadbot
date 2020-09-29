@@ -66,29 +66,23 @@ public class ManageCoinsCmd extends BaseCmd {
 
                     final String mentionsStr = context.getMessage().mentionsEveryone()
                             ? "Everyone" : FormatUtils.format(members, Tuple2::getT1, ", ");
-                    switch (action) {
-                        case ADD:
-                            return Flux.fromIterable(members)
-                                    .map(Tuple2::getT2)
-                                    .flatMap(dbMember -> dbMember.addCoins(coins))
-                                    .then(Mono.just(String.format(Emoji.MONEY_BAG + " **%s** received **%s**.",
-                                            mentionsStr, FormatUtils.coins(coins))));
-                        case REMOVE:
-                            return Flux.fromIterable(members)
-                                    .map(Tuple2::getT2)
-                                    .flatMap(dbMember -> dbMember.addCoins(-coins))
-                                    .then(Mono.just(String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.",
-                                            mentionsStr, FormatUtils.coins(coins))));
-                        case RESET:
-                            return Flux.fromIterable(members)
-                                    .map(Tuple2::getT2)
-                                    .flatMap(DBMember::resetCoins)
-                                    .then(Mono.just(String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.",
-                                            mentionsStr, members.size() == 1 ? "his" : "their")));
-                        default:
-                            return Mono.error(new CommandException(String.format("`%s` is not a valid action. %s",
-                                    args.get(0), FormatUtils.options(Action.class))));
-                    }
+                    return switch (action) {
+                        case ADD -> Flux.fromIterable(members)
+                                .map(Tuple2::getT2)
+                                .flatMap(dbMember -> dbMember.addCoins(coins))
+                                .then(Mono.just(String.format(Emoji.MONEY_BAG + " **%s** received **%s**.",
+                                        mentionsStr, FormatUtils.coins(coins))));
+                        case REMOVE -> Flux.fromIterable(members)
+                                .map(Tuple2::getT2)
+                                .flatMap(dbMember -> dbMember.addCoins(-coins))
+                                .then(Mono.just(String.format(Emoji.MONEY_BAG + " **%s** lost **%s**.",
+                                        mentionsStr, FormatUtils.coins(coins))));
+                        case RESET -> Flux.fromIterable(members)
+                                .map(Tuple2::getT2)
+                                .flatMap(DBMember::resetCoins)
+                                .then(Mono.just(String.format(Emoji.MONEY_BAG + " **%s** lost all %s coins.",
+                                        mentionsStr, members.size() == 1 ? "his" : "their")));
+                    };
                 })
                 .flatMap(text -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))

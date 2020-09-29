@@ -5,7 +5,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.premium.PremiumCollection;
 import com.shadorc.shadbot.db.premium.RelicType;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
@@ -33,7 +33,7 @@ public class GenerateRelicCmd extends BaseCmd {
                 new CommandException(String.format("`%s` in not a valid type. %s",
                         arg, FormatUtils.options(RelicType.class))));
 
-        return DatabaseManager.getPremium()
+        return PremiumCollection
                 .generateRelic(type)
                 .flatMap(relic -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(

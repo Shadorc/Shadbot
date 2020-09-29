@@ -92,7 +92,7 @@ public class DiabloCmd extends BaseCmd {
                                             context.getUsername()));
                                 }
                                 Collections.reverse(heroResponses);
-                                return updatableMsg.setEmbed(this.getEmbed(context.getAvatarUrl(), profile, heroResponses));
+                                return updatableMsg.setEmbed(DiabloCmd.getEmbed(context.getAvatarUrl(), profile, heroResponses));
                             });
                 })
                 .flatMap(UpdatableMessage::send)
@@ -100,7 +100,7 @@ public class DiabloCmd extends BaseCmd {
                 .then();
     }
 
-    private Consumer<EmbedCreateSpec> getEmbed(String avatarUrl, ProfileResponse profile, List<HeroResponse> heroResponses) {
+    private static Consumer<EmbedCreateSpec> getEmbed(String avatarUrl, ProfileResponse profile, List<HeroResponse> heroResponses) {
         final String description = String.format("Stats for **%s** (Guild: **%s**)"
                         + "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
                         + "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",

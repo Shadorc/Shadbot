@@ -75,17 +75,10 @@ public class AutoMessagesSetting extends BaseSetting {
 
         return DatabaseManager.getGuilds()
                 .getDBGuild(context.getGuildId())
-                .flatMap(dbGuild -> {
-                    switch (type) {
-                        case CHANNEL:
-                            return AutoMessagesSetting.channel(context, dbGuild, action);
-                        case JOIN_MESSAGE:
-                            return this.updateMessage(context, dbGuild, Setting.JOIN_MESSAGE, action, args);
-                        case LEAVE_MESSAGE:
-                            return this.updateMessage(context, dbGuild, Setting.LEAVE_MESSAGE, action, args);
-                        default:
-                            return Mono.empty();
-                    }
+                .flatMap(dbGuild -> switch (type) {
+                    case CHANNEL -> AutoMessagesSetting.channel(context, dbGuild, action);
+                    case JOIN_MESSAGE -> this.updateMessage(context, dbGuild, Setting.JOIN_MESSAGE, action, args);
+                    case LEAVE_MESSAGE -> this.updateMessage(context, dbGuild, Setting.LEAVE_MESSAGE, action, args);
                 })
                 .then();
     }
@@ -157,9 +150,10 @@ public class AutoMessagesSetting extends BaseSetting {
                         Type.LEAVE_MESSAGE.toString().toLowerCase(),
                         Type.CHANNEL.toString().toLowerCase()), true)
                 .addField("Info", "You don't need to specify *value* to disable a type.", false)
-                .addField("Formatting", "**{mention}** - the mention of the user who joined/left"
-                        + "\n**{username}** - the username of the user who joined/left"
-                        + "\n**{userId}** - the id of the user who joined/left", false)
+                .addField("Formatting", """
+                        **{mention}** - the mention of the user who joined/left
+                        **{username}** - the username of the user who joined/left
+                        **{userId}** - the id of the user who joined/left""", false)
                 .setExample(String.format("`%s%s enable join_message Hello {mention} (:`"
                                 + "%n`%s%s disable leave_message`",
                         context.getPrefix(), this.getCommandName(), context.getPrefix(), this.getCommandName()))

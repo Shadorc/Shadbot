@@ -74,21 +74,21 @@ public class RestrictedRolesSetting extends BaseSetting {
         final String name = args.get(3);
         final Set<BaseCmd> commands = new HashSet<>();
         switch (type) {
-            case COMMAND:
+            case COMMAND -> {
                 final BaseCmd command = CommandManager.getInstance().getCommand(name);
                 if (command == null) {
                     return Mono.error(new CommandException(String.format("`%s` is not a valid command.", name)));
                 }
                 commands.add(command);
-                break;
-            case CATEGORY:
+            }
+            case CATEGORY -> {
                 final CommandCategory category = EnumUtils.parseEnum(CommandCategory.class, name,
                         new CommandException(String.format("`%s` is not a valid category. %s",
                                 name, FormatUtils.options(CommandCategory.class))));
                 commands.addAll(CommandManager.getInstance().getCommands().values().stream()
                         .filter(cmd -> cmd.getCategory() == category)
                         .collect(Collectors.toSet()));
-                break;
+            }
         }
 
         return context.getGuild()
@@ -107,22 +107,22 @@ public class RestrictedRolesSetting extends BaseSetting {
                             .getRestrictedRoles();
 
                     switch (action) {
-                        case ADD:
+                        case ADD -> {
                             restrictedRoles.computeIfAbsent(mentionedRole.getId(), ignored -> new HashSet<>())
                                     .addAll(commands);
                             strBuilder.append(
                                     String.format("Command(s) %s can now only be used by role **%s**.",
                                             FormatUtils.format(commands, cmd -> String.format("`%s`", cmd.getName()), " "),
                                             mentionedRole.getName()));
-                            break;
-                        case REMOVE:
+                        }
+                        case REMOVE -> {
                             if (restrictedRoles.containsKey(mentionedRole.getId())) {
                                 restrictedRoles.get(mentionedRole.getId()).removeAll(commands);
                             }
                             strBuilder.append(
                                     String.format("Command(s) %s can now be used everywhere.",
                                             FormatUtils.format(commands, cmd -> String.format("`%s`", cmd.getName()), " ")));
-                            break;
+                        }
                     }
 
                     final Map<String, Set<String>> setting = restrictedRoles

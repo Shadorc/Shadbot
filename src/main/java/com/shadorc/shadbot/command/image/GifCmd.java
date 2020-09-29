@@ -37,7 +37,7 @@ public class GifCmd extends BaseCmd {
 
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading gif...", context.getUsername()))
                 .send()
-                .then(this.getGif(NetUtils.encode(context.getArg().orElse(""))))
+                .then(GifCmd.getGif(NetUtils.encode(context.getArg().orElse(""))))
                 .map(gifUrl -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setImage(gifUrl))))
                 .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
@@ -48,7 +48,7 @@ public class GifCmd extends BaseCmd {
                 .then();
     }
 
-    private Mono<String> getGif(String encodedSearch) {
+    private static Mono<String> getGif(String encodedSearch) {
         final String apiKey = CredentialManager.getInstance().get(Credential.GIPHY_API_KEY);
         final String url;
         if (encodedSearch.isBlank()) {

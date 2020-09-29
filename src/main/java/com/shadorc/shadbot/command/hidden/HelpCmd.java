@@ -42,7 +42,7 @@ public class HelpCmd extends BaseCmd {
 
         return context.getPermissions()
                 .collectList()
-                .flatMap(authorPermissions -> this.getMultiMap(context, authorPermissions))
+                .flatMap(authorPermissions -> HelpCmd.getMultiMap(context, authorPermissions))
                 .map(map -> ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> {
                             embed.setAuthor("Shadbot Help", "https://github.com/Shadorc/Shadbot/wiki/Commands",
@@ -67,7 +67,7 @@ public class HelpCmd extends BaseCmd {
                 .then();
     }
 
-    private Mono<Map<CommandCategory, Collection<String>>> getMultiMap(Context context, List<CommandPermission> authorPermissions) {
+    private static Mono<Map<CommandCategory, Collection<String>>> getMultiMap(Context context, List<CommandPermission> authorPermissions) {
         final Mono<Boolean> getIsDm = context.getChannel()
                 .map(Channel::getType)
                 .map(Channel.Type.DM::equals)

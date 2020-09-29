@@ -45,10 +45,10 @@ public class CounterStrikeCmd extends BaseCmd {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading CS:GO stats...", context.getUsername()))
                 .send()
-                .thenReturn(this.getIdentificator(arg))
-                .flatMap(this::getSteamId)
-                .flatMap(this::getPlayerSummary)
-                .flatMap(player -> this.getStats(context, updatableMsg, player))
+                .thenReturn(CounterStrikeCmd.getIdentificator(arg))
+                .flatMap(CounterStrikeCmd::getSteamId)
+                .flatMap(CounterStrikeCmd::getPlayerSummary)
+                .flatMap(player -> CounterStrikeCmd.getStats(context, updatableMsg, player))
                 .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Steam player not found.",
                                 context.getUsername()))))
@@ -60,7 +60,7 @@ public class CounterStrikeCmd extends BaseCmd {
     /**
      * @return The identificator, either directly provided or extracted from an URL.
      */
-    private String getIdentificator(String arg) {
+    private static String getIdentificator(String arg) {
         // The user provided an URL that can contains a pseudo or an ID
         if (arg.contains("/")) {
             final List<String> splittedUrl = StringUtils.split(arg, "/");
@@ -76,7 +76,7 @@ public class CounterStrikeCmd extends BaseCmd {
     /**
      * @return The identificator converted as an ID or empty if not found.
      */
-    private Mono<String> getSteamId(String identificator) {
+    private static Mono<String> getSteamId(String identificator) {
         // The user directly provided the ID
         if (NumberUtils.isPositiveLong(identificator)) {
             return Mono.just(identificator);
@@ -95,7 +95,7 @@ public class CounterStrikeCmd extends BaseCmd {
     /**
      * @return The {@link PlayerSummary} corresponding to the provided steam ID.
      */
-    private Mono<PlayerSummary> getPlayerSummary(String steamId) {
+    private static Mono<PlayerSummary> getPlayerSummary(String steamId) {
         final String url = String.format("%s?key=%s&steamids=%s",
                 PLAYER_SUMMARIES_URL, CredentialManager.getInstance().get(Credential.STEAM_API_KEY), steamId);
         return NetUtils.get(url, PlayerSummariesResponse.class)
@@ -105,7 +105,7 @@ public class CounterStrikeCmd extends BaseCmd {
                 .next();
     }
 
-    private Mono<UpdatableMessage> getStats(Context context, UpdatableMessage updatableMsg, PlayerSummary player) {
+    private static Mono<UpdatableMessage> getStats(Context context, UpdatableMessage updatableMsg, PlayerSummary player) {
         if (player.getCommunityVisibilityState() != PlayerSummary.CommunityVisibilityState.PUBLIC) {
             return Mono.just(updatableMsg.setContent(
                     String.format(Emoji.ACCESS_DENIED + " (**%s**) This profile is private, more info here: <%s>",

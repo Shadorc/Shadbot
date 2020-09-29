@@ -21,8 +21,6 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
-
 public class Rule34Cmd extends BaseCmd {
 
     private static final String HOME_URL = "https://rule34.xxx/index.php";
@@ -46,7 +44,7 @@ public class Rule34Cmd extends BaseCmd {
                         return Mono.just(updatableMsg.setContent(ShadbotUtils.mustBeNsfw(context.getPrefix())));
                     }
 
-                    return this.getR34Post(arg)
+                    return Rule34Cmd.getR34Post(arg)
                             .map(post -> {
                                 final List<String> tags = StringUtils.split(post.getTags(), " ");
 
@@ -69,7 +67,7 @@ public class Rule34Cmd extends BaseCmd {
                                             });
 
                                             final String resolution = String.format("%dx%d", post.getWidth(), post.getHeight());
-                                            final String formattedTags = this.formatTags(tags);
+                                            final String formattedTags = Rule34Cmd.formatTags(tags);
                                             embed.setAuthor(String.format("Rule34: %s", arg), post.getFileUrl(), context.getAvatarUrl())
                                                     .setThumbnail("https://i.imgur.com/t6JJWFN.png")
                                                     .addField("Resolution", resolution, false)
@@ -88,7 +86,7 @@ public class Rule34Cmd extends BaseCmd {
                 .then();
     }
 
-    private Mono<R34Post> getR34Post(String search) {
+    private static Mono<R34Post> getR34Post(String search) {
         final String url = String.format("%s?page=dapi&s=post&q=index&tags=%s",
                 HOME_URL, NetUtils.encode(search.replace(" ", "_")));
 
@@ -103,7 +101,7 @@ public class Rule34Cmd extends BaseCmd {
                 .map(RandUtils::randValue);
     }
 
-    private String formatTags(List<String> tags) {
+    private static String formatTags(List<String> tags) {
         final StringBuilder tagsBuilder = new StringBuilder();
         for (final String tag : tags) {
             if (tagsBuilder.length() + tag.length() < MAX_TAGS_CHAR) {

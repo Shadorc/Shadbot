@@ -33,7 +33,7 @@ public class ThisDayCmd extends BaseCmd {
 
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading events...", context.getUsername()))
                 .send()
-                .then(this.getThisDay())
+                .then(ThisDayCmd.getThisDay())
                 .map(thisDay -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor(String.format("On This Day: %s",
                                 thisDay.getDate()), HOME_URL, context.getAvatarUrl())
@@ -44,7 +44,7 @@ public class ThisDayCmd extends BaseCmd {
                 .then();
     }
 
-    private Mono<ThisDay> getThisDay() {
+    private static Mono<ThisDay> getThisDay() {
         return NetUtils.get(HOME_URL)
                 .map(Jsoup::parse)
                 .map(ThisDay::new);

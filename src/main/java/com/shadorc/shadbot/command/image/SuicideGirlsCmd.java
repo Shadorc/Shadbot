@@ -38,7 +38,7 @@ public class SuicideGirlsCmd extends BaseCmd {
                         return Mono.just(updatableMsg.setContent(ShadbotUtils.mustBeNsfw(context.getPrefix())));
                     }
 
-                    return this.getRandomSuicideGirl()
+                    return SuicideGirlsCmd.getRandomSuicideGirl()
                             .map(girl -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                                     .andThen(embed -> embed.setAuthor("SuicideGirls", girl.getUrl(), context.getAvatarUrl())
                                             .setDescription(String.format("Name: **%s**", girl.getName()))
@@ -49,7 +49,7 @@ public class SuicideGirlsCmd extends BaseCmd {
                 .then();
     }
 
-    private Mono<SuicideGirl> getRandomSuicideGirl() {
+    private static Mono<SuicideGirl> getRandomSuicideGirl() {
         return NetUtils.get(HOME_URL)
                 .map(Jsoup::parse)
                 .map(SuicideGirl::new);

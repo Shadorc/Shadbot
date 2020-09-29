@@ -83,11 +83,12 @@ public class ChatCmd extends BaseCmd {
         return CommandHelpBuilder.create(this, context)
                 .setDescription("Chat with an artificial intelligence.")
                 .addArg("message", String.format("must not exceed %d characters", MAX_CHARACTERS), false)
-                .setSource("https://www.pandorabots.com/"
-                        + "\n**Marvin** (ID: efc39100ce34d038)"
-                        + "\n**Chomsky** (ID: b0dafd24ee35a477)"
-                        + "\n**R.I.V.K.A** (ID: ea373c261e3458c6)"
-                        + "\n**Lisa** (ID: b0a6a41a5e345c23)")
+                .setSource("""
+                        https://www.pandorabots.com/
+                        **Marvin** (ID: efc39100ce34d038)
+                        **Chomsky** (ID: b0dafd24ee35a477)
+                        **R.I.V.K.A** (ID: ea373c261e3458c6)
+                        **Lisa** (ID: b0a6a41a5e345c23)""")
                 .build();
     }
 }

@@ -42,7 +42,7 @@ public class LotteryCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         if (context.getArg().isEmpty()) {
-            return this.show(context).then();
+            return LotteryCmd.show(context).then();
         }
 
         final String arg = context.requireArg();
@@ -76,7 +76,7 @@ public class LotteryCmd extends BaseCmd {
                 .then();
     }
 
-    private Mono<Message> show(Context context) {
+    private static Mono<Message> show(Context context) {
         final Mono<List<LotteryGambler>> getGamblers = DatabaseManager.getLottery()
                 .getGamblers()
                 .collectList();

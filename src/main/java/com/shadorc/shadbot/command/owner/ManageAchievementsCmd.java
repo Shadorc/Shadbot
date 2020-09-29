@@ -54,15 +54,9 @@ public class ManageAchievementsCmd extends BaseCmd {
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
                         err -> Mono.empty())
                 .flatMap(user -> DatabaseManager.getUsers().getDBUser(user.getId())
-                        .flatMap(dbUser -> {
-                            switch (action) {
-                                case ADD:
-                                    return dbUser.unlockAchievement(achievement);
-                                case REMOVE:
-                                    return dbUser.lockAchievement(achievement);
-                                default:
-                                    return Mono.error(new IllegalStateException(String.format("Unknown action: %s", action)));
-                            }
+                        .flatMap(dbUser -> switch (action) {
+                            case ADD -> dbUser.unlockAchievement(achievement);
+                            case REMOVE -> dbUser.lockAchievement(achievement);
                         })
                         .then(context.getChannel())
                         .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s **%s** to **%s** done.",

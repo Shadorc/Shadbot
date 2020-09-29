@@ -19,13 +19,13 @@ public class SettingManager {
     private final Map<String, BaseSetting> settingsMap;
 
     private SettingManager() {
-        this.settingsMap = this.initialize(
+        this.settingsMap = SettingManager.initialize(
                 new AllowedChannelsSetting(), new AllowedRolesSetting(), new AutoMessagesSetting(),
                 new AutoRolesSetting(), new BlacklistSettingCmd(), new NSFWSetting(), new PrefixSetting(),
                 new VolumeSetting(), new RestrictedChannelsSetting(), new RestrictedRolesSetting());
     }
 
-    private Map<String, BaseSetting> initialize(BaseSetting... settings) {
+    private static Map<String, BaseSetting> initialize(BaseSetting... settings) {
         final Map<String, BaseSetting> map = new LinkedHashMap<>();
         for (final BaseSetting setting : settings) {
             for (final String name : setting.getNames()) {

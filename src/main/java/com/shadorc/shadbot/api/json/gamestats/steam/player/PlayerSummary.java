@@ -35,16 +35,12 @@ public class PlayerSummary {
         PUBLIC;
 
         public static CommunityVisibilityState valueOf(int state) {
-            switch (state) {
-                case 1:
-                    return PRIVATE;
-                case 2:
-                    return FRIENDS_ONLY;
-                case 3:
-                    return PUBLIC;
-                default:
-                    throw new AssertionError();
-            }
+            return switch (state) {
+                case 1 -> PRIVATE;
+                case 2 -> FRIENDS_ONLY;
+                case 3 -> PUBLIC;
+                default -> throw new AssertionError();
+            };
         }
     }
 

@@ -43,7 +43,7 @@ public class TrackScheduler {
      * @return {@code true} if the track was started, {@code false} if it was added to the queue.
      */
     public boolean startOrQueue(AudioTrack track, boolean first) {
-        if (this.audioPlayer.startTrack(this.makeClone(track), true)) {
+        if (this.audioPlayer.startTrack(TrackScheduler.makeClone(track), true)) {
             this.currentTrack = track;
             return true;
         } else if (first) {
@@ -64,9 +64,9 @@ public class TrackScheduler {
                 this.queue.offer(this.currentTrack);
             case NONE:
                 this.currentTrack = this.queue.poll();
-                return this.audioPlayer.startTrack(this.makeClone(this.currentTrack), false);
+                return this.audioPlayer.startTrack(TrackScheduler.makeClone(this.currentTrack), false);
             case SONG:
-                this.audioPlayer.playTrack(this.makeClone(this.currentTrack));
+                this.audioPlayer.playTrack(TrackScheduler.makeClone(this.currentTrack));
                 break;
         }
         return true;
@@ -77,7 +77,7 @@ public class TrackScheduler {
         for (int i = 0; i < num; i++) {
             track = this.queue.poll();
         }
-        this.audioPlayer.playTrack(this.makeClone(track));
+        this.audioPlayer.playTrack(TrackScheduler.makeClone(track));
         this.currentTrack = track;
     }
 
@@ -137,7 +137,7 @@ public class TrackScheduler {
      * @return A clone of the provided track or {@code null} if null input track.
      */
     @Nullable
-    private AudioTrack makeClone(AudioTrack track) {
+    private static AudioTrack makeClone(AudioTrack track) {
         return track == null ? null : track.makeClone();
     }
 

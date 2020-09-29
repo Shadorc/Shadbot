@@ -46,15 +46,10 @@ public class NSFWSetting extends BaseSetting {
         return context.getChannel()
                 .cast(TextChannel.class)
                 .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_CHANNELS)
-                        .then(Mono.fromSupplier(() -> {
-                            switch (action) {
-                                case TOGGLE:
-                                    return !channel.isNsfw();
-                                case ENABLE:
-                                    return true;
-                                default:
-                                    return false;
-                            }
+                        .then(Mono.fromSupplier(() -> switch (action) {
+                            case TOGGLE -> !channel.isNsfw();
+                            case ENABLE -> true;
+                            default -> false;
                         }))
                         .flatMap(nsfw -> channel.edit(spec -> spec.setNsfw(nsfw))))
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) %s is now **%sSFW**.",

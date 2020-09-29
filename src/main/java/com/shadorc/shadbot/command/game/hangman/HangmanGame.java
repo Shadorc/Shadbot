@@ -136,14 +136,10 @@ public class HangmanGame extends Game<HangmanCmd> {
     }
 
     private String getWord(HangmanCmd.Difficulty difficulty) {
-        switch (difficulty) {
-            case EASY:
-                return this.getGameCmd().getEasyWords().getRandomWord();
-            case HARD:
-                return this.getGameCmd().getHardWords().getRandomWord();
-            default:
-                throw new RuntimeException(String.format("Unknown difficulty: %s", difficulty));
-        }
+        return switch (difficulty) {
+            case EASY -> this.getGameCmd().getEasyWords().getRandomWord();
+            case HARD -> this.getGameCmd().getHardWords().getRandomWord();
+        };
     }
 
     protected Mono<Void> checkLetter(String chr) {
