@@ -64,7 +64,7 @@ public class RateLimiter {
         gateway.getUserById(userId)
                 .map(author -> {
                     final String username = author.getUsername();
-                    final String message = ShadbotUtils.SPAMS.getRandomText();
+                    final String message = ShadbotUtils.SPAMS.getRandomLine();
                     final String maxNum = StringUtils.pluralOf(this.bandwidth.getCapacity(), "time");
                     final String durationStr = FormatUtils.formatDurationWords(
                             Duration.ofNanos(this.bandwidth.getRefillPeriodNanos()));

@@ -54,7 +54,7 @@ public class ShadbotUtils {
      */
     public static StatusUpdate getRandomStatus() {
         final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX,
-                TIPS.getRandomTextFormatted());
+                TIPS.getRandomLineFormatted());
         return Presence.online(Activity.playing(presence));
     }
 
