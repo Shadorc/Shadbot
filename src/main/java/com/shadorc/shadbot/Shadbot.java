@@ -3,6 +3,7 @@ package com.shadorc.shadbot;
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.core.retriever.SpyRestEntityRetriever;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.data.TextFile;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
@@ -60,18 +61,8 @@ public class Shadbot {
 
         if (!Config.IS_SNAPSHOT) {
             DEFAULT_LOGGER.info("Initializing Sentry");
-            final List<String> exclusionList = List.of(
-                    "discord4j.common.close.CloseException",
-                    "discord4j.gateway.retry.GatewayException",
-                    "discord4j.gateway.retry.InvalidSessionException",
-                    "java.net.UnknownHostException",
-                    "io.netty.handler.codec.http.websocketx.WebSocketHandshakeException",
-                    "io.netty.channel.unix.Errors$NativeIoException",
-                    "Voice gateway exception",
-                    "A timeout occurred while posting statistics",
-                    "reactor.netty.http.client.PrematureCloseException",
-                    // TODO: remove once fixed: https://github.com/Discord4J/Discord4J/issues/790
-                    "Attempt to deserialize payload with unknown event type");
+            final TextFile exclusionFile = new TextFile("texts/exclusion_list.txt");
+            final List<String> exclusionList = exclusionFile.getLines();
             Sentry.init(options -> {
                 options.setDsn(CredentialManager.getInstance().get(Credential.SENTRY_DSN));
                 options.setBeforeSend((event, hint) -> {

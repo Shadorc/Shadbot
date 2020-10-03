@@ -2,7 +2,7 @@ package com.shadorc.shadbot.object.casino;
 
 import com.shadorc.shadbot.object.Emoji;
 
-import java.awt.Color;
+import java.awt.*;
 
 public enum Suit {
     HEART(Color.RED, Emoji.HEARTS),
