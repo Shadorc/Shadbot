@@ -58,18 +58,6 @@ public class Shadbot {
         // Set default to Locale US
         Locale.setDefault(Locale.US);
 
-        DEFAULT_LOGGER.info("Starting Shadbot V{}", Config.VERSION);
-
-        final String port = CredentialManager.getInstance().get(Credential.PROMETHEUS_PORT);
-        if (port != null) {
-            DEFAULT_LOGGER.info("Initializing Prometheus on port {}", port);
-            try {
-                Shadbot.prometheusServer = new HTTPServer(Integer.parseInt(port));
-            } catch (final IOException err) {
-                DEFAULT_LOGGER.error("An error occurred while initializing Prometheus", err);
-            }
-        }
-
         if (!Config.IS_SNAPSHOT) {
             DEFAULT_LOGGER.info("Initializing Sentry");
             final List<String> exclusionList = List.of(
@@ -81,10 +69,31 @@ public class Shadbot {
                     "io.netty.channel.unix.Errors$NativeIoException",
                     "Voice gateway exception",
                     "A timeout occurred while posting statistics",
-                    "reactor.netty.http.client.PrematureCloseException");
-            Sentry.init(CredentialManager.getInstance().get(Credential.SENTRY_DSN))
-                    .addShouldSendEventCallback(event -> exclusionList.stream().noneMatch(event.getMessage()::contains)
-                            && !event.getLogger().startsWith("com.sedmelluq"));
+                    "reactor.netty.http.client.PrematureCloseException",
+                    // TODO: remove once fixed: https://github.com/Discord4J/Discord4J/issues/790
+                    "Attempt to deserialize payload with unknown event type");
+            Sentry.init(options -> {
+                options.setDsn(CredentialManager.getInstance().get(Credential.SENTRY_DSN));
+                options.setBeforeSend((event, hint) -> {
+                    if (exclusionList.stream().anyMatch(event.getMessage().getMessage()::contains)
+                            || event.getLogger().startsWith("com.sedmelluq")) {
+                        return null;
+                    }
+                    return event;
+                });
+            });
+        }
+
+        DEFAULT_LOGGER.info("Starting Shadbot V{}", Config.VERSION);
+
+        final String port = CredentialManager.getInstance().get(Credential.PROMETHEUS_PORT);
+        if (port != null) {
+            DEFAULT_LOGGER.info("Initializing Prometheus on port {}", port);
+            try {
+                Shadbot.prometheusServer = new HTTPServer(Integer.parseInt(port));
+            } catch (final IOException err) {
+                DEFAULT_LOGGER.error("An error occurred while initializing Prometheus", err);
+            }
         }
 
         // BlockHound is used to detect blocking actions in non-blocking threads
