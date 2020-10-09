@@ -19,7 +19,8 @@ public class TextFile {
         final File file = new File(path);
         if (file.exists()) {
             try {
-                this.lines.addAll(Arrays.asList(Files.readString(file.toPath()).split("\n")));
+                final String content = Files.readString(file.toPath()).replace("\r\n", "\n");
+                this.lines.addAll(Arrays.asList(content.split("\n")));
             } catch (final IOException err) {
                 DEFAULT_LOGGER.error(String.format("An error occurred while reading text file: %s", file.getPath()), err);
             }

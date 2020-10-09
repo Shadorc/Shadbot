@@ -61,7 +61,7 @@ public class Shadbot {
 
         if (!Config.IS_SNAPSHOT) {
             DEFAULT_LOGGER.info("Initializing Sentry");
-            final TextFile exclusionFile = new TextFile("texts/exclusion_list.txt");
+            final TextFile exclusionFile = new TextFile("texts/sentry_exclusion.txt");
             final List<String> exclusionList = exclusionFile.getLines();
             Sentry.init(options -> {
                 options.setDsn(CredentialManager.getInstance().get(Credential.SENTRY_DSN));
