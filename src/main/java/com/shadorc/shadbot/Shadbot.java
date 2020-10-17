@@ -29,7 +29,6 @@ import discord4j.store.caffeine.CaffeineStoreService;
 import discord4j.store.jdk.JdkStoreService;
 import io.prometheus.client.exporter.HTTPServer;
 import io.sentry.Sentry;
-import reactor.blockhound.BlockHound;
 import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -87,13 +86,7 @@ public class Shadbot {
             }
         }
 
-        // BlockHound is used to detect blocking actions in non-blocking threads
         if (Config.IS_SNAPSHOT) {
-            DEFAULT_LOGGER.info("[SNAPSHOT] Initializing BlockHound");
-            BlockHound.builder()
-                    .allowBlockingCallsInside("java.io.FileInputStream", "readBytes")
-                    .install();
-
             DEFAULT_LOGGER.info("[SNAPSHOT] Initializing Reactor operator stack recorder");
             Hooks.onOperatorDebug();
         }
