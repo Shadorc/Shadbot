@@ -145,18 +145,12 @@
             <artifactId>simpleclient_httpserver</artifactId>
             <version>0.9.0</version>
         </dependency>
-        <!-- Sentry -->
-        <dependency>
-            <groupId>io.sentry</groupId>
-            <artifactId>sentry</artifactId>
-            <version>3.0.0</version>
-        </dependency>
+        <!-- Others -->
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-logback</artifactId>
             <version>3.1.1</version>
         </dependency>
-        <!-- Others -->
         <dependency>
             <groupId>com.github.vladimir-bukhtoyarov</groupId>
             <artifactId>bucket4j-core</artifactId>
