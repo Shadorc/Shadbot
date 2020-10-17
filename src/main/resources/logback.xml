@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
 <configuration scan="true">
-
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} %level [%thread/%logger]: %msg%n</pattern>
@@ -26,15 +25,13 @@
         <appender-ref ref="FILE"/>
     </appender>
 
-    <appender name="Sentry" class="io.sentry.logback.SentryAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>WARN</level>
-        </filter>
+    <appender name="SENTRY" class="io.sentry.logback.SENTRYAppender">
+        <minimumEventLevel>WARN</minimumEventLevel>
     </appender>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="ASYNC"/>
-        <appender-ref ref="Sentry"/>
+        <appender-ref ref="SENTRY"/>
     </root>
 </configuration>
