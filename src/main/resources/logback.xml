@@ -25,7 +25,7 @@
         <appender-ref ref="FILE"/>
     </appender>
 
-    <appender name="SENTRY" class="io.sentry.logback.SENTRYAppender">
+    <appender name="SENTRY" class="io.sentry.logback.SentryAppender">
         <minimumEventLevel>WARN</minimumEventLevel>
     </appender>
 
