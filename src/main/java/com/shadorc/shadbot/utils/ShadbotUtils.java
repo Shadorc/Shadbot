@@ -60,12 +60,12 @@ public class ShadbotUtils {
 
     /**
      * @param guildId The {@link Snowflake} ID of the {@link discord4j.core.object.entity.Guild} in which the
-     * {@link discord4j.core.object.entity.User} made the bet.
-     * @param userId The {@link Snowflake} ID of the {@link discord4j.core.object.entity.User} who made the bet.
-     * @param betStr The string representing the bet.
+     *                {@link discord4j.core.object.entity.User} made the bet.
+     * @param userId  The {@link Snowflake} ID of the {@link discord4j.core.object.entity.User} who made the bet.
+     * @param betStr  The string representing the bet.
      * @return A long representing {@code betStr}.
      * @throws CommandException thrown if {@code betStr} cannot be casted to a long or if the user does not have
-     * enough coins.
+     *                          enough coins.
      */
     public static Mono<Long> requireValidBet(Snowflake guildId, Snowflake userId, String betStr) {
         final Long bet = NumberUtils.toPositiveLongOrNull(betStr);
@@ -77,9 +77,9 @@ public class ShadbotUtils {
 
     /**
      * @param guildId The {@link Snowflake} ID of the {@link discord4j.core.object.entity.Guild} in which the
-     * {@link discord4j.core.object.entity.User} made the bet.
-     * @param userId The {@link Snowflake} ID of the {@link discord4j.core.object.entity.User} who made the bet.
-     * @param bet The bet.
+     *                {@link discord4j.core.object.entity.User} made the bet.
+     * @param userId  The {@link Snowflake} ID of the {@link discord4j.core.object.entity.User} who made the bet.
+     * @param bet     The bet.
      * @return The bet.
      * @throws CommandException thrown if the user does not have enough coins.
      */

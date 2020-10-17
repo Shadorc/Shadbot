@@ -107,7 +107,8 @@ public class NetUtils {
     }
 
     public static RequestSender request(HttpMethod method, String url) {
-        return NetUtils.request(spec -> {}, method, url);
+        return NetUtils.request(spec -> {
+        }, method, url);
     }
 
     public static Mono<String> post(Consumer<HttpHeaders> headerBuilder, String url, String content) {
@@ -128,7 +129,8 @@ public class NetUtils {
     }
 
     public static <T> Mono<T> get(String url, JavaType type) {
-        return NetUtils.get(spec -> {}, url, type);
+        return NetUtils.get(spec -> {
+        }, url, type);
     }
 
     public static <T> Mono<T> get(String url, Class<? extends T> type) {
@@ -142,7 +144,8 @@ public class NetUtils {
     }
 
     public static Mono<String> get(String url) {
-        return NetUtils.get(spec -> {}, url);
+        return NetUtils.get(spec -> {
+        }, url);
     }
 
 }

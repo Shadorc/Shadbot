@@ -42,8 +42,8 @@ public class StringUtils {
     }
 
     /**
-     * @param str The string containing the substrings.
-     * @param open The string identifying the start of the substring.
+     * @param str   The string containing the substrings.
+     * @param open  The string identifying the start of the substring.
      * @param close The string identifying the end of the substring.
      * @return A string list of substrings.
      */
@@ -71,7 +71,7 @@ public class StringUtils {
     }
 
     /**
-     * @param str The string to check, may be {@code null}.
+     * @param str      The string to check, may be {@code null}.
      * @param maxWidth Maximum length of result string, must be at least 4.
      * @return Abbreviated string, {@code null} if null string input.
      * @throws IllegalArgumentException If the width is too small.
@@ -81,9 +81,9 @@ public class StringUtils {
     }
 
     /**
-     * @param str The string to check, may be {@code null}.
+     * @param str          The string to check, may be {@code null}.
      * @param abbrevMarker The string used as replacement marker.
-     * @param maxWidth Maximum length of result string.
+     * @param maxWidth     Maximum length of result string.
      * @return Abbreviated string, {@code null} if null string input.
      * @throws IllegalArgumentException If the width is too small.
      */
@@ -147,7 +147,7 @@ public class StringUtils {
 
     /**
      * @param count The number of elements.
-     * @param str The string to get plural from, may be {@code null}.
+     * @param str   The string to get plural from, may be {@code null}.
      * @return {@code count str(s)} with {@code count} formatted using English locale.
      */
     @Nullable
@@ -162,7 +162,7 @@ public class StringUtils {
     }
 
     /**
-     * @param str The string from which to remove patterns, may be {@code null}.
+     * @param str      The string from which to remove patterns, may be {@code null}.
      * @param toRemove The strings to be substituted for each match.
      * @return The resulting string.
      */
@@ -172,7 +172,7 @@ public class StringUtils {
     }
 
     /**
-     * @param str The string from which to remove patterns, may be {@code null}.
+     * @param str      The string from which to remove patterns, may be {@code null}.
      * @param toRemove The strings to be substituted for each match.
      * @return The resulting string.
      */
@@ -197,7 +197,7 @@ public class StringUtils {
     }
 
     /**
-     * @param str The string to split, may be {@code null}.
+     * @param str   The string to split, may be {@code null}.
      * @param limit The result threshold.
      * @return An endless list containing all the elements resulting of {@code str} splitted using space excluding
      * empty results.
@@ -207,8 +207,8 @@ public class StringUtils {
     }
 
     /**
-     * @param str The string to split, may be {@code null}.
-     * @param limit The result threshold.
+     * @param str       The string to split, may be {@code null}.
+     * @param limit     The result threshold.
      * @param delimiter The delimiting regular expression.
      * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} splitted
      * using {@code delimiter} excluding empty results.
@@ -224,7 +224,7 @@ public class StringUtils {
     }
 
     /**
-     * @param str The string to split, may be {@code null}.
+     * @param str       The string to split, may be {@code null}.
      * @param delimiter The delimiting regular expression.
      * @return An endless list all the elements resulting of {@code str} splitted using {@code delimiter} excluding
      * empty results.

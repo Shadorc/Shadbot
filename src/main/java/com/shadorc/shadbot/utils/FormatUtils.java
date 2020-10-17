@@ -139,8 +139,8 @@ public class FormatUtils {
     }
 
     /**
-     * @param limit The inclusive upper bound.
-     * @param count The number of elements the stream should be limited to.
+     * @param limit  The inclusive upper bound.
+     * @param count  The number of elements the stream should be limited to.
      * @param mapper A function to apply to each element.
      * @return A string consisting of the elements returned by the mapper applied to a stream of numbers from 1 to the minimum value
      * between {@code limit} and {@code count} and joined with new lines.
@@ -155,7 +155,7 @@ public class FormatUtils {
 
     /**
      * @param enumClass The Enum class to get constants from.
-     * @param <E> An enumeration.
+     * @param <E>       An enumeration.
      * @return {@code Options: `option_1`, `option_2`, ...}
      * @throws java.lang.IllegalArgumentException If the enumeration contains less than 2 constants.
      */

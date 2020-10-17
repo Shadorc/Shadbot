@@ -16,7 +16,7 @@ public class MapUtils {
     }
 
     /**
-     * @param map The map to sort.
+     * @param map        The map to sort.
      * @param comparator The {@link Comparator} to be used to compare stream elements.
      * @return A {@link LinkedHashMap} containing the elements of the {@code map} sorted using {@code comparator}.
      */

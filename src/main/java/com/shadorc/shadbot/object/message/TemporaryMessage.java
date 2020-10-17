@@ -16,9 +16,9 @@ public class TemporaryMessage {
     private final Duration duration;
 
     /**
-     * @param gateway The Discord gateway.
+     * @param gateway   The Discord gateway.
      * @param channelId The Channel ID in which to send the message.
-     * @param duration The delay to wait before deleting the message.
+     * @param duration  The delay to wait before deleting the message.
      */
     public TemporaryMessage(GatewayDiscordClient gateway, Snowflake channelId, Duration duration) {
         this.gateway = gateway;
