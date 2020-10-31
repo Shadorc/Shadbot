@@ -60,8 +60,6 @@ public class FormatUtilsTest {
         assertEquals("1:01:15",
                 FormatUtils.formatLongDuration(localDateTime.minusHours(1).minusMinutes(1).minusSeconds(15)));
         assertEquals("1 day", FormatUtils.formatLongDuration(localDateTime.minusDays(1)));
-        assertEquals("1 month", FormatUtils.formatLongDuration(localDateTime.minusMonths(1)));
-        assertEquals("1 month, 7 days", FormatUtils.formatLongDuration(localDateTime.minusMonths(1).minusDays(7)));
     }
 
     @Test
