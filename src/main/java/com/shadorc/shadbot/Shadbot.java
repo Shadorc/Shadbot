@@ -60,18 +60,7 @@ public class Shadbot {
 
         if (!Config.IS_SNAPSHOT) {
             DEFAULT_LOGGER.info("Initializing Sentry");
-            final TextFile exclusionFile = new TextFile("texts/sentry_exclusion.txt");
-            final List<String> exclusionList = exclusionFile.getLines();
-            Sentry.init(options -> {
-                options.setDsn(CredentialManager.getInstance().get(Credential.SENTRY_DSN));
-                options.setBeforeSend((event, hint) -> {
-                    if (exclusionList.stream().anyMatch(event.getMessage().getMessage()::contains)
-                            || event.getLogger().startsWith("com.sedmelluq")) {
-                        return null;
-                    }
-                    return event;
-                });
-            });
+            Sentry.init(options -> options.setDsn(CredentialManager.getInstance().get(Credential.SENTRY_DSN)));
         }
 
         DEFAULT_LOGGER.info("Starting Shadbot V{}", Config.VERSION);
