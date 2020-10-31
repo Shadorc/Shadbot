@@ -35,7 +35,7 @@
     </ul>
     <hr>
     <h2>Getting Started</h2>
-    <br>1. Make sure Java 11 is installed.
+    <br>1. Make sure Java 15 is installed.
     <br>2. Fork the Shadbot repository: https://github.com/Shadorc/Shadbot/fork
     <br>3. Clone your forked repository, ie. <code>git clone http://github.com/&lt;YOUR-USERNAME&gt;/shadbot.git</code>
     <br>4. Read this: https://github.com/Shadorc/Shadbot/wiki/Build-&-Configure
