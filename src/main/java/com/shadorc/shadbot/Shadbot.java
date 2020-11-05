@@ -3,7 +3,6 @@ package com.shadorc.shadbot;
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.core.retriever.SpyRestEntityRetriever;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.data.TextFile;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
@@ -38,7 +37,6 @@ import reactor.util.Loggers;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
