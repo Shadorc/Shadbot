@@ -2,6 +2,7 @@ package com.shadorc.shadbot.data.credential;
 
 import reactor.util.Logger;
 import reactor.util.Loggers;
+import reactor.util.annotation.Nullable;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,8 +44,10 @@ public class CredentialManager {
         }
     }
 
+    @Nullable
     public String get(Credential key) {
-        return this.properties.getProperty(key.toString());
+        final String property = this.properties.getProperty(key.toString());
+        return property.isBlank() ? null : property;
     }
 
     public static CredentialManager getInstance() {
