@@ -4,10 +4,14 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.rest.http.client.ClientException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
+
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class TemporaryMessage {
 
@@ -37,7 +41,12 @@ public class TemporaryMessage {
                 .cast(MessageChannel.class)
                 .flatMap(channel -> DiscordUtils.sendMessage(content, channel))
                 .flatMap(message -> Mono.delay(this.duration, Schedulers.boundedElastic())
-                        .then(message.delete()));
+                        .then(message.delete()))
+                // TODO: Remove once the empty on 404 issue is fixed
+                .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.NOT_FOUND.code()), err -> {
+                    DEFAULT_LOGGER.error("404 detected on Message::delete (2)");
+                    return Mono.empty();
+                });
     }
 
 }

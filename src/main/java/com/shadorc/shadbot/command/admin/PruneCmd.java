@@ -20,7 +20,9 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.GuildMessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.Permission;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -29,6 +31,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class PruneCmd extends BaseCmd {
 
@@ -94,6 +98,11 @@ public class PruneCmd extends BaseCmd {
                         .flatMap(messageIds -> ((GuildMessageChannel) channel).bulkDelete(Flux.fromIterable(messageIds))
                                 .count()
                                 .map(messagesNotDeleted -> messageIds.size() - messagesNotDeleted))
+                        // TODO: Remove once the empty on 404 issue is fixed
+                        .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.NOT_FOUND.code()), err -> {
+                            DEFAULT_LOGGER.error("404 detected on Message::delete (3)");
+                            return Mono.empty();
+                        })
                         .map(deletedMessages -> String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
                                 context.getUsername(),
                                 StringUtils.pluralOf(deletedMessages - MESSAGES_OFFSET, "message"))))

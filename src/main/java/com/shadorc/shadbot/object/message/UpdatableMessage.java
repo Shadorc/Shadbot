@@ -96,7 +96,7 @@ public class UpdatableMessage {
                 .flatMap(Message::delete)
                 // TODO: Remove once the empty on 404 issue is fixed
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.NOT_FOUND.code()), err -> {
-                    DEFAULT_LOGGER.error("404 detected on Message::delete, " +
+                    DEFAULT_LOGGER.error("404 detected on Message::delete (1), " +
                             "Channel ID: {}, Message ID: {}", this.channelId.asLong(), this.messageId.get());
                     return Mono.empty();
                 });
