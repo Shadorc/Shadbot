@@ -36,16 +36,14 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
         // If the voice state update comes from the bot...
         if (userId.equals(event.getClient().getSelfId())) {
             LOGGER.trace("{Guild ID: {}} Voice state update event: {}", guildId.asLong(), event);
-            if (event.getCurrent().getChannelId().isEmpty() && event.getOld().isPresent()) {
+            if (event.isLeaveEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel left", guildId.asLong());
                 return Mono.fromRunnable(VOICE_COUNT_GAUGE::dec)
                         .and(MusicManager.getInstance().destroyConnection(guildId));
-            } else if (event.getCurrent().getChannelId().isPresent() && event.getOld().isEmpty()) {
+            } else if (event.isJoinEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asLong());
                 return Mono.fromRunnable(VOICE_COUNT_GAUGE::inc);
-            } else if (!event.getCurrent().getChannelId()
-                    .flatMap(current -> event.getOld().flatMap(VoiceState::getChannelId).map(current::equals))
-                    .orElse(true)) {
+            } else if (event.isMoveEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel moved", guildId.asLong());
             }
         }
