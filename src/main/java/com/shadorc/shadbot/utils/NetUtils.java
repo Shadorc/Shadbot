@@ -13,6 +13,7 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -28,8 +29,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-
-import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class NetUtils {
 
@@ -97,14 +96,15 @@ public class NetUtils {
                     .defaultIfEmpty("Empty body")
                     .flatMap(err -> Mono.error(new HeaderException(resp, err)));
         }
-
         return body.asInputStream()
                 .flatMap(input -> Mono.fromCallable(() -> {
-                    try {
-                        return NetUtils.MAPPER.readValue(input, type);
-                    } catch (final JSONException err) {
-                        DEFAULT_LOGGER.error("Invalid JSON received (response: {}): {}", resp, input);
-                        throw err;
+                    String content = "Unknown";
+                    try (input) {
+                        content = IOUtils.toString(input, StandardCharsets.UTF_8);
+                        return NetUtils.MAPPER.readValue(content, type);
+                    } catch (JSONException err) {
+                        throw new JSONException(err.getMessage(),
+                                new RuntimeException(String.format("Invalid JSON received (response: %s): %s", resp, content)));
                     }
                 }));
     }
