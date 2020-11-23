@@ -111,12 +111,12 @@
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>3.1.2-SNAPSHOT</version>
+            <version>3.1.2</version>
         </dependency>
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>stores-caffeine</artifactId>
-            <version>3.1.4</version>
+            <version>3.1.5</version>
         </dependency>
         <!-- lavaplayer -->
         <dependency>
