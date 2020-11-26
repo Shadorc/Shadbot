@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.command.CommandException;
+import com.shadorc.shadbot.command.MissingPermissionException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -35,7 +36,7 @@ public class PlayCmd extends BaseCmd {
 
     private static final String SC_QUERY = "soundcloud ";
 
-    private static final int MAX_ERRORS = 5;
+    private static final int MAX_ERRORS = 3;
     private static final Map<Snowflake, AtomicInteger> ERRORS_MAP = new ConcurrentHashMap<>();
 
     public PlayCmd() {
@@ -57,11 +58,14 @@ public class PlayCmd extends BaseCmd {
                     LOGGER.info("{Guild ID: {}} An error occurred while joining a voice channel: {}",
                             context.getGuildId().asLong(), err.getMessage());
 
-                    if (ERRORS_MAP.computeIfAbsent(context.getGuildId(), ignored -> new AtomicInteger())
-                            .incrementAndGet() >= MAX_ERRORS) {
-                        LOGGER.error("{Guild ID: {}} {} voice errors detected in a row!",
-                                context.getGuildId().asLong(), MAX_ERRORS);
-                        ERRORS_MAP.remove(context.getGuildId());
+                    if (!(err instanceof CommandException) && !(err instanceof MissingPermissionException)) {
+                        final int errorCount= ERRORS_MAP.computeIfAbsent(context.getGuildId(), ignored -> new AtomicInteger())
+                                .incrementAndGet();
+                        if (errorCount >= MAX_ERRORS) {
+                            LOGGER.error("{Guild ID: {}} {} voice errors detected in a row!",
+                                    context.getGuildId().asLong(), errorCount);
+                            ERRORS_MAP.remove(context.getGuildId());
+                        }
                     }
 
                     if (err instanceof VoiceGatewayException) {
