@@ -58,7 +58,13 @@ public class Shadbot {
 
         if (!Config.IS_SNAPSHOT) {
             DEFAULT_LOGGER.info("Initializing Sentry");
-            Sentry.init(options -> options.setDsn(CredentialManager.getInstance().get(Credential.SENTRY_DSN)));
+            Sentry.init(options -> {
+                options.setDsn(CredentialManager.getInstance().get(Credential.SENTRY_DSN));
+                options.setRelease(Config.VERSION);
+                // Ignore events coming from lavaplayer
+                options.setBeforeSend(
+                        (sentryEvent, obj) -> sentryEvent.getLogger().startsWith("com.sedmelluq") ? null : sentryEvent);
+            });
         }
 
         DEFAULT_LOGGER.info("Starting Shadbot V{}", Config.VERSION);
