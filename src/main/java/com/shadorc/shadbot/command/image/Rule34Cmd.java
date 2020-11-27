@@ -14,8 +14,6 @@ import com.shadorc.shadbot.utils.RandUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.spec.EmbedCreateSpec;
-import org.json.JSONObject;
-import org.json.XML;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -90,10 +88,7 @@ public class Rule34Cmd extends BaseCmd {
         final String url = String.format("%s?page=dapi&s=post&q=index&tags=%s",
                 HOME_URL, NetUtils.encode(search.replace(" ", "_")));
 
-        return NetUtils.get(url)
-                .map(XML::toJSONObject)
-                .map(JSONObject::toString)
-                .flatMap(value -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(value, R34Response.class)))
+        return NetUtils.get(url, R34Response.class, true)
                 .map(R34Response::getPosts)
                 .flatMap(Mono::justOrEmpty)
                 .map(R34Posts::getPosts)

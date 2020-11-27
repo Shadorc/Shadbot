@@ -15,6 +15,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
+import org.json.XML;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
@@ -84,7 +85,7 @@ public class NetUtils {
         return URLEncoder.encode(str, StandardCharsets.UTF_8);
     }
 
-    private static <T> Mono<T> handleResponse(HttpClientResponse resp, ByteBufMono body, JavaType type) {
+    private static <T> Mono<T> handleResponse(HttpClientResponse resp, ByteBufMono body, JavaType type, boolean isXml) {
         final int statusCode = resp.status().code();
         if (statusCode / 100 != 2 && statusCode != 404) {
             return body.asString()
@@ -101,6 +102,9 @@ public class NetUtils {
                     String content = "Unknown";
                     try (input) {
                         content = IOUtils.toString(input, StandardCharsets.UTF_8);
+                        if (isXml) {
+                            content = XML.toJSONObject(content).toString();
+                        }
                         return NetUtils.MAPPER.readValue(content, type);
                     } catch (JSONException err) {
                         throw new JSONException(err.getMessage(),
@@ -128,23 +132,36 @@ public class NetUtils {
                 .timeout(Config.TIMEOUT);
     }
 
-    public static <T> Mono<T> get(Consumer<HttpHeaders> headerBuilder, String url, JavaType type) {
+    public static <T> Mono<T> get(Consumer<HttpHeaders> headerBuilder, String url, JavaType type, boolean isXml) {
         return NetUtils.request(headerBuilder, HttpMethod.GET, url)
-                .<T>responseSingle((resp, body) -> NetUtils.handleResponse(resp, body, type))
+                .<T>responseSingle((resp, body) -> NetUtils.handleResponse(resp, body, type, isXml))
                 .timeout(Config.TIMEOUT);
+    }
+
+
+    public static <T> Mono<T> get(Consumer<HttpHeaders> headerBuilder, String url, JavaType type) {
+        return NetUtils.get(headerBuilder, url, type, false);
     }
 
     public static <T> Mono<T> get(Consumer<HttpHeaders> headerBuilder, String url, Class<? extends T> type) {
         return NetUtils.get(headerBuilder, url, TypeFactory.defaultInstance().constructType(type));
     }
 
-    public static <T> Mono<T> get(String url, JavaType type) {
+    public static <T> Mono<T> get(String url, JavaType type, boolean isXml) {
         return NetUtils.get(spec -> {
-        }, url, type);
+        }, url, type, isXml);
+    }
+
+    public static <T> Mono<T> get(String url, JavaType type) {
+        return NetUtils.get(url, type, false);
+    }
+
+    public static <T> Mono<T> get(String url, Class<? extends T> type, boolean isXml) {
+        return NetUtils.get(url, TypeFactory.defaultInstance().constructType(type), isXml);
     }
 
     public static <T> Mono<T> get(String url, Class<? extends T> type) {
-        return NetUtils.get(url, TypeFactory.defaultInstance().constructType(type));
+        return NetUtils.get(url, type, false);
     }
 
     public static Mono<String> get(Consumer<HttpHeaders> headerBuilder, String url) {
