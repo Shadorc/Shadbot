@@ -59,7 +59,7 @@ public class PlayCmd extends BaseCmd {
                             context.getGuildId().asLong(), err.getMessage());
 
                     if (!(err instanceof CommandException) && !(err instanceof MissingPermissionException)) {
-                        final int errorCount= ERRORS_MAP.computeIfAbsent(context.getGuildId(), ignored -> new AtomicInteger())
+                        final int errorCount = ERRORS_MAP.computeIfAbsent(context.getGuildId(), ignored -> new AtomicInteger())
                                 .incrementAndGet();
                         if (errorCount >= MAX_ERRORS) {
                             LOGGER.error("{Guild ID: {}} {} voice errors detected in a row!",
