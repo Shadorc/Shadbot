@@ -1,17 +1,18 @@
 package com.shadorc.shadbot.command.fun;
 
 import com.shadorc.shadbot.api.json.pandorabots.ChatBotResponse;
+import com.shadorc.shadbot.api.json.pandorabots.ChatBotResult;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import org.json.XML;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -67,12 +68,11 @@ public class ChatCmd extends BaseCmd {
         final String url = String.format("%s?botid=%s&input=%s&custid=%s",
                 HOME_URl, botId, NetUtils.encode(input), this.channelsCustid.getOrDefault(channelId, ""));
 
-        return NetUtils.get(url)
-                .map(XML::toJSONObject)
-                .map(jsonObj -> jsonObj.getJSONObject("result"))
-                .flatMap(resultObj -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(resultObj.toString(), ChatBotResponse.class)))
+        return RequestHelper.create(url)
+                .toMono(ChatBotResponse.class)
+                .map(ChatBotResponse::getResult)
                 .doOnNext(chat -> this.channelsCustid.put(channelId, chat.getCustId()))
-                .map(ChatBotResponse::getResponse)
+                .map(ChatBotResult::getResponse)
                 .onErrorResume(err -> Mono.fromRunnable(() ->
                         DEFAULT_LOGGER.info("[{}] {} is not reachable, trying another one.",
                                 this.getClass().getSimpleName(), botId)));

@@ -11,6 +11,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.*;
@@ -67,7 +68,7 @@ public class DiabloCmd extends BaseCmd {
                 .then(this.requestAccessToken())
                 .then(Mono.fromCallable(() -> String.format("https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s",
                         region.toString().toLowerCase(), NetUtils.encode(battletag), this.token.getAccessToken())))
-                .flatMap(url -> NetUtils.get(url, ProfileResponse.class))
+                .flatMap(url -> RequestHelper.create(url).toMono(ProfileResponse.class))
                 .flatMap(profile -> {
                     if (profile.getCode().map("NOTFOUND"::equals).orElse(false)) {
                         return Mono.just(updatableMsg.setContent(String.format(
@@ -78,7 +79,7 @@ public class DiabloCmd extends BaseCmd {
                     return Flux.fromIterable(profile.getHeroIds())
                             .map(heroId -> String.format("https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s",
                                     region, NetUtils.encode(battletag), heroId.getId(), this.token.getAccessToken()))
-                            .flatMap(heroUrl -> NetUtils.get(heroUrl, HeroResponse.class)
+                            .flatMap(heroUrl -> RequestHelper.create(heroUrl).toMono(HeroResponse.class)
                                     .onErrorResume(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR),
                                             err -> Mono.empty()))
                             .filter(hero -> hero.getCode().isEmpty())
@@ -133,7 +134,8 @@ public class DiabloCmd extends BaseCmd {
      * @return A {@link Mono} that completes once the token has been successfully updated, if expired.
      */
     private Mono<Void> requestAccessToken() {
-        final Mono<TokenResponse> requestAccessToken = NetUtils.get(ACCESS_TOKEN_URL, TokenResponse.class)
+        final Mono<TokenResponse> requestAccessToken = RequestHelper.create(ACCESS_TOKEN_URL)
+                .toMono(TokenResponse.class)
                 .doOnNext(token -> {
                     this.token = token;
                     this.lastTokenGeneration.set(System.currentTimeMillis());

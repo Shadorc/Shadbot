@@ -2,33 +2,15 @@ package com.shadorc.shadbot.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.shadorc.shadbot.api.HeaderException;
-import com.shadorc.shadbot.api.ServerAccessException;
-import com.shadorc.shadbot.data.Config;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import org.apache.commons.io.IOUtils;
-import org.json.JSONException;
-import org.json.XML;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
-import reactor.core.publisher.Mono;
-import reactor.netty.ByteBufMono;
-import reactor.netty.http.client.HttpClient;
-import reactor.netty.http.client.HttpClient.RequestSender;
-import reactor.netty.http.client.HttpClientResponse;
 import reactor.util.annotation.Nullable;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 public class NetUtils {
@@ -39,9 +21,6 @@ public class NetUtils {
             .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
             .enable(SerializationFeature.INDENT_OUTPUT)
             .setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-
-    private static final HttpClient HTTP_CLIENT = HttpClient.create()
-            .followRedirect(true);
 
     // Source: https://urlregex.com/
     private static final Pattern URL_MATCH = Pattern.compile(
@@ -84,95 +63,4 @@ public class NetUtils {
         }
         return URLEncoder.encode(str, StandardCharsets.UTF_8);
     }
-
-    private static <T> Mono<T> handleResponse(HttpClientResponse resp, ByteBufMono body, JavaType type, boolean isXml) {
-        final int statusCode = resp.status().code();
-        if (statusCode / 100 != 2 && statusCode != 404) {
-            return body.asString()
-                    .defaultIfEmpty("Empty body")
-                    .flatMap(err -> Mono.error(new ServerAccessException(resp, err)));
-        }
-        if (!resp.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE).startsWith(HttpHeaderValues.APPLICATION_JSON.toString())) {
-            return body.asString()
-                    .defaultIfEmpty("Empty body")
-                    .flatMap(err -> Mono.error(new HeaderException(resp, err)));
-        }
-        return body.asInputStream()
-                .flatMap(input -> Mono.fromCallable(() -> {
-                    String content = "Unknown";
-                    try (input) {
-                        content = IOUtils.toString(input, StandardCharsets.UTF_8);
-                        if (isXml) {
-                            content = XML.toJSONObject(content).toString();
-                        }
-                        return NetUtils.MAPPER.readValue(content, type);
-                    } catch (JSONException err) {
-                        throw new JSONException(err.getMessage(),
-                                new RuntimeException(String.format("Invalid JSON received (response: %s): %s", resp, content)));
-                    }
-                }));
-    }
-
-    public static RequestSender request(Consumer<HttpHeaders> headerBuilder, HttpMethod method, String url) {
-        return HTTP_CLIENT
-                .headers(headerBuilder.andThen(header -> header.add(HttpHeaderNames.USER_AGENT, Config.USER_AGENT)))
-                .request(method)
-                .uri(url);
-    }
-
-    public static RequestSender request(HttpMethod method, String url) {
-        return NetUtils.request(spec -> {
-        }, method, url);
-    }
-
-    public static Mono<String> post(Consumer<HttpHeaders> headerBuilder, String url, String content) {
-        return NetUtils.request(headerBuilder, HttpMethod.POST, url)
-                .send((req, res) -> res.sendString(Mono.just(content), StandardCharsets.UTF_8))
-                .responseSingle((res, con) -> con.asString(StandardCharsets.UTF_8))
-                .timeout(Config.TIMEOUT);
-    }
-
-    public static <T> Mono<T> get(Consumer<HttpHeaders> headerBuilder, String url, JavaType type, boolean isXml) {
-        return NetUtils.request(headerBuilder, HttpMethod.GET, url)
-                .<T>responseSingle((resp, body) -> NetUtils.handleResponse(resp, body, type, isXml))
-                .timeout(Config.TIMEOUT);
-    }
-
-
-    public static <T> Mono<T> get(Consumer<HttpHeaders> headerBuilder, String url, JavaType type) {
-        return NetUtils.get(headerBuilder, url, type, false);
-    }
-
-    public static <T> Mono<T> get(Consumer<HttpHeaders> headerBuilder, String url, Class<? extends T> type) {
-        return NetUtils.get(headerBuilder, url, TypeFactory.defaultInstance().constructType(type));
-    }
-
-    public static <T> Mono<T> get(String url, JavaType type, boolean isXml) {
-        return NetUtils.get(spec -> {
-        }, url, type, isXml);
-    }
-
-    public static <T> Mono<T> get(String url, JavaType type) {
-        return NetUtils.get(url, type, false);
-    }
-
-    public static <T> Mono<T> get(String url, Class<? extends T> type, boolean isXml) {
-        return NetUtils.get(url, TypeFactory.defaultInstance().constructType(type), isXml);
-    }
-
-    public static <T> Mono<T> get(String url, Class<? extends T> type) {
-        return NetUtils.get(url, type, false);
-    }
-
-    public static Mono<String> get(Consumer<HttpHeaders> headerBuilder, String url) {
-        return NetUtils.request(headerBuilder, HttpMethod.GET, url)
-                .responseSingle((resp, body) -> body.asString(StandardCharsets.UTF_8))
-                .timeout(Config.TIMEOUT);
-    }
-
-    public static Mono<String> get(String url) {
-        return NetUtils.get(spec -> {
-        }, url);
-    }
-
 }

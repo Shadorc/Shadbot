@@ -5,9 +5,9 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -41,7 +41,9 @@ public class JokeCmd extends BaseCmd {
     }
 
     private static Mono<String> getRandomJoke() {
-        return NetUtils.get(header -> header.add(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON), HOME_URL, JokeResponse.class)
+        return RequestHelper.create(HOME_URL)
+                .addHeaders(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON)
+                .toMono(JokeResponse.class)
                 .map(JokeResponse::getJoke);
     }
 

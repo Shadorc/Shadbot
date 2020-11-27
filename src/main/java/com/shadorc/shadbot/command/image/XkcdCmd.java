@@ -5,9 +5,9 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
@@ -43,10 +43,12 @@ public class XkcdCmd extends BaseCmd {
     }
 
     private static Mono<XkcdResponse> getRandomXkcd() {
-        return NetUtils.get(LAST_URL, XkcdResponse.class)
+        return RequestHelper.create(LAST_URL)
+                .toMono(XkcdResponse.class)
                 .map(XkcdResponse::getNum)
                 .map(ThreadLocalRandom.current()::nextInt)
-                .flatMap(rand -> NetUtils.get(String.format("%s/%d/info.0.json", HOME_URL, rand), XkcdResponse.class));
+                .flatMap(rand -> RequestHelper.create(String.format("%s/%d/info.0.json", HOME_URL, rand))
+                        .toMono(XkcdResponse.class));
     }
 
     @Override

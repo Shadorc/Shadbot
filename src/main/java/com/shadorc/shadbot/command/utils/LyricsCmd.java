@@ -12,6 +12,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.NetUtils;
@@ -19,7 +20,6 @@ import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
-import io.netty.handler.codec.http.HttpMethod;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Document.OutputSettings;
@@ -108,7 +108,8 @@ public class LyricsCmd extends BaseCmd {
     private static Mono<Document> getLyricsDocument(String url) {
         // Sometimes Musixmatch redirects to a wrong page
         // If the response URL and the requested URL are different, retry
-        return NetUtils.request(HttpMethod.GET, url)
+        return RequestHelper.create(url)
+                .request()
                 .responseSingle((res, con) -> con.asString(StandardCharsets.UTF_8)
                         .map(body -> Tuples.of(res, body)))
                 .timeout(Config.TIMEOUT)
@@ -127,7 +128,7 @@ public class LyricsCmd extends BaseCmd {
     private static Mono<String> getCorrectedUrl(String search) {
         final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtils.encode(search));
         // Make a search request on the site
-        return NetUtils.get(url)
+        return RequestHelper.request(url)
                 .map(Jsoup::parse)
                 .map(doc -> doc.getElementsByClass("media-card-title"))
                 .filter(elements -> !elements.isEmpty())

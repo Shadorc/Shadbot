@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.game.hangman;
 
-import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.RandUtils;
 import com.shadorc.shadbot.utils.StringUtils;
@@ -24,7 +24,7 @@ public class WordsList {
 
     public Mono<Void> load() {
         if (this.words.isEmpty()) {
-            return NetUtils.get(this.url)
+            return RequestHelper.request(this.url)
                     .flatMapIterable(str -> StringUtils.split(str, "\n"))
                     .filter(word -> NumberUtils.isBetween(word.length(), MIN_WORD_LENGTH, MAX_WORD_LENGTH))
                     .take(500)

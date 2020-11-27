@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.NetUtils;
@@ -53,7 +54,7 @@ public class WallpaperCmd extends BaseCmd {
 
                     return urlBuilder.toString();
                 }))
-                .flatMap(url -> NetUtils.get(url, WallhavenResponse.class))
+                .flatMap(url -> RequestHelper.create(url).toMono(WallhavenResponse.class))
                 .map(WallhavenResponse::getWallpapers)
                 .filter(wallpapers -> !wallpapers.isEmpty())
                 .map(RandUtils::randValue)

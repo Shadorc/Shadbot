@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.NetUtils;
@@ -73,7 +74,8 @@ public class WikiCmd extends BaseCmd {
                         + "&exsentences=5",
                 NetUtils.encode(search));
 
-        return NetUtils.get(url, WikipediaResponse.class)
+        return RequestHelper.create(url)
+                .toMono(WikipediaResponse.class)
                 .map(WikipediaResponse::getQuery)
                 .map(WikipediaQuery::getPages)
                 .flatMapIterable(Map::entrySet)

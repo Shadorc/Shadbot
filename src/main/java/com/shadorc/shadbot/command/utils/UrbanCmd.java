@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.NetUtils;
@@ -76,7 +77,8 @@ public class UrbanCmd extends BaseCmd {
 
     private static Mono<UrbanDefinition> getUrbanDefinition(String search) {
         final String url = String.format("%s?term=%s", HOME_URL, NetUtils.encode(search));
-        return NetUtils.get(url, UrbanDictionaryResponse.class)
+        return RequestHelper.create(url)
+                .toMono(UrbanDictionaryResponse.class)
                 .flatMapIterable(UrbanDictionaryResponse::getDefinitions)
                 .next()
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))

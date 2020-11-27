@@ -5,9 +5,9 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.jsoup.Jsoup;
@@ -50,7 +50,7 @@ public class SuicideGirlsCmd extends BaseCmd {
     }
 
     private static Mono<SuicideGirl> getRandomSuicideGirl() {
-        return NetUtils.get(HOME_URL)
+        return RequestHelper.request(HOME_URL)
                 .map(Jsoup::parse)
                 .map(SuicideGirl::new);
     }

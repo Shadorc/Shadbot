@@ -9,6 +9,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.EnumUtils;
@@ -16,7 +17,6 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
-import io.netty.handler.codec.http.HttpHeaders;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
@@ -50,11 +50,11 @@ public class FortniteCmd extends BaseCmd {
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        final Consumer<HttpHeaders> headerBuilder = header -> header.add("TRN-Api-Key",
-                CredentialManager.getInstance().get(Credential.FORTNITE_API_KEY));
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Fortnite stats...", context.getUsername()))
                 .send()
-                .then(NetUtils.get(headerBuilder, url, FortniteResponse.class))
+                .then(RequestHelper.create(url)
+                        .addHeaders("TRN-Api-Key", CredentialManager.getInstance().get(Credential.FORTNITE_API_KEY))
+                        .toMono(FortniteResponse.class))
                 .map(fortnite -> {
                     if (fortnite.getError().map("Player Not Found"::equals).orElse(false)) {
                         throw Exceptions.propagate(new IOException("HTTP Error 400. The request URL is invalid."));

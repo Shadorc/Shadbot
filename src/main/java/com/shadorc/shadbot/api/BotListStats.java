@@ -2,17 +2,19 @@ package com.shadorc.shadbot.api;
 
 import com.shadorc.shadbot.api.json.dbl.TopGgWebhookResponse;
 import com.shadorc.shadbot.cache.CacheManager;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.ExceptionHandler;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
 import reactor.core.publisher.Flux;
@@ -22,9 +24,9 @@ import reactor.netty.http.server.HttpServer;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
@@ -220,10 +222,14 @@ public class BotListStats {
     }
 
     private static Mono<String> post(String url, String authorization, JSONObject content) {
-        final Consumer<HttpHeaders> headersConsumer =
-                header -> header.add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-                        .add(HttpHeaderNames.AUTHORIZATION, authorization);
-        return NetUtils.post(headersConsumer, url, content.toString());
+        return RequestHelper.create(url)
+                .setMethod(HttpMethod.POST)
+                .addHeaders(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+                .addHeaders(HttpHeaderNames.AUTHORIZATION, authorization)
+                .request()
+                .send((req, res) -> res.sendString(Mono.just(content.toString()), StandardCharsets.UTF_8))
+                .responseSingle((res, con) -> con.asString(StandardCharsets.UTF_8))
+                .timeout(Config.TIMEOUT);
     }
 
     private static <T> Function<? super Throwable, ? extends Mono<? extends T>> handleError(String url) {

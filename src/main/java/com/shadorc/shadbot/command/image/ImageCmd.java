@@ -10,6 +10,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.NetUtils;
@@ -78,7 +79,7 @@ public class ImageCmd extends BaseCmd {
                                 + "&access_token=%s",
                         BROWSE_POPULAR_URL, encodedSearch, ThreadLocalRandom.current().nextInt(150),
                         this.token.getAccessToken())))
-                .flatMap(url -> NetUtils.get(url, DeviantArtResponse.class))
+                .flatMap(url -> RequestHelper.create(url).toMono(DeviantArtResponse.class))
                 .flatMapIterable(DeviantArtResponse::getResults)
                 .filter(image -> image.getContent().isPresent())
                 .collectList()
@@ -91,7 +92,7 @@ public class ImageCmd extends BaseCmd {
                 OAUTH_URL, CredentialManager.getInstance().get(Credential.DEVIANTART_CLIENT_ID),
                 CredentialManager.getInstance().get(Credential.DEVIANTART_API_SECRET)))
                 .filter(url -> this.isTokenExpired())
-                .flatMap(url -> NetUtils.get(url, TokenResponse.class))
+                .flatMap(url -> RequestHelper.create(url).toMono(TokenResponse.class))
                 .doOnNext(token -> {
                     this.token = token;
                     this.lastTokenGeneration.set(System.currentTimeMillis());

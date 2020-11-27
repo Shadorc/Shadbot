@@ -6,6 +6,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.MapUtils;
@@ -86,7 +87,7 @@ public class TranslateCmd extends BaseCmd {
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading translation...",
                 context.getUsername()))
                 .send()
-                .then(NetUtils.get(url))
+                .then(RequestHelper.request(url))
                 .map(body -> {
                     if (langFrom == null || langTo == null
                             // The body is an error 400 if one of the specified language exists but is not supported

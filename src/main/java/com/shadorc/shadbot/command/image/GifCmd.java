@@ -10,6 +10,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.NetUtils;
@@ -58,7 +59,8 @@ public class GifCmd extends BaseCmd {
                     SEARCH_ENDPOINT, apiKey, encodedSearch, ThreadLocalRandom.current().nextInt(25));
         }
 
-        return NetUtils.get(url, GiphyResponse.class)
+        return RequestHelper.create(url)
+                .toMono(GiphyResponse.class)
                 .flatMapIterable(GiphyResponse::getData)
                 .next()
                 .map(Data::getImages)

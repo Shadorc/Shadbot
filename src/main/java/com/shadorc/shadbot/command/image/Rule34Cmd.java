@@ -7,6 +7,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.NetUtils;
@@ -88,7 +89,8 @@ public class Rule34Cmd extends BaseCmd {
         final String url = String.format("%s?page=dapi&s=post&q=index&tags=%s",
                 HOME_URL, NetUtils.encode(search.replace(" ", "_")));
 
-        return NetUtils.get(url, R34Response.class, true)
+        return RequestHelper.create(url)
+                .toMono(R34Response.class)
                 .map(R34Response::getPosts)
                 .flatMap(Mono::justOrEmpty)
                 .map(R34Posts::getPosts)

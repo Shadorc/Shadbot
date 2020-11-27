@@ -8,6 +8,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.FormatUtils;
@@ -49,8 +50,8 @@ public class DtcCmd extends BaseCmd {
 
     private static Mono<Quote> getRandomQuote() {
         final JavaType valueType = NetUtils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
-        return NetUtils
-                .<List<Quote>>get(RANDOM_QUOTE_URL, valueType)
+        return RequestHelper.create(RANDOM_QUOTE_URL)
+                .<List<Quote>>toMono(valueType)
                 .map(quotes -> {
                     Quote quote;
                     do {

@@ -1,21 +1,13 @@
 package com.shadorc.shadbot.api.json.pandorabots;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.shadorc.shadbot.utils.StringUtils;
 
 public class ChatBotResponse {
 
-    @JsonProperty("that")
-    private String response;
-    @JsonProperty("custid")
-    private String custid;
+    @JsonProperty("result")
+    private ChatBotResult result;
 
-    public String getResponse() {
-        return StringUtils.normalizeSpace(this.response.replace("<br>", "\n"));
+    public ChatBotResult getResult() {
+        return this.result;
     }
-
-    public String getCustId() {
-        return this.custid;
-    }
-
 }

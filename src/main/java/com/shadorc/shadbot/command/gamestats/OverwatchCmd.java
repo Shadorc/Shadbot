@@ -8,6 +8,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.EnumUtils;
@@ -91,7 +92,8 @@ public class OverwatchCmd extends BaseCmd {
         final String username = NetUtils.encode(battletag.replace("#", "-"));
 
         final Mono<ProfileResponse> getProfile =
-                NetUtils.get(OverwatchCmd.getUrl("profile", platform, username), ProfileResponse.class)
+                RequestHelper.create(OverwatchCmd.getUrl("profile", platform, username))
+                        .toMono(ProfileResponse.class)
                         .map(profile -> {
                             if (profile.getMessage().map("Error: Profile not found"::equals).orElse(false)) {
                                 throw new CommandException("Profile not found. The specified platform may be incorrect.");
@@ -99,7 +101,8 @@ public class OverwatchCmd extends BaseCmd {
                             return profile;
                         });
         final Mono<StatsResponse> getStats =
-                NetUtils.get(OverwatchCmd.getUrl("stats", platform, username), StatsResponse.class);
+                RequestHelper.create(OverwatchCmd.getUrl("stats", platform, username))
+                        .toMono(StatsResponse.class);
 
         return Mono.zip(Mono.just(platform), getProfile, getStats)
                 .map(TupleUtils.function(OverwatchProfile::new))

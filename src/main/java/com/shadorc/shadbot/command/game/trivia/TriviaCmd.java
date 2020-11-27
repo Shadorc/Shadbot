@@ -5,6 +5,7 @@ import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -74,7 +75,8 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
     }
 
     private Mono<TriviaCategoriesResponse> getCategories() {
-        final Mono<TriviaCategoriesResponse> getCategories = NetUtils.get(CATEGORY_URL, TriviaCategoriesResponse.class)
+        final Mono<TriviaCategoriesResponse> getCategories = RequestHelper.create(CATEGORY_URL)
+                .toMono(TriviaCategoriesResponse.class)
                 .doOnNext(categories -> {
                     this.categories = categories;
                     DEFAULT_LOGGER.info("Open Trivia DB categories obtained");

@@ -6,7 +6,11 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
 import com.shadorc.shadbot.core.game.player.Player;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.object.RequestHelper;
+import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
@@ -48,7 +52,8 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
     public Mono<Void> start() {
         final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s",
                 Objects.toString(this.categoryId, ""));
-        return NetUtils.get(url, TriviaResponse.class)
+        return RequestHelper.create(url)
+                .toMono(TriviaResponse.class)
                 .map(TriviaResponse::getResults)
                 .map(list -> list.get(0))
                 .doOnNext(trivia -> {

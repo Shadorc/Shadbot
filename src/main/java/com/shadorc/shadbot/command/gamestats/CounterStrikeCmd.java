@@ -15,6 +15,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.*;
@@ -85,7 +86,8 @@ public class CounterStrikeCmd extends BaseCmd {
         else {
             final String url = String.format("%s?key=%s&vanityurl=%s",
                     RESOLVE_VANITY_URL, CredentialManager.getInstance().get(Credential.STEAM_API_KEY), NetUtils.encode(identificator));
-            return NetUtils.get(url, ResolveVanityUrlResponse.class)
+            return RequestHelper.create(url)
+                    .toMono(ResolveVanityUrlResponse.class)
                     .map(ResolveVanityUrlResponse::getResponse)
                     .map(Response::getSteamId)
                     .flatMap(Mono::justOrEmpty);
@@ -98,7 +100,8 @@ public class CounterStrikeCmd extends BaseCmd {
     private static Mono<PlayerSummary> getPlayerSummary(String steamId) {
         final String url = String.format("%s?key=%s&steamids=%s",
                 PLAYER_SUMMARIES_URL, CredentialManager.getInstance().get(Credential.STEAM_API_KEY), steamId);
-        return NetUtils.get(url, PlayerSummariesResponse.class)
+        return RequestHelper.create(url)
+                .toMono(PlayerSummariesResponse.class)
                 .map(PlayerSummariesResponse::getResponse)
                 // Users matching the steamId
                 .flatMapIterable(PlayerSummaries::getPlayers)
@@ -115,7 +118,7 @@ public class CounterStrikeCmd extends BaseCmd {
         final String userStatsUrl = String.format("%s?appid=730&key=%s&steamid=%s",
                 USER_STATS_FOR_GAME_URL, CredentialManager.getInstance().get(Credential.STEAM_API_KEY), player.getSteamId());
 
-        return NetUtils.get(userStatsUrl)
+        return RequestHelper.request(userStatsUrl)
                 .flatMap(body -> {
                     if (body.contains("500 Internal Server Error")) {
                         return Mono.just(updatableMsg.setContent(
