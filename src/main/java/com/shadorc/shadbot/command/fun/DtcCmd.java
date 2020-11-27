@@ -50,8 +50,8 @@ public class DtcCmd extends BaseCmd {
 
     private static Mono<Quote> getRandomQuote() {
         final JavaType valueType = NetUtils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
-        return RequestHelper.create(RANDOM_QUOTE_URL)
-                .<List<Quote>>toMono(valueType)
+        return RequestHelper.fromUrl(RANDOM_QUOTE_URL)
+                .<List<Quote>>to(valueType)
                 .map(quotes -> {
                     Quote quote;
                     do {

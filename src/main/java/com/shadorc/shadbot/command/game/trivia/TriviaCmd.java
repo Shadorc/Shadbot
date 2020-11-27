@@ -75,8 +75,8 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
     }
 
     private Mono<TriviaCategoriesResponse> getCategories() {
-        final Mono<TriviaCategoriesResponse> getCategories = RequestHelper.create(CATEGORY_URL)
-                .toMono(TriviaCategoriesResponse.class)
+        final Mono<TriviaCategoriesResponse> getCategories = RequestHelper.fromUrl(CATEGORY_URL)
+                .to(TriviaCategoriesResponse.class)
                 .doOnNext(categories -> {
                     this.categories = categories;
                     DEFAULT_LOGGER.info("Open Trivia DB categories obtained");

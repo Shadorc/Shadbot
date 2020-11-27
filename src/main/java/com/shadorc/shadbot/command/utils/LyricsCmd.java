@@ -108,7 +108,7 @@ public class LyricsCmd extends BaseCmd {
     private static Mono<Document> getLyricsDocument(String url) {
         // Sometimes Musixmatch redirects to a wrong page
         // If the response URL and the requested URL are different, retry
-        return RequestHelper.create(url)
+        return RequestHelper.fromUrl(url)
                 .request()
                 .responseSingle((res, con) -> con.asString(StandardCharsets.UTF_8)
                         .map(body -> Tuples.of(res, body)))

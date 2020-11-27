@@ -74,8 +74,8 @@ public class WikiCmd extends BaseCmd {
                         + "&exsentences=5",
                 NetUtils.encode(search));
 
-        return RequestHelper.create(url)
-                .toMono(WikipediaResponse.class)
+        return RequestHelper.fromUrl(url)
+                .to(WikipediaResponse.class)
                 .map(WikipediaResponse::getQuery)
                 .map(WikipediaQuery::getPages)
                 .flatMapIterable(Map::entrySet)

@@ -222,7 +222,7 @@ public class BotListStats {
     }
 
     private static Mono<String> post(String url, String authorization, JSONObject content) {
-        return RequestHelper.create(url)
+        return RequestHelper.fromUrl(url)
                 .setMethod(HttpMethod.POST)
                 .addHeaders(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
                 .addHeaders(HttpHeaderNames.AUTHORIZATION, authorization)

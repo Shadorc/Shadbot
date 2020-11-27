@@ -41,9 +41,9 @@ public class JokeCmd extends BaseCmd {
     }
 
     private static Mono<String> getRandomJoke() {
-        return RequestHelper.create(HOME_URL)
+        return RequestHelper.fromUrl(HOME_URL)
                 .addHeaders(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON)
-                .toMono(JokeResponse.class)
+                .to(JokeResponse.class)
                 .map(JokeResponse::getJoke);
     }
 

@@ -59,8 +59,8 @@ public class GifCmd extends BaseCmd {
                     SEARCH_ENDPOINT, apiKey, encodedSearch, ThreadLocalRandom.current().nextInt(25));
         }
 
-        return RequestHelper.create(url)
-                .toMono(GiphyResponse.class)
+        return RequestHelper.fromUrl(url)
+                .to(GiphyResponse.class)
                 .flatMapIterable(GiphyResponse::getData)
                 .next()
                 .map(Data::getImages)

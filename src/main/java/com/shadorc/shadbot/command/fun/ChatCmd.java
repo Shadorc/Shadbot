@@ -68,8 +68,8 @@ public class ChatCmd extends BaseCmd {
         final String url = String.format("%s?botid=%s&input=%s&custid=%s",
                 HOME_URl, botId, NetUtils.encode(input), this.channelsCustid.getOrDefault(channelId, ""));
 
-        return RequestHelper.create(url)
-                .toMono(ChatBotResponse.class)
+        return RequestHelper.fromUrl(url)
+                .to(ChatBotResponse.class)
                 .map(ChatBotResponse::getResult)
                 .doOnNext(chat -> this.channelsCustid.put(channelId, chat.getCustId()))
                 .map(ChatBotResult::getResponse)

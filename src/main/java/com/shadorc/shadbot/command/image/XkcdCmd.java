@@ -43,12 +43,12 @@ public class XkcdCmd extends BaseCmd {
     }
 
     private static Mono<XkcdResponse> getRandomXkcd() {
-        return RequestHelper.create(LAST_URL)
-                .toMono(XkcdResponse.class)
+        return RequestHelper.fromUrl(LAST_URL)
+                .to(XkcdResponse.class)
                 .map(XkcdResponse::getNum)
                 .map(ThreadLocalRandom.current()::nextInt)
-                .flatMap(rand -> RequestHelper.create(String.format("%s/%d/info.0.json", HOME_URL, rand))
-                        .toMono(XkcdResponse.class));
+                .flatMap(rand -> RequestHelper.fromUrl(String.format("%s/%d/info.0.json", HOME_URL, rand))
+                        .to(XkcdResponse.class));
     }
 
     @Override

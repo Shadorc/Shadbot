@@ -79,7 +79,7 @@ public class ImageCmd extends BaseCmd {
                                 + "&access_token=%s",
                         BROWSE_POPULAR_URL, encodedSearch, ThreadLocalRandom.current().nextInt(150),
                         this.token.getAccessToken())))
-                .flatMap(url -> RequestHelper.create(url).toMono(DeviantArtResponse.class))
+                .flatMap(url -> RequestHelper.fromUrl(url).to(DeviantArtResponse.class))
                 .flatMapIterable(DeviantArtResponse::getResults)
                 .filter(image -> image.getContent().isPresent())
                 .collectList()
@@ -92,7 +92,7 @@ public class ImageCmd extends BaseCmd {
                 OAUTH_URL, CredentialManager.getInstance().get(Credential.DEVIANTART_CLIENT_ID),
                 CredentialManager.getInstance().get(Credential.DEVIANTART_API_SECRET)))
                 .filter(url -> this.isTokenExpired())
-                .flatMap(url -> RequestHelper.create(url).toMono(TokenResponse.class))
+                .flatMap(url -> RequestHelper.fromUrl(url).to(TokenResponse.class))
                 .doOnNext(token -> {
                     this.token = token;
                     this.lastTokenGeneration.set(System.currentTimeMillis());

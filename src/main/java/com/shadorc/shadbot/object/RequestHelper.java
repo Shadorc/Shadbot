@@ -33,12 +33,12 @@ public class RequestHelper {
         this.url = url;
     }
 
-    public static RequestHelper create(final String url) {
+    public static RequestHelper fromUrl(final String url) {
         return new RequestHelper(url);
     }
 
     public static Mono<String> request(final String url) {
-        return RequestHelper.create(url)
+        return RequestHelper.fromUrl(url)
                 .request()
                 .responseSingle((resp, body) -> body.asString(StandardCharsets.UTF_8))
                 .timeout(Config.TIMEOUT);
@@ -61,14 +61,14 @@ public class RequestHelper {
                 .uri(this.url);
     }
 
-    public <T> Mono<T> toMono(final JavaType type) {
+    public <T> Mono<T> to(final JavaType type) {
         return this.request()
                 .<T>responseSingle((resp, body) -> RequestHelper.handleResponse(resp, body, type))
                 .timeout(Config.TIMEOUT);
     }
 
-    public <T> Mono<T> toMono(final Class<? extends T> type) {
-        return this.toMono(TypeFactory.defaultInstance().constructType(type));
+    public <T> Mono<T> to(final Class<? extends T> type) {
+        return this.to(TypeFactory.defaultInstance().constructType(type));
     }
 
     private static <T> Mono<T> handleResponse(final HttpClientResponse resp, final ByteBufMono body, final JavaType type) {

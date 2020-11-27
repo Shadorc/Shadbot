@@ -54,7 +54,7 @@ public class WallpaperCmd extends BaseCmd {
 
                     return urlBuilder.toString();
                 }))
-                .flatMap(url -> RequestHelper.create(url).toMono(WallhavenResponse.class))
+                .flatMap(url -> RequestHelper.fromUrl(url).to(WallhavenResponse.class))
                 .map(WallhavenResponse::getWallpapers)
                 .filter(wallpapers -> !wallpapers.isEmpty())
                 .map(RandUtils::randValue)

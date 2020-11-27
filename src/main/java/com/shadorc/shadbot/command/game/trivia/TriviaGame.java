@@ -52,8 +52,8 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
     public Mono<Void> start() {
         final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s",
                 Objects.toString(this.categoryId, ""));
-        return RequestHelper.create(url)
-                .toMono(TriviaResponse.class)
+        return RequestHelper.fromUrl(url)
+                .to(TriviaResponse.class)
                 .map(TriviaResponse::getResults)
                 .map(list -> list.get(0))
                 .doOnNext(trivia -> {

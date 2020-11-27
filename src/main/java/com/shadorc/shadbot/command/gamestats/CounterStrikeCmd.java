@@ -86,8 +86,8 @@ public class CounterStrikeCmd extends BaseCmd {
         else {
             final String url = String.format("%s?key=%s&vanityurl=%s",
                     RESOLVE_VANITY_URL, CredentialManager.getInstance().get(Credential.STEAM_API_KEY), NetUtils.encode(identificator));
-            return RequestHelper.create(url)
-                    .toMono(ResolveVanityUrlResponse.class)
+            return RequestHelper.fromUrl(url)
+                    .to(ResolveVanityUrlResponse.class)
                     .map(ResolveVanityUrlResponse::getResponse)
                     .map(Response::getSteamId)
                     .flatMap(Mono::justOrEmpty);
@@ -100,8 +100,8 @@ public class CounterStrikeCmd extends BaseCmd {
     private static Mono<PlayerSummary> getPlayerSummary(String steamId) {
         final String url = String.format("%s?key=%s&steamids=%s",
                 PLAYER_SUMMARIES_URL, CredentialManager.getInstance().get(Credential.STEAM_API_KEY), steamId);
-        return RequestHelper.create(url)
-                .toMono(PlayerSummariesResponse.class)
+        return RequestHelper.fromUrl(url)
+                .to(PlayerSummariesResponse.class)
                 .map(PlayerSummariesResponse::getResponse)
                 // Users matching the steamId
                 .flatMapIterable(PlayerSummaries::getPlayers)

@@ -92,8 +92,8 @@ public class OverwatchCmd extends BaseCmd {
         final String username = NetUtils.encode(battletag.replace("#", "-"));
 
         final Mono<ProfileResponse> getProfile =
-                RequestHelper.create(OverwatchCmd.getUrl("profile", platform, username))
-                        .toMono(ProfileResponse.class)
+                RequestHelper.fromUrl(OverwatchCmd.getUrl("profile", platform, username))
+                        .to(ProfileResponse.class)
                         .map(profile -> {
                             if (profile.getMessage().map("Error: Profile not found"::equals).orElse(false)) {
                                 throw new CommandException("Profile not found. The specified platform may be incorrect.");
@@ -101,8 +101,8 @@ public class OverwatchCmd extends BaseCmd {
                             return profile;
                         });
         final Mono<StatsResponse> getStats =
-                RequestHelper.create(OverwatchCmd.getUrl("stats", platform, username))
-                        .toMono(StatsResponse.class);
+                RequestHelper.fromUrl(OverwatchCmd.getUrl("stats", platform, username))
+                        .to(StatsResponse.class);
 
         return Mono.zip(Mono.just(platform), getProfile, getStats)
                 .map(TupleUtils.function(OverwatchProfile::new))

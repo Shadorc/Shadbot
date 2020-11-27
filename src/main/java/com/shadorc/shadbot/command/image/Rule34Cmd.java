@@ -89,8 +89,8 @@ public class Rule34Cmd extends BaseCmd {
         final String url = String.format("%s?page=dapi&s=post&q=index&tags=%s",
                 HOME_URL, NetUtils.encode(search.replace(" ", "_")));
 
-        return RequestHelper.create(url)
-                .toMono(R34Response.class)
+        return RequestHelper.fromUrl(url)
+                .to(R34Response.class)
                 .map(R34Response::getPosts)
                 .flatMap(Mono::justOrEmpty)
                 .map(R34Posts::getPosts)
