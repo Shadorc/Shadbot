@@ -26,6 +26,7 @@ import discord4j.rest.response.ResponseFunction;
 import discord4j.store.api.mapping.MappingStoreService;
 import discord4j.store.caffeine.CaffeineStoreService;
 import discord4j.store.jdk.JdkStoreService;
+import io.prometheus.client.Counter;
 import io.prometheus.client.exporter.HTTPServer;
 import io.sentry.Sentry;
 import reactor.core.publisher.Hooks;
@@ -143,6 +144,11 @@ public class Shadbot {
                     Shadbot.register(gateway, new VoiceStateUpdateListener());
                     Shadbot.register(gateway, new ReactionListener.ReactionAddListener());
                     Shadbot.register(gateway, new ReactionListener.ReactionRemoveListener());
+
+                    final Counter eventsCounter = Counter.build().namespace("event")
+                            .name("event_count").help("Discord events count").labelNames("type").register();
+                    gateway.on(Event.class,
+                            event -> Mono.fromRunnable(() -> eventsCounter.labels(event.getClass().getSimpleName()).inc()));
 
                     DEFAULT_LOGGER.info("Shadbot is ready");
                     return gateway.onDisconnect();
