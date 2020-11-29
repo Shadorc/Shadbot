@@ -7,7 +7,6 @@ import com.shadorc.shadbot.api.ServerAccessException;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.utils.NetUtils;
 import io.netty.handler.codec.http.*;
-import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.XML;
 import reactor.core.publisher.Mono;
@@ -15,6 +14,7 @@ import reactor.netty.ByteBufMono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.http.client.HttpClientResponse;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -71,33 +71,33 @@ public class RequestHelper {
         return this.to(TypeFactory.defaultInstance().constructType(type));
     }
 
-    private static <T> Mono<T> handleResponse(final HttpClientResponse resp, final ByteBufMono body, final JavaType type) {
+    private static <T> Mono<T> handleResponse(final HttpClientResponse resp, final ByteBufMono byteBufMono, final JavaType type) {
         final int statusCode = resp.status().code();
         if (statusCode / 100 != 2 && statusCode != HttpResponseStatus.NOT_FOUND.code()) {
-            return body.asString()
+            return byteBufMono.asString()
                     .defaultIfEmpty("Empty body")
-                    .flatMap(err -> Mono.error(new ServerAccessException(resp, err)));
+                    .flatMap(body -> Mono.error(new ServerAccessException(resp, body)));
         }
+
         final String contentType = resp.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE);
         final boolean isXml = contentType.contains("text/xml");
         final boolean isJson = contentType.contains(HttpHeaderValues.APPLICATION_JSON);
         if (!isXml && !isJson) {
-            return body.asString()
+            return byteBufMono.asString()
                     .defaultIfEmpty("Empty body")
-                    .flatMap(err -> Mono.error(new HeaderException(resp, err)));
+                    .flatMap(body -> Mono.error(new HeaderException(resp, body)));
         }
-        return body.asInputStream()
-                .flatMap(input -> Mono.fromCallable(() -> {
-                    String content = "Unknown";
-                    try (input) {
-                        content = IOUtils.toString(input, StandardCharsets.UTF_8);
+
+        return byteBufMono.asString()
+                .flatMap(body -> Mono.fromCallable(() -> {
+                    try {
                         if (isXml) {
-                            content = XML.toJSONObject(content).toString();
+                            return NetUtils.MAPPER.readValue(XML.toJSONObject(body).toString(), type);
                         }
-                        return NetUtils.MAPPER.readValue(content, type);
-                    } catch (JSONException err) {
+                        return NetUtils.MAPPER.readValue(body, type);
+                    } catch (final JSONException err) {
                         throw new JSONException(err.getMessage(),
-                                new RuntimeException(String.format("Invalid JSON received (response: %s): %s", resp, content)));
+                                new IOException(String.format("Invalid JSON received (response: %s): %s", resp, body)));
                     }
                 }));
     }
