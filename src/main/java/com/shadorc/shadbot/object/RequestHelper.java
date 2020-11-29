@@ -1,11 +1,13 @@
 package com.shadorc.shadbot.object;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.shadorc.shadbot.api.HeaderException;
 import com.shadorc.shadbot.api.ServerAccessException;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.utils.NetUtils;
+import io.netty.channel.unix.Errors;
 import io.netty.handler.codec.http.*;
 import org.json.JSONException;
 import org.json.XML;
@@ -13,9 +15,12 @@ import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufMono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.http.client.HttpClientResponse;
+import reactor.netty.http.client.PrematureCloseException;
+import reactor.util.retry.Retry;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -89,17 +94,14 @@ public class RequestHelper {
         }
 
         return byteBufMono.asString()
-                .flatMap(body -> Mono.fromCallable(() -> {
-                    try {
-                        if (isXml) {
-                            return NetUtils.MAPPER.readValue(XML.toJSONObject(body).toString(), type);
-                        }
-                        return NetUtils.MAPPER.readValue(body, type);
-                    } catch (final JSONException err) {
-                        throw new JSONException(err.getMessage(),
-                                new IOException(String.format("Invalid JSON received (response: %s): %s", resp, body)));
-                    }
-                }));
+                .flatMap(body -> Mono.<T>fromCallable(() -> {
+                    final String json = isXml ? XML.toJSONObject(body).toString() : body;
+                    return NetUtils.MAPPER.readValue(json, type);
+                })
+                        .onErrorMap(err -> err instanceof JSONException || err instanceof JsonProcessingException,
+                                err -> new IOException(err.getMessage(),
+                                        new IOException(String.format("Invalid JSON received (response: %s): %s", resp, body)))))
+                .retryWhen(Retry.backoff(3, Duration.ofSeconds(1))
+                        .filter(err -> err instanceof PrematureCloseException || err instanceof Errors.NativeIoException));
     }
-
 }
