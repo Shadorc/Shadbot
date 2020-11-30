@@ -1,38 +1,18 @@
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.html.suicidegirl.SuicideGirl;
-import com.shadorc.shadbot.utils.LogUtils;
-import org.junit.jupiter.api.BeforeAll;
+import com.shadorc.shadbot.command.CmdTest;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
-import reactor.util.Logger;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class SuicideGirlsCmdTest {
-
-    private static Logger logger;
-    private static SuicideGirlsCmd cmd;
-
-    @BeforeAll
-    public static void init() {
-        logger = LogUtils.getLogger(SuicideGirlsCmdTest.class, LogUtils.Category.TEST);
-        cmd = new SuicideGirlsCmd();
-    }
+public class SuicideGirlsCmdTest extends CmdTest<SuicideGirlsCmd> {
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testGetRandomSuicideGirl() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        final Method method = SuicideGirlsCmd.class.getDeclaredMethod("getRandomSuicideGirl");
-        method.setAccessible(true);
-        final SuicideGirl result = ((Mono<SuicideGirl>) method.invoke(cmd)).block();
-        logger.debug("testGetRandomSuicideGirl: name={}, url={}, imageUrl={}", result.getName(), result.getUrl(), result.getImageUrl());
+    public void testGetRandomSuicideGirl() {
+        final SuicideGirl result = this.invoke("getRandomSuicideGirl");
         assertNotNull(result.getName());
         assertNotNull(result.getImageUrl());
         assertNotNull(result.getUrl());
     }
-
 }

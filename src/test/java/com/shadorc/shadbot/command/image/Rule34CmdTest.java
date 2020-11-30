@@ -1,37 +1,16 @@
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.r34.R34Post;
-import com.shadorc.shadbot.utils.LogUtils;
-import org.junit.jupiter.api.BeforeAll;
+import com.shadorc.shadbot.command.CmdTest;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
-import reactor.util.Logger;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class Rule34CmdTest {
-
-    private static Logger logger;
-    private static Rule34Cmd cmd;
-    private static Method method;
-
-    @BeforeAll
-    public static void init() throws NoSuchMethodException {
-        logger = LogUtils.getLogger(Rule34CmdTest.class, LogUtils.Category.TEST);
-        cmd = new Rule34Cmd();
-
-        method = Rule34Cmd.class.getDeclaredMethod("getR34Post", String.class);
-        method.setAccessible(true);
-    }
+public class Rule34CmdTest extends CmdTest<Rule34Cmd> {
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testGetR34Post() throws InvocationTargetException, IllegalAccessException {
-        final R34Post result = ((Mono<R34Post>) method.invoke(cmd, "dab")).block();
-        logger.debug("testGetR34Post: {}", result);
+    public void testGetR34Post() {
+        final R34Post result = this.invoke("getR34Post", String.class, "dab");
         assertNotNull(result.getSource());
         assertNotNull(result.getFileUrl());
         assertNotNull(result.getTags());
@@ -40,11 +19,9 @@ public class Rule34CmdTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testGetR34PostSpecial() throws InvocationTargetException, IllegalAccessException {
-        final R34Post result = ((Mono<R34Post>) method.invoke(cmd,
-                "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block();
-        logger.debug("testGetR34PostSpecial: {}", result);
+    public void testGetR34PostSpecial() {
+        final R34Post result = this.invoke(
+                "getR34Post", String.class, "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/");
         assertNull(result);
     }
 
