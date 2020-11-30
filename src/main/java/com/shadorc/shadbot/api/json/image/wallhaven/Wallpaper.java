@@ -29,4 +29,13 @@ public class Wallpaper {
         return this.purity;
     }
 
+    @Override
+    public String toString() {
+        return "Wallpaper{" +
+                "url='" + this.url + '\'' +
+                ", path='" + this.path + '\'' +
+                ", resolution='" + this.resolution + '\'' +
+                ", purity='" + this.purity + '\'' +
+                '}';
+    }
 }
