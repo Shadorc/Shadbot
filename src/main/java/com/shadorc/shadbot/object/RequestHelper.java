@@ -10,12 +10,15 @@ import com.shadorc.shadbot.utils.NetUtils;
 import io.netty.channel.unix.Errors;
 import io.netty.handler.codec.http.*;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.XML;
 import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufMono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.http.client.HttpClientResponse;
 import reactor.netty.http.client.PrematureCloseException;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 import reactor.util.retry.Retry;
 
 import java.io.IOException;
@@ -26,8 +29,8 @@ import java.util.function.Consumer;
 
 public class RequestHelper {
 
-    private static final HttpClient HTTP_CLIENT = HttpClient.create()
-            .followRedirect(true);
+    private static final Logger LOGGER = Loggers.getLogger("shadbot.RequestHelper");
+    private static final HttpClient HTTP_CLIENT = HttpClient.create().followRedirect(true);
 
     private final String url;
 
@@ -96,6 +99,10 @@ public class RequestHelper {
         return byteBufMono.asString()
                 .flatMap(body -> Mono.<T>fromCallable(() -> {
                     final String json = isXml ? XML.toJSONObject(body).toString() : body;
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("JSON deserialized from {}: {}",
+                                resp.fullPath(), new JSONObject(json).toString(2));
+                    }
                     return NetUtils.MAPPER.readValue(json, type);
                 })
                         .onErrorMap(err -> err instanceof JSONException || err instanceof JsonProcessingException,
