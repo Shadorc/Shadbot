@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class WikiCmd extends BaseCmd {
+public class WikipediaCmd extends BaseCmd {
 
-    public WikiCmd() {
+    public WikipediaCmd() {
         super(CommandCategory.UTILS, List.of("wiki", "wikipedia"));
         this.setDefaultRateLimiter();
     }
@@ -36,7 +36,7 @@ public class WikiCmd extends BaseCmd {
 
         return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Wikipedia...", context.getUsername()))
                 .send()
-                .then(WikiCmd.getWikipediaPage(arg))
+                .then(WikipediaCmd.getWikipediaPage(arg))
                 .map(page -> {
                     if (page.getExtract().endsWith("may refer to:")) {
                         return updatableMsg.setContent(
