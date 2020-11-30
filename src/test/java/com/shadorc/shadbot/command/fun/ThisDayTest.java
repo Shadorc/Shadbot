@@ -29,7 +29,7 @@ public class ThisDayTest {
         final Method method = ThisDayCmd.class.getDeclaredMethod("getThisDay");
         method.setAccessible(true);
         final ThisDay result = ((Mono<ThisDay>) method.invoke(cmd)).block();
-        logger.debug("testGetThisDay: date={}, events={}", result.getDate(), result.getEvents());
+        logger.debug("testGetThisDay: {}", result);
         assertNotNull(result.getDate());
         assertNotNull(result.getEvents());
     }

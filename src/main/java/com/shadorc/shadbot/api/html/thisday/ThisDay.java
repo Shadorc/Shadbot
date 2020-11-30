@@ -36,4 +36,11 @@ public class ThisDay {
                 .collect(Collectors.joining("\n\n"));
     }
 
+    @Override
+    public String toString() {
+        return "ThisDay{" +
+                "date='" + this.getDate() + '\'' +
+                ", events='" + this.getEvents() + '\'' +
+                '}';
+    }
 }
