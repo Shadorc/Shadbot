@@ -97,14 +97,6 @@
             <id>sedmelluq</id>
             <url>https://dl.bintray.com/sedmelluq/com.sedmelluq</url>
         </repository>
-        <!-- Discord4J's snapshots -->
-        <repository>
-            <id>oss.sonatype.org-snapshot</id>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
     </repositories>
     <dependencies>
         <!-- Discord4J -->
