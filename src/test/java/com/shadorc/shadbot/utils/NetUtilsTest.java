@@ -11,6 +11,18 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class NetUtilsTest {
 
     @Test
+    public void testIsUrl() {
+        assertEquals(true, NetUtils.isUrl("http://www.youtube.com"));
+        assertEquals(true, NetUtils.isUrl("https://www.youtube.com"));
+        assertEquals(true, NetUtils.isUrl("https://www.you%20tube.com"));
+        assertEquals(true, NetUtils.isUrl("https://www.(you)%20tube.com"));
+        assertEquals(false, NetUtils.isUrl("https://www.you tube.com"));
+        assertEquals(false, NetUtils.isUrl("youtube"));
+        assertEquals(false, NetUtils.isUrl("youtube.com"));
+        assertEquals(false, NetUtils.isUrl("www.youtube.com"));
+    }
+
+    @Test
     public void testCleanWithLinebreaks() {
         assertEquals("Test", NetUtils.cleanWithLinebreaks("<html>Test</html>"));
         assertEquals("", NetUtils.cleanWithLinebreaks("<html></html>"));
