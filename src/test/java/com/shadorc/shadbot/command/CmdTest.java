@@ -6,6 +6,7 @@ import reactor.util.Logger;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
 
 public abstract class CmdTest<T> {
 
@@ -24,26 +25,26 @@ public abstract class CmdTest<T> {
         }
     }
 
-    public <R> R invoke(final String name) {
-        return this.invoke(name, new Class<?>[]{}, new Object[]{});
-    }
-
-    public <R> R invoke(final String name, final Class<?> clazz, final Object arg) {
-        return this.invoke(name, new Class<?>[]{clazz}, new Object[]{arg});
-    }
-
     @SuppressWarnings("unchecked")
-    public <R> R invoke(final String name, final Class<?>[] classes, final Object[] args) {
+    public <R> R invoke(final String name, final Object... args) {
         try {
+            final Class<?>[] classes = Arrays.stream(args).map(Object::getClass).toArray(Class[]::new);
             final Method method = this.cmdClass.getDeclaredMethod(name, classes);
             method.setAccessible(true);
 
-            final R result = ((Mono<R>) method.invoke(this.cmd, args)).block();
+            final Object resultObj = method.invoke(this.cmd, args);
+            final R result = resultObj instanceof Mono ? ((Mono<R>) resultObj).block() : (R) resultObj;
             if (this.logger.isDebugEnabled()) {
                 this.logger.debug("{}: {}", this.cmdClass.getSimpleName(), result);
             }
             return result;
+        } catch (final RuntimeException err) {
+            throw err;
         } catch (final Exception err) {
+            final Throwable cause = err.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
             throw new RuntimeException(err);
         }
     }

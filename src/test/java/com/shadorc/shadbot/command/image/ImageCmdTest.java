@@ -12,7 +12,7 @@ public class ImageCmdTest extends CmdTest<ImageCmd> {
 
     @Test
     public void testGetPopularImage() {
-        final Image result = this.invoke("getPopularImage", String.class, "dab");
+        final Image result = this.invoke("getPopularImage", "dab");
         assertNotNull(result.getContent());
         assertNotNull(result.getAuthor());
         assertNotNull(result.getCategoryPath());
@@ -23,7 +23,7 @@ public class ImageCmdTest extends CmdTest<ImageCmd> {
     @Test
     public void testGetPopularImageSpecial() {
         final Image result = this.invoke(
-                "getPopularImage", String.class, NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/"));
+                "getPopularImage", NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/"));
         assertNull(result);
     }
 

@@ -14,7 +14,7 @@ public class LogUtils {
     }
 
     public static <T> Logger getLogger() {
-        return LogUtils.getLogger(null, new Category[] {});
+        return LogUtils.getLogger(null, new Category[]{});
     }
 
     public static <T> Logger getLogger(Category... categories) {

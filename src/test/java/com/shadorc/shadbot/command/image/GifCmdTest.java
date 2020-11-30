@@ -11,20 +11,20 @@ public class GifCmdTest extends CmdTest<GifCmd> {
 
     @Test
     public void testGetGifRandom() {
-        final String result = this.invoke("getGif", String.class, "");
+        final String result = this.invoke("getGif", "");
         assertNotNull(result);
     }
 
     @Test
     public void testGetGifSearch() {
-        final String result = this.invoke("getGif", String.class, "doom");
+        final String result = this.invoke("getGif", "doom");
         assertNotNull(result);
     }
 
     @Test
     public void testGetGifSearchSpecial() {
         assertDoesNotThrow(() -> {
-            this.invoke("getGif", String.class, NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/"));
+            this.invoke("getGif", NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/"));
         });
     }
 

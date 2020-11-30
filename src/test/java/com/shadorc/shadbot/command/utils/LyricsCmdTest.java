@@ -1,39 +1,17 @@
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.api.html.musixmatch.Musixmatch;
-import com.shadorc.shadbot.utils.LogUtils;
-import org.junit.jupiter.api.BeforeAll;
+import com.shadorc.shadbot.command.CmdTest;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
-import reactor.util.Logger;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class LyricsCmdTest {
-
-    private static Logger logger;
-    private static LyricsCmd cmd;
-    private static Method method;
-
-    @BeforeAll
-    public static void init() throws NoSuchMethodException {
-        logger = LogUtils.getLogger(LyricsCmdTest.class, LogUtils.Category.TEST);
-        cmd = new LyricsCmd();
-
-        method = LyricsCmd.class.getDeclaredMethod("getMusixmatch", String.class);
-        method.setAccessible(true);
-    }
+public class LyricsCmdTest extends CmdTest<LyricsCmd> {
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testGetMusixmatch() throws InvocationTargetException, IllegalAccessException {
-        final Musixmatch result = ((Mono<Musixmatch>) method.invoke(cmd, "21 guns")).block();
-        logger.debug("testGetMusixmatch: {\n\turl={},\n\ttitle={},\n\tartist={},\n\timageUrl={},\n\tlyrics={}\n}",
-                result.getUrl(), result.getTitle(), result.getArtist(), result.getImageUrl(), result.getLyrics());
+    public void testGetMusixmatch() {
+        final Musixmatch result = this.invoke("getMusixmatch", "21 guns");
         assertNotNull(result.getLyrics());
         assertNotNull(result.getArtist());
         assertNotNull(result.getImageUrl());
@@ -42,11 +20,9 @@ public class LyricsCmdTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testGetMusixmatchSpecial() throws InvocationTargetException, IllegalAccessException {
-        final Musixmatch result = ((Mono<Musixmatch>) method.invoke(cmd,
-                "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block();
-        logger.debug("testGetMusixmatchSpecial: {}", result);
+    public void testGetMusixmatchSpecial() {
+        final Musixmatch result = this.invoke(
+                "getMusixmatch", "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/");
         assertNull(result);
     }
 

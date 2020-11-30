@@ -1,37 +1,18 @@
 package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.overwatch.OverwatchProfile;
+import com.shadorc.shadbot.command.CmdTest;
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.utils.LogUtils;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
-import reactor.util.Logger;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class OverwatchCmdTest {
-
-    private static Logger logger;
-    private static OverwatchCmd cmd;
-
-    @BeforeAll
-    public static void init() {
-        logger = LogUtils.getLogger(OverwatchCmdTest.class, LogUtils.Category.TEST);
-        cmd = new OverwatchCmd();
-    }
+public class OverwatchCmdTest extends CmdTest<OverwatchCmd> {
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testGetResponse() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        final Method method = OverwatchCmd.class.getDeclaredMethod("getOverwatchProfile", String.class, OverwatchCmd.Platform.class);
-        method.setAccessible(true);
-
-        final OverwatchProfile result = ((Mono<OverwatchProfile>) method.invoke(cmd, "Shadorc#2503", OverwatchCmd.Platform.PC)).block();
-        logger.debug("testGetResponse: {}", result);
+    public void testGetResponse() {
+        final OverwatchProfile result = this.invoke(
+                "getOverwatchProfile", "Shadorc#2503", OverwatchCmd.Platform.PC);
         assertEquals(OverwatchCmd.Platform.PC, result.getPlatform());
         assertNull(result.getProfile().getMessage().orElse(null));
         assertFalse(result.getProfile().isPrivate());
@@ -45,13 +26,9 @@ public class OverwatchCmdTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testGetResponseWrongBattletag() throws NoSuchMethodException {
-        final Method method = OverwatchCmd.class.getDeclaredMethod("getOverwatchProfile", String.class, OverwatchCmd.Platform.class);
-        method.setAccessible(true);
-
-        assertThrows(CommandException.class, () -> ((Mono<OverwatchProfile>) method.invoke(cmd,
-                "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%* µ,?;.:/!§<>+-*/", OverwatchCmd.Platform.PC)).block());
+    public void testGetResponseWrongBattletag() {
+        assertThrows(CommandException.class, () -> this.invoke(
+                "getOverwatchProfile", "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%* µ,?;.:/!§<>+-*/", OverwatchCmd.Platform.PC));
     }
 
 }

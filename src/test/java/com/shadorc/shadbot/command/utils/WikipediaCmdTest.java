@@ -1,47 +1,25 @@
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.api.json.wikipedia.WikipediaPage;
-import com.shadorc.shadbot.utils.LogUtils;
-import org.junit.jupiter.api.BeforeAll;
+import com.shadorc.shadbot.command.CmdTest;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
-import reactor.util.Logger;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class WikipediaCmdTest {
-
-    private static Logger logger;
-    private static WikiCmd cmd;
-    private static Method method;
-
-    @BeforeAll
-    public static void init() throws NoSuchMethodException {
-        logger = LogUtils.getLogger(WikipediaCmdTest.class, LogUtils.Category.TEST);
-        cmd = new WikiCmd();
-
-        method = WikiCmd.class.getDeclaredMethod("getWikipediaPage", String.class);
-        method.setAccessible(true);
-    }
+public class WikipediaCmdTest extends CmdTest<WikiCmd> {
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testGetWikipediaPage() throws InvocationTargetException, IllegalAccessException {
-        final WikipediaPage result = ((Mono<WikipediaPage>) method.invoke(cmd, "21 guns")).block();
-        logger.debug("testGetWikipediaPage: {}", result);
+    public void testGetWikipediaPage() {
+        final WikipediaPage result = this.invoke("getWikipediaPage", "21 guns");
         assertNotNull(result.getExtract());
         assertNotNull(result.getTitle());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testGetWikipediaPageSpecial() throws InvocationTargetException, IllegalAccessException {
-        final WikipediaPage result = ((Mono<WikipediaPage>) method.invoke(cmd, "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block();
-        logger.debug("testGetWikipediaPageSpecial: {}", result);
+    public void testGetWikipediaPageSpecial() {
+        final WikipediaPage result = this.invoke(
+                "getWikipediaPage", "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/");
         assertNull(result);
     }
 

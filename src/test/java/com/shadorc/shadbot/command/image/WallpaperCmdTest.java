@@ -10,7 +10,7 @@ public class WallpaperCmdTest extends CmdTest<WallpaperCmd> {
 
     @Test
     public void TestGetWallpaper_Keyword() {
-        final Wallpaper result = this.invoke("getWallpaper", String.class, "doom");
+        final Wallpaper result = this.invoke("getWallpaper", "doom");
         assertNotNull(result.getPath());
         assertEquals("sfw", result.getPurity());
         assertNotNull(result.getResolution());
@@ -19,7 +19,7 @@ public class WallpaperCmdTest extends CmdTest<WallpaperCmd> {
 
     @Test
     public void TestGetWallpaper_Keywords() {
-        final Wallpaper result = this.invoke("getWallpaper", String.class, "doom, video game");
+        final Wallpaper result = this.invoke("getWallpaper", "doom, video game");
         assertNotNull(result.getPath());
         assertEquals("sfw", result.getPurity());
         assertNotNull(result.getResolution());
@@ -28,7 +28,7 @@ public class WallpaperCmdTest extends CmdTest<WallpaperCmd> {
 
     @Test
     public void TestGetWallpaper_Random() {
-        final Wallpaper result = this.invoke("getWallpaper", String.class, "");
+        final Wallpaper result = this.invoke("getWallpaper", "");
         assertNotNull(result.getPath());
         assertEquals("sfw", result.getPurity());
         assertNotNull(result.getResolution());
@@ -37,7 +37,7 @@ public class WallpaperCmdTest extends CmdTest<WallpaperCmd> {
 
     @Test
     public void TestGetWallpaper_NotFound() {
-        final Wallpaper result = this.invoke("getWallpaper", String.class, "this is not a keyword");
+        final Wallpaper result = this.invoke("getWallpaper", "this is not a keyword");
         assertNull(result);
     }
 

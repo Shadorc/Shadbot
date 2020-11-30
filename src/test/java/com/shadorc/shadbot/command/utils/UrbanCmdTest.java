@@ -1,37 +1,16 @@
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.api.json.urbandictionary.UrbanDefinition;
-import com.shadorc.shadbot.utils.LogUtils;
-import org.junit.jupiter.api.BeforeAll;
+import com.shadorc.shadbot.command.CmdTest;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
-import reactor.util.Logger;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class UrbanCmdTest {
-
-    private static Logger logger;
-    private static UrbanCmd cmd;
-    private static Method method;
-
-    @BeforeAll
-    public static void init() throws NoSuchMethodException {
-        logger = LogUtils.getLogger(UrbanCmdTest.class, LogUtils.Category.TEST);
-        cmd = new UrbanCmd();
-
-        method = UrbanCmd.class.getDeclaredMethod("getUrbanDefinition", String.class);
-        method.setAccessible(true);
-    }
+public class UrbanCmdTest extends CmdTest<UrbanCmd> {
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testGetUrbanDefinition() throws InvocationTargetException, IllegalAccessException {
-        final UrbanDefinition result = ((Mono<UrbanDefinition>) method.invoke(cmd, "dab")).block();
-        logger.debug("testGetUrbanDefinition: {}", result);
+    public void testGetUrbanDefinition() {
+        final UrbanDefinition result = this.invoke("getUrbanDefinition", "dab");
         assertNotNull(result.getDefinition());
         assertNotNull(result.getExample());
         assertNotNull(result.getPermalink());
@@ -39,11 +18,9 @@ public class UrbanCmdTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testGetUrbanDefinitionSpecial() throws InvocationTargetException, IllegalAccessException {
-        final UrbanDefinition result = ((Mono<UrbanDefinition>) method.invoke(cmd,
-                "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/")).block();
-        logger.debug("testGetUrbanDefinitionSpecial: {}", result);
+    public void testGetUrbanDefinitionSpecial() {
+        final UrbanDefinition result = this.invoke(
+                "getUrbanDefinition", "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/");
         assertNotNull(result);
     }
 
