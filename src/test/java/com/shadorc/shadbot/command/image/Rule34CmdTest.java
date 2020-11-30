@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.r34.R34Post;
+import com.shadorc.shadbot.utils.LogUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,7 +20,7 @@ public class Rule34CmdTest {
 
     @BeforeAll
     public static void init() throws NoSuchMethodException {
-        logger = Loggers.getLogger(Rule34CmdTest.class);
+        logger = LogUtils.getLogger(Rule34CmdTest.class, LogUtils.Category.TEST);
         cmd = new Rule34Cmd();
 
         method = Rule34Cmd.class.getDeclaredMethod("getR34Post", String.class);

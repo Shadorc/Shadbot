@@ -1,10 +1,10 @@
 package com.shadorc.shadbot.command.fun;
 
+import com.shadorc.shadbot.utils.LogUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,7 +18,7 @@ public class JokeCmdTest {
 
     @BeforeAll
     public static void init() {
-        logger = Loggers.getLogger(JokeCmdTest.class);
+        logger = LogUtils.getLogger(JokeCmdTest.class, LogUtils.Category.TEST);
         cmd = new JokeCmd();
     }
 

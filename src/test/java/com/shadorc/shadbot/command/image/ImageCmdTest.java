@@ -1,12 +1,12 @@
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.deviantart.Image;
+import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,7 +22,7 @@ public class ImageCmdTest {
 
     @BeforeAll
     public static void init() throws NoSuchMethodException {
-        logger = Loggers.getLogger(ImageCmdTest.class);
+        logger = LogUtils.getLogger(ImageCmdTest.class, LogUtils.Category.TEST);
         cmd = new ImageCmd();
 
         method = ImageCmd.class.getDeclaredMethod("getPopularImage", String.class);

@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.api.json.wikipedia.WikipediaPage;
+import com.shadorc.shadbot.utils.LogUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,7 +21,7 @@ public class WikipediaCmdTest {
 
     @BeforeAll
     public static void init() throws NoSuchMethodException {
-        logger = Loggers.getLogger(WikipediaCmdTest.class);
+        logger = LogUtils.getLogger(WikipediaCmdTest.class, LogUtils.Category.TEST);
         cmd = new WikiCmd();
 
         method = WikiCmd.class.getDeclaredMethod("getWikipediaPage", String.class);

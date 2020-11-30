@@ -11,6 +11,7 @@ import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
 import com.shadorc.shadbot.db.lottery.bean.LotteryHistoricBean;
 import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
 import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
+import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.common.util.Snowflake;
 import org.bson.Document;
@@ -18,13 +19,12 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 
 public class LotteryCollection extends DatabaseCollection {
 
-    public static final Logger LOGGER = Loggers.getLogger("shadbot.database.lottery");
+    public static final Logger LOGGER = LogUtils.getLogger(LotteryCollection.class, LogUtils.Category.DATABASE);
     public static final String NAME = "lottery";
 
     public LotteryCollection(MongoDatabase database) {

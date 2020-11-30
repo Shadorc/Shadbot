@@ -6,6 +6,7 @@ import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.guilds.bean.DBGuildBean;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
+import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.common.util.Snowflake;
 import org.bson.Document;
@@ -13,7 +14,6 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -23,7 +23,7 @@ import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 
 public class GuildsCollection extends DatabaseCollection {
 
-    public static final Logger LOGGER = Loggers.getLogger("shadbot.database.guilds");
+    public static final Logger LOGGER = LogUtils.getLogger(GuildsCollection.class, LogUtils.Category.DATABASE);
     public static final String NAME = "guilds";
 
     public GuildsCollection(MongoDatabase database) {

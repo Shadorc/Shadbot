@@ -9,6 +9,7 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
@@ -33,7 +34,6 @@ import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -43,7 +43,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class Shadbot {
 
-    public static final Logger DEFAULT_LOGGER = Loggers.getLogger("shadbot");
+    public static final Logger DEFAULT_LOGGER = LogUtils.getLogger();
 
     private static final Instant LAUNCH_TIME = Instant.now();
     private static final AtomicLong OWNER_ID = new AtomicLong();

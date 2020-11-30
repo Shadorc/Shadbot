@@ -2,11 +2,11 @@ package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.overwatch.OverwatchProfile;
 import com.shadorc.shadbot.command.CommandException;
+import com.shadorc.shadbot.utils.LogUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,7 +20,7 @@ public class OverwatchCmdTest {
 
     @BeforeAll
     public static void init() {
-        logger = Loggers.getLogger(OverwatchCmdTest.class);
+        logger = LogUtils.getLogger(OverwatchCmdTest.class, LogUtils.Category.TEST);
         cmd = new OverwatchCmd();
     }
 

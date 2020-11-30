@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.html.suicidegirl.SuicideGirl;
+import com.shadorc.shadbot.utils.LogUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,7 +19,7 @@ public class SuicideGirlsCmdTest {
 
     @BeforeAll
     public static void init() {
-        logger = Loggers.getLogger(SuicideGirlsCmdTest.class);
+        logger = LogUtils.getLogger(SuicideGirlsCmdTest.class, LogUtils.Category.TEST);
         cmd = new SuicideGirlsCmd();
     }
 

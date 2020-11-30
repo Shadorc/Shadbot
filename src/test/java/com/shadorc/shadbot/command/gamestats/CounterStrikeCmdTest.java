@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.steam.player.PlayerSummary;
+import com.shadorc.shadbot.utils.LogUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,7 +19,7 @@ public class CounterStrikeCmdTest {
 
     @BeforeAll
     public static void init() {
-        logger = Loggers.getLogger(CounterStrikeCmdTest.class);
+        logger = LogUtils.getLogger(CounterStrikeCmdTest.class, LogUtils.Category.TEST);
         cmd = new CounterStrikeCmd();
     }
 

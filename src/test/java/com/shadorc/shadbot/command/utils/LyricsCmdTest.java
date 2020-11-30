@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.api.html.musixmatch.Musixmatch;
+import com.shadorc.shadbot.utils.LogUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,7 +21,7 @@ public class LyricsCmdTest {
 
     @BeforeAll
     public static void init() throws NoSuchMethodException {
-        logger = Loggers.getLogger(LyricsCmdTest.class);
+        logger = LogUtils.getLogger(LyricsCmdTest.class, LogUtils.Category.TEST);
         cmd = new LyricsCmd();
 
         method = LyricsCmd.class.getDeclaredMethod("getMusixmatch", String.class);

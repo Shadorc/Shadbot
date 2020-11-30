@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.command.image;
 
+import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,7 +21,7 @@ public class GifCmdTest {
 
     @BeforeAll
     public static void init() throws NoSuchMethodException {
-        logger = Loggers.getLogger(GifCmdTest.class);
+        logger = LogUtils.getLogger(GifCmdTest.class, LogUtils.Category.TEST);
         cmd = new GifCmd();
 
         method = GifCmd.class.getDeclaredMethod("getGif", String.class);

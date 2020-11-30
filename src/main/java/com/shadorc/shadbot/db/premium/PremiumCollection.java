@@ -6,6 +6,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.premium.bean.RelicBean;
 import com.shadorc.shadbot.db.premium.entity.Relic;
+import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Guild;
@@ -15,7 +16,6 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -24,7 +24,7 @@ import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 
 public class PremiumCollection extends DatabaseCollection {
 
-    public static final Logger LOGGER = Loggers.getLogger("shadbot.database.premium");
+    public static final Logger LOGGER = LogUtils.getLogger(PremiumCollection.class, LogUtils.Category.DATABASE);
     public static final String NAME = "premium";
 
     public PremiumCollection(MongoDatabase database) {

@@ -3,6 +3,7 @@ package com.shadorc.shadbot.listener;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.object.VoiceState;
@@ -11,7 +12,6 @@ import discord4j.core.object.entity.channel.VoiceChannel;
 import io.prometheus.client.Gauge;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateEvent> {
 
@@ -21,7 +21,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
             .help("Connected voice channel count")
             .register();
 
-    private static final Logger LOGGER = Loggers.getLogger("shadbot.music.VoiceStateUpdateListener");
+    private static final Logger LOGGER = LogUtils.getLogger(VoiceStateUpdateListener.class, LogUtils.Category.MUSIC);
 
     @Override
     public Class<VoiceStateUpdateEvent> getEventType() {

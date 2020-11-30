@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.shadorc.shadbot.api.HeaderException;
 import com.shadorc.shadbot.api.ServerAccessException;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import io.netty.channel.unix.Errors;
 import io.netty.handler.codec.http.*;
@@ -18,7 +19,6 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.http.client.HttpClientResponse;
 import reactor.netty.http.client.PrematureCloseException;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 import reactor.util.retry.Retry;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 
 public class RequestHelper {
 
-    private static final Logger LOGGER = Loggers.getLogger("shadbot.RequestHelper");
+    private static final Logger LOGGER = LogUtils.getLogger(RequestHelper.class);
     private static final HttpClient HTTP_CLIENT = HttpClient.create().followRedirect(true);
 
     private final String url;

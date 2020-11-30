@@ -1,14 +1,12 @@
 package com.shadorc.shadbot.command.image;
 
-import com.shadorc.shadbot.api.json.image.r34.R34Post;
 import com.shadorc.shadbot.api.json.image.wallhaven.Wallpaper;
+import com.shadorc.shadbot.utils.LogUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -22,7 +20,7 @@ public class WallpaperCmdTest {
 
     @BeforeAll
     public static void init() throws NoSuchMethodException {
-        logger = Loggers.getLogger(WallpaperCmdTest.class);
+        logger = LogUtils.getLogger(WallpaperCmdTest.class, LogUtils.Category.TEST);
         cmd = new WallpaperCmd();
 
         method = WallpaperCmd.class.getDeclaredMethod("getWallpaper", String.class);

@@ -5,19 +5,19 @@ import com.mongodb.reactivestreams.client.MongoDatabase;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.users.bean.DBUserBean;
 import com.shadorc.shadbot.db.users.entity.DBUser;
+import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.common.util.Snowflake;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 
 public class UsersCollection extends DatabaseCollection {
 
-    public static final Logger LOGGER = Loggers.getLogger("shadbot.database.users");
+    public static final Logger LOGGER = LogUtils.getLogger(UsersCollection.class, LogUtils.Category.DATABASE);
     public static final String NAME = "users";
 
     public UsersCollection(MongoDatabase database) {

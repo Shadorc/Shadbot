@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.command.fun;
 
+import com.shadorc.shadbot.utils.LogUtils;
 import discord4j.common.util.Snowflake;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,7 +20,7 @@ public class ChatCmdTest {
 
     @BeforeAll
     public static void init() throws NoSuchMethodException {
-        logger = Loggers.getLogger(ChatCmdTest.class);
+        logger = LogUtils.getLogger(ChatCmdTest.class, LogUtils.Category.TEST);
         cmd = new ChatCmd();
 
         method = ChatCmd.class.getDeclaredMethod("getResponse", Snowflake.class, String.class);

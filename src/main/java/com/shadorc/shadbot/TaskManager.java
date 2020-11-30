@@ -5,6 +5,7 @@ import com.shadorc.shadbot.cache.CacheManager;
 import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.ProcessUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.GatewayDiscordClient;
@@ -17,7 +18,6 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.Logger;
-import reactor.util.Loggers;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
@@ -29,7 +29,7 @@ import java.util.Map;
 public class TaskManager {
 
     private static final Scheduler DEFAULT_SCHEDULER = Schedulers.boundedElastic();
-    private static final Logger LOGGER = Loggers.getLogger("shadbot.TaskManager");
+    private static final Logger LOGGER = LogUtils.getLogger(TaskManager.class);
 
     private final List<Disposable> tasks;
 
