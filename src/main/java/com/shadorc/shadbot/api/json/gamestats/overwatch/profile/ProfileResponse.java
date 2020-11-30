@@ -55,7 +55,7 @@ public class ProfileResponse {
         this.competitive.getDamage().getRank().ifPresent(rank -> strBuilder.append(String.format("%nDamage: %d", rank)));
         this.competitive.getTank().getRank().ifPresent(rank -> strBuilder.append(String.format("%nTank: %d", rank)));
         this.competitive.getSupport().getRank().ifPresent(rank -> strBuilder.append(String.format("%nSupport: %d", rank)));
-        return strBuilder.length() == 0 ? "Not ranked" : strBuilder.toString();
+        return strBuilder.isEmpty() ? "Not ranked" : strBuilder.toString();
     }
 
     public String getQuickplayPlaytime() {

@@ -78,7 +78,7 @@ public class TrackEventListener extends AudioEventAdapter {
                     }
 
                     return guildMusic.getMessageChannel()
-                            .filter(ignored -> strBuilder.length() > 0)
+                            .filter(ignored -> !strBuilder.isEmpty())
                             .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
                             .then(this.nextOrEnd());
                 })

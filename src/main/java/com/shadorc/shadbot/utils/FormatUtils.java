@@ -118,16 +118,16 @@ public class FormatUtils {
         return FormatUtils.format(enumClass.getEnumConstants(), value -> value.name().toLowerCase(), delimiter);
     }
 
+    public static <T> String format(T[] array, Function<T, String> mapper, CharSequence delimiter) {
+        return FormatUtils.format(Arrays.stream(array), mapper, delimiter);
+    }
+
     public static <T> String format(Collection<T> collection, Function<T, String> mapper, CharSequence delimiter) {
         return FormatUtils.format(collection.stream(), mapper, delimiter);
     }
 
     public static <T> String format(Stream<T> stream, Function<T, String> mapper, CharSequence delimiter) {
         return stream.map(mapper).collect(Collectors.joining(delimiter));
-    }
-
-    public static <T> String format(T[] array, Function<T, String> mapper, CharSequence delimiter) {
-        return FormatUtils.format(Arrays.stream(array), mapper, delimiter);
     }
 
     /**

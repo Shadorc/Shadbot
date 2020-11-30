@@ -116,7 +116,7 @@ public class PollManager {
             count++;
         }
 
-        if (representation.length() == 0) {
+        if (representation.isEmpty()) {
             representation.append("\nAll choices have been removed.");
         }
 
