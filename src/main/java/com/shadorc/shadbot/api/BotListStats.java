@@ -23,8 +23,9 @@ import reactor.netty.DisposableServer;
 import reactor.netty.http.server.HttpServer;
 import reactor.util.Logger;
 import reactor.util.Loggers;
+import reactor.util.retry.Retry;
 
-import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -227,9 +228,11 @@ public class BotListStats {
                 .addHeaders(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
                 .addHeaders(HttpHeaderNames.AUTHORIZATION, authorization)
                 .request()
-                .send((req, res) -> res.sendString(Mono.just(content.toString()), StandardCharsets.UTF_8))
-                .responseSingle((res, con) -> con.asString(StandardCharsets.UTF_8))
-                .timeout(Config.TIMEOUT);
+                .send((req, res) -> res.sendString(Mono.just(content.toString())))
+                .responseSingle((res, con) -> con.asString())
+                .timeout(Config.TIMEOUT)
+                .retryWhen(Retry.backoff(3, Duration.ofSeconds(5))
+                        .filter(TimeoutException.class::isInstance));
     }
 
     private static <T> Function<? super Throwable, ? extends Mono<? extends T>> handleError(String url) {
