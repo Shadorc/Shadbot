@@ -15,31 +15,18 @@ import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.json.JSONArray;
+import org.json.JSONException;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class TranslateCmd extends BaseCmd {
-
-    private static final String AUTO = "auto";
-    private static final int CHARACTERS_LIMIT = 150;
-
-    private final Map<String, String> langIsoMap;
-    private final Map<String, String> isoLangMap;
 
     public TranslateCmd() {
         super(CommandCategory.UTILS, List.of("translate"));
         this.setDefaultRateLimiter();
-
-        final Map<String, String> map = new HashMap<>();
-        for (final String iso : Locale.getISOLanguages()) {
-            map.put(new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(), iso);
-        }
-        map.put(AUTO, AUTO);
-
-        this.langIsoMap = Collections.unmodifiableMap(map);
-        this.isoLangMap = Collections.unmodifiableMap(MapUtils.inverse(map));
     }
 
     @Override
@@ -51,83 +38,70 @@ public class TranslateCmd extends BaseCmd {
             return Mono.error(new CommandException(
                     "The text to translate cannot be empty and must be enclosed in quotation marks."));
         }
+
+        final TranslateData data = new TranslateData();
+
         final String sourceText = quotedWords.get(0);
-        if (sourceText.length() > CHARACTERS_LIMIT) {
-            return Mono.error(new CommandException(
-                    String.format("The text to translate cannot exceed %d characters.", CHARACTERS_LIMIT)));
-        }
+        data.setSourceText(sourceText);
 
         final List<String> languages = StringUtils.split(StringUtils.remove(arg, sourceText, "\""));
-        if (languages.isEmpty()) {
-            return Mono.error(new MissingArgumentException());
+        try {
+            data.setLanguages(languages);
+        } catch (final IllegalArgumentException err) {
+            throw new CommandException(String.format("%s. Use `%shelp %s` to see a complete list of supported languages.",
+                    err.getMessage(), context.getPrefix(), this.getName()));
         }
-
-        if (languages.size() == 1) {
-            languages.add(0, AUTO);
-        }
-
-        final String langFrom = this.toISO(languages.get(0));
-        final String langTo = this.toISO(languages.get(1));
-
-        if (langTo != null && Objects.equals(langFrom, langTo)) {
-            return Mono.error(new CommandException("The destination language must be different from the source one."));
-        }
-
-        final String url = String.format("https://translate.googleapis.com/translate_a/single?"
-                        + "client=gtx"
-                        + "&ie=UTF-8"
-                        + "&oe=UTF-8"
-                        + "&sl=%s"
-                        + "&tl=%s"
-                        + "&dt=t"
-                        + "&q=%s",
-                NetUtils.encode(langFrom), NetUtils.encode(langTo), NetUtils.encode(sourceText));
 
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading translation...",
-                context.getUsername()))
+        return updatableMsg.setContent(
+                String.format(Emoji.HOURGLASS + " (**%s**) Loading translation...", context.getUsername()))
                 .send()
-                .then(RequestHelper.request(url))
-                .map(body -> {
-                    if (langFrom == null || langTo == null
-                            // The body is an error 400 if one of the specified language exists but is not supported
-                            // by Google translator
-                            || !body.startsWith("[")
-                            || !(new JSONArray(body).get(0) instanceof JSONArray)) {
-                        throw new CommandException(String.format("One of the specified language isn't supported. "
-                                        + "Use `%shelp %s` to see a complete list of supported languages.",
-                                context.getPrefix(), this.getName()));
-                    }
-
-                    final JSONArray result = new JSONArray(body);
-                    final StringBuilder translatedText = new StringBuilder();
-                    final JSONArray translations = result.getJSONArray(0);
-                    for (int i = 0; i < translations.length(); i++) {
-                        translatedText.append(translations.getJSONArray(i).getString(0));
-                    }
-
-                    if (translatedText.toString().equalsIgnoreCase(sourceText)) {
-                        throw new CommandException(String.format("The text could not been translated."
-                                        + "%nCheck that the specified languages are supported, that the text is in "
-                                        + "the specified language and that the destination language is different from the "
-                                        + "source one. %nUse `%shelp %s` to see a complete list of supported languages.",
-                                context.getPrefix(), this.getName()));
-                    }
-
-                    return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor("Translation", null, context.getAvatarUrl())
-                                    .setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
-                                            StringUtils.capitalize(this.isoLangMap.get(langFrom)), sourceText,
-                                            StringUtils.capitalize(this.isoLangMap.get(langTo)), translatedText))));
-
-                })
+                .then(TranslateCmd.getTranslation(data))
+                .map(translatedText -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
+                        .andThen(embed -> embed.setAuthor("Translation", null, context.getAvatarUrl())
+                                .setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
+                                        StringUtils.capitalize(TranslateData.isoToLang(data.getLangFrom())), sourceText,
+                                        StringUtils.capitalize(TranslateData.isoToLang(data.getLangTo())), translatedText)))))
+                .onErrorMap(IllegalArgumentException.class,
+                        err -> new CommandException(String.format("%s. Use `%shelp %s` to see a complete list of supported languages.",
+                                err.getMessage(), context.getPrefix(), this.getName())))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
                 .then();
     }
 
-    private String toISO(String lang) {
-        return this.langIsoMap.containsValue(lang) ? lang : this.langIsoMap.get(lang);
+    private static Mono<String> getTranslation(TranslateData data) {
+        return RequestHelper.request(data.getUrl())
+                .map(body -> {
+                    // The body is an error 400 if one of the specified language
+                    // exists but is not supported by Google translator
+                    if (!TranslateCmd.isValidBody(body)) {
+                        throw new IllegalArgumentException("One of the specified language isn't supported");
+                    }
+
+                    final JSONArray translations = new JSONArray(body).getJSONArray(0);
+                    final StringBuilder translatedText = new StringBuilder();
+                    for (int i = 0; i < translations.length(); i++) {
+                        translatedText.append(translations.getJSONArray(i).getString(0));
+                    }
+
+                    if (translatedText.toString().equalsIgnoreCase(data.getSourceText())) {
+                        throw new IllegalArgumentException("The text could not been translated."
+                                + "%nCheck that the specified languages are supported, that the text is in "
+                                + "the specified language and that the destination language is different from the "
+                                + "source one");
+                    }
+
+                    return translatedText.toString();
+                });
+    }
+
+    private static boolean isValidBody(final String body) {
+        try {
+            return new JSONArray(body).get(0) instanceof JSONArray;
+        } catch (final JSONException err) {
+            return false;
+        }
     }
 
     @Override
@@ -142,5 +116,82 @@ public class TranslateCmd extends BaseCmd {
                 .addField("Documentation", "List of supported languages: "
                         + "https://cloud.google.com/translate/docs/languages", false)
                 .build();
+    }
+
+    public static class TranslateData {
+
+        private static final String API_URL = "https://translate.googleapis.com/translate_a/single";
+        private static final int CHARACTERS_LIMIT = 150;
+        private static final String AUTO = "auto";
+
+        private static final Map<String, String> LANG_ISO_MAP = Arrays.stream(Locale.getISOLanguages())
+                .collect(Collectors.toUnmodifiableMap(
+                        iso -> new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(),
+                        iso -> iso,
+                        (value1, value2) -> value1));
+        private static final Map<String, String> ISO_LANG_MAP = MapUtils.inverse(LANG_ISO_MAP);
+
+        private String langTo;
+        private String langFrom;
+        private String sourceText;
+
+        public TranslateData setSourceText(final String sourceText) {
+            if (sourceText.length() > CHARACTERS_LIMIT) {
+                throw new CommandException(
+                        String.format("The text to translate cannot exceed %d characters.", CHARACTERS_LIMIT));
+            }
+
+            this.sourceText = sourceText;
+            return this;
+        }
+
+        public TranslateData setLanguages(final List<String> languages) {
+            if (languages.isEmpty()) {
+                throw new MissingArgumentException();
+            }
+
+            if (languages.size() == 1) {
+                this.langFrom = AUTO;
+                this.langTo = TranslateData.langToIso(languages.get(0));
+            } else {
+                this.langFrom = TranslateData.langToIso(languages.get(0));
+                this.langTo = TranslateData.langToIso(languages.get(1));
+            }
+
+            if (this.langFrom == null || this.langTo == null) {
+                throw new IllegalArgumentException("One of the specified language isn't supported");
+            }
+
+            if (Objects.equals(this.langFrom, this.langTo)) {
+                throw new IllegalArgumentException("The destination language must be different from the source one.");
+            }
+
+            return this;
+        }
+
+        public String getUrl() {
+            return String.format("%s?client=gtx&ie=UTF-8&oe=UTF-8&sl=%s&tl=%s&dt=t&q=%s",
+                    API_URL, NetUtils.encode(langFrom), NetUtils.encode(langTo), NetUtils.encode(sourceText));
+        }
+
+        public String getLangTo() {
+            return this.langTo;
+        }
+
+        public String getLangFrom() {
+            return this.langFrom;
+        }
+
+        public String getSourceText() {
+            return this.sourceText;
+        }
+
+        private static String langToIso(final String lang) {
+            return LANG_ISO_MAP.getOrDefault(lang, lang);
+        }
+
+        private static String isoToLang(final String iso) {
+            return ISO_LANG_MAP.get(iso);
+        }
     }
 }
