@@ -25,7 +25,7 @@ public class LogUtils {
         final StringBuilder strBuilder = new StringBuilder(ROOT_NAME);
         if (categories.length > 0) {
             strBuilder.append(DELIMITER);
-            strBuilder.append(FormatUtils.format(categories, Category::name, DELIMITER));
+            strBuilder.append(FormatUtils.format(categories, category -> category.name().toLowerCase(), DELIMITER));
         }
         if (classType != null) {
             strBuilder.append(DELIMITER);
