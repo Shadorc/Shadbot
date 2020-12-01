@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.command.CmdTest;
-import com.shadorc.shadbot.command.CommandException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
