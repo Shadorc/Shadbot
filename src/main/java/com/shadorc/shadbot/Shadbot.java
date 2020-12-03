@@ -44,6 +44,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Shadbot {
 
     public static final Logger DEFAULT_LOGGER = LogUtils.getLogger();
+    private static final Counter EVENT_COUNTER = Counter.build().namespace("discord")
+            .name("event_count").help("Discord events count").labelNames("type").register();
 
     private static final Instant LAUNCH_TIME = Instant.now();
     private static final AtomicLong OWNER_ID = new AtomicLong();
@@ -145,11 +147,6 @@ public class Shadbot {
                     Shadbot.register(gateway, new ReactionListener.ReactionAddListener());
                     Shadbot.register(gateway, new ReactionListener.ReactionRemoveListener());
 
-                    final Counter eventsCounter = Counter.build().namespace("event")
-                            .name("event_count").help("Discord events count").labelNames("type").register();
-                    gateway.on(Event.class,
-                            event -> Mono.fromRunnable(() -> eventsCounter.labels(event.getClass().getSimpleName()).inc()));
-
                     DEFAULT_LOGGER.info("Shadbot is ready");
                     return gateway.onDisconnect();
                 })
@@ -161,6 +158,7 @@ public class Shadbot {
     private static <T extends Event> void register(GatewayDiscordClient gateway, EventListener<T> eventListener) {
         gateway.getEventDispatcher()
                 .on(eventListener.getEventType())
+                .doOnNext(event -> EVENT_COUNTER.labels(event.getClass().getSimpleName()).inc())
                 .flatMap(event -> eventListener.execute(event)
                         .thenReturn(eventListener.getEventType().getSimpleName())
                         .filter(ignored -> DEFAULT_LOGGER.isTraceEnabled())
