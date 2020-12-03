@@ -21,6 +21,7 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.voice.retry.VoiceGatewayException;
+import io.prometheus.client.Counter;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -35,9 +36,8 @@ import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 public class PlayCmd extends BaseCmd {
 
     private static final String SC_QUERY = "soundcloud ";
-
-    private static final int MAX_ERRORS = 3;
-    private static final Map<Snowflake, AtomicInteger> ERRORS_MAP = new ConcurrentHashMap<>();
+    private static final Counter MUSIC_ERROR_COUNTER = Counter.build().namespace("music")
+            .name("error_count").help("Music error count").labelNames("type").register();
 
     public PlayCmd() {
         super(CommandCategory.MUSIC, List.of("play", "add", "queue", "playfirst", "addfirst", "queuefirst"));
@@ -53,20 +53,10 @@ public class PlayCmd extends BaseCmd {
                         .flatMap(channel -> MusicManager.getInstance()
                                 .getOrCreate(context.getClient(), context.getGuildId(), voiceChannel.getId())
                                 .flatMap(guildMusic -> PlayCmd.play(context, channel, guildMusic, PlayCmd.getIdentifier(arg)))))
-                .doOnSuccess(ignored -> ERRORS_MAP.remove(context.getGuildId()))
                 .onErrorMap(err -> {
                     LOGGER.info("{Guild ID: {}} An error occurred while joining a voice channel: {}",
                             context.getGuildId().asLong(), err.getMessage());
-
-                    if (!(err instanceof CommandException) && !(err instanceof MissingPermissionException)) {
-                        final int errorCount = ERRORS_MAP.computeIfAbsent(context.getGuildId(), ignored -> new AtomicInteger())
-                                .incrementAndGet();
-                        if (errorCount >= MAX_ERRORS) {
-                            LOGGER.error("{Guild ID: {}} {} voice errors detected in a row!",
-                                    context.getGuildId().asLong(), errorCount);
-                            ERRORS_MAP.remove(context.getGuildId());
-                        }
-                    }
+                    MUSIC_ERROR_COUNTER.labels(err.getClass().getSimpleName()).inc();
 
                     if (err instanceof VoiceGatewayException) {
                         return new CommandException("An unknown error occurred while joining the voice channel, please try again later.");
