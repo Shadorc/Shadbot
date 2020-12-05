@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.command.CommandException;
+import com.shadorc.shadbot.command.MissingPermissionException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -51,7 +52,10 @@ public class PlayCmd extends BaseCmd {
                 .onErrorMap(err -> {
                     LOGGER.info("{Guild ID: {}} An error occurred while joining a voice channel: {}",
                             context.getGuildId().asLong(), err.getMessage());
-                    MUSIC_ERROR_COUNTER.labels(err.getClass().getSimpleName()).inc();
+
+                    if (!(err instanceof CommandException) && !(err instanceof MissingPermissionException)) {
+                        MUSIC_ERROR_COUNTER.labels(err.getClass().getSimpleName()).inc();
+                    }
 
                     if (err instanceof VoiceGatewayException) {
                         return new CommandException("An unknown error occurred while joining the voice channel, please try again later.");
