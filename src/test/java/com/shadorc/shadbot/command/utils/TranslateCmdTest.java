@@ -33,9 +33,7 @@ public class TranslateCmdTest extends CmdTest<TranslateCmd> {
         assertThrows(IllegalArgumentException.class, () -> this.invoke("getTranslation", data4));
 
         final TranslateCmd.TranslateData data6 = new TranslateCmd.TranslateData();
-        data6.setLanguages(List.of("en", "en"));
-        data6.setSourceText("Hello, how are you?");
-        assertThrows(IllegalArgumentException.class, () -> this.invoke("getTranslation", data6));
+        assertThrows(IllegalArgumentException.class, () -> data6.setLanguages(List.of("en", "en")));
     }
 
 }
