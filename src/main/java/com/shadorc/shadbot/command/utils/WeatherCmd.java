@@ -39,8 +39,13 @@ public class WeatherCmd extends BaseCmd {
         this.setDefaultRateLimiter();
 
         this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy 'at' hh:mm aa", Locale.ENGLISH);
-        this.owm = new OWM(CredentialManager.getInstance().get(Credential.OPENWEATHERMAP_API_KEY));
-        this.owm.setUnit(Unit.METRIC);
+        final String apiKey = CredentialManager.getInstance().get(Credential.OPENWEATHERMAP_API_KEY);
+        if(apiKey != null) {
+            this.owm = new OWM(CredentialManager.getInstance().get(Credential.OPENWEATHERMAP_API_KEY));
+            this.owm.setUnit(Unit.METRIC);
+        } else {
+            this.owm = null;
+        }
     }
 
     @Override
