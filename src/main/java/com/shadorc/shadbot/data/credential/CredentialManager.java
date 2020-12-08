@@ -47,7 +47,10 @@ public class CredentialManager {
     @Nullable
     public String get(Credential key) {
         final String property = this.properties.getProperty(key.toString());
-        return property.isBlank() ? null : property;
+        if(property == null || property.isBlank()) {
+            return null;
+        }
+        return property;
     }
 
     public static CredentialManager getInstance() {
