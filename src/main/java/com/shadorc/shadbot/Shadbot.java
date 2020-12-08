@@ -59,10 +59,11 @@ public class Shadbot {
         // Set default to Locale US
         Locale.setDefault(Locale.US);
 
-        if (!Config.IS_SNAPSHOT) {
+        final String sentryDsn = CredentialManager.getInstance().get(Credential.SENTRY_DSN);
+        if (sentryDsn != null && !Config.IS_SNAPSHOT) {
             DEFAULT_LOGGER.info("Initializing Sentry");
             Sentry.init(options -> {
-                options.setDsn(CredentialManager.getInstance().get(Credential.SENTRY_DSN));
+                options.setDsn(sentryDsn);
                 options.setRelease(Config.VERSION);
                 // Ignore events coming from lavaplayer
                 options.setBeforeSend(
