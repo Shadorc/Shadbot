@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class AutoRolesSetting extends BaseSetting {
 
     private enum Action {
-        ADD, REMOVE;
+        ADD, REMOVE
     }
 
     public AutoRolesSetting() {

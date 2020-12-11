@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 public class FortniteCmd extends BaseCmd {
 
     private enum Platform {
-        PC, XBL, PSN;
+        PC, XBL, PSN
     }
 
     public FortniteCmd() {

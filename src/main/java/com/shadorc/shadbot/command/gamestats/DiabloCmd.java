@@ -37,7 +37,7 @@ public class DiabloCmd extends BaseCmd {
             CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_SECRET));
 
     private enum Region {
-        EU, US, TW, KR;
+        EU, US, TW, KR
     }
 
     private final AtomicLong lastTokenGeneration;

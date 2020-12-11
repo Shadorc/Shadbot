@@ -171,7 +171,7 @@ public class TranslateCmd extends BaseCmd {
 
         public String getUrl() {
             return String.format("%s?client=gtx&ie=UTF-8&oe=UTF-8&sl=%s&tl=%s&dt=t&q=%s",
-                    API_URL, NetUtils.encode(langFrom), NetUtils.encode(langTo), NetUtils.encode(sourceText));
+                    API_URL, NetUtils.encode(this.langFrom), NetUtils.encode(this.langTo), NetUtils.encode(this.sourceText));
         }
 
         public String getLangTo() {

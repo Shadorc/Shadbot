@@ -24,7 +24,7 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
     private static final Pattern NUMBER_PATTERN = Pattern.compile("^([1-9]|1[0-9]|2[0-9]|3[0-6])$");
 
     public enum Place {
-        RED, BLACK, ODD, EVEN, LOW, HIGH;
+        RED, BLACK, ODD, EVEN, LOW, HIGH
     }
 
     public RouletteCmd() {

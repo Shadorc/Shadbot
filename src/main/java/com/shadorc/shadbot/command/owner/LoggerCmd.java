@@ -26,7 +26,7 @@ public class LoggerCmd extends BaseCmd {
         DEBUG,
         INFO,
         WARN,
-        ERROR;
+        ERROR
     }
 
     public LoggerCmd() {

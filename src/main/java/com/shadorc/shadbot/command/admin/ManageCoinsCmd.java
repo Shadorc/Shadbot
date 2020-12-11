@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 public class ManageCoinsCmd extends BaseCmd {
 
     private enum Action {
-        ADD, REMOVE, RESET;
+        ADD, REMOVE, RESET
     }
 
     public ManageCoinsCmd() {

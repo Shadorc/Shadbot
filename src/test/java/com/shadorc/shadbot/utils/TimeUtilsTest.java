@@ -16,9 +16,9 @@ public class TimeUtilsTest {
     public void testIsLocalDateInTheSameWeek() {
         assertTrue(TimeUtils.isLocalDateInTheSameWeek(LocalDate.now(), LocalDate.now()));
         assertTrue(TimeUtils.isLocalDateInTheSameWeek(
-                LocalDate.of(2020, 04, 11), LocalDate.of(2020, 04, 6)));
+                LocalDate.of(2020, 4, 11), LocalDate.of(2020, 4, 6)));
         assertFalse(TimeUtils.isLocalDateInTheSameWeek(
-                LocalDate.of(2020, 04, 11), LocalDate.of(2020, 04, 13)));
+                LocalDate.of(2020, 4, 11), LocalDate.of(2020, 4, 13)));
     }
 
     @Test
@@ -27,7 +27,6 @@ public class TimeUtilsTest {
         final int millis = new Random().nextInt(10_000);
         final long elapsed = TimeUtils.getMillisUntil(Instant.now().minusMillis(millis));
         assertTrue(elapsed >= millis - offset && elapsed <= millis + offset);
-        assertThrows(NullPointerException.class, () -> TimeUtils.getMillisUntil(null));
     }
 
     @Test
@@ -36,7 +35,6 @@ public class TimeUtilsTest {
         final int millis = new Random().nextInt(10_000);
         final long elapsed = TimeUtils.getMillisUntil(Instant.now().minusMillis(millis).toEpochMilli());
         assertTrue(elapsed >= millis - offset && elapsed <= millis + offset);
-        assertThrows(NullPointerException.class, () -> TimeUtils.getMillisUntil(null));
     }
 
     @Test
@@ -47,13 +45,11 @@ public class TimeUtilsTest {
         assertThrows(IllegalArgumentException.class, () -> TimeUtils.parseTime("1m00"));
         assertThrows(IllegalArgumentException.class, () -> TimeUtils.parseTime("26d01h10m6s"));
         assertThrows(IllegalArgumentException.class, () -> TimeUtils.parseTime("-10s"));
-        assertThrows(NullPointerException.class, () -> TimeUtils.parseTime(null));
     }
 
     @Test
     public void testToLocalDateTime() {
         final Instant now = Instant.now();
         assertEquals(LocalDateTime.ofInstant(now, ZoneId.systemDefault()), TimeUtils.toLocalDateTime(now));
-        assertThrows(NullPointerException.class, () -> TimeUtils.toLocalDateTime(null));
     }
 }

@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 public class NSFWSetting extends BaseSetting {
 
     private enum Action {
-        TOGGLE, ENABLE, DISABLE;
+        TOGGLE, ENABLE, DISABLE
     }
 
     public NSFWSetting() {

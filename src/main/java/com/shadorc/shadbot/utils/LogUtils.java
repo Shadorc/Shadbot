@@ -10,7 +10,7 @@ public class LogUtils {
     private static final String DELIMITER = ".";
 
     public enum Category {
-        DATABASE, TEST, MUSIC;
+        DATABASE, TEST, MUSIC
     }
 
     public static <T> Logger getLogger() {

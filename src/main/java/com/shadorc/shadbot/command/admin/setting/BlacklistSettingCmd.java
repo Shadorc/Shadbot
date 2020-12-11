@@ -28,11 +28,11 @@ import java.util.stream.Collectors;
 public class BlacklistSettingCmd extends BaseSetting {
 
     private enum Action {
-        ADD, REMOVE;
+        ADD, REMOVE
     }
 
     private enum Type {
-        COMMAND, CATEGORY;
+        COMMAND, CATEGORY
     }
 
     public BlacklistSettingCmd() {

@@ -5,21 +5,20 @@ import org.junit.jupiter.api.Test;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NetUtilsTest {
 
     @Test
     public void testIsUrl() {
-        assertEquals(true, NetUtils.isUrl("http://www.youtube.com"));
-        assertEquals(true, NetUtils.isUrl("https://www.youtube.com"));
-        assertEquals(true, NetUtils.isUrl("https://www.you%20tube.com"));
-        assertEquals(true, NetUtils.isUrl("https://www.(you)%20tube.com"));
-        assertEquals(false, NetUtils.isUrl("https://www.you tube.com"));
-        assertEquals(false, NetUtils.isUrl("youtube"));
-        assertEquals(false, NetUtils.isUrl("youtube.com"));
-        assertEquals(false, NetUtils.isUrl("www.youtube.com"));
+        assertTrue(NetUtils.isUrl("http://www.youtube.com"));
+        assertTrue(NetUtils.isUrl("https://www.youtube.com"));
+        assertTrue(NetUtils.isUrl("https://www.you%20tube.com"));
+        assertTrue(NetUtils.isUrl("https://www.(you)%20tube.com"));
+        assertFalse(NetUtils.isUrl("https://www.you tube.com"));
+        assertFalse(NetUtils.isUrl("youtube"));
+        assertFalse(NetUtils.isUrl("youtube.com"));
+        assertFalse(NetUtils.isUrl("www.youtube.com"));
     }
 
     @Test

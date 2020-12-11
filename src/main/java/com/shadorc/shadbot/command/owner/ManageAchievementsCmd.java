@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 public class ManageAchievementsCmd extends BaseCmd {
 
     private enum Action {
-        ADD, REMOVE;
+        ADD, REMOVE
     }
 
     public ManageAchievementsCmd() {

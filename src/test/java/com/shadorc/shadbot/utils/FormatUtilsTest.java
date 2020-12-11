@@ -21,7 +21,7 @@ public class FormatUtilsTest {
     }
 
     private enum TestEnum {
-        TEST_ONE, test_Two, testThree;
+        TEST_ONE, test_Two, testThree
     }
 
     @Test
@@ -95,7 +95,7 @@ public class FormatUtilsTest {
         assertEquals("", FormatUtils.numberedList(-1, 0, i -> Integer.toString(i)));
     }
 
-    private enum FakeEnum1 {VALUE_1, VALUE_2, VALUE_3;}
+    private enum FakeEnum1 {VALUE_1, VALUE_2, VALUE_3}
 
     private enum FakeEnum2 {VALUE_1}
 

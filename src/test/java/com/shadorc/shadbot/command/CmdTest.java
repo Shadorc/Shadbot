@@ -17,9 +17,9 @@ public abstract class CmdTest<T> {
     @SuppressWarnings("unchecked")
     public CmdTest() {
         this.cmdClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        this.logger = LogUtils.getLogger(cmdClass, LogUtils.Category.TEST);
+        this.logger = LogUtils.getLogger(this.cmdClass, LogUtils.Category.TEST);
         try {
-            this.cmd = cmdClass.getConstructor().newInstance();
+            this.cmd = this.cmdClass.getConstructor().newInstance();
         } catch (final Exception err) {
             throw new RuntimeException(err);
         }

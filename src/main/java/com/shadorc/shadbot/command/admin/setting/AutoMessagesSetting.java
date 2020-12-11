@@ -26,11 +26,11 @@ import java.util.function.Consumer;
 public class AutoMessagesSetting extends BaseSetting {
 
     private enum Action {
-        ENABLE, DISABLE;
+        ENABLE, DISABLE
     }
 
     private enum Type {
-        CHANNEL, JOIN_MESSAGE, LEAVE_MESSAGE;
+        CHANNEL, JOIN_MESSAGE, LEAVE_MESSAGE
     }
 
     public AutoMessagesSetting() {

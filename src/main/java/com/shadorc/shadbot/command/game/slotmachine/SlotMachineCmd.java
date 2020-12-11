@@ -64,13 +64,13 @@ public class SlotMachineCmd extends BaseCmd {
         if (rand == 0) {
             return List.of(SlotOptions.GIFT, SlotOptions.GIFT, SlotOptions.GIFT);
         }
-        if (rand > 0 && rand <= 5) {
+        if (rand <= 5) {
             return List.of(SlotOptions.BELL, SlotOptions.BELL, SlotOptions.BELL);
         }
-        if (rand > 5 && rand <= 20) {
+        if (rand <= 20) {
             return List.of(SlotOptions.CHERRIES, SlotOptions.CHERRIES, SlotOptions.CHERRIES);
         }
-        if (rand > 20 && rand <= 50) {
+        if (rand <= 50) {
             return List.of(SlotOptions.APPLE, SlotOptions.APPLE, SlotOptions.APPLE);
         }
 

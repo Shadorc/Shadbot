@@ -26,7 +26,7 @@ import java.util.Set;
 public class ReactionListener {
 
     private enum Action {
-        ADD, REMOVE;
+        ADD, REMOVE
     }
 
     public static class ReactionAddListener implements EventListener<ReactionAddEvent> {

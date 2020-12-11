@@ -28,7 +28,7 @@ public class PollCreateSpec {
     }
 
     public Map<String, ReactionEmoji> getChoices() {
-        return Collections.unmodifiableMap(this.choices);
+        return this.choices;
     }
 
     public Collection<ReactionEmoji> getReactions() {

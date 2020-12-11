@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class AllowedChannelsSetting extends BaseSetting {
 
     private enum Action {
-        ADD, REMOVE;
+        ADD, REMOVE
     }
 
     public AllowedChannelsSetting() {

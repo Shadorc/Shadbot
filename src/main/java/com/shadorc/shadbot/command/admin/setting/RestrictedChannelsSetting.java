@@ -32,11 +32,11 @@ import java.util.stream.Collectors;
 public class RestrictedChannelsSetting extends BaseSetting {
 
     private enum Action {
-        ADD, REMOVE;
+        ADD, REMOVE
     }
 
     private enum Type {
-        COMMAND, CATEGORY;
+        COMMAND, CATEGORY
     }
 
     public RestrictedChannelsSetting() {

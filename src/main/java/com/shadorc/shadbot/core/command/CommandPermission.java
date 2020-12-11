@@ -4,6 +4,6 @@ public enum CommandPermission {
 
     USER,
     ADMIN,
-    OWNER;
+    OWNER
 
 }

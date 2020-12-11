@@ -19,7 +19,7 @@ import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 public class HangmanCmd extends GameCmd<HangmanGame> {
 
     protected enum Difficulty {
-        EASY, HARD;
+        EASY, HARD
     }
 
     private final WordsList easyWords;
