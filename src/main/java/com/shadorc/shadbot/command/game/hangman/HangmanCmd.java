@@ -47,7 +47,8 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                     if (hangmanManager == null) {
                         final HangmanGame newHangmanManager = this.getManagers().get(context.getChannelId());
                         return newHangmanManager.start()
-                                .then(newHangmanManager.show());
+                                .then(newHangmanManager.show())
+                                .doOnError(err -> this.getManagers().remove(context.getChannelId()));
                     } else {
                         return context.getChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(
