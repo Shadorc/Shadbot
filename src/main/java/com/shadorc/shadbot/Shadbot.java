@@ -159,6 +159,7 @@ public class Shadbot {
                 .on(eventListener.getEventType())
                 .doOnNext(event -> EVENT_COUNTER.labels(event.getClass().getSimpleName()).inc())
                 .flatMap(event -> eventListener.execute(event)
+                        .timeout(Duration.ofDays(1), Mono.error(new RuntimeException(String.format("%s timed out", event))))
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
