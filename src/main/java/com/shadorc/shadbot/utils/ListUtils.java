@@ -19,8 +19,8 @@ public class ListUtils {
         }
 
         public List<T> get(int index) {
-            int start = index * this.size;
-            int end = Math.min(start + this.size, this.list.size());
+            final int start = index * this.size;
+            final int end = Math.min(start + this.size, this.list.size());
             return this.list.subList(start, end);
         }
 

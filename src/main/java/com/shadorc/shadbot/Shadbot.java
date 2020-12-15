@@ -8,7 +8,6 @@ import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.object.ExceptionHandler;
-import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.common.util.Snowflake;
@@ -32,7 +31,6 @@ import io.prometheus.client.exporter.HTTPServer;
 import io.sentry.Sentry;
 import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
 import reactor.util.Logger;
 
 import java.io.IOException;
@@ -161,12 +159,6 @@ public class Shadbot {
                 .on(eventListener.getEventType())
                 .doOnNext(event -> EVENT_COUNTER.labels(event.getClass().getSimpleName()).inc())
                 .flatMap(event -> eventListener.execute(event)
-                        .thenReturn(eventListener.getEventType().getSimpleName())
-                        .filter(ignored -> DEFAULT_LOGGER.isTraceEnabled())
-                        .elapsed()
-                        .doOnNext(TupleUtils.consumer((elapsed, eventType) ->
-                                DEFAULT_LOGGER.trace("{} took {} to be processed: {}",
-                                        eventType, FormatUtils.formatDuration(elapsed), event.toString())))
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }

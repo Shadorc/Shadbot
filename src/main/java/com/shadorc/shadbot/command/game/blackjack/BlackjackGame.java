@@ -166,7 +166,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackCmd, BlackjackPlayer
     }
 
     public Map<String, Consumer<BlackjackPlayer>> getActions() {
-        return Collections.unmodifiableMap(this.actions);
+        return this.actions;
     }
 
 }
