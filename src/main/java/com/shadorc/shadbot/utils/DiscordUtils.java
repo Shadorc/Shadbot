@@ -31,6 +31,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
@@ -102,8 +103,11 @@ public class DiscordUtils {
                 }))
                 // 403 Forbidden means that the bot is not in the guild
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
+                .timeout(Duration.ofSeconds(15))
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(1))
-                        .filter(err -> err instanceof PrematureCloseException || err instanceof Errors.NativeIoException));
+                        .filter(err -> err instanceof PrematureCloseException
+                                || err instanceof Errors.NativeIoException
+                                || err instanceof TimeoutException));
     }
 
     public static Mono<Member> extractMemberOrAuthor(Guild guild, Message message) {
