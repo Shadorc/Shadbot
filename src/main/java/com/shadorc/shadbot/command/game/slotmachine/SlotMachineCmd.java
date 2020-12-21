@@ -4,6 +4,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -11,7 +12,6 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.RandUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
-import io.prometheus.client.Summary;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -20,9 +20,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 public class SlotMachineCmd extends BaseCmd {
-
-    private static final Summary SLOT_MACHINE_SUMMARY = Summary.build().name("game_slot_machine")
-            .help("Slot Machine game").labelNames("result").register();
 
     public SlotMachineCmd() {
         super(CommandCategory.GAME, List.of("slot_machine"), "sm");
@@ -44,11 +41,11 @@ public class SlotMachineCmd extends BaseCmd {
                         final int slotGains = slots.get(0).getGains();
                         final long gains = ThreadLocalRandom.current().nextInt((int) (slotGains * Constants.RAND_FACTOR),
                                 (int) (slotGains * (Constants.RAND_FACTOR + 1)));
-                        SLOT_MACHINE_SUMMARY.labels("win").observe(gains);
+                        Telemetry.SLOT_MACHINE_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
                                 .thenReturn(strBuilder.append(String.format("You win **%s** !", FormatUtils.coins(gains))));
                     } else {
-                        SLOT_MACHINE_SUMMARY.labels("loss").observe(Constants.PAID_COST);
+                        Telemetry.SLOT_MACHINE_SUMMARY.labels("loss").observe(Constants.PAID_COST);
                         return Mono.just(strBuilder.append(String.format("You lose **%s** !", FormatUtils.coins(Constants.PAID_COST))));
                     }
                 })

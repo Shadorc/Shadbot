@@ -5,6 +5,7 @@ import com.shadorc.shadbot.api.json.trivia.TriviaResult;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
 import com.shadorc.shadbot.core.game.player.Player;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -15,7 +16,6 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
-import io.prometheus.client.Summary;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
@@ -27,12 +27,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
-
-    private static final Summary TRIVIA_SUMMARY = Summary.build()
-            .name("game_trivia")
-            .help("Trivia game")
-            .labelNames("result")
-            .register();
 
     @Nullable
     private final Integer categoryId;
@@ -113,7 +107,7 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
 
         this.stop();
 
-        TRIVIA_SUMMARY.labels("win").observe(gains);
+        Telemetry.TRIVIA_SUMMARY.labels("win").observe(gains);
 
         return new Player(this.getContext().getGuildId(), member.getId())
                 .win(gains)

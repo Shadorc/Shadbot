@@ -5,6 +5,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -13,7 +14,6 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.RandUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import io.prometheus.client.Summary;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 import reactor.util.function.Tuple2;
@@ -25,9 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class RpsCmd extends BaseCmd {
-
-    private static final Summary RPS_SUMMARY = Summary.build().name("game_rps").help("RPS game")
-            .labelNames("result").register();
 
     private final Map<Tuple2<Snowflake, Snowflake>, RpsPlayer> players;
 
@@ -57,7 +54,7 @@ public class RpsCmd extends BaseCmd {
                     if (userHandsign.isSuperior(botHandsign)) {
                         final int winStreak = player.getWinStreak().incrementAndGet();
                         final long gains = Math.min((long) Constants.GAINS * winStreak, Config.MAX_COINS);
-                        RPS_SUMMARY.labels("win").observe(gains);
+                        Telemetry.RPS_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
                                 .thenReturn(strBuilder.append(
                                         String.format(Emoji.BANK + " (**%s**) Well done, you win **%s** (Win Streak x%d)!",

@@ -2,6 +2,7 @@ package com.shadorc.shadbot.db.lottery.entity;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
@@ -9,7 +10,6 @@ import com.shadorc.shadbot.db.lottery.LotteryCollection;
 import com.shadorc.shadbot.db.lottery.bean.LotteryHistoricBean;
 import reactor.core.publisher.Mono;
 
-import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 import static com.shadorc.shadbot.db.premium.PremiumCollection.LOGGER;
 
 public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> implements DatabaseEntity {
@@ -45,7 +45,7 @@ public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> imp
                         new ReplaceOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[LotteryHistoric] Insertion result: {}", result))
                 .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
 
     @Override
@@ -57,7 +57,7 @@ public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> imp
                 .deleteOne(Filters.eq("_id", "historic")))
                 .doOnNext(result -> LOGGER.trace("[LotteryHistoric] Deletion result: {}", result))
                 .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import com.shadorc.shadbot.core.setting.Setting;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
@@ -18,7 +19,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 import static com.shadorc.shadbot.db.guilds.GuildsCollection.LOGGER;
 
 public class DBGuild extends SerializableEntity<DBGuildBean> implements DatabaseEntity {
@@ -65,7 +65,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Setting update result: {}",
                         this.getId().asLong(), result))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     public Mono<UpdateResult> removeSetting(Setting setting) {
@@ -78,7 +78,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                         Updates.unset(String.format("settings.%s", setting))))
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Setting deletion result: {}",
                         this.getId().asLong(), result))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     @Override
@@ -90,7 +90,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                 .insertOne(this.toDocument()))
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Insertion result: {}",
                         this.getId().asLong(), result))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc())
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc())
                 .then();
     }
 
@@ -102,7 +102,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                 .getCollection()
                 .deleteOne(Filters.eq("_id", this.getId().asString())))
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Deletion result: {}", this.getId().asLong(), result))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc())
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc())
                 .then();
     }
 

@@ -3,6 +3,7 @@ package com.shadorc.shadbot;
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.core.retriever.SpyRestEntityRetriever;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
@@ -26,7 +27,6 @@ import discord4j.rest.response.ResponseFunction;
 import discord4j.store.api.mapping.MappingStoreService;
 import discord4j.store.caffeine.CaffeineStoreService;
 import discord4j.store.jdk.JdkStoreService;
-import io.prometheus.client.Counter;
 import io.prometheus.client.exporter.HTTPServer;
 import io.sentry.Sentry;
 import reactor.core.publisher.Hooks;
@@ -42,8 +42,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Shadbot {
 
     public static final Logger DEFAULT_LOGGER = LogUtils.getLogger();
-    private static final Counter EVENT_COUNTER = Counter.build().namespace("discord")
-            .name("event_count").help("Discord events count").labelNames("type").register();
 
     private static final Instant LAUNCH_TIME = Instant.now();
     private static final AtomicLong OWNER_ID = new AtomicLong();
@@ -157,7 +155,7 @@ public class Shadbot {
     private static <T extends Event> void register(GatewayDiscordClient gateway, EventListener<T> eventListener) {
         gateway.getEventDispatcher()
                 .on(eventListener.getEventType())
-                .doOnNext(event -> EVENT_COUNTER.labels(event.getClass().getSimpleName()).inc())
+                .doOnNext(event -> Telemetry.EVENT_COUNTER.labels(event.getClass().getSimpleName()).inc())
                 .flatMap(event -> eventListener.execute(event)
                         .timeout(Duration.ofDays(1), Mono.error(new RuntimeException(String.format("%s timed out", event))))
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))

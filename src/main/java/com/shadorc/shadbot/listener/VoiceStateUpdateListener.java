@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.listener;
 
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -9,17 +10,10 @@ import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.VoiceChannel;
-import io.prometheus.client.Gauge;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 
 public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateEvent> {
-
-    public static final Gauge VOICE_COUNT_GAUGE = Gauge.build()
-            .namespace("shadbot")
-            .name("voice_count")
-            .help("Connected voice channel count")
-            .register();
 
     private static final Logger LOGGER = LogUtils.getLogger(VoiceStateUpdateListener.class, LogUtils.Category.MUSIC);
 
@@ -38,11 +32,11 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
             LOGGER.trace("{Guild ID: {}} Voice state update event: {}", guildId.asLong(), event);
             if (event.isLeaveEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel left", guildId.asLong());
-                return Mono.fromRunnable(VOICE_COUNT_GAUGE::dec)
+                return Mono.fromRunnable(Telemetry.VOICE_COUNT_GAUGE::dec)
                         .and(MusicManager.getInstance().destroyConnection(guildId));
             } else if (event.isJoinEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asLong());
-                return Mono.fromRunnable(VOICE_COUNT_GAUGE::inc);
+                return Mono.fromRunnable(Telemetry.VOICE_COUNT_GAUGE::inc);
             } else if (event.isMoveEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel moved", guildId.asLong());
             }

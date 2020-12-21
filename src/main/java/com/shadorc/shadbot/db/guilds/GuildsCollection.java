@@ -2,6 +2,7 @@ package com.shadorc.shadbot.db.guilds;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoDatabase;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.guilds.bean.DBGuildBean;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
@@ -18,8 +19,6 @@ import reactor.util.Logger;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 
 public class GuildsCollection extends DatabaseCollection {
 
@@ -46,7 +45,7 @@ public class GuildsCollection extends DatabaseCollection {
                     }
                 })
                 .defaultIfEmpty(new DBGuild(guildId))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
     public Mono<DBMember> getDBMember(Snowflake guildId, Snowflake memberId) {
@@ -68,7 +67,7 @@ public class GuildsCollection extends DatabaseCollection {
                     }
                     return members;
                 })
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
     }
 
 }

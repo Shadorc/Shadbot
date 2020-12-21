@@ -15,14 +15,11 @@ import com.shadorc.shadbot.db.guilds.GuildsCollection;
 import com.shadorc.shadbot.db.lottery.LotteryCollection;
 import com.shadorc.shadbot.db.premium.PremiumCollection;
 import com.shadorc.shadbot.db.users.UsersCollection;
-import io.prometheus.client.Counter;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 
 public class DatabaseManager {
 
-    public static final Counter DB_REQUEST_COUNTER = Counter.build().namespace("database")
-            .name("request_count").help("Database request count").labelNames("collection").register();
     public static final CodecRegistry CODEC_REGISTRY = CodecRegistries.fromRegistries(
             MongoClientSettings.getDefaultCodecRegistry(),
             CodecRegistries.fromCodecs(new SnowflakeCodec(), new LongCodec(), new IamCodec()));

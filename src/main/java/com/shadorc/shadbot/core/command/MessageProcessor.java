@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.object.Emoji;
@@ -11,7 +12,6 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
-import io.prometheus.client.Counter;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
@@ -19,9 +19,6 @@ import java.time.Instant;
 
 public class MessageProcessor {
 
-    private static final Counter COMMAND_USAGE_COUNTER = Counter.build()
-            .namespace("shadbot").name("command_usage").help("Command usage")
-            .labelNames("command").register();
     private static final String DM_TEXT = String.format("Hello !"
                     + "%nCommands only work in a server but you can see help using `%shelp`."
                     + "%nIf you have a question, a suggestion or if you just want to talk, don't hesitate to "
@@ -125,7 +122,7 @@ public class MessageProcessor {
             return Mono.empty();
         }
 
-        COMMAND_USAGE_COUNTER.labels(command.getName()).inc();
+        Telemetry.COMMAND_USAGE_COUNTER.labels(command.getName()).inc();
 
         return context.getPermissions()
                 .collectList()

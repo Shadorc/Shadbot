@@ -4,12 +4,12 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.Game;
 import com.shadorc.shadbot.core.game.player.Player;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.*;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
-import io.prometheus.client.Summary;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -21,9 +21,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class HangmanGame extends Game<HangmanCmd> {
-
-    private static final Summary HANGMAN_SUMMARY = Summary.build().name("game_hangman").help("Hangman game")
-            .labelNames("result").register();
 
     private static final List<String> IMG_LIST = List.of(
             HangmanGame.getImageUrl("8/8b", 0),
@@ -75,7 +72,7 @@ public class HangmanGame extends Game<HangmanCmd> {
                 final float imagesRemaining = IMG_LIST.size() - this.failCount;
                 final int difficultyMultiplicator = this.difficulty == HangmanCmd.Difficulty.HARD ? 4 : 1;
                 final int gains = (int) (Constants.MIN_GAINS + Math.ceil(BONUS_PER_IMAGE * imagesRemaining) * difficultyMultiplicator);
-                HANGMAN_SUMMARY.labels("win").observe(gains);
+                Telemetry.HANGMAN_SUMMARY.labels("win").observe(gains);
                 return new Player(this.getContext().getGuildId(), this.getContext().getAuthorId())
                         .win(gains)
                         .thenReturn(strBuilder.append(

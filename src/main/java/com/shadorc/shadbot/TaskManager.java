@@ -3,6 +3,7 @@ package com.shadorc.shadbot;
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.cache.CacheManager;
 import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.LogUtils;
@@ -11,7 +12,6 @@ import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.gateway.GatewayClient;
 import discord4j.gateway.GatewayClientGroup;
-import io.prometheus.client.Gauge;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -59,21 +59,6 @@ public class TaskManager {
     public void schedulePeriodicStats(GatewayDiscordClient gateway) {
         LOGGER.info("Scheduling periodic stats log");
 
-        final Gauge ramUsageGauge = Gauge.build().namespace("process").name("ram_usage_mb")
-                .help("Ram usage in MB").register();
-        final Gauge cpuUsageGauge = Gauge.build().namespace("process").name("cpu_usage_percent")
-                .help("CPU usage in percent").register();
-        final Gauge threadCountGauge = Gauge.build().namespace("process").name("thread_count")
-                .help("Thread count").register();
-        final Gauge gcCountGauge = Gauge.build().namespace("process").name("gc_count")
-                .help("Garbage collector count").register();
-        final Gauge gcTimeGauge = Gauge.build().namespace("process").name("gc_time")
-                .help("Garbage collector total time in ms").register();
-        final Gauge responseTimeGauge = Gauge.build().namespace("shard").name("response_time")
-                .help("Shard response time").labelNames("shard_id").register();
-        final Gauge guildCountGauge = Gauge.build().namespace("shadbot")
-                .name("guild_count").help("Guild count").register();
-
         final GatewayClientGroup group = gateway.getGatewayClientGroup();
         final Mono<Map<Integer, Long>> getResponseTimes = Flux.range(0, group.getShardCount())
                 .flatMap(i -> Mono.justOrEmpty(group.find(i))
@@ -84,16 +69,16 @@ public class TaskManager {
 
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(15), DEFAULT_SCHEDULER)
                 .doOnNext(ignored -> {
-                    ramUsageGauge.set(ProcessUtils.getMemoryUsed());
-                    cpuUsageGauge.set(ProcessUtils.getCpuUsage());
-                    threadCountGauge.set(Thread.activeCount());
-                    gcCountGauge.set(ProcessUtils.getGCCount());
-                    gcTimeGauge.set(ProcessUtils.getGCTime());
-                    guildCountGauge.set(CacheManager.getInstance().getGuildOwnersCache().count());
+                    Telemetry.RAM_USAGE_GAUGE.set(ProcessUtils.getMemoryUsed());
+                    Telemetry.CPU_USAGE_GAUGE.set(ProcessUtils.getCpuUsage());
+                    Telemetry.THREAD_COUNT_GAUGE.set(Thread.activeCount());
+                    Telemetry.GC_COUNT_GAUGE.set(ProcessUtils.getGCCount());
+                    Telemetry.GC_TIME_GAUGE.set(ProcessUtils.getGCTime());
+                    Telemetry.GUILD_COUNT_GAUGE.set(CacheManager.getInstance().getGuildOwnersCache().count());
                 })
                 .flatMap(ignored -> getResponseTimes)
                 .doOnNext(responseTimeMap -> responseTimeMap
-                        .forEach((key, value) -> responseTimeGauge.labels(key.toString()).set(value)))
+                        .forEach((key, value) -> Telemetry.RESPONSE_TIME_GAUGE.labels(key.toString()).set(value)))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
         this.tasks.add(task);

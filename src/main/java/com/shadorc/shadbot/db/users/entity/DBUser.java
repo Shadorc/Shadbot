@@ -4,6 +4,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
@@ -16,7 +17,6 @@ import reactor.core.publisher.Mono;
 import java.util.EnumSet;
 import java.util.Objects;
 
-import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 import static com.shadorc.shadbot.db.guilds.GuildsCollection.LOGGER;
 
 public class DBUser extends SerializableEntity<DBUserBean> implements DatabaseEntity {
@@ -65,7 +65,7 @@ public class DBUser extends SerializableEntity<DBUserBean> implements DatabaseEn
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[DBUser {}] Achievements update result: {}",
                         this.getId().asLong(), result))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(UsersCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(UsersCollection.NAME).inc());
     }
 
     @Override

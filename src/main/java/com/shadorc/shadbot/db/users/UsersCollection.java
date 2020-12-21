@@ -2,6 +2,7 @@ package com.shadorc.shadbot.db.users;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoDatabase;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.users.bean.DBUserBean;
 import com.shadorc.shadbot.db.users.entity.DBUser;
@@ -12,8 +13,6 @@ import org.bson.Document;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-
-import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 
 public class UsersCollection extends DatabaseCollection {
 
@@ -40,7 +39,7 @@ public class UsersCollection extends DatabaseCollection {
                     }
                 })
                 .defaultIfEmpty(new DBUser(id))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(UsersCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(UsersCollection.NAME).inc());
     }
 
 }

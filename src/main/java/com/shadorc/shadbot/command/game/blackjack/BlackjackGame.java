@@ -4,6 +4,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.casino.Deck;
 import com.shadorc.shadbot.object.casino.Hand;
@@ -13,7 +14,6 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
-import io.prometheus.client.Summary;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -23,9 +23,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class BlackjackGame extends MultiplayerGame<BlackjackCmd, BlackjackPlayer> {
-
-    private static final Summary BLACKJACK_SUMMARY = Summary.build().name("game_blackjack")
-            .help("Blackjack game").labelNames("result").register();
 
     private final RateLimiter rateLimiter;
     private final UpdatableMessage updatableMessage;
@@ -76,12 +73,12 @@ public class BlackjackGame extends MultiplayerGame<BlackjackCmd, BlackjackPlayer
                     switch (BlackjackGame.getResult(playerValue, dealerValue)) {
                         case 1:
                             final long coins = Math.min((long) (player.getBet() * Constants.WIN_MULTIPLICATOR), Config.MAX_COINS);
-                            BLACKJACK_SUMMARY.labels("win").observe(coins);
+                            Telemetry.BLACKJACK_SUMMARY.labels("win").observe(coins);
                             return player.cancelBet()
                                     .then(player.win(coins))
                                     .thenReturn(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(coins)));
                         case -1:
-                            BLACKJACK_SUMMARY.labels("loss").observe(player.getBet());
+                            Telemetry.BLACKJACK_SUMMARY.labels("loss").observe(player.getBet());
                             return player.cancelBet()
                                     .then(player.lose(player.getBet()))
                                     .thenReturn(String.format("**%s** (Losses: **%s**)",

@@ -3,13 +3,13 @@ package com.shadorc.shadbot.command.game.dice;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
-import io.prometheus.client.Summary;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -19,9 +19,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class DiceGame extends MultiplayerGame<DiceCmd, DicePlayer> {
-
-    private static final Summary DICE_SUMMARY = Summary.build().name("game_dice")
-            .help("Dice game").labelNames("result").register();
 
     private final long bet;
     private final UpdatableMessage updatableMessage;
@@ -53,11 +50,11 @@ public class DiceGame extends MultiplayerGame<DiceCmd, DicePlayer> {
                     if (player.getNumber() == winningNum) {
                         final long gains = Math.min((long) (this.bet * (this.getPlayers().size() + Constants.WIN_MULTIPLICATOR)),
                                 Config.MAX_COINS);
-                        DICE_SUMMARY.labels("win").observe(gains);
+                        Telemetry.DICE_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
                                 .thenReturn(String.format("**%s** (Gains: **%s**)", username, FormatUtils.coins(gains)));
                     } else {
-                        DICE_SUMMARY.labels("loss").observe(this.bet);
+                        Telemetry.DICE_SUMMARY.labels("loss").observe(this.bet);
                         return Mono.just(String.format("**%s** (Losses: **%s**)", username, FormatUtils.coins(this.bet)));
                     }
                 }))

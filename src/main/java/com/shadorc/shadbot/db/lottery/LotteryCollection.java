@@ -6,6 +6,7 @@ import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoDatabase;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
 import com.shadorc.shadbot.db.lottery.bean.LotteryHistoricBean;
@@ -19,8 +20,6 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
-
-import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 
 public class LotteryCollection extends DatabaseCollection {
 
@@ -43,7 +42,7 @@ public class LotteryCollection extends DatabaseCollection {
                 .map(Document::toJson)
                 .flatMap(json -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(json, LotteryGamblerBean.class)))
                 .map(LotteryGambler::new)
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
 
     public Mono<LotteryHistoric> getHistoric() {
@@ -57,7 +56,7 @@ public class LotteryCollection extends DatabaseCollection {
                 .map(Document::toJson)
                 .flatMap(json -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(json, LotteryHistoricBean.class)))
                 .map(LotteryHistoric::new)
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
 
     public Mono<Long> getJackpot() {
@@ -70,7 +69,7 @@ public class LotteryCollection extends DatabaseCollection {
         return Mono.from(request)
                 .map(document -> document.getLong("jackpot"))
                 .defaultIfEmpty(0L)
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
 
     public Mono<Boolean> isGambler(Snowflake userId) {
@@ -83,7 +82,7 @@ public class LotteryCollection extends DatabaseCollection {
 
         return Mono.from(request)
                 .hasElement()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
 
     public Mono<DeleteResult> resetGamblers() {
@@ -92,7 +91,7 @@ public class LotteryCollection extends DatabaseCollection {
         return Mono.from(this.getCollection()
                 .deleteOne(Filters.eq("_id", "gamblers")))
                 .doOnNext(result -> LOGGER.trace("[Lottery] Gamblers deletion result: {}", result))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
 
     public Mono<UpdateResult> addToJackpot(long coins) {
@@ -105,7 +104,7 @@ public class LotteryCollection extends DatabaseCollection {
                         Updates.inc("jackpot", value),
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[Lottery] Jackpot update result: {}", result))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
 
     public Mono<DeleteResult> resetJackpot() {
@@ -114,7 +113,7 @@ public class LotteryCollection extends DatabaseCollection {
         return Mono.from(this.getCollection()
                 .deleteOne(Filters.eq("_id", "jackpot")))
                 .doOnNext(result -> LOGGER.trace("[Lottery] Jackpot deletion result: {}", result))
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
 
 }

@@ -3,6 +3,7 @@ package com.shadorc.shadbot.command.game.russianroulette;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
@@ -10,7 +11,6 @@ import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import io.prometheus.client.Summary;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 import reactor.util.function.Tuple2;
@@ -23,9 +23,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 public class RussianRouletteCmd extends BaseCmd {
-
-    private static final Summary RUSSIAN_ROULETTE_SUMMARY = Summary.build().name("game_russian_roulette")
-            .help("Russian Roulette game").labelNames("result").register();
 
     private final Map<Tuple2<Snowflake, Snowflake>, RussianRoulettePlayer> players;
 
@@ -64,14 +61,14 @@ public class RussianRouletteCmd extends BaseCmd {
                         descBuilder.append(String.format("\n**\\*click\\*** ... Phew, you are still alive!%nYou get **%s**.",
                                 FormatUtils.coins(coins)));
 
-                        RUSSIAN_ROULETTE_SUMMARY.labels("win").observe(coins);
+                        Telemetry.RUSSIAN_ROULETTE_SUMMARY.labels("win").observe(coins);
                         return player.cancelBet()
                                 .then(player.win(coins))
                                 .thenReturn(embedConsumer.andThen(embed -> embed.setDescription(descBuilder.toString())));
                     }
 
                     descBuilder.append("\n**\\*PAN\\*** ... Sorry, you died...");
-                    RUSSIAN_ROULETTE_SUMMARY.labels("loss").observe(player.getBet());
+                    Telemetry.RUSSIAN_ROULETTE_SUMMARY.labels("loss").observe(player.getBet());
                     return Mono.just(embedConsumer.andThen(embed -> embed.setDescription(descBuilder.toString())));
                 })
                 .flatMap(embed -> context.getChannel()

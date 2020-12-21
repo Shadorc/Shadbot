@@ -3,6 +3,7 @@ package com.shadorc.shadbot.db.lottery.entity;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
@@ -13,7 +14,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
-import static com.shadorc.shadbot.db.DatabaseManager.DB_REQUEST_COUNTER;
 import static com.shadorc.shadbot.db.lottery.LotteryCollection.LOGGER;
 
 public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> implements DatabaseEntity {
@@ -50,7 +50,7 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
                 .doOnNext(result -> LOGGER.trace("[LotteryGambler {} / {}] Insertion result: {}",
                         this.getUserId().asLong(), this.getGuildId().asLong(), result))
                 .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
 
     @Override
@@ -66,7 +66,7 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
                 .doOnNext(result -> LOGGER.trace("[LotteryGambler {} / {}] Deletion result: {}",
                         this.getUserId().asLong(), this.getGuildId().asLong(), result))
                 .then()
-                .doOnTerminate(() -> DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
 
     @Override

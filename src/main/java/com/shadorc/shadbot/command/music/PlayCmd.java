@@ -6,6 +6,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.music.GuildMusic;
@@ -20,7 +21,6 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.voice.retry.VoiceGatewayException;
-import io.prometheus.client.Counter;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -32,8 +32,6 @@ import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 public class PlayCmd extends BaseCmd {
 
     private static final String SC_QUERY = "soundcloud ";
-    private static final Counter MUSIC_ERROR_COUNTER = Counter.build().namespace("music")
-            .name("error_count").help("Music error count").labelNames("type").register();
 
     public PlayCmd() {
         super(CommandCategory.MUSIC, List.of("play", "add", "queue", "playfirst", "addfirst", "queuefirst"));
@@ -54,7 +52,7 @@ public class PlayCmd extends BaseCmd {
                             context.getGuildId().asLong(), err.getMessage());
 
                     if (!(err instanceof CommandException) && !(err instanceof MissingPermissionException)) {
-                        MUSIC_ERROR_COUNTER.labels(err.getClass().getSimpleName()).inc();
+                        Telemetry.MUSIC_ERROR_COUNTER.labels(err.getClass().getSimpleName()).inc();
                     }
 
                     if (err instanceof VoiceGatewayException) {
