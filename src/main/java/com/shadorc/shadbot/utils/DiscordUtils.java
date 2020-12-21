@@ -3,6 +3,7 @@ package com.shadorc.shadbot.utils;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.command.MissingPermissionException;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
@@ -107,7 +108,8 @@ public class DiscordUtils {
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(1))
                         .filter(err -> err instanceof PrematureCloseException
                                 || err instanceof Errors.NativeIoException
-                                || err instanceof TimeoutException));
+                                || err instanceof TimeoutException))
+                .doOnSuccess(ignored -> Telemetry.MESSAGE_SENT_COUNTER.inc());
     }
 
     public static Mono<Member> extractMemberOrAuthor(Guild guild, Message message) {

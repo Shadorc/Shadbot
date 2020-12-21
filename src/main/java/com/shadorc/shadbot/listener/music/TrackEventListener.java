@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -56,6 +57,7 @@ public class TrackEventListener extends AudioEventAdapter {
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
+        Telemetry.MUSIC_ERROR_COUNTER.labels(exception.getClass().getSimpleName()).inc();
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .flatMap(guildMusic -> {
                     this.errorCount.incrementAndGet();
@@ -89,6 +91,7 @@ public class TrackEventListener extends AudioEventAdapter {
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
         LOGGER.info("{Guild ID: {}} Music stuck, skipping it", this.guildId.asLong());
+        Telemetry.MUSIC_ERROR_COUNTER.labels("StuckException").inc();
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .flatMap(GuildMusic::getMessageChannel)
                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll "

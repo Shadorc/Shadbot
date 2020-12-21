@@ -52,7 +52,7 @@ public class PlayCmd extends BaseCmd {
                             context.getGuildId().asLong(), err.getMessage());
 
                     if (!(err instanceof CommandException) && !(err instanceof MissingPermissionException)) {
-                        Telemetry.MUSIC_ERROR_COUNTER.labels(err.getClass().getSimpleName()).inc();
+                        Telemetry.VOICE_CHANNEL_ERROR_COUNTER.labels(err.getClass().getSimpleName()).inc();
                     }
 
                     if (err instanceof VoiceGatewayException) {
