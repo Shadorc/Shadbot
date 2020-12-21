@@ -61,6 +61,13 @@ public class TrackEventListener extends AudioEventAdapter {
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .flatMap(guildMusic -> {
                     this.errorCount.incrementAndGet();
+                    if(this.errorCount.get() > 10) {
+                        LOGGER.error("{Guild ID: {}} Stopping playlist due to too many errors.", guildId.asLong());
+                        return guildMusic.getMessageChannel()
+                                .flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_FLAG
+                                        + " Something is going wrong, I will stop retrying. Please try again later.", channel))
+                                .then(guildMusic.end());
+                    }
 
                     final String errMessage = ShadbotUtils.cleanLavaplayerErr(exception);
                     LOGGER.info("{Guild ID: {}} {}Track exception: {}", this.guildId.asLong(),
