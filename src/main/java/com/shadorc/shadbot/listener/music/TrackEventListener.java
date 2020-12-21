@@ -23,6 +23,9 @@ import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 
 public class TrackEventListener extends AudioEventAdapter {
 
+    private static final int IGNORED_ERROR_THRESHOLD = 3;
+    private static final int MAX_ERROR_COUNT = 10;
+
     private final Snowflake guildId;
     private final AtomicInteger errorCount;
 
@@ -61,7 +64,7 @@ public class TrackEventListener extends AudioEventAdapter {
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .flatMap(guildMusic -> {
                     this.errorCount.incrementAndGet();
-                    if(this.errorCount.get() > 10) {
+                    if(this.errorCount.get() > MAX_ERROR_COUNT) {
                         LOGGER.error("{Guild ID: {}} Stopping playlist due to too many errors.", guildId.asLong());
                         return guildMusic.getMessageChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_FLAG
@@ -71,15 +74,15 @@ public class TrackEventListener extends AudioEventAdapter {
 
                     final String errMessage = ShadbotUtils.cleanLavaplayerErr(exception);
                     LOGGER.info("{Guild ID: {}} {}Track exception: {}", this.guildId.asLong(),
-                            this.errorCount.get() > 3 ? "(Ignored) " : "", errMessage);
+                            this.errorCount.get() > IGNORED_ERROR_THRESHOLD ? "(Ignored) " : "", errMessage);
 
                     final StringBuilder strBuilder = new StringBuilder();
-                    if (this.errorCount.get() < 3) {
+                    if (this.errorCount.get() < IGNORED_ERROR_THRESHOLD) {
                         strBuilder.append(String.format(Emoji.RED_CROSS + " Sorry, %s. I'll try to play "
                                 + "the next available song.", errMessage.toLowerCase()));
                     }
 
-                    if (this.errorCount.get() == 3) {
+                    if (this.errorCount.get() == IGNORED_ERROR_THRESHOLD) {
                         LOGGER.info("{Guild ID: {}} Too many errors in a row. They will be ignored until"
                                 + " a music can be played.", this.guildId.asLong());
                         strBuilder.append("\n" + Emoji.RED_FLAG + " Too many errors in a row, I will ignore"
