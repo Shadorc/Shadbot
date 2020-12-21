@@ -65,7 +65,7 @@ public class TrackEventListener extends AudioEventAdapter {
                 .flatMap(guildMusic -> {
                     this.errorCount.incrementAndGet();
                     if(this.errorCount.get() > MAX_ERROR_COUNT) {
-                        LOGGER.error("{Guild ID: {}} Stopping playlist due to too many errors.", guildId.asLong());
+                        LOGGER.error("{Guild ID: {}} Stopping playlist due to too many errors.", this.guildId.asLong());
                         return guildMusic.getMessageChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_FLAG
                                         + " Something is going wrong, I will stop retrying. Please try again later.", channel))
