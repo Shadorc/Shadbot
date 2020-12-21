@@ -67,7 +67,7 @@ public class TrackEventListener extends AudioEventAdapter {
                             this.errorCount.get() > 3 ? "(Ignored) " : "", errMessage);
 
                     final StringBuilder strBuilder = new StringBuilder();
-                    if (this.errorCount.get() <= 3) {
+                    if (this.errorCount.get() < 3) {
                         strBuilder.append(String.format(Emoji.RED_CROSS + " Sorry, %s. I'll try to play "
                                 + "the next available song.", errMessage.toLowerCase()));
                     }
