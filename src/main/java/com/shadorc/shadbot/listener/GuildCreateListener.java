@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.cache.CacheManager;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
 import reactor.core.publisher.Mono;
 
@@ -18,9 +17,6 @@ public class GuildCreateListener implements EventListener<GuildCreateEvent> {
         final long guildId = event.getGuild().getId().asLong();
         final int memberCount = event.getGuild().getMemberCount();
         DEFAULT_LOGGER.debug("{Guild ID: {}} Connected ({} users)", guildId, memberCount);
-
-        CacheManager.getInstance().getGuildOwnersCache()
-                .save(event.getGuild().getId(), event.getGuild().getOwnerId());
         return Mono.empty();
     }
 
