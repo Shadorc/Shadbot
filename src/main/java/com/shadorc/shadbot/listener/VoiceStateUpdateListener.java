@@ -23,7 +23,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
     }
 
     @Override
-    public Mono<Void> execute(VoiceStateUpdateEvent event) {
+    public Mono<?> execute(VoiceStateUpdateEvent event) {
         final Snowflake userId = event.getCurrent().getUserId();
         final Snowflake guildId = event.getCurrent().getGuildId();
 
@@ -49,7 +49,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
         return Mono.empty();
     }
 
-    private static Mono<Void> onUserEvent(VoiceStateUpdateEvent event) {
+    private static Mono<?> onUserEvent(VoiceStateUpdateEvent event) {
         final Snowflake guildId = event.getCurrent().getGuildId();
         return Mono.defer(() -> Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(guildId)))
                 .flatMap(guildMusic -> event.getClient()
@@ -84,8 +84,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
                             return strBuilder.toString();
                         })
                         .flatMap(content -> guildMusic.getMessageChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(content, channel)))
-                        .then());
+                                .flatMap(channel -> DiscordUtils.sendMessage(content, channel))));
     }
 
 }

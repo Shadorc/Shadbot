@@ -16,7 +16,7 @@ public class MemberLeaveListener implements EventListener<MemberLeaveEvent> {
     }
 
     @Override
-    public Mono<Void> execute(MemberLeaveEvent event) {
+    public Mono<?> execute(MemberLeaveEvent event) {
         // Delete the member from the database
         final Mono<Void> deleteMember = Mono.justOrEmpty(event.getMember())
                 .flatMap(member -> DatabaseManager.getGuilds()
@@ -34,6 +34,7 @@ public class MemberLeaveListener implements EventListener<MemberLeaveEvent> {
                         MemberJoinListener.sendAutoMessage(event.getClient(), event.getUser(),
                                 channelId, leaveMessage)));
 
-        return deleteMember.and(sendLeaveMessage);
+        return deleteMember
+                .and(sendLeaveMessage);
     }
 }

@@ -25,7 +25,7 @@ public class MessageProcessor {
                     + "join my support server : %s",
             Config.DEFAULT_PREFIX, Config.SUPPORT_SERVER_URL);
 
-    public static Mono<Void> processEvent(MessageCreateEvent event) {
+    public static Mono<?> processEvent(MessageCreateEvent event) {
         // The message is a webhook or a bot, ignore
         if (event.getMessage().getAuthor().map(User::isBot).orElse(true)) {
             return Mono.empty();
@@ -37,7 +37,7 @@ public class MessageProcessor {
                 .flatMap(guildId -> MessageProcessor.processGuildMessage(guildId, event));
     }
 
-    private static Mono<Void> processPrivateMessage(MessageCreateEvent event) {
+    private static Mono<?> processPrivateMessage(MessageCreateEvent event) {
         if (event.getMessage().getContent().startsWith(String.format("%shelp", Config.DEFAULT_PREFIX))) {
             return CommandManager.getInstance().getCommand("help")
                     .execute(new Context(event, Config.DEFAULT_PREFIX));
@@ -49,11 +49,10 @@ public class MessageProcessor {
                         .take(20)
                         .map(Message::getContent)
                         .any(DM_TEXT::equals)))
-                .flatMap(channel -> DiscordUtils.sendMessage(DM_TEXT, channel))
-                .then();
+                .flatMap(channel -> DiscordUtils.sendMessage(DM_TEXT, channel));
     }
 
-    private static Mono<Void> processGuildMessage(Snowflake guildId, MessageCreateEvent event) {
+    private static Mono<?> processGuildMessage(Snowflake guildId, MessageCreateEvent event) {
         final String firstWord = event.getMessage().getContent().split(" ", 2)[0];
         // Only execute database request if the first word of the message contains an existing command
         if (CommandManager.getInstance().getCommands().keySet().stream().anyMatch(firstWord::contains)) {
@@ -63,7 +62,7 @@ public class MessageProcessor {
         return Mono.empty();
     }
 
-    private static Mono<Void> processCommand(MessageCreateEvent event, DBGuild dbGuild) {
+    private static Mono<?> processCommand(MessageCreateEvent event, DBGuild dbGuild) {
         return Mono.justOrEmpty(event.getMember())
                 // The role is allowed or the author is the guild's owner
                 .filterWhen(member -> BooleanUtils.or(
@@ -96,21 +95,20 @@ public class MessageProcessor {
                 .orElse(false);
     }
 
-    private static Mono<Void> executeCommand(DBGuild dbGuild, Context context) {
+    private static Mono<?> executeCommand(DBGuild dbGuild, Context context) {
         final BaseCmd command = CommandManager.getInstance().getCommand(context.getCommandName());
         // The command does not exist
         if (command == null) {
             return Mono.empty();
         }
 
-        // The command has been temporarly disabled by the bot's owner
+        // The command has been temporarily disabled by the bot's owner
         if (!command.isEnabled()) {
             final String text = String.format(Emoji.ACCESS_DENIED + " (**%s**) Sorry, this command is temporary " +
                             "disabled. Do not hesitate to join the support server (<%s>) if you have any questions.",
                     context.getUsername(), Config.SUPPORT_SERVER_URL);
             return context.getChannel()
-                    .flatMap(channel -> DiscordUtils.sendMessage(text, channel))
-                    .then();
+                    .flatMap(channel -> DiscordUtils.sendMessage(text, channel));
         }
 
         // This category is not allowed in this channel
@@ -137,7 +135,8 @@ public class MessageProcessor {
                 .filter(ignored -> dbGuild.getSettings().isCommandAllowed(command)
                         && !MessageProcessor.isRateLimited(context, command))
                 .flatMap(ignored -> command.execute(context))
-                .onErrorResume(err -> ExceptionHandler.handleCommandError(err, command, context));
+                .onErrorResume(err -> ExceptionHandler.handleCommandError(err, command, context)
+                        .then(Mono.empty()));
     }
 
 }

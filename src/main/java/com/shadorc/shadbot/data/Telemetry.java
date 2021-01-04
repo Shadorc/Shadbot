@@ -5,7 +5,7 @@ import io.prometheus.client.Gauge;
 import io.prometheus.client.Summary;
 
 public class Telemetry {
-    
+
     private static final String PROCESS_NAMESPACE = "process";
     private static final String SHARD_NAMESPACE = "shard";
     private static final String SHADBOT_NAMESPACE = "shadbot";

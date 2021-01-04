@@ -20,7 +20,7 @@ public class MessageUpdateListener implements EventListener<MessageUpdateEvent> 
     }
 
     @Override
-    public Mono<Void> execute(MessageUpdateEvent event) {
+    public Mono<?> execute(MessageUpdateEvent event) {
         if (!event.isContentChanged()) {
             return Mono.empty();
         }
@@ -44,8 +44,7 @@ public class MessageUpdateListener implements EventListener<MessageUpdateEvent> 
                 .doOnNext(TupleUtils.consumer((message, member) -> event.getClient()
                         .getEventDispatcher()
                         .publish(new MessageCreateEvent(event.getClient(), event.getShardInfo(), message,
-                                guildId, member.orElse(null)))))
-                .then();
+                                guildId, member.orElse(null)))));
     }
 
 }

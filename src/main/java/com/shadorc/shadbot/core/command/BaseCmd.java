@@ -49,7 +49,7 @@ public abstract class BaseCmd {
         this(category, names, null);
     }
 
-    public abstract Mono<Void> execute(Context context);
+    public abstract Mono<?> execute(Context context);
 
     public abstract Consumer<EmbedCreateSpec> getHelp(Context context);
 

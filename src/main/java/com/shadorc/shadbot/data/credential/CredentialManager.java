@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Objects;
 import java.util.Properties;
 
 public class CredentialManager {
@@ -38,14 +39,14 @@ public class CredentialManager {
         // Check if all API keys are present
         for (final Credential credential : Credential.values()) {
             if (this.get(credential) == null) {
-                LOGGER.warn("Credential {} not found, the associated command/service may not work properly",
-                        credential);
+                LOGGER.warn("Credential {} not found, the associated command/service may not work properly", credential);
             }
         }
     }
 
     @Nullable
     public String get(Credential key) {
+        Objects.requireNonNull(key);
         final String property = this.properties.getProperty(key.toString());
         if (property == null || property.isBlank()) {
             return null;

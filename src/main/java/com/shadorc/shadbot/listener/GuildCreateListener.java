@@ -14,14 +14,14 @@ public class GuildCreateListener implements EventListener<GuildCreateEvent> {
     }
 
     @Override
-    public Mono<Void> execute(GuildCreateEvent event) {
-        return Mono.fromRunnable(() -> {
-            final long guildId = event.getGuild().getId().asLong();
-            final int memberCount = event.getGuild().getMemberCount();
-            DEFAULT_LOGGER.debug("{Guild ID: {}} Connected ({} users)", guildId, memberCount);
+    public Mono<?> execute(GuildCreateEvent event) {
+        final long guildId = event.getGuild().getId().asLong();
+        final int memberCount = event.getGuild().getMemberCount();
+        DEFAULT_LOGGER.debug("{Guild ID: {}} Connected ({} users)", guildId, memberCount);
 
-            CacheManager.getInstance().getGuildOwnersCache().save(event.getGuild().getId(), event.getGuild().getOwnerId());
-        });
+        CacheManager.getInstance().getGuildOwnersCache()
+                .save(event.getGuild().getId(), event.getGuild().getOwnerId());
+        return Mono.empty();
     }
 
 }

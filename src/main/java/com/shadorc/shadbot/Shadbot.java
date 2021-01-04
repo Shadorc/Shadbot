@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Shadbot {
@@ -69,11 +70,11 @@ public class Shadbot {
 
         DEFAULT_LOGGER.info("Starting Shadbot V{}", Config.VERSION);
 
-        final String port = CredentialManager.getInstance().get(Credential.PROMETHEUS_PORT);
-        if (port != null) {
-            DEFAULT_LOGGER.info("Initializing Prometheus on port {}", port);
+        final String prometheusPort = CredentialManager.getInstance().get(Credential.PROMETHEUS_PORT);
+        if (prometheusPort != null) {
+            DEFAULT_LOGGER.info("Initializing Prometheus on port {}", prometheusPort);
             try {
-                Shadbot.prometheusServer = new HTTPServer(Integer.parseInt(port));
+                Shadbot.prometheusServer = new HTTPServer(Integer.parseInt(prometheusPort));
             } catch (final IOException err) {
                 DEFAULT_LOGGER.error("An error occurred while initializing Prometheus", err);
             }
@@ -84,19 +85,20 @@ public class Shadbot {
             Hooks.onOperatorDebug();
         }
 
-        final DiscordClient client = DiscordClient.builder(CredentialManager.getInstance().get(Credential.DISCORD_TOKEN))
+        final String discordToken = CredentialManager.getInstance().get(Credential.DISCORD_TOKEN);
+        Objects.requireNonNull(discordToken, "Missing Discord bot token");
+        final DiscordClient client = DiscordClient.builder(discordToken)
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
                 .build();
 
-        client.getApplicationInfo()
+        final Long ownerId = client.getApplicationInfo()
                 .map(ApplicationInfoData::owner)
                 .map(UserData::id)
                 .map(Snowflake::asLong)
-                .doOnNext(ownerId -> {
-                    DEFAULT_LOGGER.info("Owner ID acquired: {}", ownerId);
-                    Shadbot.OWNER_ID.set(ownerId);
-                })
                 .block();
+        Objects.requireNonNull(ownerId);
+        DEFAULT_LOGGER.info("Owner ID acquired: {}", ownerId);
+        Shadbot.OWNER_ID.set(ownerId);
 
         DEFAULT_LOGGER.info("Connecting to Discord");
         client.gateway()
@@ -157,7 +159,7 @@ public class Shadbot {
                 .on(eventListener.getEventType())
                 .doOnNext(event -> Telemetry.EVENT_COUNTER.labels(event.getClass().getSimpleName()).inc())
                 .flatMap(event -> eventListener.execute(event)
-                        .timeout(Duration.ofDays(1), Mono.error(new RuntimeException(String.format("%s timed out", event))))
+                        .timeout(Duration.ofHours(12), Mono.error(new RuntimeException(String.format("%s timed out", event))))
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }

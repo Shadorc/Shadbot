@@ -25,7 +25,7 @@ public class MemberJoinListener implements EventListener<MemberJoinEvent> {
     }
 
     @Override
-    public Mono<Void> execute(MemberJoinEvent event) {
+    public Mono<?> execute(MemberJoinEvent event) {
         // Send an automatic join message if one was configured
         final Mono<Message> sendWelcomeMessage = DatabaseManager.getGuilds()
                 .getDBGuild(event.getGuildId())
@@ -49,7 +49,8 @@ public class MemberJoinListener implements EventListener<MemberJoinEvent> {
                                 .filterWhen(role -> self.hasHigherRoles(Set.of(role.getId())))
                                 .flatMap(role -> event.getMember().addRole(role.getId()))));
 
-        return sendWelcomeMessage.and(addAutoRoles);
+        return sendWelcomeMessage
+                .and(addAutoRoles);
     }
 
     public static Mono<Message> sendAutoMessage(GatewayDiscordClient gateway, User user, Snowflake channelId, String message) {

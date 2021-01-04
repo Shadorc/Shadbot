@@ -16,7 +16,7 @@ public class TextChannelDeleteListener implements EventListener<TextChannelDelet
     }
 
     @Override
-    public Mono<Void> execute(TextChannelDeleteEvent event) {
+    public Mono<?> execute(TextChannelDeleteEvent event) {
         return DatabaseManager.getGuilds()
                 .getDBGuild(event.getChannel().getGuildId())
                 .flatMap(dbGuild -> {
@@ -27,8 +27,7 @@ public class TextChannelDeleteListener implements EventListener<TextChannelDelet
                         return dbGuild.updateSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds);
                     }
                     return Mono.empty();
-                })
-                .then();
+                });
     }
 
 }

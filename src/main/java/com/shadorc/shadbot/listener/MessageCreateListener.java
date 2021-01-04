@@ -12,7 +12,7 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
     }
 
     @Override
-    public Mono<Void> execute(MessageCreateEvent event) {
+    public Mono<?> execute(MessageCreateEvent event) {
         return MessageProcessor.processEvent(event);
     }
 

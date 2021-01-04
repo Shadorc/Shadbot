@@ -37,7 +37,7 @@ public class ReactionListener {
         }
 
         @Override
-        public Mono<Void> execute(ReactionAddEvent event) {
+        public Mono<?> execute(ReactionAddEvent event) {
             return event.getMessage()
                     .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
                     .flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.ADD));
@@ -52,7 +52,7 @@ public class ReactionListener {
         }
 
         @Override
-        public Mono<Void> execute(ReactionRemoveEvent event) {
+        public Mono<?> execute(ReactionRemoveEvent event) {
             return event.getMessage()
                     .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
                     .flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.REMOVE));
@@ -88,7 +88,7 @@ public class ReactionListener {
                         }))));
     }
 
-    private static Mono<Void> execute(Message message, Member member, Action action) {
+    private static Mono<?> execute(Message message, Member member, Action action) {
         return DatabaseManager.getGuilds()
                 .getDBGuild(member.getGuildId())
                 .map(DBGuild::getSettings)
@@ -100,7 +100,7 @@ public class ReactionListener {
                 .then();
     }
 
-    private static Mono<Void> iam(Message message, Snowflake userId, ReactionEmoji emoji, Action action) {
+    private static Mono<?> iam(Message message, Snowflake userId, ReactionEmoji emoji, Action action) {
         // If this is the correct reaction
         if (!emoji.equals(IamCmd.REACTION)) {
             return Mono.empty();

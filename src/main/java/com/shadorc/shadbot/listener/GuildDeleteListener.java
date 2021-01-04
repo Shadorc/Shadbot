@@ -29,32 +29,33 @@ public class GuildDeleteListener implements EventListener<GuildDeleteEvent> {
     }
 
     @Override
-    public Mono<Void> execute(GuildDeleteEvent event) {
-        if (!event.isUnavailable()) {
-            DEFAULT_LOGGER.info("{Guild ID: {}} Disconnected", event.getGuildId().asLong());
-
-            final Mono<Snowflake> deleteCache = Mono.defer(() ->
-                    Mono.justOrEmpty(
-                            CacheManager.getInstance().getGuildOwnersCache().delete(event.getGuildId())));
-
-            final Mono<Message> sendMessage = deleteCache
-                    .flatMap(event.getClient()::getUserById)
-                    .flatMap(User::getPrivateChannel)
-                    .flatMap(channel -> DiscordUtils.sendMessage(TEXT, channel))
-                    .onErrorResume(ClientException.class, err -> Mono.empty());
-
-            final Mono<Void> deleteGuild = DatabaseManager.getGuilds()
-                    .getDBGuild(event.getGuildId())
-                    .flatMap(DBGuild::delete);
-
-            final Mono<Void> destroyVoiceConnection = MusicManager.getInstance()
-                    .destroyConnection(event.getGuildId());
-
-            return destroyVoiceConnection
-                    .and(sendMessage)
-                    .and(deleteGuild);
+    public Mono<?> execute(GuildDeleteEvent event) {
+        if (event.isUnavailable()) {
+            return Mono.empty();
         }
-        return Mono.empty();
+
+        DEFAULT_LOGGER.info("{Guild ID: {}} Disconnected", event.getGuildId().asLong());
+
+        final Mono<Void> destroyVoiceConnection = MusicManager.getInstance()
+                .destroyConnection(event.getGuildId());
+
+        final Mono<Snowflake> deleteCache = Mono.defer(() ->
+                Mono.justOrEmpty(
+                        CacheManager.getInstance().getGuildOwnersCache().delete(event.getGuildId())));
+
+        final Mono<Message> sendMessage = deleteCache
+                .flatMap(event.getClient()::getUserById)
+                .flatMap(User::getPrivateChannel)
+                .flatMap(channel -> DiscordUtils.sendMessage(TEXT, channel))
+                .onErrorResume(ClientException.class, err -> Mono.empty());
+
+        final Mono<Void> deleteGuild = DatabaseManager.getGuilds()
+                .getDBGuild(event.getGuildId())
+                .flatMap(DBGuild::delete);
+
+        return destroyVoiceConnection
+                .and(sendMessage)
+                .and(deleteGuild);
     }
 
 }
