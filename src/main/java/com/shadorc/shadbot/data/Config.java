@@ -24,7 +24,6 @@ public class Config {
     public static final String INVITE_URL = PROPERTIES.getProperty("invite.url");
     public static final String USER_AGENT = String.format("Shadbot/%s/D4J-DiscordBot (%s)", VERSION, GITHUB_URL);
 
-    public static final String DEFAULT_PREFIX = PROPERTIES.getProperty("default.prefix");
     public static final String COMMAND_DELIMITER = PROPERTIES.getProperty("command.delimiter");
 
     public static final int DEFAULT_VOLUME = Integer.parseInt(PROPERTIES.getProperty("default.volume"));

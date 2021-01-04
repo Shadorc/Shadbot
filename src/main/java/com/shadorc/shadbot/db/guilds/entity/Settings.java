@@ -147,12 +147,6 @@ public class Settings extends SerializableEntity<SettingsBean> {
                 .map(Snowflake::of);
     }
 
-    public String getPrefix() {
-        return Optional.ofNullable(this.getBean())
-                .map(SettingsBean::getPrefix)
-                .orElse(Config.DEFAULT_PREFIX);
-    }
-
     public Map<Snowflake, Set<BaseCmd>> getRestrictedChannels() {
         return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getRestrictedChannels)
