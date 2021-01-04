@@ -140,8 +140,6 @@ public class Shadbot {
                     Shadbot.register(gateway, new GuildDeleteListener());
                     Shadbot.register(gateway, new MemberJoinListener());
                     Shadbot.register(gateway, new MemberLeaveListener());
-                    Shadbot.register(gateway, new MessageCreateListener());
-                    Shadbot.register(gateway, new MessageUpdateListener());
                     Shadbot.register(gateway, new VoiceStateUpdateListener());
                     Shadbot.register(gateway, new ReactionListener.ReactionAddListener());
                     Shadbot.register(gateway, new ReactionListener.ReactionRemoveListener());
