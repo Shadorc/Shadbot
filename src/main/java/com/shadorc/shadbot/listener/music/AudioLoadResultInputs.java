@@ -1,11 +1,6 @@
-/*
 package com.shadorc.shadbot.listener.music;
 
-import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
-import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -50,16 +45,11 @@ public class AudioLoadResultInputs extends Inputs {
         final Mono<GuildMusic> getGuildMusic = Mono.justOrEmpty(MusicManager.getInstance()
                 .getGuildMusic(this.listener.getGuildId()));
 
-        final Mono<String> getPrefix = DatabaseManager.getGuilds()
-                .getDBGuild(this.listener.getGuildId())
-                .map(DBGuild::getSettings)
-                .map(Settings::getPrefix);
-
-        return Mono.zip(getGuildMusic, getPrefix)
-                .flatMap(TupleUtils.function((guildMusic, prefix) -> {
+        return getGuildMusic
+                .flatMap(guildMusic -> {
                     final String content = event.getMessage().getContent();
 
-                    if (content.equals(String.format("%scancel", prefix))) {
+                    if (content.equals("/cancel")) {
                         guildMusic.setWaitingForChoice(false);
                         return guildMusic.getMessageChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(
@@ -68,14 +58,8 @@ public class AudioLoadResultInputs extends Inputs {
                                 .then(Mono.empty());
                     }
 
-                    final String[] playCmdNames = CommandManager.getInstance()
-                            .getCommand("play")
-                            .getNames()
-                            .toArray(new String[0]);
-
-                    // Remove prefix and command names from message content
-                    String contentCleaned = StringUtils.remove(content, prefix);
-                    contentCleaned = StringUtils.remove(contentCleaned, playCmdNames);
+                    // Remove prefix and command name from message content
+                    String contentCleaned = StringUtils.remove(content, "/play");
 
                     final Set<Integer> choices = new HashSet<>();
                     for (final String choice : contentCleaned.split(",")) {
@@ -92,7 +76,7 @@ public class AudioLoadResultInputs extends Inputs {
                     choices.forEach(choice -> this.listener.trackLoaded(this.listener.getResultTracks().get(choice - 1)));
                     guildMusic.setWaitingForChoice(false);
                     return Mono.empty();
-                }));
+                });
     }
 
     @Override
@@ -104,4 +88,3 @@ public class AudioLoadResultInputs extends Inputs {
     }
 
 }
-*/

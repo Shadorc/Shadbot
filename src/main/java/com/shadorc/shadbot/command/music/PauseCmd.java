@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -6,43 +5,30 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class PauseCmd extends BaseCmd {
 
     public PauseCmd() {
-        super(CommandCategory.MUSIC, List.of("pause", "unpause", "resume"));
+        super(CommandCategory.MUSIC, "pause", "Toggle pause for current music");
         this.setDefaultRateLimiter();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
+    public Mono<?> execute(Context context) {
         final AudioPlayer audioPlayer = context.requireGuildMusic().getTrackScheduler().getAudioPlayer();
 
         return DiscordUtils.requireVoiceChannel(context)
-                .map(ignored -> {
+                .map(__ -> {
                     audioPlayer.setPaused(!audioPlayer.isPaused());
                     if (audioPlayer.isPaused()) {
-                        return String.format(Emoji.PAUSE + " Music paused by **%s**.", context.getUsername());
+                        return String.format(Emoji.PAUSE + " Music paused by **%s**.", context.getAuthorName());
                     } else {
-                        return String.format(Emoji.PLAY + " Music resumed by **%s**.", context.getUsername());
+                        return String.format(Emoji.PLAY + " Music resumed by **%s**.", context.getAuthorName());
                     }
                 })
-                .flatMap(message -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(message, channel)))
-                .then();
+                .flatMap(context::createFollowupMessage);
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Pause current music. Use this command again to resume.")
-                .build();
-    }
-}*/
+}

@@ -4,6 +4,7 @@ import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.command.currency.CoinsCmd;
 import com.shadorc.shadbot.command.currency.TransferCoinsCmd;
 import com.shadorc.shadbot.command.fun.ChatCmd;
+import com.shadorc.shadbot.command.music.*;
 import discord4j.discordjson.json.ApplicationCommandData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.rest.RestClient;
@@ -40,11 +41,11 @@ public class CommandManager {
 //                new SlotMachineCmd(), new RouletteCmd(), new BlackjackCmd(), new DiceCmd(),
 //                new LotteryCmd(),
                 // Currency Commands
-                new CoinsCmd(), /*new LeaderboardCmd(),*/ new TransferCoinsCmd()
+                new CoinsCmd(), /*new LeaderboardCmd(),*/ new TransferCoinsCmd(),
                 // Music Commands
-//                new PlayCmd(), new PauseCmd(), new StopCmd(), new SkipCmd(), new RepeatCmd(),
-//                new BackwardCmd(), new ForwardCmd(), new VolumeCmd(), new NameCmd(),
-//                new PlaylistCmd(), new ShuffleCmd(), new ClearCmd(), new BassBoostCmd(),
+                /*new PlayCmd(),*/ new PauseCmd(), new StopCmd(), /*new SkipCmd(), new RepeatCmd(),*/
+                new BackwardCmd(), new ForwardCmd(), /*new VolumeCmd(),*/ new NameCmd(),
+                /*new PlaylistCmd(),*/ new ShuffleCmd(), new ClearCmd()/*, new BassBoostCmd()*/
                 // Game Stats Commands
 //                new FortniteCmd(), new DiabloCmd(), new CounterStrikeCmd(), new OverwatchCmd(),
                 // Info Commands
@@ -82,9 +83,7 @@ public class CommandManager {
                         .createGuildApplicationCommand(applicationId, guildId,
                                 cmd.build(ApplicationCommandRequest.builder()
                                         .name(cmd.getName())
-                                        .description(cmd.getDescription()))))
-                .doOnNext(System.out::println)
-                .doOnError(err -> DEFAULT_LOGGER.error("error", err));
+                                        .description(cmd.getDescription()))));
     }
 
     public Map<String, BaseCmd> getCommands() {

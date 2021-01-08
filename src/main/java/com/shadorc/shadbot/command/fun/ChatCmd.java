@@ -60,8 +60,7 @@ public class ChatCmd extends BaseCmd {
                     MAX_CHARACTERS)));
         }
 
-        return context.acknowledge()
-                .then(this.getResponse(context.getChannelId(), message))
+        return this.getResponse(context.getChannelId(), message)
                 .flatMap(response -> context.createFollowupMessage(Emoji.SPEECH + " " + response));
     }
 

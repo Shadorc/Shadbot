@@ -2,10 +2,8 @@ package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
-import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.ExceptionHandler;
-import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.object.entity.Guild;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
@@ -14,13 +12,7 @@ import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class CommandProcessor {
 
-    public static Mono<?> processEvent(InteractionCreateEvent event) {
-        return DatabaseManager.getGuilds()
-                .getDBGuild(event.getGuildId())
-                .flatMap(dbGuild -> CommandProcessor.processCommand(new Context(event, dbGuild)));
-    }
-
-    private static Mono<?> processCommand(Context context) {
+    public static Mono<?> processCommand(Context context) {
         return Mono.just(context.getAuthor())
                 // The role is allowed or the author is the guild's owner
                 .filterWhen(member -> BooleanUtils.or(

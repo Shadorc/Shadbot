@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.listener.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
@@ -8,8 +7,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
-import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.music.TrackScheduler;
@@ -104,7 +101,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                     return guildMusic.getGateway()
                             .getUserById(guildMusic.getDjId())
                             .map(User::getAvatarUrl)
-                            .flatMap(avatarUrl -> this.getPlaylistEmbed(playlist, avatarUrl))
+                            .map(avatarUrl -> this.getPlaylistEmbed(playlist, avatarUrl))
                             .flatMap(embed -> guildMusic.getMessageChannel()
                                     .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
                             .flatMapMany(ignored ->
@@ -145,7 +142,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
-    private Mono<Consumer<EmbedCreateSpec>> getPlaylistEmbed(AudioPlaylist playlist, String avatarUrl) {
+    private Consumer<EmbedCreateSpec> getPlaylistEmbed(AudioPlaylist playlist, String avatarUrl) {
         final String choices = FormatUtils.numberedList(Config.MUSIC_SEARCHES, playlist.getTracks().size(),
                 count -> {
                     final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
@@ -153,19 +150,15 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 });
 
         final String playlistName = StringUtils.abbreviate(playlist.getName(), MAX_PLAYLIST_NAME_LENGTH);
-        return DatabaseManager.getGuilds()
-                .getDBGuild(this.guildId)
-                .map(DBGuild::getSettings)
-                .map(Settings::getPrefix)
-                .map(prefix -> ShadbotUtils.getDefaultEmbed()
-                        .andThen(embed -> embed.setAuthor(playlistName, null, avatarUrl)
-                                .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
-                                .setDescription("**Select a music by typing the corresponding number.**"
-                                        + "\nYou can choose several musics by separating them with a comma."
-                                        + "\nExample: 1,3,4"
-                                        + "\n\n" + choices)
-                                .setFooter(String.format("Use %scancel to cancel the selection (Automatically " +
-                                        "canceled in %ds).", prefix, Config.MUSIC_CHOICE_DURATION), null)));
+        return ShadbotUtils.getDefaultEmbed()
+                .andThen(embed -> embed.setAuthor(playlistName, null, avatarUrl)
+                        .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
+                        .setDescription("**Select a music by typing the corresponding number.**"
+                                + "\nYou can choose several musics by separating them with a comma."
+                                + "\nExample: 1,3,4"
+                                + "\n\n" + choices)
+                        .setFooter(String.format("Use /cancel to cancel the selection (Automatically " +
+                                "canceled in %ds).", Config.MUSIC_CHOICE_DURATION), null));
     }
 
     @Override
@@ -215,4 +208,3 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
 }
-*/

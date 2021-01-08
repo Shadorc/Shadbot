@@ -1,42 +1,27 @@
-/*
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class StopCmd extends BaseCmd {
 
     public StopCmd() {
-        super(CommandCategory.MUSIC, List.of("stop"));
+        super(CommandCategory.MUSIC, "stop", "Stop current music");
         this.setDefaultRateLimiter();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        return Mono.just(context.requireGuildMusic())
-                .map(ignored -> context.getClient().getVoiceConnectionRegistry())
-                .flatMap(registry -> registry.getVoiceConnection(context.getGuildId()))
+    public Mono<?> execute(Context context) {
+        context.requireGuildMusic();
+        return context.getClient()
+                .getVoiceConnectionRegistry()
+                .getVoiceConnection(context.getGuildId())
                 .flatMap(VoiceConnection::disconnect)
-                .then(context.getChannel())
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.STOP_BUTTON + " Music stopped by **%s**.",
-                        context.getUsername()), channel))
-                .then();
+                .then(context.createFollowupMessage(Emoji.STOP_BUTTON + " Music stopped by **%s**.", context.getAuthorName()));
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Stop music.")
-                .build();
-    }
-}*/
+}

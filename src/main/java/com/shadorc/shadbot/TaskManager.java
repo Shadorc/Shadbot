@@ -3,7 +3,6 @@ package com.shadorc.shadbot;
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.ExceptionHandler;
-import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.ProcessUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;

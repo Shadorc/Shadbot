@@ -44,15 +44,14 @@ public class TransferCoinsCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return context.acknowledge()
-                .then(context.getOptionAsMember("user"))
+        return context.getOptionAsMember("user")
                 .flatMap(receiverUser -> {
                     final Snowflake senderUserId = context.getAuthorId();
                     if (receiverUser.getId().equals(senderUserId)) {
                         return Mono.error(new CommandException("You cannot transfer coins to yourself."));
                     }
 
-                    final int coins = context.getOptionAsInteger("coins").orElseThrow();
+                    final long coins = context.getOptionAsLong("coins").orElseThrow();
                     if (coins <= 0) {
                         return Mono.error(new CommandException(String.format("`%s` is not a valid amount of coins.", coins)));
                     }

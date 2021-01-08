@@ -5,7 +5,6 @@ import com.shadorc.shadbot.command.MissingPermissionException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.music.NoMusicException;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import reactor.core.publisher.Mono;
 
@@ -37,20 +36,17 @@ public class ExceptionHandler {
     }
 
     private static Mono<?> onCommandException(CommandException err, Context context) {
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
-                        context.getAuthorName(), err.getMessage()), channel));
+        return context.createFollowupMessage(Emoji.GREY_EXCLAMATION + " (**%s**) %s", context.getAuthorName(), err.getMessage());
     }
 
     private static Mono<?> onMissingPermissionException(MissingPermissionException err, Context context) {
         final String missingPerm = FormatUtils.capitalizeEnum(err.getPermission());
-        DEFAULT_LOGGER.info("{Guild ID: {}} Missing permission: {}", context.getGuildId().asLong(), missingPerm);
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(
-                        String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of "
-                                        + "permission.%nPlease, check my permissions and channel-specific "
-                                        + "ones to verify that %s is checked.", context.getAuthorName(),
-                                String.format("**%s**", FormatUtils.capitalizeEnum(err.getPermission()))), channel));
+        DEFAULT_LOGGER.info("{Guild ID: {}} Missing permission: {}", context.getGuildId().asString(), missingPerm);
+        return context.createFollowupMessage(
+                Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of "
+                        + "permission.%nPlease, check my permissions and channel-specific "
+                        + "ones to verify that %s is checked.",
+                context.getAuthorName(), String.format("**%s**", FormatUtils.capitalizeEnum(err.getPermission())));
     }
 
 /*    private static Mono<?> onMissingArgumentException(BaseCmd cmd, Context context) {
@@ -61,10 +57,7 @@ public class ExceptionHandler {
     }*/
 
     private static Mono<?> onNoMusicException(Context context) {
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(
-                        String.format(Emoji.MUTE + " (**%s**) No currently playing music.",
-                                context.getAuthorName()), channel));
+        return context.createFollowupMessage(Emoji.MUTE + " (**%s**) No currently playing music.", context.getAuthorName());
     }
 
 /*    private static Mono<?> onServerAccessError(Throwable err, BaseCmd cmd, Context context) {

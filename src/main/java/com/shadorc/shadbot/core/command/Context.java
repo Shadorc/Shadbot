@@ -2,6 +2,9 @@ package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.music.GuildMusic;
+import com.shadorc.shadbot.music.MusicManager;
+import com.shadorc.shadbot.music.NoMusicException;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
@@ -18,7 +21,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.Optional;
-import java.util.OptionalInt;
 
 public class Context {
 
@@ -104,9 +106,9 @@ public class Context {
                 .flatMap(memberId -> this.event.getClient().getMemberById(this.getGuildId(), memberId));
     }
 
-    public Optional<Integer> getOptionAsInteger(String name) {
+    public Optional<Long> getOptionAsLong(String name) {
         return this.getOption(name)
-                .map(Integer::parseInt);
+                .map(Long::parseLong);
     }
 
     public Flux<CommandPermission> getPermissions() {
@@ -137,10 +139,6 @@ public class Context {
         return this.getChannel().map(TextChannel::isNsfw);
     }
 
-    public Mono<Void> acknowledge() {
-        return this.event.acknowledge(true);
-    }
-
     public Mono<MessageData> createFollowupMessage(String content) {
         return this.event.getInteractionResponse().createFollowupMessage(content);
     }
@@ -149,11 +147,11 @@ public class Context {
         return this.event.getInteractionResponse().createFollowupMessage(String.format(format, args));
     }
 
-    /*public GuildMusic requireGuildMusic() {
+    public GuildMusic requireGuildMusic() {
         return MusicManager.getInstance()
                 .getGuildMusic(this.getGuildId())
                 .filter(guildMusic -> !guildMusic.getTrackScheduler().isStopped())
                 .orElseThrow(NoMusicException::new);
-    }*/
+    }
 
 }

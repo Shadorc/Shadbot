@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.music;
 
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
@@ -49,11 +48,9 @@ public class GuildMusic {
         this.leavingTask = new AtomicReference<>();
     }
 
-    */
-/**
+    /**
      * Schedules to leave the voice channel in 1 minute.
-     *//*
-
+     */
     public void scheduleLeave() {
         LOGGER.debug("{Guild ID: {}} Scheduling auto-leave", this.guildId);
         this.leavingTask.set(Mono.delay(LEAVE_DELAY, Schedulers.boundedElastic())
@@ -151,4 +148,3 @@ public class GuildMusic {
         this.trackScheduler.destroy();
     }
 }
-*/

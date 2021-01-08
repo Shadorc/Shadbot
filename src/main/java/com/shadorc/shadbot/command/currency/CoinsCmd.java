@@ -34,9 +34,8 @@ public class CoinsCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return context.acknowledge()
-                .then(context.getOptionAsMember("user")
-                        .defaultIfEmpty(context.getAuthor()))
+        return context.getOptionAsMember("user")
+                .defaultIfEmpty(context.getAuthor())
                 .flatMap(user -> DatabaseManager.getGuilds()
                         .getDBMember(context.getGuildId(), user.getId())
                         .map(DBMember::getCoins)
