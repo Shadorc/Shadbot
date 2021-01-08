@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -72,4 +73,4 @@ public class PlaylistCmd extends BaseCmd {
                 .setDescription("Show current playlist.")
                 .build();
     }
-}
+}*/

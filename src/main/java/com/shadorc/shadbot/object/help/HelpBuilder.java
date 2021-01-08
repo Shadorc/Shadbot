@@ -105,7 +105,7 @@ public abstract class HelpBuilder {
         return ShadbotUtils.getDefaultEmbed()
                 .andThen(embed -> {
                     if (this.authorName != null && !this.authorName.isBlank()) {
-                        embed.setAuthor(this.authorName, this.authorUrl, this.context.getAvatarUrl());
+                        embed.setAuthor(this.authorName, this.authorUrl, this.context.getAuthorAvatarUrl());
                     }
                     embed.addField("Usage", this.getUsage(), false);
 
@@ -147,10 +147,10 @@ public abstract class HelpBuilder {
         }
 
         if (this.args.isEmpty()) {
-            return String.format("`%s%s`", this.context.getPrefix(), this.getCommandName());
+            return String.format("`/%s`", this.getCommandName());
         }
 
-        return String.format("`%s%s %s`", this.context.getPrefix(), this.getCommandName(),
+        return String.format("`/%s %s`", this.getCommandName(),
                 FormatUtils.format(this.args,
                         arg -> String.format(arg.isOptional() ? "[<%s>]" : "<%s>", arg.getName()), this.delimiter));
     }

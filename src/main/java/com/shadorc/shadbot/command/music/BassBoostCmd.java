@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -75,3 +76,4 @@ public class BassBoostCmd extends BaseCmd {
                 .build();
     }
 }
+*/

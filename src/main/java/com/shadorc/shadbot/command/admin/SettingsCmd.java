@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.admin;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -118,3 +119,4 @@ public class SettingsCmd extends BaseCmd {
     }
 
 }
+*/

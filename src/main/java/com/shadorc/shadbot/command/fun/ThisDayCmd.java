@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.fun;
 
 import com.shadorc.shadbot.api.html.thisday.ThisDay;
@@ -15,7 +16,6 @@ import discord4j.core.spec.EmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class ThisDayCmd extends BaseCmd {
@@ -23,7 +23,7 @@ public class ThisDayCmd extends BaseCmd {
     private static final String HOME_URL = "https://www.onthisday.com/";
 
     public ThisDayCmd() {
-        super(CommandCategory.FUN, List.of("this_day"), "td");
+        super(CommandCategory.FUN, "this_day", "Show significant events of the day");
         this.setDefaultRateLimiter();
     }
 
@@ -31,12 +31,12 @@ public class ThisDayCmd extends BaseCmd {
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
 
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading events...", context.getUsername()))
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading events...", context.getAuthorName()))
                 .send()
                 .then(ThisDayCmd.getThisDay())
                 .map(thisDay -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor(String.format("On This Day: %s",
-                                thisDay.getDate()), HOME_URL, context.getAvatarUrl())
+                                thisDay.getDate()), HOME_URL, context.getAuthorAvatarUrl())
                                 .setThumbnail("https://i.imgur.com/FdfyJDD.png")
                                 .setDescription(StringUtils.abbreviate(thisDay.getEvents(), Embed.MAX_DESCRIPTION_LENGTH)))))
                 .flatMap(UpdatableMessage::send)
@@ -58,3 +58,4 @@ public class ThisDayCmd extends BaseCmd {
                 .build();
     }
 }
+*/

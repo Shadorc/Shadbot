@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.utils;
 
 import com.fathzer.soft.javaluator.DoubleEvaluator;
@@ -51,3 +52,4 @@ public class MathCmd extends BaseCmd {
     }
 
 }
+*/

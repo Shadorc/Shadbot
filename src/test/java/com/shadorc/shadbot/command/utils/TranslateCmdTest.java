@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.command.CmdTest;
@@ -37,3 +38,4 @@ public class TranslateCmdTest extends CmdTest<TranslateCmd> {
     }
 
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.fun;
 
 import com.shadorc.shadbot.api.html.thisday.ThisDay;
@@ -16,3 +17,4 @@ public class ThisDayCmdTest extends CmdTest<ThisDayCmd> {
     }
 
 }
+*/

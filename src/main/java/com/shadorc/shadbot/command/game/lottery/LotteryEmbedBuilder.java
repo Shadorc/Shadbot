@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.lottery;
 
 import com.shadorc.shadbot.core.command.Context;
@@ -69,3 +70,4 @@ public class LotteryEmbedBuilder {
     }
 
 }
+*/

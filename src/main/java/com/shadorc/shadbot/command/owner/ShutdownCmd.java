@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.Shadbot;
@@ -39,3 +40,4 @@ public class ShutdownCmd extends BaseCmd {
     }
 
 }
+*/

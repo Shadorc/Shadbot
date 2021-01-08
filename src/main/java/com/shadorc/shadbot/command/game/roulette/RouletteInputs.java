@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.roulette;
 
 import com.shadorc.shadbot.object.Emoji;
@@ -50,3 +51,4 @@ public class RouletteInputs extends Inputs {
     }
 
 }
+*/

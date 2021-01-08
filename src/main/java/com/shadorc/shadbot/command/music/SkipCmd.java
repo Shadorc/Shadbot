@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -73,4 +74,4 @@ public class SkipCmd extends BaseCmd {
                 .addArg("num", "the number of the music in the playlist to play", true)
                 .build();
     }
-}
+}*/

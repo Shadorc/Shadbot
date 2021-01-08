@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.lottery;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -171,3 +172,4 @@ public class LotteryCmd extends BaseCmd {
                 .build();
     }
 }
+*/

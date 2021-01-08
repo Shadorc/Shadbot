@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.info;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -7,50 +8,62 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.DBUser;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
+import discord4j.core.object.entity.Member;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
+import java.util.EnumSet;
 import java.util.function.Consumer;
 
 public class AchievementsCmd extends BaseCmd {
 
     public AchievementsCmd() {
-        super(CommandCategory.INFO, List.of("achievements", "achievement"));
+        super(CommandCategory.INFO, "achievements", "Show user's achievements");
         this.setDefaultRateLimiter();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        return context.getGuild()
-                .flatMap(guild -> DiscordUtils.extractMemberOrAuthor(guild, context.getMessage()))
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        return builder.addOption(ApplicationCommandOptionData.builder()
+                .name("user")
+                .description("if not specified, it will show your achievements")
+                .type(ApplicationCommandOptionType.USER.getValue())
+                .required(false)
+                .build())
+                .build();
+    }
+
+    @Override
+    public Mono<?> execute(Context context) {
+        return context.getOptionAsMember("user")
                 .flatMap(member -> DatabaseManager.getUsers().getDBUser(member.getId())
                         .map(DBUser::getAchievements)
-                        .map(achievements -> ShadbotUtils.getDefaultEmbed()
-                                .andThen(embed -> {
-                                    embed.setAuthor(String.format("%s's Achievements", member.getUsername()),
-                                            null, member.getAvatarUrl());
-                                    embed.setThumbnail("https://i.imgur.com/IMHDI7D.png");
-                                    embed.setTitle(String.format("%d/%d achievements unlocked.",
-                                            achievements.size(), Achievement.values().length));
-
-                                    final StringBuilder description = new StringBuilder();
-                                    for (final Achievement achievement : achievements) {
-                                        description.append(AchievementsCmd.formatAchievement(achievement, true));
-                                    }
-                                    for (final Achievement achievement : Achievement.values()) {
-                                        if (!achievements.contains(achievement)) {
-                                            description.append(AchievementsCmd.formatAchievement(achievement, false));
-                                        }
-                                    }
-                                    embed.setDescription(description.toString());
-                                })))
+                        .map(achievements -> AchievementsCmd.formatAchievements(achievements, member)))
                 .flatMap(embed -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
-                .then();
+                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)));
+    }
+
+    private static Consumer<EmbedCreateSpec> formatAchievements(EnumSet<Achievement> achievements, Member member) {
+        return ShadbotUtils.getDefaultEmbed()
+                .andThen(embed -> {
+                    embed.setAuthor(String.format("%s's Achievements", member.getUsername()),
+                            null, member.getAvatarUrl());
+                    embed.setThumbnail("https://i.imgur.com/IMHDI7D.png");
+                    embed.setTitle(String.format("%d/%d achievements unlocked.",
+                            achievements.size(), Achievement.values().length));
+
+                    final StringBuilder description = new StringBuilder();
+                    for (final Achievement achievement : Achievement.values()) {
+                        description.append(AchievementsCmd.formatAchievement(achievement, achievements.contains(achievement)));
+                    }
+                    embed.setDescription(description.toString());
+                });
     }
 
     private static String formatAchievement(Achievement achievement, boolean unlocked) {
@@ -58,12 +71,5 @@ public class AchievementsCmd extends BaseCmd {
                 unlocked ? achievement.getEmoji() : Emoji.LOCK, achievement.getTitle(), achievement.getDescription());
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show user's achievements.")
-                .addArg("@user", "if not specified, it will show your achievements", true)
-                .build();
-    }
-
 }
+*/

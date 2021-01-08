@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.core.game;
 
 import com.shadorc.shadbot.core.command.Context;
@@ -27,3 +28,4 @@ public abstract class MultiplayerGame<G extends GameCmd<?>, P extends Player> ex
     }
 
 }
+*/

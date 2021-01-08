@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.dice;
 
 import com.shadorc.shadbot.core.command.Context;
@@ -109,3 +110,4 @@ public class DiceGame extends MultiplayerGame<DiceCmd, DicePlayer> {
     }
 
 }
+*/

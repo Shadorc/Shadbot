@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.hangman;
 
 import com.shadorc.shadbot.object.RequestHelper;
@@ -44,3 +45,4 @@ public class WordsList {
     }
 
 }
+*/

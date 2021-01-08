@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.dice;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -120,3 +121,4 @@ public class DiceCmd extends GameCmd<DiceGame> {
                 .build();
     }
 }
+*/

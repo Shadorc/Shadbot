@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.giphy.Data;
@@ -78,3 +79,4 @@ public class GifCmd extends BaseCmd {
     }
 
 }
+*/

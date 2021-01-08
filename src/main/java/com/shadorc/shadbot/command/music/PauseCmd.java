@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -44,4 +45,4 @@ public class PauseCmd extends BaseCmd {
                 .setDescription("Pause current music. Use this command again to resume.")
                 .build();
     }
-}
+}*/

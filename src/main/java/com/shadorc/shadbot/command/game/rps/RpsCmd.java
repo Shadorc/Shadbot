@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.rps;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -89,3 +90,4 @@ public class RpsCmd extends BaseCmd {
     }
 
 }
+*/

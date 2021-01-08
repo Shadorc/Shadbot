@@ -42,7 +42,7 @@ public class Settings extends SerializableEntity<SettingsBean> {
         if (blacklistedCmds.isEmpty()) {
             return true;
         }
-        return cmd.getNames().stream().noneMatch(blacklistedCmds::contains);
+        return !blacklistedCmds.contains(cmd.getName());
     }
 
     public boolean isTextChannelAllowed(Snowflake channelId) {

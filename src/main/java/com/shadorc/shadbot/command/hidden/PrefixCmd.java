@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.hidden;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -45,3 +46,4 @@ public class PrefixCmd extends BaseCmd {
                 .build();
     }
 }
+*/

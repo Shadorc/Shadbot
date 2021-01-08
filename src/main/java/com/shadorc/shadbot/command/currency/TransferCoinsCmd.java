@@ -8,43 +8,53 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.common.util.Snowflake;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class TransferCoinsCmd extends BaseCmd {
 
     public TransferCoinsCmd() {
-        super(CommandCategory.CURRENCY, List.of("transfer"));
+        super(CommandCategory.CURRENCY, "transfer", "Transfer coins to a user");
         this.setDefaultRateLimiter();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final List<String> args = context.requireArgs(2);
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("coins")
+                        .description("number of coins to transfer")
+                        .type(ApplicationCommandOptionType.INTEGER.getValue())
+                        .required(true)
+                        .build())
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("user")
+                        .description("user to transfer coins to")
+                        .type(ApplicationCommandOptionType.USER.getValue())
+                        .required(true)
+                        .build())
+                .build();
+    }
 
-        return context.getGuild()
-                .flatMapMany(guild -> DiscordUtils.extractMembers(guild, args.get(1)))
-                .next()
-                .switchIfEmpty(Mono.error(new CommandException("You cannot transfer coins to yourself.")))
+    @Override
+    public Mono<?> execute(Context context) {
+        return context.acknowledge()
+                .then(context.getOptionAsMember("user"))
                 .flatMap(receiverUser -> {
                     final Snowflake senderUserId = context.getAuthorId();
                     if (receiverUser.getId().equals(senderUserId)) {
                         return Mono.error(new CommandException("You cannot transfer coins to yourself."));
                     }
 
-                    final Long coins = NumberUtils.toPositiveLongOrNull(args.get(0));
-                    if (coins == null) {
-                        return Mono.error(new CommandException(String.format("`%s` is not a valid amount of coins.",
-                                args.get(0))));
+                    final int coins = context.getOptionAsInteger("coins").orElseThrow();
+                    if (coins <= 0) {
+                        return Mono.error(new CommandException(String.format("`%s` is not a valid amount of coins.", coins)));
                     }
 
                     if (coins > Config.MAX_COINS) {
@@ -63,31 +73,20 @@ public class TransferCoinsCmd extends BaseCmd {
 
                                 final DBMember dbReceiver = dbMembers.get(receiverUser.getId());
                                 if (dbReceiver.getCoins() + coins >= Config.MAX_COINS) {
-                                    return context.getChannel()
-                                            .flatMap(channel -> DiscordUtils.sendMessage(String.format(
-                                                    Emoji.BANK + " (**%s**) This transfer cannot be done because %s would " +
-                                                            "exceed the maximum coins cap.",
-                                                    context.getUsername(), receiverUser.getUsername()), channel));
+                                    return context.createFollowupMessage(
+                                            Emoji.BANK + " (**%s**) This transfer cannot be done because %s would " +
+                                                    "exceed the maximum coins cap.",
+                                            context.getAuthorName(), receiverUser.getUsername());
                                 }
 
                                 return dbSender.addCoins(-coins)
                                         .and(dbReceiver.addCoins(coins))
-                                        .then(context.getChannel())
-                                        .flatMap(channel -> DiscordUtils.sendMessage(
-                                                String.format(Emoji.BANK + " **%s** has transferred **%s** to **%s**.",
-                                                        context.getUsername(), FormatUtils.coins(coins),
-                                                        receiverUser.getUsername()), channel));
+                                        .then(context.createFollowupMessage(
+                                                Emoji.BANK + " **%s** has transferred **%s** to **%s**.",
+                                                context.getAuthorName(), FormatUtils.coins(coins),
+                                                receiverUser.getUsername()));
                             });
-                })
-                .then();
+                });
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Transfer coins to a user.")
-                .addArg("coins", false)
-                .addArg("@user", false)
-                .build();
-    }
 }

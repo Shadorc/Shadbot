@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.admin.member;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -75,7 +76,7 @@ public abstract class RemoveMemberCmd extends BaseCmd {
 
         return Mono.zip(context.getGuild(),
                 context.getChannel(),
-                context.getSelfAsMember(),
+                context.getSelfMember(),
                 context.getClient().getMemberById(context.getGuildId(), mentionUserId))
                 .filterWhen(tuple -> DiscordUtils.requirePermissions(tuple.getT2(), this.permission).thenReturn(true))
                 .filterWhen(tuple -> this.canInteract(tuple.getT2(), tuple.getT3(), context.getMember(), tuple.getT4()))
@@ -124,3 +125,4 @@ public abstract class RemoveMemberCmd extends BaseCmd {
     }
 
 }
+*/

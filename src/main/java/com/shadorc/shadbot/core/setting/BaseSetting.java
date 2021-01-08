@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.core.setting;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -36,3 +37,4 @@ public abstract class BaseSetting extends BaseCmd {
     public abstract Mono<ImmutableEmbedFieldData> show(Context context, Settings settings);
 
 }
+*/

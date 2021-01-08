@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.blackjack;
 
 import com.shadorc.shadbot.db.DatabaseManager;
@@ -98,3 +99,4 @@ public class BlackjackInputs extends Inputs {
     }
 
 }
+*/

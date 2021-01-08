@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.owner;
 
 import ch.qos.logback.classic.Level;
@@ -69,3 +70,4 @@ public class LoggerCmd extends BaseCmd {
     }
 
 }
+*/

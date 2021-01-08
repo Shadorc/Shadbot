@@ -1,0 +1,85 @@
+package com.shadorc.shadbot.core.command;
+
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.data.Telemetry;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.ExceptionHandler;
+import discord4j.core.event.domain.InteractionCreateEvent;
+import discord4j.core.object.entity.Guild;
+import reactor.bool.BooleanUtils;
+import reactor.core.publisher.Mono;
+
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
+
+public class CommandProcessor {
+
+    public static Mono<?> processEvent(InteractionCreateEvent event) {
+        return DatabaseManager.getGuilds()
+                .getDBGuild(event.getGuildId())
+                .flatMap(dbGuild -> CommandProcessor.processCommand(new Context(event, dbGuild)));
+    }
+
+    private static Mono<?> processCommand(Context context) {
+        return Mono.just(context.getAuthor())
+                // The role is allowed or the author is the guild's owner
+                .filterWhen(member -> BooleanUtils.or(
+                        member.getRoles().collectList().map(context.getDbGuild().getSettings()::hasAllowedRole),
+                        member.getGuild().map(Guild::getOwnerId).map(member.getId()::equals)))
+                // The channel is allowed
+                .filter(__ -> context.getDbGuild().getSettings().isTextChannelAllowed(context.getChannelId()))
+                // Execute the command
+                .flatMap(__ -> CommandProcessor.executeCommand(context));
+    }
+
+    private static Mono<?> executeCommand(Context context) {
+        final BaseCmd command = CommandManager.getInstance().getCommand(context.getCommandName());
+        // The command does not exist
+        if (command == null) {
+            DEFAULT_LOGGER.error("{Guild ID: {}} Command {} not found",
+                    context.getGuildId().asString(), context.getCommandName());
+            return Mono.empty();
+        }
+
+        // The command has been temporarily disabled by the bot's owner
+        if (!command.isEnabled()) {
+            return context.createFollowupMessage(
+                    Emoji.ACCESS_DENIED + " (**%s**) Sorry, this command is temporary disabled. " +
+                            "Do not hesitate to join the [support server](%s) if you have any questions.",
+                    context.getAuthorName(), Config.SUPPORT_SERVER_URL);
+        }
+
+        // This category is not allowed in this channel
+        if (!context.getDbGuild().getSettings().isCommandAllowedInChannel(command, context.getChannelId())) {
+            return Mono.empty();
+        }
+
+        // This command is not allowed to this role
+        if (!context.getDbGuild().getSettings().isCommandAllowedToRole(command, context.getAuthor().getRoleIds())) {
+            return Mono.empty();
+        }
+
+        Telemetry.COMMAND_USAGE_COUNTER.labels(command.getName()).inc();
+
+        return context.getPermissions()
+                .collectList()
+                // The author has the permission to execute this command
+                .filter(userPerms -> userPerms.contains(command.getPermission()))
+                .switchIfEmpty(context.createFollowupMessage(Emoji.ACCESS_DENIED
+                        + " (**%s**) You do not have the permission to execute this command.", context.getAuthorName())
+                        .then(Mono.empty()))
+                // The command is allowed in the guild and the user is not rate limited
+                .filter(__ -> context.getDbGuild().getSettings().isCommandAllowed(command)
+                        && !CommandProcessor.isRateLimited(context, command))
+                .flatMap(__ -> command.execute(context))
+                .onErrorResume(err -> ExceptionHandler.handleCommandError(err, command, context)
+                        .then(Mono.empty()));
+    }
+
+    private static boolean isRateLimited(Context context, BaseCmd cmd) {
+        return cmd.getRateLimiter()
+                .map(rateLimiter -> rateLimiter.isLimitedAndWarn(context.getChannelId(), context.getAuthor()))
+                .orElse(false);
+    }
+
+}

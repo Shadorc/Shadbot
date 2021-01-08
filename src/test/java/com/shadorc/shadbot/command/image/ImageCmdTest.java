@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.deviantart.Image;
@@ -23,8 +24,9 @@ public class ImageCmdTest extends CmdTest<ImageCmd> {
     @Test
     public void testGetPopularImageSpecial() {
         final Image result = this.invoke(
-                "getPopularImage", NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/"));
+                "getPopularImage", NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+*-/"));
         assertNull(result);
     }
 
 }
+*/

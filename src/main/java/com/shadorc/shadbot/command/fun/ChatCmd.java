@@ -8,18 +8,17 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.common.util.Snowflake;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
@@ -35,38 +34,48 @@ public class ChatCmd extends BaseCmd {
     private final Map<Snowflake, String> channelsCustid;
 
     public ChatCmd() {
-        super(CommandCategory.FUN, List.of("chat"));
+        super(CommandCategory.FUN, "chat", "Chat with an artificial intelligence");
         this.setDefaultRateLimiter();
 
         this.channelsCustid = new ConcurrentHashMap<>();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final String arg = context.requireArg();
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("message")
+                        .description(String.format("the message to send, must not exceed %d characters", MAX_CHARACTERS))
+                        .type(ApplicationCommandOptionType.STRING.getValue())
+                        .required(true)
+                        .build())
+                .build();
+    }
 
-        if (arg.length() > MAX_CHARACTERS) {
+    @Override
+    public Mono<?> execute(Context context) {
+        final String message = context.getOption("message").orElseThrow();
+        if (message.length() > MAX_CHARACTERS) {
             return Mono.error(new CommandException(String.format("The message must not exceed **%d characters**.",
                     MAX_CHARACTERS)));
         }
 
-        return this.getResponse(context.getChannelId(), arg)
-                .flatMap(response -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(Emoji.SPEECH + " " + response, channel)))
-                .then();
+        return context.acknowledge()
+                .then(this.getResponse(context.getChannelId(), message))
+                .flatMap(response -> context.createFollowupMessage(Emoji.SPEECH + " " + response));
     }
 
-    private Mono<String> getResponse(Snowflake channelId, String input) {
+    private Mono<String> getResponse(Snowflake channelId, String message) {
         return Flux.fromIterable(BOTS.entrySet())
-                .flatMap(bot -> Mono.defer(() -> this.talk(channelId, bot.getValue(), input)
+                .flatMap(bot -> Mono.defer(() -> this.talk(channelId, bot.getValue(), message)
                         .map(response -> String.format("**%s**: %s", bot.getKey(), response))))
                 .takeUntil(str -> !str.isBlank())
                 .next();
     }
 
-    private Mono<String> talk(Snowflake channelId, String botId, String input) {
+    private Mono<String> talk(Snowflake channelId, String botId, String message) {
         final String url = String.format("%s?botid=%s&input=%s&custid=%s",
-                HOME_URl, botId, NetUtils.encode(input), this.channelsCustid.getOrDefault(channelId, ""));
+                HOME_URl, botId, NetUtils.encode(message), this.channelsCustid.getOrDefault(channelId, ""));
 
         return RequestHelper.fromUrl(url)
                 .to(ChatBotResponse.class)
@@ -78,17 +87,4 @@ public class ChatCmd extends BaseCmd {
                                 this.getClass().getSimpleName(), botId)));
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Chat with an artificial intelligence.")
-                .addArg("message", String.format("must not exceed %d characters", MAX_CHARACTERS), false)
-                .setSource("""
-                        https://www.pandorabots.com/
-                        **Marvin** (ID: efc39100ce34d038)
-                        **Chomsky** (ID: b0dafd24ee35a477)
-                        **R.I.V.K.A** (ID: ea373c261e3458c6)
-                        **Lisa** (ID: b0a6a41a5e345c23)""")
-                .build();
-    }
 }

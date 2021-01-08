@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
@@ -42,4 +43,4 @@ public class NameCmd extends BaseCmd {
                 .setDescription("Show current music name.")
                 .build();
     }
-}
+}*/

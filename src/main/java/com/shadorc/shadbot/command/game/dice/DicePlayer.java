@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.dice;
 
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
@@ -17,3 +18,4 @@ public class DicePlayer extends GamblerPlayer {
     }
 
 }
+*/

@@ -1,9 +1,9 @@
+/*
 package com.shadorc.shadbot.command.info;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
@@ -11,6 +11,10 @@ import com.shadorc.shadbot.utils.TimeUtils;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
@@ -25,23 +29,34 @@ public class UserInfoCmd extends BaseCmd {
     private final DateTimeFormatter dateFormatter;
 
     public UserInfoCmd() {
-        super(CommandCategory.INFO, List.of("user_info"));
+        super(CommandCategory.INFO, "user_info", "Show info about a user");
         this.setDefaultRateLimiter();
 
         this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("user")
+                        .description("if not specified, it will show your info")
+                        .type(ApplicationCommandOptionType.USER.getValue())
+                        .required(false)
+                        .build())
+                .build();
+    }
+
+    @Override
+    public Mono<?> execute(Context context) {
         final Mono<Member> getMemberOrAuthor = context.getGuild()
                 .flatMap(guild -> DiscordUtils.extractMemberOrAuthor(guild, context.getMessage()))
                 .cache();
 
         return Mono.zip(getMemberOrAuthor, getMemberOrAuthor.flatMapMany(Member::getRoles).collectList())
-                .map(TupleUtils.function((user, roles) -> this.getEmbed(user, roles, context.getAvatarUrl())))
+                .map(TupleUtils.function((user, roles) -> this.getEmbed(user, roles, context.getAuthorAvatarUrl())))
                 .flatMap(embed -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
-                .then();
+                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)));
     }
 
     private Consumer<EmbedCreateSpec> getEmbed(Member member, List<Role> roles, String avatarUrl) {
@@ -76,12 +91,5 @@ public class UserInfoCmd extends BaseCmd {
                 });
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show info about a user.")
-                .addArg("@user", "if not specified, it will show your info", true)
-                .build();
-    }
-
 }
+*/

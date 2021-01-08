@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.russianroulette;
 
 class Constants {
@@ -10,3 +11,4 @@ class Constants {
     protected static final int MAX_GAINS = 250;
 
 }
+*/

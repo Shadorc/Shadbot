@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.fun;
 
 import com.fasterxml.jackson.databind.JavaType;
@@ -28,19 +29,19 @@ public class DtcCmd extends BaseCmd {
             HOME_URL, CredentialManager.getInstance().get(Credential.DTC_API_KEY));
 
     public DtcCmd() {
-        super(CommandCategory.FUN, List.of("dtc"));
+        super(CommandCategory.FUN, "dtc", "Show a random quote from DansTonChat.com");
         this.setDefaultRateLimiter();
     }
 
     @Override
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading quote...", context.getUsername()))
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading quote...", context.getAuthorName()))
                 .send()
                 .then(DtcCmd.getRandomQuote())
                 .map(quote -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
                         .andThen(embed -> embed.setAuthor("Quote DansTonChat",
-                                String.format("https://danstonchat.com/%s.html", quote.getId()), context.getAvatarUrl())
+                                String.format("https://danstonchat.com/%s.html", quote.getId()), context.getAuthorAvatarUrl())
                                 .setThumbnail("https://i.imgur.com/5YvTlAA.png")
                                 .setDescription(this.formatContent(quote.getContent())))))
                 .flatMap(UpdatableMessage::send)
@@ -83,3 +84,4 @@ public class DtcCmd extends BaseCmd {
                 .build();
     }
 }
+*/

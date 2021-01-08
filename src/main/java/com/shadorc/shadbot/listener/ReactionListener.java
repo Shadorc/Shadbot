@@ -1,6 +1,6 @@
+/*
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.command.admin.IamCmd;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
@@ -116,3 +116,4 @@ public class ReactionListener {
     }
 
 }
+*/

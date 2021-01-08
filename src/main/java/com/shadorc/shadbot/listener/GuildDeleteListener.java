@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.db.DatabaseManager;
@@ -35,3 +36,4 @@ public class GuildDeleteListener implements EventListener<GuildDeleteEvent> {
     }
 
 }
+*/

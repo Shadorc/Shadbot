@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -50,3 +51,4 @@ public class GenerateRelicCmd extends BaseCmd {
                 .build();
     }
 }
+*/

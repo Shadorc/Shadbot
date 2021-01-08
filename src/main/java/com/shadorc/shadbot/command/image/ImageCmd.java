@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.TokenResponse;
@@ -115,3 +116,4 @@ public class ImageCmd extends BaseCmd {
                 .build();
     }
 }
+*/

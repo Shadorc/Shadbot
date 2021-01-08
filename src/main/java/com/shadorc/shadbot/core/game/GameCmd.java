@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.core.game;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -26,3 +27,4 @@ public abstract class GameCmd<T extends Game<?>> extends BaseCmd {
         return this.managers;
     }
 }
+*/

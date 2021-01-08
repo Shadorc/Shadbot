@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.api.json.urbandictionary.UrbanDefinition;
@@ -20,8 +21,9 @@ public class UrbanCmdTest extends CmdTest<UrbanCmd> {
     @Test
     public void testGetUrbanDefinitionSpecial() {
         final UrbanDefinition result = this.invoke(
-                "getUrbanDefinition", "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/");
+                "getUrbanDefinition", "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+*-/");
         assertNotNull(result);
     }
 
 }
+*/

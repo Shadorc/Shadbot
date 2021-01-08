@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.fortnite.FortniteResponse;
@@ -108,3 +109,4 @@ public class FortniteCmd extends BaseCmd {
     }
 
 }
+*/

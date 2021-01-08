@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -61,3 +62,4 @@ public class BackwardCmd extends BaseCmd {
                 .build();
     }
 }
+*/

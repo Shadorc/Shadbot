@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.api.ServerAccessException;
@@ -94,3 +95,4 @@ public class UrbanCmd extends BaseCmd {
     }
 
 }
+*/

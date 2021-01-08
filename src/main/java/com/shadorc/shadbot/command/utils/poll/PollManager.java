@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.utils.poll;
 
 import com.shadorc.shadbot.core.command.Context;
@@ -129,4 +130,4 @@ public class PollManager {
                 .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel));
     }
 
-}
+}*/

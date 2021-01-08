@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.trivia;
 
 import com.shadorc.shadbot.object.Emoji;
@@ -83,3 +84,4 @@ public class TriviaInputs extends Inputs {
     }
 
 }
+*/

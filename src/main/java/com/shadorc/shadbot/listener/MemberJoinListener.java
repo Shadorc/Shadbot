@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
@@ -28,8 +27,7 @@ public class MemberJoinListener implements EventListener<MemberJoinEvent> {
     public Mono<?> execute(MemberJoinEvent event) {
         // Send an automatic join message if one was configured
         final Mono<Message> sendWelcomeMessage = DatabaseManager.getGuilds()
-                .getDBGuild(event.getGuildId())
-                .map(DBGuild::getSettings)
+                .getSettings(event.getGuildId())
                 .flatMap(settings -> Mono.zip(
                         Mono.justOrEmpty(settings.getMessageChannelId()),
                         Mono.justOrEmpty(settings.getJoinMessage())))
@@ -41,9 +39,7 @@ public class MemberJoinListener implements EventListener<MemberJoinEvent> {
                 .flatMap(Guild::getSelfMember)
                 .flatMapMany(self -> self.getBasePermissions()
                         .filter(permissions -> permissions.contains(Permission.MANAGE_ROLES))
-                        .flatMap(ignored -> DatabaseManager.getGuilds()
-                                .getDBGuild(event.getGuildId())
-                                .map(DBGuild::getSettings))
+                        .flatMap(ignored -> DatabaseManager.getGuilds().getSettings(event.getGuildId()))
                         .flatMapMany(settings -> Flux.fromIterable(settings.getAutoRoleIds())
                                 .flatMap(roleId -> event.getClient().getRoleById(event.getGuildId(), roleId))
                                 .filterWhen(role -> self.hasHigherRoles(Set.of(role.getId())))

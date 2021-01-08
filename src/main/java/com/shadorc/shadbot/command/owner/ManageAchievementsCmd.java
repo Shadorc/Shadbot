@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -74,3 +75,4 @@ public class ManageAchievementsCmd extends BaseCmd {
                 .build();
     }
 }
+*/

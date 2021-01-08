@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.roulette;
 
 import com.shadorc.shadbot.command.game.roulette.RouletteCmd.Place;
@@ -131,4 +132,4 @@ public class RouletteGame extends MultiplayerGame<RouletteCmd, RoulettePlayer> {
                 .then();
     }
 
-}
+}*/

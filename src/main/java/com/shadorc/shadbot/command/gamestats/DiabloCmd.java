@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.ServerAccessException;
@@ -128,11 +129,13 @@ public class DiabloCmd extends BaseCmd {
                 || TimeUtils.getMillisUntil(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(this.token.getExpiresIn());
     }
 
-    /**
-     * Requests to update the Blizzard token, if expired.
-     *
-     * @return A {@link Mono} that completes once the token has been successfully updated, if expired.
-     */
+    */
+/**
+ * Requests to update the Blizzard token, if expired.
+ *
+ * @return A {@link Mono} that completes once the token has been successfully updated, if expired.
+ *//*
+
     private Mono<Void> requestAccessToken() {
         final Mono<TokenResponse> requestAccessToken = RequestHelper.fromUrl(ACCESS_TOKEN_URL)
                 .to(TokenResponse.class)
@@ -159,3 +162,4 @@ public class DiabloCmd extends BaseCmd {
     }
 
 }
+*/

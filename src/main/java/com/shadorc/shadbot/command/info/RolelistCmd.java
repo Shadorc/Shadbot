@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.info;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -84,3 +85,4 @@ public class RolelistCmd extends BaseCmd {
     }
 
 }
+*/

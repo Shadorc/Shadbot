@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.api.json.wikipedia.WikipediaPage;
@@ -94,3 +95,4 @@ public class WikipediaCmd extends BaseCmd {
     }
 
 }
+*/

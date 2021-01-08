@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.russianroulette;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -94,3 +95,4 @@ public class RussianRouletteCmd extends BaseCmd {
                 .build();
     }
 }
+*/

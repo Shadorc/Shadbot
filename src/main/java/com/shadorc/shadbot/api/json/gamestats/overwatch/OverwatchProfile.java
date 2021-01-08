@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.api.json.gamestats.overwatch;
 
 import com.shadorc.shadbot.api.json.gamestats.overwatch.profile.ProfileResponse;
@@ -38,3 +39,4 @@ public class OverwatchProfile {
                 '}';
     }
 }
+*/

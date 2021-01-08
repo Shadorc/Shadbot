@@ -7,6 +7,7 @@ import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.guilds.bean.DBGuildBean;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
+import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.common.util.Snowflake;
@@ -46,6 +47,11 @@ public class GuildsCollection extends DatabaseCollection {
                 })
                 .defaultIfEmpty(new DBGuild(guildId))
                 .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+    }
+
+    public Mono<Settings> getSettings(Snowflake guildId) {
+        return this.getDBGuild(guildId)
+                .map(DBGuild::getSettings);
     }
 
     public Mono<DBMember> getDBMember(Snowflake guildId, Snowflake memberId) {

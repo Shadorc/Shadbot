@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.utils.poll;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -154,3 +155,4 @@ public class PollCmd extends BaseCmd {
         return this.managers;
     }
 }
+*/

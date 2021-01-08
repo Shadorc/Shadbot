@@ -25,7 +25,7 @@ public class CommandHelpBuilder extends HelpBuilder {
     }
 
     public CommandHelpBuilder setUsage(String usage) {
-        this.setFullUsage(String.format("%s%s %s", this.context.getPrefix(), this.cmd.getName(), usage));
+        this.setFullUsage(String.format("/%s %s", this.cmd.getName(), usage));
         return this;
     }
 
@@ -38,9 +38,9 @@ public class CommandHelpBuilder extends HelpBuilder {
     public Consumer<EmbedCreateSpec> build() {
         this.setAuthor(String.format("Help for command: %s", this.cmd.getName()),
                 "https://github.com/Shadorc/Shadbot/wiki/Commands");
-        this.cmd.getAlias()
+      /*  this.cmd.getAlias()
                 .filter(alias -> !alias.isBlank())
-                .ifPresent(alias -> this.setFooter(String.format("Alias: %s", alias)));
+                .ifPresent(alias -> this.setFooter(String.format("Alias: %s", alias)));*/
 
         return super.build();
     }

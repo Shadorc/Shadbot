@@ -220,12 +220,12 @@ public class DiscordUtils {
      * connect and speak.
      */
     public static Mono<VoiceChannel> requireVoiceChannel(Context context) {
-        final Mono<Optional<Snowflake>> getBotVoiceChannelId = context.getSelfAsMember()
+        final Mono<Optional<Snowflake>> getBotVoiceChannelId = context.getSelfMember()
                 .flatMap(Member::getVoiceState)
                 .map(VoiceState::getChannelId)
                 .defaultIfEmpty(Optional.empty());
 
-        final Mono<Optional<Snowflake>> getUserVoiceChannelId = context.getMember()
+        final Mono<Optional<Snowflake>> getUserVoiceChannelId = context.getAuthor()
                 .getVoiceState()
                 .map(VoiceState::getChannelId)
                 .defaultIfEmpty(Optional.empty());

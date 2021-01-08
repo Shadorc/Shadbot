@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.rps;
 
 import com.shadorc.shadbot.core.game.player.Player;
@@ -19,3 +20,4 @@ public class RpsPlayer extends Player {
     }
 
 }
+*/

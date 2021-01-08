@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.wallhaven.WallhavenResponse;
@@ -94,4 +95,4 @@ public class WallpaperCmd extends BaseCmd {
                 .setSource("https://wallhaven.cc/")
                 .build();
     }
-}
+}*/

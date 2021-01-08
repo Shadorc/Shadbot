@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.admin.member;
 
 import com.shadorc.shadbot.core.command.Context;
@@ -30,3 +31,4 @@ public class KickCmd extends RemoveMemberCmd {
     }
 
 }
+*/

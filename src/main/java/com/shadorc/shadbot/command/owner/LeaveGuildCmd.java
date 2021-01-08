@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -53,3 +54,4 @@ public class LeaveGuildCmd extends BaseCmd {
     }
 
 }
+*/

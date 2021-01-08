@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.steam.player.PlayerSummaries;
@@ -58,9 +59,13 @@ public class CounterStrikeCmd extends BaseCmd {
                 .then();
     }
 
-    /**
-     * @return The identificator, either directly provided or extracted from an URL.
-     */
+    */
+/**
+ * @return The identificator, either directly provided or extracted from an URL.
+ * @return The identificator converted as an ID or empty if not found.
+ * @return The {@link PlayerSummary} corresponding to the provided steam ID.
+ *//*
+
     private static String getIdentificator(String arg) {
         // The user provided an URL that can contains a pseudo or an ID
         if (arg.contains("/")) {
@@ -74,9 +79,11 @@ public class CounterStrikeCmd extends BaseCmd {
         }
     }
 
-    /**
-     * @return The identificator converted as an ID or empty if not found.
-     */
+    */
+/**
+ * @return The identificator converted as an ID or empty if not found.
+ *//*
+
     private static Mono<String> getSteamId(String identificator) {
         // The user directly provided the ID
         if (NumberUtils.isPositiveLong(identificator)) {
@@ -94,9 +101,11 @@ public class CounterStrikeCmd extends BaseCmd {
         }
     }
 
-    /**
-     * @return The {@link PlayerSummary} corresponding to the provided steam ID.
-     */
+    */
+/**
+ * @return The {@link PlayerSummary} corresponding to the provided steam ID.
+ *//*
+
     private static Mono<PlayerSummary> getPlayerSummary(String steamId) {
         final String url = String.format("%s?key=%s&steamids=%s",
                 PLAYER_SUMMARIES_URL, CredentialManager.getInstance().get(Credential.STEAM_API_KEY), steamId);
@@ -186,3 +195,4 @@ public class CounterStrikeCmd extends BaseCmd {
                 .build();
     }
 }
+*/

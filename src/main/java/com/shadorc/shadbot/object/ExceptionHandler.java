@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.object;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.command.MissingArgumentException;
 import com.shadorc.shadbot.command.MissingPermissionException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.Context;
@@ -10,9 +9,7 @@ import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
@@ -25,22 +22,24 @@ public class ExceptionHandler {
         if (err instanceof MissingPermissionException) {
             return ExceptionHandler.onMissingPermissionException((MissingPermissionException) err, context);
         }
-        if (err instanceof MissingArgumentException) {
+/*        if (err instanceof MissingArgumentException) {
             return ExceptionHandler.onMissingArgumentException(cmd, context);
-        }
+        }*/
         if (err instanceof NoMusicException) {
             return ExceptionHandler.onNoMusicException(context);
         }
-        if (err instanceof TimeoutException || err instanceof IOException) {
+/*        if (err instanceof TimeoutException || err instanceof IOException) {
             return ExceptionHandler.onServerAccessError(err, cmd, context);
-        }
-        return ExceptionHandler.onUnknown(err, cmd, context);
+        }*/
+//        return ExceptionHandler.onUnknown(err, cmd, context);
+        ExceptionHandler.handleUnknownError(err);
+        return Mono.empty();
     }
 
     private static Mono<?> onCommandException(CommandException err, Context context) {
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION + " (**%s**) %s",
-                        context.getUsername(), err.getMessage()), channel));
+                        context.getAuthorName(), err.getMessage()), channel));
     }
 
     private static Mono<?> onMissingPermissionException(MissingPermissionException err, Context context) {
@@ -50,25 +49,25 @@ public class ExceptionHandler {
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         String.format(Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of "
                                         + "permission.%nPlease, check my permissions and channel-specific "
-                                        + "ones to verify that %s is checked.", context.getUsername(),
+                                        + "ones to verify that %s is checked.", context.getAuthorName(),
                                 String.format("**%s**", FormatUtils.capitalizeEnum(err.getPermission()))), channel));
     }
 
-    private static Mono<?> onMissingArgumentException(BaseCmd cmd, Context context) {
+/*    private static Mono<?> onMissingArgumentException(BaseCmd cmd, Context context) {
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         Emoji.WHITE_FLAG + " Some arguments are missing, here is the help for this command.",
                         cmd.getHelp(context), channel));
-    }
+    }*/
 
     private static Mono<?> onNoMusicException(Context context) {
         return context.getChannel()
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         String.format(Emoji.MUTE + " (**%s**) No currently playing music.",
-                                context.getUsername()), channel));
+                                context.getAuthorName()), channel));
     }
 
-    private static Mono<?> onServerAccessError(Throwable err, BaseCmd cmd, Context context) {
+/*    private static Mono<?> onServerAccessError(Throwable err, BaseCmd cmd, Context context) {
         final Throwable cause = err.getCause() != null ? err.getCause() : err;
         DEFAULT_LOGGER.warn("{Guild ID: {}} [{}] Server access error on input '{}'. {}: {}",
                 context.getGuildId().asLong(), cmd.getClass().getSimpleName(), context.getContent(),
@@ -78,9 +77,10 @@ public class ExceptionHandler {
                         String.format(Emoji.RED_FLAG + " (**%s**) Mmmh... The web service related to the `%s%s` "
                                         + "command is not available right now... This is not my fault, I promise !"
                                         + " Try again later.",
-                                context.getUsername(), context.getPrefix(), context.getCommandName()), channel));
-    }
+                                context.getAuthorName(), context.getPrefix(), context.getCommandName()), channel));
+    }*/
 
+/*
     private static Mono<?> onUnknown(Throwable err, BaseCmd cmd, Context context) {
         DEFAULT_LOGGER.error(String.format("{Guild ID: %d} [%s] An unknown error occurred (input: %s): %s",
                 context.getGuildId().asLong(), cmd.getClass().getSimpleName(), context.getContent(),
@@ -92,6 +92,7 @@ public class ExceptionHandler {
                                         "executing `%s%s`. My developer has been warned.",
                                 context.getUsername(), context.getPrefix(), context.getCommandName()), channel));
     }
+*/
 
     public static void handleUnknownError(Throwable err) {
         DEFAULT_LOGGER.error(String.format("An unknown error occurred: %s",

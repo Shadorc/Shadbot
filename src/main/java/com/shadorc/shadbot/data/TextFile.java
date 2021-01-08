@@ -39,7 +39,6 @@ public class TextFile {
 
     public String getRandomLineFormatted() {
         return Objects.requireNonNull(RandUtils.randValue(this.lines))
-                .replace("{default_prefix}", Config.DEFAULT_PREFIX)
                 .replace("{patreon_url}", Config.PATREON_URL)
                 .replace("{support_server_url}", Config.SUPPORT_SERVER_URL);
     }

@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.slotmachine;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -95,4 +96,4 @@ public class SlotMachineCmd extends BaseCmd {
                 .build();
     }
 
-}
+}*/

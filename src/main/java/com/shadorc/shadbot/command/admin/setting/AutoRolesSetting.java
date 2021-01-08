@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.admin.setting;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -100,7 +101,7 @@ public class AutoRolesSetting extends BaseSetting {
             return context.getChannel()
                     .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.MANAGE_ROLES)
                             .thenReturn(roles.stream().map(Role::getId).collect(Collectors.toSet()))
-                            .flatMap(roleIds -> context.getSelfAsMember()
+                            .flatMap(roleIds -> context.getSelfMember()
                                     .filterWhen(self -> self.hasHigherRoles(roleIds))
                                     .switchIfEmpty(DiscordUtils.sendMessage(Emoji.WARNING +
                                             " I can't automatically add this role because I'm lower or " +
@@ -121,3 +122,4 @@ public class AutoRolesSetting extends BaseSetting {
     }
 
 }
+*/

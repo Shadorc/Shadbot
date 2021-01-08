@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.info;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -5,26 +6,24 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class InviteCmd extends BaseCmd {
 
     public InviteCmd() {
-        super(CommandCategory.INFO, List.of("invite", "support", "donate", "donation", "link", "links"));
+        super(CommandCategory.INFO, "invite", "Explain how to invite the bot in a server");
         this.setDefaultRateLimiter();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
+    public Mono<?> execute(Context context) {
         final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
-                .andThen(embed -> embed.setAuthor("Links", Config.INVITE_URL, context.getAvatarUrl())
+                .andThen(embed -> embed.setAuthor("Links", Config.INVITE_URL, context.getAuthorAvatarUrl())
                         .setDescription("I'm glad you're willing to invite **Shadbot** in your own server, thank you!" +
                                 "\nHere are some useful links for you." +
                                 "\nIf you have any questions or issues, **do not hesitate to join the Support Server and ask!**" +
@@ -35,14 +34,8 @@ public class InviteCmd extends BaseCmd {
                         .addField("Donation", Config.PATREON_URL, false));
 
         return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
-                .then();
+                .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel));
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Explain how to invite Shadbot in a server.")
-                .build();
-    }
 }
+*/

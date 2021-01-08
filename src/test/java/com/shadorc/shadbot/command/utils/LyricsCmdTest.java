@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.api.html.musixmatch.Musixmatch;
@@ -22,8 +23,9 @@ public class LyricsCmdTest extends CmdTest<LyricsCmd> {
     @Test
     public void testGetMusixmatchSpecial() {
         final Musixmatch result = this.invoke(
-                "getMusixmatch", "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/");
+                "getMusixmatch", "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+*-/");
         assertNull(result);
     }
 
 }
+*/

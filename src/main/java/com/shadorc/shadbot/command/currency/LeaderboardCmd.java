@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.currency;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -6,25 +7,21 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.object.entity.User;
-import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import java.util.Comparator;
-import java.util.List;
-import java.util.function.Consumer;
 
 public class LeaderboardCmd extends BaseCmd {
 
     private static final int USER_COUNT = 10;
 
     public LeaderboardCmd() {
-        super(CommandCategory.CURRENCY, List.of("leaderboard"));
+        super(CommandCategory.CURRENCY, "leaderboard", "Show coins leaderboard for this server");
         this.setDefaultRateLimiter();
     }
 
@@ -52,17 +49,12 @@ public class LeaderboardCmd extends BaseCmd {
                             });
                 })
                 .map(description -> ShadbotUtils.getDefaultEmbed()
-                        .andThen(embed -> embed.setAuthor("Leaderboard", null, context.getAvatarUrl())
+                        .andThen(embed -> embed.setAuthor("Leaderboard", null, context.getAuthorAvatarUrl())
                                 .setDescription(description)))
                 .flatMap(embed -> context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
                 .then();
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show coins leaderboard for this server.")
-                .build();
-    }
 }
+*/

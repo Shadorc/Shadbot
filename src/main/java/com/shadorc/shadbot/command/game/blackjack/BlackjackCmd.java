@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.blackjack;
 
 import com.shadorc.shadbot.core.command.Context;
@@ -70,3 +71,4 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
                 .build();
     }
 }
+*/

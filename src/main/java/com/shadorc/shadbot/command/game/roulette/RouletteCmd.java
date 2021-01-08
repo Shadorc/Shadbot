@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.roulette;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -82,3 +83,4 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                 .build();
     }
 }
+*/

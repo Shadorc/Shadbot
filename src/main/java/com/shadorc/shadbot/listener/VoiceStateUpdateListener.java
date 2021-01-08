@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.data.Telemetry;
@@ -32,11 +33,11 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
             LOGGER.trace("{Guild ID: {}} Voice state update event: {}", guildId.asLong(), event);
             if (event.isLeaveEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel left", guildId.asLong());
-                return Mono.fromRunnable(Telemetry.VOICE_COUNT_GAUGE::dec)
-                        .and(MusicManager.getInstance().destroyConnection(guildId));
+                Telemetry.VOICE_COUNT_GAUGE.dec();
+                return MusicManager.getInstance().destroyConnection(guildId);
             } else if (event.isJoinEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asLong());
-                return Mono.fromRunnable(Telemetry.VOICE_COUNT_GAUGE::inc);
+                Telemetry.VOICE_COUNT_GAUGE.inc();
             } else if (event.isMoveEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel moved", guildId.asLong());
             }
@@ -88,3 +89,4 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
     }
 
 }
+*/

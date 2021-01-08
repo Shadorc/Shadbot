@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.steam.player.PlayerSummary;
@@ -27,7 +28,7 @@ public class CounterStrikeCmdTest extends CmdTest<CounterStrikeCmd> {
         assertEquals("76561198040113951", this.invoke("getSteamId", "shadorc"));
         assertNull(this.invoke("getSteamId", "-76561198040113951"));
         assertNull(this.invoke("getSteamId", "thisuser_does_not_exist"));
-        assertNull(this.invoke("getSteamId", "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/"));
+        assertNull(this.invoke("getSteamId", "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+*-/"));
         assertNull(this.invoke("getSteamId", "*"));
     }
 
@@ -41,3 +42,4 @@ public class CounterStrikeCmdTest extends CmdTest<CounterStrikeCmd> {
     }
 
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.object.help;
 
 import com.shadorc.shadbot.core.command.Context;
@@ -33,3 +34,4 @@ public class SettingHelpBuilder extends HelpBuilder {
         return super.build();
     }
 }
+*/

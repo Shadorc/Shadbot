@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.fun;
 
 import com.shadorc.shadbot.api.json.joke.JokeResponse;
@@ -14,7 +15,6 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class JokeCmd extends BaseCmd {
@@ -22,18 +22,18 @@ public class JokeCmd extends BaseCmd {
     private static final String HOME_URL = "https://icanhazdadjoke.com/";
 
     public JokeCmd() {
-        super(CommandCategory.FUN, List.of("joke"));
+        super(CommandCategory.FUN, "joke", "Show a random joke");
         this.setDefaultRateLimiter();
     }
 
     @Override
     public Mono<Void> execute(Context context) {
         final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading joke...", context.getUsername()))
+        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading joke...", context.getAuthorName()))
                 .send()
                 .then(JokeCmd.getRandomJoke())
                 .map(joke -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
-                        .andThen(embed -> embed.setAuthor("Joke", HOME_URL, context.getAvatarUrl())
+                        .andThen(embed -> embed.setAuthor("Joke", HOME_URL, context.getAuthorAvatarUrl())
                                 .setDescription(joke))))
                 .flatMap(UpdatableMessage::send)
                 .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
@@ -55,3 +55,4 @@ public class JokeCmd extends BaseCmd {
                 .build();
     }
 }
+*/

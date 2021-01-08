@@ -53,8 +53,7 @@ public class ShadbotUtils {
      * @return A random status update showing "Playing {prefix}help | {tip}"
      */
     public static StatusUpdate getRandomStatus() {
-        final String presence = String.format("%shelp | %s", Config.DEFAULT_PREFIX,
-                TIPS.getRandomLineFormatted());
+        final String presence = String.format("/help | %s", TIPS.getRandomLineFormatted());
         return Presence.online(Activity.playing(presence));
     }
 

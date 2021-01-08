@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.hangman;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -93,3 +94,4 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                 .build();
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
@@ -71,21 +72,25 @@ public class MusicManager {
         }
     }
 
-    /**
+    */
+/**
      * Schedules loading a track or playlist with the specified identifier. Items loaded with the same
      * guild ID are handled sequentially in the order of calls to this method.
      *
      * @return A future for this operation.
-     */
+     *//*
+
     protected Future<Void> loadItemOrdered(long guildId, String identifier, AudioLoadResultHandler listener) {
         return this.audioPlayerManager.loadItemOrdered(guildId, identifier, listener);
     }
 
-    /**
+    */
+/**
      * Gets the {@link GuildMusic} corresponding to the provided {@code guildId}. If there is none,
      * a new one is created and a request to join the {@link VoiceChannel} corresponding to the provided
      * {@code voiceChannelId} is sent.
-     */
+     *//*
+
     public Mono<GuildMusic> getOrCreate(GatewayDiscordClient gateway, Snowflake guildId, Snowflake voiceChannelId) {
         return Mono.justOrEmpty(this.getGuildMusic(guildId))
                 .switchIfEmpty(Mono.defer(() -> {
@@ -106,9 +111,11 @@ public class MusicManager {
                 }));
     }
 
-    /**
+    */
+/**
      * Requests to join a voice channel.
-     */
+     *//*
+
     private Mono<VoiceConnection> joinVoiceChannel(GatewayDiscordClient gateway, Snowflake guildId, Snowflake voiceChannelId,
                                                    AudioProvider audioProvider) {
         // Do not join the voice channel if the bot is already joining one
@@ -158,3 +165,4 @@ public class MusicManager {
         return MusicManager.instance;
     }
 }
+*/

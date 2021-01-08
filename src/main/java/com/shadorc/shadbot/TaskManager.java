@@ -1,8 +1,6 @@
 package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
-import com.shadorc.shadbot.cache.CacheManager;
-import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtils;
@@ -47,14 +45,14 @@ public class TaskManager {
         this.tasks.add(task);
     }
 
-    public void scheduleLottery(GatewayDiscordClient gateway) {
+/*    public void scheduleLottery(GatewayDiscordClient gateway) {
         LOGGER.info("Starting lottery (next draw in {})", FormatUtils.formatDurationWords(LotteryCmd.getDelay()));
         final Disposable task = Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), DEFAULT_SCHEDULER)
                 .flatMap(ignored -> LotteryCmd.draw(gateway))
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
         this.tasks.add(task);
-    }
+    }*/
 
     public void schedulePeriodicStats(GatewayDiscordClient gateway) {
         LOGGER.info("Scheduling periodic stats log");
@@ -68,13 +66,14 @@ public class TaskManager {
                 .collectMap(Tuple2::getT1, Tuple2::getT2);
 
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(15), DEFAULT_SCHEDULER)
-                .doOnNext(ignored -> {
+                .then(gateway.getGuilds().count())
+                .doOnNext(guildCount -> {
                     Telemetry.RAM_USAGE_GAUGE.set(ProcessUtils.getMemoryUsed());
                     Telemetry.CPU_USAGE_GAUGE.set(ProcessUtils.getCpuUsage());
                     Telemetry.THREAD_COUNT_GAUGE.set(Thread.activeCount());
                     Telemetry.GC_COUNT_GAUGE.set(ProcessUtils.getGCCount());
                     Telemetry.GC_TIME_GAUGE.set(ProcessUtils.getGCTime());
-                    Telemetry.GUILD_COUNT_GAUGE.set(CacheManager.getInstance().getGuildOwnersCache().count());
+                    Telemetry.GUILD_COUNT_GAUGE.set(guildCount);
                 })
                 .flatMap(ignored -> getResponseTimes)
                 .doOnNext(responseTimeMap -> responseTimeMap

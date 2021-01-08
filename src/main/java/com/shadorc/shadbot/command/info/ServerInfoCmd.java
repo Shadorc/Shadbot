@@ -1,9 +1,9 @@
+/*
 package com.shadorc.shadbot.command.info;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
@@ -30,24 +30,23 @@ public class ServerInfoCmd extends BaseCmd {
     private final DateTimeFormatter dateFormatter;
 
     public ServerInfoCmd() {
-        super(CommandCategory.INFO, List.of("server_info"));
+        super(CommandCategory.INFO, "server_info", "Show info about this server.");
         this.setDefaultRateLimiter();
 
         this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy - HH'h'mm", Locale.ENGLISH);
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
+    public Mono<?> execute(Context context) {
         final Mono<Guild> getGuild = context.getGuild().cache();
         return Mono.zip(getGuild,
                 getGuild.flatMapMany(Guild::getChannels).collectList(),
                 getGuild.flatMap(Guild::getOwner),
                 getGuild.flatMap(Guild::getRegion),
-                Mono.just(context.getAvatarUrl()))
+                Mono.just(context.getAuthorAvatarUrl()))
                 .map(TupleUtils.function(this::getEmbed))
                 .flatMap(embed -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
-                .then();
+                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)));
     }
 
     private Consumer<EmbedCreateSpec> getEmbed(Guild guild, List<GuildChannel> channels, Member owner, Region region, String avatarUrl) {
@@ -68,11 +67,5 @@ public class ServerInfoCmd extends BaseCmd {
                         .addField("Members", Integer.toString(guild.getMemberCount()), false));
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show info about this server.")
-                .build();
-    }
-
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.admin.setting;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -160,3 +161,4 @@ public class AutoMessagesSetting extends BaseSetting {
                 .build();
     }
 }
+*/

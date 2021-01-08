@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.utils;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -85,9 +86,11 @@ public class LyricsCmd extends BaseCmd {
                 .filter(musixmatch -> !musixmatch.getLyrics().isBlank());
     }
 
-    /**
-     * @return The search term, either the current playing music title or the context argument.
-     */
+    */
+/**
+ * @return The search term, either the current playing music title or the context argument.
+ *//*
+
     private static String getSearch(Context context) {
         return context.getArg()
                 .orElseGet(() -> {
@@ -147,3 +150,4 @@ public class LyricsCmd extends BaseCmd {
                 .build();
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.hangman;
 
 import com.shadorc.shadbot.core.command.Context;
@@ -194,4 +195,4 @@ public class HangmanGame extends Game<HangmanCmd> {
                 path, num, num);
     }
 
-}
+}*/

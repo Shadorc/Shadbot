@@ -1,104 +1,112 @@
 package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.Shadbot;
-import com.shadorc.shadbot.command.MissingArgumentException;
-import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.music.GuildMusic;
-import com.shadorc.shadbot.music.MusicManager;
-import com.shadorc.shadbot.music.NoMusicException;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
-import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.Channel;
-import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.TextChannel;
+import discord4j.discordjson.json.MessageData;
 import discord4j.rest.util.Permission;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.annotation.Nullable;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 public class Context {
 
-    private final MessageCreateEvent event;
-    private final String prefix;
-    private final String cmdName;
-    @Nullable
-    private final String arg;
+    private final InteractionCreateEvent event;
+    private final DBGuild dbGuild;
 
-    public Context(MessageCreateEvent event, String prefix) {
+    public Context(InteractionCreateEvent event, DBGuild dbGuild) {
         this.event = event;
-        this.prefix = prefix;
-
-        final List<String> splittedMsg = StringUtils.split(this.getContent(), 2);
-        this.cmdName = splittedMsg.get(0).substring(prefix.length()).toLowerCase();
-        this.arg = splittedMsg.size() > 1 ? splittedMsg.get(1).trim() : null;
+        this.dbGuild = dbGuild;
     }
 
-    public MessageCreateEvent getEvent() {
+    public InteractionCreateEvent getEvent() {
         return this.event;
     }
 
-    public Optional<String> getArg() {
-        return Optional.ofNullable(this.arg);
+    public DBGuild getDbGuild() {
+        return this.dbGuild;
     }
 
-    public User getAuthor() {
-        return this.getMessage().getAuthor().orElseThrow();
-    }
-
-    public Snowflake getAuthorId() {
-        return this.getAuthor().getId();
-    }
-
-    public String getAvatarUrl() {
-        return this.getAuthor().getAvatarUrl();
-    }
-
-    public Mono<MessageChannel> getChannel() {
-        return this.getMessage().getChannel();
-    }
-
-    public Snowflake getChannelId() {
-        return this.getMessage().getChannelId();
+    public String getCommandName() {
+        return this.event.getCommandName();
     }
 
     public GatewayDiscordClient getClient() {
         return this.event.getClient();
     }
 
-    public String getCommandName() {
-        return this.cmdName;
+    public Snowflake getGuildId() {
+        return this.event.getGuildId();
     }
 
-    public String getContent() {
-        return this.getMessage().getContent();
+    public Snowflake getChannelId() {
+        return this.event.getChannelId();
+    }
+
+    public Snowflake getAuthorId() {
+        return Snowflake.of(this.event.getMemberData().user().id());
     }
 
     public Mono<Guild> getGuild() {
-        return this.event.getGuild();
+        return this.event.getClient().getGuildById(this.getGuildId());
     }
 
-    public Snowflake getGuildId() {
-        return this.event.getGuildId().orElseThrow();
+    public Mono<TextChannel> getChannel() {
+        return this.event.getClient().getChannelById(this.getChannelId())
+                .cast(TextChannel.class);
     }
 
-    public Member getMember() {
-        return this.event.getMember().orElseThrow();
+    // TODO: Do not build the member myself
+    public Member getAuthor() {
+        return new Member(this.event.getClient(), this.event.getMemberData(), this.event.getGuildId().asLong());
     }
 
-    public Message getMessage() {
-        return this.event.getMessage();
+    public Mono<Member> getSelfMember() {
+        return this.getGuild().flatMap(Guild::getSelfMember);
+    }
+
+    // TODO
+    public String getAuthorName() {
+        return this.event.getMemberData().user().username();
+    }
+
+    // TODO
+    public String getAuthorAvatarUrl() {
+        return this.event.getMemberData().user().avatar().orElseThrow();
+    }
+    // TODO
+
+    public Optional<String> getOption(String name) {
+        return this.event.getCommandInteractionData()
+                .options()
+                .toOptional()
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(option -> option.name().equals(name))
+                .findFirst()
+                .flatMap(option -> option.value().toOptional());
+    }
+
+    public Mono<Member> getOptionAsMember(String name) {
+        return Mono.justOrEmpty(this.getOption(name))
+                .map(Snowflake::of)
+                .flatMap(memberId -> this.event.getClient().getMemberById(this.getGuildId(), memberId));
+    }
+
+    public Optional<Integer> getOptionAsInteger(String name) {
+        return this.getOption(name)
+                .map(Integer::parseInt);
     }
 
     public Flux<CommandPermission> getPermissions() {
@@ -117,67 +125,35 @@ public class Context {
         return Flux.merge(ownerPerm, adminPerm, Mono.just(CommandPermission.USER));
     }
 
-    public String getPrefix() {
-        return this.prefix;
-    }
-
-    public Mono<User> getSelf() {
-        return this.getClient().getSelf();
-    }
-
-    public Snowflake getSelfId() {
-        return this.getClient().getSelfId();
-    }
-
-    public Mono<Member> getSelfAsMember() {
-        return this.getSelf().flatMap(self -> self.asMember(this.getGuildId()));
-    }
-
     public int getShardCount() {
-        return this.getEvent().getShardInfo().getCount();
+        return this.event.getShardInfo().getCount();
     }
 
     public int getShardIndex() {
-        return this.getEvent().getShardInfo().getIndex();
-    }
-
-    public String getUsername() {
-        return this.getAuthor().getUsername();
+        return this.event.getShardInfo().getIndex();
     }
 
     public Mono<Boolean> isChannelNsfw() {
-        return this.getChannel()
-                .ofType(TextChannel.class)
-                .map(TextChannel::isNsfw);
+        return this.getChannel().map(TextChannel::isNsfw);
     }
 
-    public String requireArg() {
-        return this.getArg()
-                .map(StringUtils::normalizeSpace)
-                .orElseThrow(MissingArgumentException::new);
+    public Mono<Void> acknowledge() {
+        return this.event.acknowledge(true);
     }
 
-    public List<String> requireArgs(int count) {
-        return this.requireArgs(count, count);
+    public Mono<MessageData> createFollowupMessage(String content) {
+        return this.event.getInteractionResponse().createFollowupMessage(content);
     }
 
-    public List<String> requireArgs(int min, int max) {
-        return this.requireArgs(min, max, Config.COMMAND_DELIMITER);
+    public Mono<MessageData> createFollowupMessage(String format, Object... args) {
+        return this.event.getInteractionResponse().createFollowupMessage(String.format(format, args));
     }
 
-    public List<String> requireArgs(int min, int max, String delimiter) {
-        final List<String> args = StringUtils.split(this.requireArg(), max, delimiter);
-        if (!NumberUtils.isBetween(args.size(), min, max)) {
-            throw new MissingArgumentException();
-        }
-        return args;
-    }
-
-    public GuildMusic requireGuildMusic() {
+    /*public GuildMusic requireGuildMusic() {
         return MusicManager.getInstance()
                 .getGuildMusic(this.getGuildId())
                 .filter(guildMusic -> !guildMusic.getTrackScheduler().isStopped())
                 .orElseThrow(NoMusicException::new);
-    }
+    }*/
 
 }

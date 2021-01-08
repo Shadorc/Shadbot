@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.api;
 
 import com.shadorc.shadbot.api.json.dbl.TopGgWebhookResponse;
-import com.shadorc.shadbot.cache.CacheManager;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
@@ -87,7 +86,7 @@ public class BotListStats {
     public Mono<Void> postStats() {
         LOGGER.info("Posting statistics");
         final int shardCount = this.gateway.getGatewayClientGroup().getShardCount();
-        return Mono.just(CacheManager.getInstance().getGuildOwnersCache().count())
+        return this.gateway.getGuilds().count()
                 .flatMap(guildCount -> this.postOnBotlistDotSpace(guildCount)
                         .and(this.postOnBotsOndiscordDotXyz(guildCount))
                         .and(this.postOnDiscordbotlistDotCom(shardCount, guildCount))

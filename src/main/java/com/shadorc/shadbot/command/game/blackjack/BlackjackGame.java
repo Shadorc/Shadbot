@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.blackjack;
 
 import com.shadorc.shadbot.core.command.Context;
@@ -165,4 +166,4 @@ public class BlackjackGame extends MultiplayerGame<BlackjackCmd, BlackjackPlayer
         return this.actions;
     }
 
-}
+}*/

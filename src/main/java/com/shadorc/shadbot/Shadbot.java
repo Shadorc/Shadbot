@@ -1,6 +1,7 @@
 package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
+import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.core.retriever.SpyRestEntityRetriever;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
@@ -20,7 +21,6 @@ import discord4j.core.retriever.FallbackEntityRetriever;
 import discord4j.core.shard.MemberRequestFilter;
 import discord4j.discordjson.json.ApplicationInfoData;
 import discord4j.discordjson.json.MessageData;
-import discord4j.discordjson.json.UserData;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.response.ResponseFunction;
@@ -46,6 +46,7 @@ public class Shadbot {
 
     private static final Instant LAUNCH_TIME = Instant.now();
     private static final AtomicLong OWNER_ID = new AtomicLong();
+    private static final AtomicLong APPLICATION_ID = new AtomicLong();
 
     private static GatewayDiscordClient gateway;
     private static TaskManager taskManager;
@@ -71,7 +72,7 @@ public class Shadbot {
         DEFAULT_LOGGER.info("Starting Shadbot V{}", Config.VERSION);
 
         final String prometheusPort = CredentialManager.getInstance().get(Credential.PROMETHEUS_PORT);
-        if (prometheusPort != null) {
+        if (prometheusPort != null && !Config.IS_SNAPSHOT) {
             DEFAULT_LOGGER.info("Initializing Prometheus on port {}", prometheusPort);
             try {
                 Shadbot.prometheusServer = new HTTPServer(Integer.parseInt(prometheusPort));
@@ -91,18 +92,16 @@ public class Shadbot {
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
                 .build();
 
-        final Long ownerId = client.getApplicationInfo()
-                .map(ApplicationInfoData::owner)
-                .map(UserData::id)
-                .map(Snowflake::asLong)
-                .block();
-        Objects.requireNonNull(ownerId);
-        DEFAULT_LOGGER.info("Owner ID acquired: {}", ownerId);
-        Shadbot.OWNER_ID.set(ownerId);
+        final ApplicationInfoData applicationInfo = client.getApplicationInfo().block();
+        Shadbot.OWNER_ID.set(Snowflake.asLong(applicationInfo.owner().id()));
+        Shadbot.APPLICATION_ID.set(Snowflake.asLong(applicationInfo.id()));
+        DEFAULT_LOGGER.info("Owner ID: {} | Application ID: {}", Shadbot.OWNER_ID.get(), Shadbot.APPLICATION_ID.get());
+
+        // TODO: Exceptions handling
+        CommandManager.getInstance().register(client).blockLast();
 
         DEFAULT_LOGGER.info("Connecting to Discord");
         client.gateway()
-                .setAwaitConnections(false)
                 .setEntityRetrievalStrategy(gateway -> new FallbackEntityRetriever(
                         EntityRetrievalStrategy.STORE.apply(gateway), new SpyRestEntityRetriever(gateway)))
                 .setEnabledIntents(IntentSet.of(
@@ -123,26 +122,26 @@ public class Shadbot {
                     Shadbot.gateway = gateway;
 
                     Shadbot.taskManager = new TaskManager();
-                    Shadbot.taskManager.scheduleLottery(gateway);
+//                    Shadbot.taskManager.scheduleLottery(gateway);
                     Shadbot.taskManager.schedulePeriodicStats(gateway);
                     Shadbot.taskManager.schedulePresenceUpdates(gateway);
 
                     if (!Config.IS_SNAPSHOT) {
                         DEFAULT_LOGGER.info("Initializing BotListStats");
                         Shadbot.botListStats = new BotListStats(gateway);
-
                         Shadbot.taskManager.schedulePostStats(Shadbot.botListStats);
                     }
 
                     DEFAULT_LOGGER.info("Registering listeners");
                     Shadbot.register(gateway, new TextChannelDeleteListener());
                     Shadbot.register(gateway, new GuildCreateListener());
-                    Shadbot.register(gateway, new GuildDeleteListener());
+//                    Shadbot.register(gateway, new GuildDeleteListener());
                     Shadbot.register(gateway, new MemberJoinListener());
                     Shadbot.register(gateway, new MemberLeaveListener());
-                    Shadbot.register(gateway, new VoiceStateUpdateListener());
-                    Shadbot.register(gateway, new ReactionListener.ReactionAddListener());
-                    Shadbot.register(gateway, new ReactionListener.ReactionRemoveListener());
+//                    Shadbot.register(gateway, new VoiceStateUpdateListener());
+//                    Shadbot.register(gateway, new ReactionListener.ReactionAddListener());
+//                    Shadbot.register(gateway, new ReactionListener.ReactionRemoveListener());
+                    Shadbot.register(gateway, new InteractionCreateListener());
 
                     DEFAULT_LOGGER.info("Shadbot is ready");
                     return gateway.onDisconnect();
@@ -174,6 +173,13 @@ public class Shadbot {
      */
     public static Snowflake getOwnerId() {
         return Snowflake.of(Shadbot.OWNER_ID.get());
+    }
+
+    /**
+     * @return The ID of the current application.
+     */
+    public static Snowflake getApplicationId() {
+        return Snowflake.of(Shadbot.APPLICATION_ID.get());
     }
 
     public static Mono<Void> quit() {

@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -38,4 +39,4 @@ public class StopCmd extends BaseCmd {
                 .setDescription("Stop music.")
                 .build();
     }
-}
+}*/

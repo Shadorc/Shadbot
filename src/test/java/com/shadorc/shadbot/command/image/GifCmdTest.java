@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.command.CmdTest;
@@ -24,8 +25,9 @@ public class GifCmdTest extends CmdTest<GifCmd> {
     @Test
     public void testGetGifSearchSpecial() {
         assertDoesNotThrow(() -> {
-            this.invoke("getGif", NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/"));
+            this.invoke("getGif", NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+*-/"));
         });
     }
 
 }
+*/

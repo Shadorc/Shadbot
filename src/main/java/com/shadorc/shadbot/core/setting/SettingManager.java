@@ -1,6 +1,5 @@
+/*
 package com.shadorc.shadbot.core.setting;
-
-import com.shadorc.shadbot.command.admin.setting.*;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -51,3 +50,4 @@ public class SettingManager {
         return SettingManager.instance;
     }
 }
+*/

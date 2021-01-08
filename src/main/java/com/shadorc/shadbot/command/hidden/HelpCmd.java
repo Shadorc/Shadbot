@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.hidden;
 
 import com.shadorc.shadbot.core.command.*;
@@ -102,3 +103,4 @@ public class HelpCmd extends BaseCmd {
     }
 
 }
+*/

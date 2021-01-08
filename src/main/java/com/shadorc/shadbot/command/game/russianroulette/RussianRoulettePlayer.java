@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.russianroulette;
 
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
@@ -61,3 +62,4 @@ public class RussianRoulettePlayer extends GamblerPlayer {
     }
 
 }
+*/

@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.object.entity.Message;
@@ -25,14 +24,12 @@ public class MemberLeaveListener implements EventListener<MemberLeaveEvent> {
 
         // Send an automatic leave message if one was configured
         final Mono<Message> sendLeaveMessage = DatabaseManager.getGuilds()
-                .getDBGuild(event.getGuildId())
-                .map(DBGuild::getSettings)
+                .getSettings(event.getGuildId())
                 .flatMap(settings -> Mono.zip(
                         Mono.justOrEmpty(settings.getMessageChannelId()),
                         Mono.justOrEmpty(settings.getLeaveMessage())))
                 .flatMap(TupleUtils.function((channelId, leaveMessage) ->
-                        MemberJoinListener.sendAutoMessage(event.getClient(), event.getUser(),
-                                channelId, leaveMessage)));
+                        MemberJoinListener.sendAutoMessage(event.getClient(), event.getUser(), channelId, leaveMessage)));
 
         return deleteMember
                 .and(sendLeaveMessage);

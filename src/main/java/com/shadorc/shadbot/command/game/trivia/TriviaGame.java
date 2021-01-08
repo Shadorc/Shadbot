@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.trivia;
 
 import com.shadorc.shadbot.api.json.trivia.TriviaResponse;
@@ -132,3 +133,4 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
     }
 
 }
+*/

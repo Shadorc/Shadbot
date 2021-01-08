@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.Shadbot;
@@ -50,3 +51,4 @@ public class ConfirmInputs extends Inputs {
         return this.task;
     }
 }
+*/

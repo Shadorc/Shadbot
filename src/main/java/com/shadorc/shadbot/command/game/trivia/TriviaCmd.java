@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.trivia;
 
 import com.shadorc.shadbot.api.json.trivia.category.TriviaCategoriesResponse;
@@ -102,3 +103,4 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
                 .build();
     }
 }
+*/
