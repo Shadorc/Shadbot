@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.info;
 
 import com.shadorc.shadbot.Shadbot;
@@ -29,7 +28,7 @@ public class FeedbackCmd extends BaseCmd {
     public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
         return builder.addOption(ApplicationCommandOptionData.builder()
                 .name("text")
-                .description("the message to send")
+                .description("The message to send")
                 .type(ApplicationCommandOptionType.STRING.getValue())
                 .required(true)
                 .build())
@@ -44,11 +43,8 @@ public class FeedbackCmd extends BaseCmd {
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         String.format(Emoji.SPEECH + " Feedback from **%s** (User ID: %d, Guild ID: %d):%n%s",
                                 context.getAuthorName(), context.getAuthorId().asLong(),
-                                context.getGuildId().asLong(), context.getOption("text")), channel))
-                .then(context.getChannel())
-                .flatMap(channel -> DiscordUtils.sendMessage(
-                        String.format(Emoji.INFO + " (**%s**) Feedback sent, thank you!", context.getAuthorName()), channel));
+                                context.getGuildId().asLong(), context.getOption("text").orElseThrow()), channel))
+                .then(context.createFollowupMessage(Emoji.INFO + " (**%s**) Feedback sent, thank you!", context.getAuthorName()));
     }
 
 }
-*/

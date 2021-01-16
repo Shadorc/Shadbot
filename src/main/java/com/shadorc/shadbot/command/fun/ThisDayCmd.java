@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.fun;
 
 import com.shadorc.shadbot.api.html.thisday.ThisDay;
@@ -7,16 +6,12 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.object.Embed;
-import discord4j.core.spec.EmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
-
-import java.util.function.Consumer;
+import reactor.function.TupleUtils;
 
 public class ThisDayCmd extends BaseCmd {
 
@@ -28,20 +23,15 @@ public class ThisDayCmd extends BaseCmd {
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading events...", context.getAuthorName()))
-                .send()
-                .then(ThisDayCmd.getThisDay())
-                .map(thisDay -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
-                        .andThen(embed -> embed.setAuthor(String.format("On This Day: %s",
-                                thisDay.getDate()), HOME_URL, context.getAuthorAvatarUrl())
-                                .setThumbnail("https://i.imgur.com/FdfyJDD.png")
-                                .setDescription(StringUtils.abbreviate(thisDay.getEvents(), Embed.MAX_DESCRIPTION_LENGTH)))))
-                .flatMap(UpdatableMessage::send)
-                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
-                .then();
+    public Mono<?> execute(Context context) {
+        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading events...", context.getAuthorName())
+                .zipWith(ThisDayCmd.getThisDay())
+                .flatMap(TupleUtils.function((messageId, thisDay) ->
+                        context.editFollowupMessage(messageId, ShadbotUtils.getDefaultEmbed(
+                                embed -> embed.setAuthor(String.format("On This Day: %s", thisDay.getDate()),
+                                        HOME_URL, context.getAuthorAvatarUrl())
+                                        .setThumbnail("https://i.imgur.com/FdfyJDD.png")
+                                        .setDescription(StringUtils.abbreviate(thisDay.getEvents(), Embed.MAX_DESCRIPTION_LENGTH))))));
     }
 
     private static Mono<ThisDay> getThisDay() {
@@ -50,12 +40,4 @@ public class ThisDayCmd extends BaseCmd {
                 .map(ThisDay::new);
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show significant events of the day.")
-                .setSource(HOME_URL)
-                .build();
-    }
 }
-*/

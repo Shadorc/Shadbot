@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.giphy.Data;
@@ -12,49 +11,61 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
 public class GifCmd extends BaseCmd {
 
-    private static final String RENDOM_ENDPOINT = "https://api.giphy.com/v1/gifs/random";
-    private static final String SEARCH_ENDPOINT = "https://api.giphy.com/v1/gifs/search";
+    private static final String API_URL = "https://api.giphy.com/v1/gifs";
+    private static final String RENDOM_ENDPOINT = String.format("%s/random", API_URL);
+    private static final String SEARCH_ENDPOINT = String.format("%s/search", API_URL);
 
     public GifCmd() {
-        super(CommandCategory.IMAGE, List.of("gif"));
+        super(CommandCategory.IMAGE, "gif", "Show a random gif");
         this.setDefaultRateLimiter();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading gif...", context.getUsername()))
-                .send()
-                .then(GifCmd.getGif(NetUtils.encode(context.getArg().orElse(""))))
-                .map(gifUrl -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
-                        .andThen(embed -> embed.setImage(gifUrl))))
-                .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
-                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
-                                context.getUsername(), context.getArg().orElse("random search")))))
-                .flatMap(UpdatableMessage::send)
-                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
-                .then();
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("tag")
+                        .description("The tag to search")
+                        .type(ApplicationCommandOptionType.STRING.getValue())
+                        .required(false)
+                        .build())
+                .build();
     }
 
-    private static Mono<String> getGif(String encodedSearch) {
+    @Override
+    public Mono<?> execute(Context context) {
+        final Optional<String> tag = context.getOption("tag");
+        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading gif...", context.getAuthorName())
+                .flatMap(messageId -> GifCmd.getGifUrl(tag.orElse(""))
+                        .flatMap(gifUrl -> context.editFollowupMessage(messageId,
+                                ShadbotUtils.getDefaultEmbed(spec -> spec.setImage(gifUrl))))
+                        .switchIfEmpty(context.editFollowupMessage(messageId,
+                                Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
+                                context.getAuthorName(), tag.orElse("random search"))));
+    }
+
+    private static Mono<String> getGifUrl(String search) {
         final String apiKey = CredentialManager.getInstance().get(Credential.GIPHY_API_KEY);
+        final String encodedSearch = Objects.requireNonNull(NetUtils.encode(search));
+
         final String url;
         if (encodedSearch.isBlank()) {
-            url = String.format("%s?api_key=%s", RENDOM_ENDPOINT, apiKey);
+            url = String.format("%s?api_key=%s",
+                    RENDOM_ENDPOINT, apiKey);
         } else {
             url = String.format("%s?api_key=%s&q=%s&limit=1&offset=%d",
                     SEARCH_ENDPOINT, apiKey, encodedSearch, ThreadLocalRandom.current().nextInt(25));
@@ -69,14 +80,4 @@ public class GifCmd extends BaseCmd {
                 .map(Original::getUrl);
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show a random gif.")
-                .addArg("tag", "the tag to search", true)
-                .setSource("https://www.giphy.com/")
-                .build();
-    }
-
 }
-*/

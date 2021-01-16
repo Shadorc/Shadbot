@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.fun;
 
 import com.fasterxml.jackson.databind.JavaType;
@@ -10,14 +9,13 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.RandUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -34,19 +32,11 @@ public class DtcCmd extends BaseCmd {
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading quote...", context.getAuthorName()))
-                .send()
-                .then(DtcCmd.getRandomQuote())
-                .map(quote -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
-                        .andThen(embed -> embed.setAuthor("Quote DansTonChat",
-                                String.format("https://danstonchat.com/%s.html", quote.getId()), context.getAuthorAvatarUrl())
-                                .setThumbnail("https://i.imgur.com/5YvTlAA.png")
-                                .setDescription(this.formatContent(quote.getContent())))))
-                .flatMap(UpdatableMessage::send)
-                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
-                .then();
+    public Mono<?> execute(Context context) {
+        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading quote...", context.getAuthorName())
+                .zipWith(DtcCmd.getRandomQuote())
+                .flatMap(TupleUtils.function((messageId, quote) ->
+                        context.editFollowupMessage(messageId, DtcCmd.formatEmbed(quote, context.getAuthorAvatarUrl()))));
     }
 
     private static Mono<Quote> getRandomQuote() {
@@ -62,7 +52,15 @@ public class DtcCmd extends BaseCmd {
                 });
     }
 
-    private String formatContent(String content) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(final Quote quote, final String avatarUrl) {
+        return ShadbotUtils.getDefaultEmbed(
+                embed -> embed.setAuthor("Quote DansTonChat",
+                        String.format("https://danstonchat.com/%s.html", quote.getId()), avatarUrl)
+                        .setThumbnail("https://i.imgur.com/5YvTlAA.png")
+                        .setDescription(DtcCmd.formatContent(quote.getContent())));
+    }
+
+    private static String formatContent(String content) {
         final String formattedContent = content.replace("*", "\\*");
         return FormatUtils.format(formattedContent.split("\n"), DtcCmd::formatLine, "\n");
     }
@@ -76,12 +74,4 @@ public class DtcCmd extends BaseCmd {
         return line;
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show a random quote from DansTonChat.com")
-                .setSource("https://www.danstonchat.com/")
-                .build();
-    }
 }
-*/

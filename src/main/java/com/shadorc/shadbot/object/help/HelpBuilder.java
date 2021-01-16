@@ -102,41 +102,40 @@ public abstract class HelpBuilder {
     }
 
     public Consumer<EmbedCreateSpec> build() {
-        return ShadbotUtils.getDefaultEmbed()
-                .andThen(embed -> {
-                    if (this.authorName != null && !this.authorName.isBlank()) {
-                        embed.setAuthor(this.authorName, this.authorUrl, this.context.getAuthorAvatarUrl());
-                    }
-                    embed.addField("Usage", this.getUsage(), false);
+        return ShadbotUtils.getDefaultEmbed(embed -> {
+            if (this.authorName != null && !this.authorName.isBlank()) {
+                embed.setAuthor(this.authorName, this.authorUrl, this.context.getAuthorAvatarUrl());
+            }
+            embed.addField("Usage", this.getUsage(), false);
 
-                    if (this.description != null && !this.description.isBlank()) {
-                        embed.setDescription(this.description);
-                    }
+            if (this.description != null && !this.description.isBlank()) {
+                embed.setDescription(this.description);
+            }
 
-                    if (this.thumbnail != null && !this.thumbnail.isBlank()) {
-                        embed.setThumbnail(this.thumbnail);
-                    }
+            if (this.thumbnail != null && !this.thumbnail.isBlank()) {
+                embed.setThumbnail(this.thumbnail);
+            }
 
-                    if (!this.getArguments().isEmpty()) {
-                        embed.addField("Arguments", this.getArguments(), false);
-                    }
+            if (!this.getArguments().isEmpty()) {
+                embed.addField("Arguments", this.getArguments(), false);
+            }
 
-                    if (this.example != null && !this.example.isBlank()) {
-                        embed.addField("Example", this.example, false);
-                    }
+            if (this.example != null && !this.example.isBlank()) {
+                embed.addField("Example", this.example, false);
+            }
 
-                    if (this.source != null && !this.source.isBlank()) {
-                        embed.addField("Source", this.source, false);
-                    }
+            if (this.source != null && !this.source.isBlank()) {
+                embed.addField("Source", this.source, false);
+            }
 
-                    for (final ImmutableEmbedFieldData field : this.fields) {
-                        embed.addField(field.name(), field.value(), field.inline().get());
-                    }
+            for (final ImmutableEmbedFieldData field : this.fields) {
+                embed.addField(field.name(), field.value(), field.inline().get());
+            }
 
-                    if (this.footer != null && !this.footer.isBlank()) {
-                        embed.setFooter(this.footer, null);
-                    }
-                });
+            if (this.footer != null && !this.footer.isBlank()) {
+                embed.setFooter(this.footer, null);
+            }
+        });
     }
 
     protected abstract String getCommandName();

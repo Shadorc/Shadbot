@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.fun;
 
 import com.shadorc.shadbot.api.json.joke.JokeResponse;
@@ -7,15 +6,11 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.ShadbotUtils;
-import discord4j.core.spec.EmbedCreateSpec;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import reactor.core.publisher.Mono;
-
-import java.util.function.Consumer;
+import reactor.function.TupleUtils;
 
 public class JokeCmd extends BaseCmd {
 
@@ -27,17 +22,13 @@ public class JokeCmd extends BaseCmd {
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading joke...", context.getAuthorName()))
-                .send()
-                .then(JokeCmd.getRandomJoke())
-                .map(joke -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
-                        .andThen(embed -> embed.setAuthor("Joke", HOME_URL, context.getAuthorAvatarUrl())
-                                .setDescription(joke))))
-                .flatMap(UpdatableMessage::send)
-                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
-                .then();
+    public Mono<?> execute(Context context) {
+        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading joke...", context.getAuthorName())
+                .zipWith(JokeCmd.getRandomJoke())
+                .flatMap(TupleUtils.function((messageId, joke) ->
+                        context.editFollowupMessage(messageId, ShadbotUtils.getDefaultEmbed(
+                                embed -> embed.setAuthor("Joke", HOME_URL, context.getAuthorAvatarUrl())
+                                        .setDescription(joke)))));
     }
 
     private static Mono<String> getRandomJoke() {
@@ -47,12 +38,4 @@ public class JokeCmd extends BaseCmd {
                 .map(JokeResponse::getJoke);
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show a random joke.")
-                .setSource(HOME_URL)
-                .build();
-    }
 }
-*/

@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.currency;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -7,7 +6,6 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.object.entity.User;
@@ -26,7 +24,7 @@ public class LeaderboardCmd extends BaseCmd {
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
+    public Mono<?> execute(Context context) {
         return DatabaseManager.getGuilds()
                 .getDBGuild(context.getGuildId())
                 .flatMapIterable(DBGuild::getMembers)
@@ -48,13 +46,10 @@ public class LeaderboardCmd extends BaseCmd {
                                         count, tuple.getT1(), FormatUtils.coins(tuple.getT2()));
                             });
                 })
-                .map(description -> ShadbotUtils.getDefaultEmbed()
-                        .andThen(embed -> embed.setAuthor("Leaderboard", null, context.getAuthorAvatarUrl())
+                .map(description -> ShadbotUtils.getDefaultEmbed(
+                        embed -> embed.setAuthor("Leaderboard", null, context.getAuthorAvatarUrl())
                                 .setDescription(description)))
-                .flatMap(embed -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
-                .then();
+                .flatMap(context::createFollowupMessage);
     }
 
 }
-*/

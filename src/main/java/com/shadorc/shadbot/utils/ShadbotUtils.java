@@ -43,10 +43,9 @@ public class ShadbotUtils {
         return Jsoup.parse(StringUtils.remove(err.getMessage(), "Watch on YouTube")).text().trim();
     }
 
-    public static String mustBeNsfw(String prefix) {
+    public static String mustBeNsfw() {
         return String.format(Emoji.GREY_EXCLAMATION
-                        + " This must be a NSFW-channel. If you're an admin, you can use `%ssetting %s enable`",
-                prefix, Setting.NSFW);
+                + " This must be a NSFW-channel. If you're an admin, you can use `/setting %s enable`", Setting.NSFW);
     }
 
     /**
@@ -97,8 +96,8 @@ public class ShadbotUtils {
     /**
      * @return A default {@link EmbedCreateSpec} with the default color set.
      */
-    public static Consumer<EmbedCreateSpec> getDefaultEmbed() {
-        return spec -> spec.setColor(Config.BOT_COLOR);
+    public static Consumer<EmbedCreateSpec> getDefaultEmbed(Consumer<EmbedCreateSpec> embed) {
+        return embed.andThen(spec -> spec.setColor(Config.BOT_COLOR));
     }
 
 }

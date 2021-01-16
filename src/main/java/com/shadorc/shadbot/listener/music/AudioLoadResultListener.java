@@ -150,8 +150,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 });
 
         final String playlistName = StringUtils.abbreviate(playlist.getName(), MAX_PLAYLIST_NAME_LENGTH);
-        return ShadbotUtils.getDefaultEmbed()
-                .andThen(embed -> embed.setAuthor(playlistName, null, avatarUrl)
+        return ShadbotUtils.getDefaultEmbed(
+                embed -> embed.setAuthor(playlistName, null, avatarUrl)
                         .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
                         .setDescription("**Select a music by typing the corresponding number.**"
                                 + "\nYou can choose several musics by separating them with a comma."

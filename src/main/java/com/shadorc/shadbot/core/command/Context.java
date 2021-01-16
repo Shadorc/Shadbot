@@ -13,14 +13,20 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.TextChannel;
+import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ImmutableWebhookMessageEditRequest;
 import discord4j.discordjson.json.MessageData;
+import discord4j.discordjson.json.WebhookExecuteRequest;
 import discord4j.rest.util.Permission;
+import discord4j.rest.util.WebhookMultipartRequest;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class Context {
 
@@ -139,12 +145,46 @@ public class Context {
         return this.getChannel().map(TextChannel::isNsfw);
     }
 
-    public Mono<MessageData> createFollowupMessage(String content) {
-        return this.event.getInteractionResponse().createFollowupMessage(content);
+    public Mono<Snowflake> createFollowupMessage(String content) {
+        return this.event.getInteractionResponse().createFollowupMessage(content)
+                .map(MessageData::id)
+                .map(Snowflake::of);
     }
 
-    public Mono<MessageData> createFollowupMessage(String format, Object... args) {
-        return this.event.getInteractionResponse().createFollowupMessage(String.format(format, args));
+    public Mono<Snowflake> createFollowupMessage(String format, Object... args) {
+        return this.createFollowupMessage(String.format(format, args));
+    }
+
+    public Mono<Snowflake> createFollowupMessage(Consumer<EmbedCreateSpec> embed) {
+        final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
+        embed.accept(mutatedSpec);
+        return this.event.getInteractionResponse().createFollowupMessage(new WebhookMultipartRequest(
+                WebhookExecuteRequest.builder()
+                        .addEmbed(mutatedSpec.asRequest())
+                        .build()), true)
+                .map(MessageData::id)
+                .map(Snowflake::of);
+    }
+
+    public Mono<MessageData> editFollowupMessage(Snowflake messageId, String content) {
+        return this.event.getInteractionResponse()
+                .editFollowupMessage(messageId.asLong(), ImmutableWebhookMessageEditRequest.builder()
+                        .content(content)
+                        .build(), true);
+    }
+
+    public Mono<MessageData> editFollowupMessage(Snowflake messageId, String format, Object... args) {
+        return this.editFollowupMessage(messageId, String.format(format, args));
+    }
+
+    public Mono<MessageData> editFollowupMessage(Snowflake messageId, Consumer<EmbedCreateSpec> embed) {
+        final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
+        embed.accept(mutatedSpec);
+        return this.event.getInteractionResponse()
+                .editFollowupMessage(messageId.asLong(), ImmutableWebhookMessageEditRequest.builder()
+                        .content("Done!") // TODO: Remove content
+                        .embeds(List.of(mutatedSpec.asRequest()))
+                        .build(), true);
     }
 
     public GuildMusic requireGuildMusic() {

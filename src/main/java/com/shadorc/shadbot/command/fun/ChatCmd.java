@@ -8,6 +8,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
+import com.shadorc.shadbot.utils.LogUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
@@ -16,16 +17,17 @@ import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.Logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
-
 public class ChatCmd extends BaseCmd {
 
+    private static final Logger LOGGER = LogUtils.getLogger(ChatCmd.class, LogUtils.Category.COMMAND);
     private static final String HOME_URl = "https://www.pandorabots.com/pandora/talk-xml";
-    private static final Map<String, String> BOTS = Map.of("Marvin", "efc39100ce34d038",
+    private static final Map<String, String> BOTS = Map.of(
+            "Marvin", "efc39100ce34d038",
             "Chomsky", "b0dafd24ee35a477",
             "R.I.V.K.A", "ea373c261e3458c6",
             "Lisa", "b0a6a41a5e345c23");
@@ -82,8 +84,7 @@ public class ChatCmd extends BaseCmd {
                 .doOnNext(chat -> this.channelsCustid.put(channelId, chat.getCustId()))
                 .map(ChatBotResult::getResponse)
                 .onErrorResume(err -> Mono.fromRunnable(() ->
-                        DEFAULT_LOGGER.info("[{}] {} is not reachable, trying another one.",
-                                this.getClass().getSimpleName(), botId)));
+                        LOGGER.info("{} is not reachable, trying another one.", botId)));
     }
 
 }
