@@ -2,12 +2,14 @@ package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.command.currency.CoinsCmd;
+import com.shadorc.shadbot.command.currency.LeaderboardCmd;
 import com.shadorc.shadbot.command.currency.TransferCoinsCmd;
 import com.shadorc.shadbot.command.fun.ChatCmd;
-import com.shadorc.shadbot.command.image.GifCmd;
-import com.shadorc.shadbot.command.image.ImageCmd;
-import com.shadorc.shadbot.command.image.Rule34Cmd;
-import com.shadorc.shadbot.command.image.XkcdCmd;
+import com.shadorc.shadbot.command.fun.DtcCmd;
+import com.shadorc.shadbot.command.fun.JokeCmd;
+import com.shadorc.shadbot.command.fun.ThisDayCmd;
+import com.shadorc.shadbot.command.image.*;
+import com.shadorc.shadbot.command.info.*;
 import com.shadorc.shadbot.command.music.*;
 import discord4j.discordjson.json.ApplicationCommandData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
@@ -36,26 +38,26 @@ public class CommandManager {
 //                new WeatherCmd(), new MathCmd(), new TranslateCmd(), new WikipediaCmd(), new PollCmd(),
 //                new UrbanCmd(), new LyricsCmd(),
                 // Fun Commands
-                new ChatCmd()/*, new ThisDayCmd(), new JokeCmd(), new DtcCmd()*/,
+                new ChatCmd(), new ThisDayCmd(), new JokeCmd(), new DtcCmd(),
                 // Image Commands
-                new GifCmd(), new ImageCmd(),/*, new WallpaperCmd(), new SuicideGirlsCmd(),*/
+                new GifCmd(), new ImageCmd(), new WallpaperCmd(), new SuicideGirlsCmd(),
                 new Rule34Cmd(), new XkcdCmd(),
                 // Game Commands
 //                new RpsCmd(), new HangmanCmd(), new TriviaCmd(), new RussianRouletteCmd(),
 //                new SlotMachineCmd(), new RouletteCmd(), new BlackjackCmd(), new DiceCmd(),
 //                new LotteryCmd(),
                 // Currency Commands
-                new CoinsCmd(), /*new LeaderboardCmd(),*/ new TransferCoinsCmd(),
+                new CoinsCmd(), new LeaderboardCmd(), new TransferCoinsCmd(),
                 // Music Commands
                 /*new PlayCmd(),*/ new PauseCmd(), new StopCmd(), /*new SkipCmd(), new RepeatCmd(),*/
                 new BackwardCmd(), new ForwardCmd(), /*new VolumeCmd(),*/ new NameCmd(),
-                /*new PlaylistCmd(),*/ new ShuffleCmd(), new ClearCmd()/*, new BassBoostCmd()*/
+                /*new PlaylistCmd(),*/ new ShuffleCmd(), new ClearCmd(),/* new BassBoostCmd()*/
                 // Game Stats Commands
 //                new FortniteCmd(), new DiabloCmd(), new CounterStrikeCmd(), new OverwatchCmd(),
                 // Info Commands
-//                new PingCmd(), new InfoCmd(), new UserInfoCmd(), new ServerInfoCmd(),
-//                new RolelistCmd(), new FeedbackCmd(), new InviteCmd(), new AchievementsCmd(),
-//                new VoteCmd(),
+                new PingCmd(), new InfoCmd(), new UserInfoCmd(), new ServerInfoCmd(),
+                /*new RolelistCmd(),*/ new FeedbackCmd(), new InviteCmd(), new AchievementsCmd(),
+                new VoteCmd()
                 // Admin Commands
 //                new ManageCoinsCmd(), new PruneCmd(), new KickCmd(), new SoftBanCmd(), new BanCmd(),
 //                new IamCmd(), new SettingsCmd(),

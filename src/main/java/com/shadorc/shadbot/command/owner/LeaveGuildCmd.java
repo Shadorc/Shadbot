@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -7,51 +6,50 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.NumberUtils;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Guild;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.http.client.ClientException;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class LeaveGuildCmd extends BaseCmd {
 
     public LeaveGuildCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("leave_guild"));
+        super(CommandCategory.OWNER, CommandPermission.OWNER, "leave_guild", "Leave a guild");
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final String arg = context.requireArg();
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("guildId")
+                        .description("The ID of the guild to leave")
+                        .type(ApplicationCommandOptionType.STRING.getValue())
+                        .required(true)
+                        .build())
+                .build();
+    }
+
+    @Override
+    public Mono<?> execute(Context context) {
+        final String arg = context.getOption("guildId").orElseThrow();
 
         final Long guildId = NumberUtils.toPositiveLongOrNull(arg);
         if (guildId == null) {
             return Mono.error(new CommandException(String.format("`%s` is not a valid guild ID.", arg)));
         }
 
-        return context.getClient().getGuildById(Snowflake.of(guildId))
+        return context.getClient()
+                .getGuildById(Snowflake.of(guildId))
                 .onErrorMap(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
                         err -> new CommandException("Guild not found."))
                 .flatMap(Guild::leave)
-                .then(context.getChannel())
-                .flatMap(channel -> DiscordUtils.sendMessage(
-                        String.format(Emoji.CHECK_MARK + " Guild with ID **%d** left.", guildId), channel))
-                .then();
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Leave a guild.")
-                .addArg("guildID", false)
-                .build();
+                .then(context.createFollowupMessage(Emoji.CHECK_MARK + " Guild with ID **%d** left.", guildId));
     }
 
 }
-*/

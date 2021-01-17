@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.info;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -8,7 +7,6 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.DBUser;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import discord4j.core.object.entity.Member;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -32,7 +30,7 @@ public class AchievementsCmd extends BaseCmd {
     public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
         return builder.addOption(ApplicationCommandOptionData.builder()
                 .name("user")
-                .description("if not specified, it will show your achievements")
+                .description("If not specified, it will show your achievements")
                 .type(ApplicationCommandOptionType.USER.getValue())
                 .required(false)
                 .build())
@@ -45,25 +43,23 @@ public class AchievementsCmd extends BaseCmd {
                 .flatMap(member -> DatabaseManager.getUsers().getDBUser(member.getId())
                         .map(DBUser::getAchievements)
                         .map(achievements -> AchievementsCmd.formatAchievements(achievements, member)))
-                .flatMap(embed -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)));
+                .flatMap(context::createFollowupMessage);
     }
 
     private static Consumer<EmbedCreateSpec> formatAchievements(EnumSet<Achievement> achievements, Member member) {
-        return ShadbotUtils.getDefaultEmbed()
-                .andThen(embed -> {
-                    embed.setAuthor(String.format("%s's Achievements", member.getUsername()),
-                            null, member.getAvatarUrl());
-                    embed.setThumbnail("https://i.imgur.com/IMHDI7D.png");
-                    embed.setTitle(String.format("%d/%d achievements unlocked.",
-                            achievements.size(), Achievement.values().length));
+        return ShadbotUtils.getDefaultEmbed(embed -> {
+            embed.setAuthor(String.format("%s's Achievements", member.getUsername()),
+                    null, member.getAvatarUrl());
+            embed.setThumbnail("https://i.imgur.com/IMHDI7D.png");
+            embed.setTitle(String.format("%d/%d achievements unlocked.",
+                    achievements.size(), Achievement.values().length));
 
-                    final StringBuilder description = new StringBuilder();
-                    for (final Achievement achievement : Achievement.values()) {
-                        description.append(AchievementsCmd.formatAchievement(achievement, achievements.contains(achievement)));
-                    }
-                    embed.setDescription(description.toString());
-                });
+            final StringBuilder description = new StringBuilder();
+            for (final Achievement achievement : Achievement.values()) {
+                description.append(AchievementsCmd.formatAchievement(achievement, achievements.contains(achievement)));
+            }
+            embed.setDescription(description.toString());
+        });
     }
 
     private static String formatAchievement(Achievement achievement, boolean unlocked) {
@@ -72,4 +68,3 @@ public class AchievementsCmd extends BaseCmd {
     }
 
 }
-*/

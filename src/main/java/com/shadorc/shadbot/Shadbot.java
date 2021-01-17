@@ -135,10 +135,10 @@ public class Shadbot {
                     DEFAULT_LOGGER.info("Registering listeners");
                     Shadbot.register(gateway, new TextChannelDeleteListener());
                     Shadbot.register(gateway, new GuildCreateListener());
-//                    Shadbot.register(gateway, new GuildDeleteListener());
+                    Shadbot.register(gateway, new GuildDeleteListener());
                     Shadbot.register(gateway, new MemberJoinListener());
                     Shadbot.register(gateway, new MemberLeaveListener());
-//                    Shadbot.register(gateway, new VoiceStateUpdateListener());
+                    Shadbot.register(gateway, new VoiceStateUpdateListener());
 //                    Shadbot.register(gateway, new ReactionListener.ReactionAddListener());
 //                    Shadbot.register(gateway, new ReactionListener.ReactionRemoveListener());
                     Shadbot.register(gateway, new InteractionCreateListener());

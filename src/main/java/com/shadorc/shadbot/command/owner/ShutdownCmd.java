@@ -10,6 +10,10 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.DiscordUtils;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -19,7 +23,7 @@ import java.util.function.Consumer;
 public class ShutdownCmd extends BaseCmd {
 
     public ShutdownCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("shutdown"));
+        super(CommandCategory.OWNER, CommandPermission.OWNER, "shutdown", "Shutdown the bot");
     }
 
     @Override
@@ -30,13 +34,6 @@ public class ShutdownCmd extends BaseCmd {
                                 context.getUsername()), channel))
                 .then(Mono.fromRunnable(() ->
                         ConfirmInputs.create(context.getClient(), Duration.ofSeconds(15), context.getChannelId(), Shadbot.quit()).listen()));
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Shutdown the bot.")
-                .build();
     }
 
 }

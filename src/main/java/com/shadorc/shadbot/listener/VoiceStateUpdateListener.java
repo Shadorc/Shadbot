@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.data.Telemetry;
@@ -89,4 +88,3 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
     }
 
 }
-*/

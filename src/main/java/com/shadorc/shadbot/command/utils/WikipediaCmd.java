@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.api.json.wikipedia.WikipediaPage;
@@ -9,57 +8,67 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 public class WikipediaCmd extends BaseCmd {
 
     public WikipediaCmd() {
-        super(CommandCategory.UTILS, List.of("wiki", "wikipedia"));
+        super(CommandCategory.UTILS, "wikipedia", "Show Wikipedia description for a search");
         this.setDefaultRateLimiter();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final String arg = context.requireArg();
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("search")
+                        .description("The word to search")
+                        .type(ApplicationCommandOptionType.STRING.getValue())
+                        .required(true)
+                        .build())
+                .build();
+    }
 
-        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
+    @Override
+    public Mono<?> execute(Context context) {
+        final String search = context.getOption("search").orElseThrow();
 
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Wikipedia...", context.getUsername()))
-                .send()
-                .then(WikipediaCmd.getWikipediaPage(arg))
-                .map(page -> {
-                    if (page.getExtract().endsWith("may refer to:")) {
-                        return updatableMsg.setContent(
-                                String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
-                                        + "try with a more precise search.", context.getUsername()));
-                    }
+        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Wikipedia...", context.getAuthorName())
+                .flatMap(messageId -> WikipediaCmd.getWikipediaPage(search)
+                        .flatMap(page -> {
+                            if (page.getExtract().endsWith("may refer to:")) {
+                                return context.editFollowupMessage(messageId,
+                                        Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
+                                                + "try with a more precise search.", context.getAuthorName());
+                            }
 
-                    final String extract = StringUtils.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
+                            return context.editFollowupMessage(messageId,
+                                    WikipediaCmd.formatEmbed(page, context.getAuthorAvatarUrl()));
+                        })
+                        .switchIfEmpty(context.editFollowupMessage(messageId,
+                                Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
+                                context.getAuthorName(), search)));
+    }
 
-                    return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
-                                    String.format("https://en.wikipedia.org/wiki/%s", page.getEncodedTitle()),
-                                    context.getAvatarUrl())
-                                    .setThumbnail("https://i.imgur.com/7X7Cvhf.png")
-                                    .setDescription(extract)));
-                })
-                .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
-                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
-                                context.getUsername(), arg))))
-                .flatMap(UpdatableMessage::send)
-                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
-                .then();
+    private static Consumer<EmbedCreateSpec> formatEmbed(final WikipediaPage page, final String avatarUrl) {
+        final String extract = StringUtils.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
+        return ShadbotUtils.getDefaultEmbed(
+                embed -> embed.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
+                        String.format("https://en.wikipedia.org/wiki/%s", page.getEncodedTitle()), avatarUrl)
+                        .setThumbnail("https://i.imgur.com/7X7Cvhf.png")
+                        .setDescription(extract));
     }
 
     private static Mono<WikipediaPage> getWikipediaPage(String search) {
@@ -85,14 +94,4 @@ public class WikipediaCmd extends BaseCmd {
                 .map(Map.Entry::getValue);
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show Wikipedia description for a search.")
-                .addArg("search", false)
-                .setSource("https://www.wikipedia.org/")
-                .build();
-    }
-
 }
-*/

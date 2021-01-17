@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.info;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
@@ -9,7 +8,6 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ProcessUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
@@ -43,14 +41,13 @@ public class InfoCmd extends BaseCmd {
                 context.getClient().getGuilds().count())
                 .flatMap(TupleUtils.function((owner, channel, guildCount) -> {
                     final long start = System.currentTimeMillis();
-                    return DiscordUtils.sendMessage(String.format(Emoji.GEAR + " (**%s**) Testing ping...",
-                            context.getAuthorName()), channel)
-                            .flatMap(message -> message.edit(spec -> spec.setContent("```prolog"
+                    return context.createFollowupMessage(Emoji.GEAR + " (**%s**) Testing ping...", context.getAuthorName())
+                            .flatMap(messageId -> context.editFollowupMessage(messageId, "```prolog"
                                     + InfoCmd.getVersionSection()
                                     + InfoCmd.getPerformanceSection()
                                     + InfoCmd.getInternetSection(context, start)
                                     + InfoCmd.getShadbotSection(context, owner, guildCount)
-                                    + "```")));
+                                    + "```"));
                 }));
     }
 
@@ -95,4 +92,3 @@ public class InfoCmd extends BaseCmd {
     }
 
 }
-*/

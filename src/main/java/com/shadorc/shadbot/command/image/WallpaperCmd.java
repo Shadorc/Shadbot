@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.wallhaven.WallhavenResponse;
@@ -10,18 +9,18 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.RandUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class WallpaperCmd extends BaseCmd {
@@ -29,34 +28,41 @@ public class WallpaperCmd extends BaseCmd {
     private static final String HOME_URL = "https://wallhaven.cc/api/v1/search";
 
     public WallpaperCmd() {
-        super(CommandCategory.IMAGE, List.of("wallpaper"), "wp");
+        super(CommandCategory.IMAGE, "wallpaper", "Search for a wallpaper");
         this.setDefaultRateLimiter();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final String arg = context.getArg().orElse("");
-        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading wallpaper...", context.getUsername()))
-                .send()
-                .then(Mono.zip(WallpaperCmd.getWallpaper(arg), context.isChannelNsfw()))
-                .map(TupleUtils.function((wallpaper, isNsfw) -> {
-                    if (!"sfw".equals(wallpaper.getPurity()) && !isNsfw) {
-                        return updatableMsg.setContent(ShadbotUtils.mustBeNsfw(context.getPrefix()));
-                    }
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("search")
+                        .description("Keywords to search (e.g. doom game)")
+                        .type(ApplicationCommandOptionType.STRING.getValue())
+                        .required(false)
+                        .build())
+                .build();
+    }
 
-                    final String title = String.format("Wallpaper: %s", arg.isBlank() ? "random" : arg);
-                    return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor(title, wallpaper.getUrl(), context.getAvatarUrl())
-                                    .setImage(wallpaper.getPath())
-                                    .addField("Resolution", wallpaper.getResolution(), false)));
-                }))
-                .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
-                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
-                                context.getUsername(), arg))))
-                .flatMap(UpdatableMessage::send)
-                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
-                .then();
+    @Override
+    public Mono<?> execute(Context context) {
+        final String search = context.getOption("search").orElse("");
+        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading wallpaper...", context.getAuthorName())
+                .flatMap(messageId -> Mono.zip(WallpaperCmd.getWallpaper(search), context.isChannelNsfw())
+                        .flatMap(TupleUtils.function((wallpaper, isNsfw) -> {
+                            if (!"sfw".equals(wallpaper.getPurity()) && !isNsfw) {
+                                return context.editFollowupMessage(messageId, ShadbotUtils.mustBeNsfw());
+                            }
+
+                            final String title = String.format("Wallpaper: %s", search.isBlank() ? "random" : search);
+                            return context.editFollowupMessage(messageId, ShadbotUtils.getDefaultEmbed(
+                                    embed -> embed.setAuthor(title, wallpaper.getUrl(), context.getAuthorAvatarUrl())
+                                            .setImage(wallpaper.getPath())
+                                            .addField("Resolution", wallpaper.getResolution(), false)));
+                        }))
+                        .switchIfEmpty(context.editFollowupMessage(messageId,
+                                Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
+                                context.getAuthorName(), search)));
     }
 
     private static Mono<Wallpaper> getWallpaper(String arg) {
@@ -87,12 +93,4 @@ public class WallpaperCmd extends BaseCmd {
         return urlBuilder.toString();
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Search for a wallpaper.")
-                .addArg("search", "keywords (e.g. doom game)", true)
-                .setSource("https://wallhaven.cc/")
-                .build();
-    }
-}*/
+}

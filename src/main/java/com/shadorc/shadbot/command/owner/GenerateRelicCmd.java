@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -9,46 +8,44 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.premium.PremiumCollection;
 import com.shadorc.shadbot.db.premium.RelicType;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.EnumUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.StringUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class GenerateRelicCmd extends BaseCmd {
 
     public GenerateRelicCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("generate_relic"));
+        super(CommandCategory.OWNER, CommandPermission.OWNER, "generate_relic", "Generate a relic");
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final String arg = context.requireArg();
-
-        final RelicType type = EnumUtils.parseEnum(RelicType.class, context.getArg().orElseThrow(),
-                new CommandException(String.format("`%s` in not a valid type. %s",
-                        arg, FormatUtils.options(RelicType.class))));
-
-        return PremiumCollection
-                .generateRelic(type)
-                .flatMap(relic -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(
-                                String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
-                                        StringUtils.capitalize(type.toString()), relic.getId()), channel)))
-                .then();
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Generate a relic.")
-                .addArg("type", FormatUtils.format(RelicType.class, "/"), false)
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("type")
+                        .description(FormatUtils.format(RelicType.class, "/"))
+                        .type(ApplicationCommandOptionType.STRING.getValue())
+                        .required(false)
+                        .build())
                 .build();
     }
+
+    @Override
+    public Mono<?> execute(Context context) {
+        final String typeStr = context.getOption("type").orElseThrow();
+
+        final RelicType type = EnumUtils.parseEnum(RelicType.class, typeStr,
+                new CommandException(String.format("`%s` in not a valid type. %s",
+                        typeStr, FormatUtils.options(RelicType.class))));
+
+        return PremiumCollection.generateRelic(type)
+                .flatMap(relic -> context.createFollowupMessage(Emoji.CHECK_MARK + " %s relic generated: **%s**",
+                        StringUtils.capitalize(type.toString()), relic.getId()));
+    }
+
 }
-*/

@@ -20,18 +20,19 @@ public class FeedbackCmd extends BaseCmd {
 
     public FeedbackCmd() {
         super(CommandCategory.INFO, "feedback",
-                "Send a message to my developer. This can be a bug report, a suggestion or anything related to the bot.");
+                "Send a message to my developer. This can be anything related to the bot");
         this.setRateLimiter(new RateLimiter(1, Duration.ofSeconds(5)));
     }
 
     @Override
     public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder.addOption(ApplicationCommandOptionData.builder()
-                .name("text")
-                .description("The message to send")
-                .type(ApplicationCommandOptionType.STRING.getValue())
-                .required(true)
-                .build())
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("text")
+                        .description("The message to send")
+                        .type(ApplicationCommandOptionType.STRING.getValue())
+                        .required(true)
+                        .build())
                 .build();
     }
 

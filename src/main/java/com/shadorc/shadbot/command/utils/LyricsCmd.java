@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.utils;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -14,13 +13,15 @@ import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.object.message.UpdatableMessage;
 import com.shadorc.shadbot.utils.NetUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.StringUtils;
 import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Document.OutputSettings;
@@ -33,7 +34,6 @@ import reactor.util.retry.Retry;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
@@ -49,36 +49,47 @@ public class LyricsCmd extends BaseCmd {
     private static final Pattern PATTERN = Pattern.compile("(?i)official|officiel|clip|video|music|\\[|]|\\(|\\)");
 
     public LyricsCmd() {
-        super(CommandCategory.UTILS, List.of("lyrics"));
+        super(CommandCategory.UTILS, "lyrics", "Show lyrics for a song or for the current music");
         this.setDefaultRateLimiter();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-        final String search = LyricsCmd.getSearch(context);
-
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading lyrics...",
-                context.getUsername()))
-                .send()
-                .then(this.getMusixmatch(search))
-                .map(musixmatch -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
-                        .andThen(embed -> embed.setAuthor(String.format("Lyrics: %s - %s",
-                                StringUtils.abbreviate(musixmatch.getArtist(), MAX_TITLE_LENGTH),
-                                musixmatch.getTitle()), musixmatch.getUrl(), context.getAvatarUrl())
-                                .setThumbnail(musixmatch.getImageUrl())
-                                .setDescription(StringUtils.abbreviate(musixmatch.getLyrics(), MAX_LYRICS_LENGTH))
-                                .setFooter("Click on the title to see the full version",
-                                        "https://i.imgur.com/G7q6Hmq.png"))))
-                .switchIfEmpty(Mono.fromCallable(() -> updatableMsg.setContent(
-                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
-                                context.getUsername(), search))))
-                .flatMap(UpdatableMessage::send)
-                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
-                .then();
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("music")
+                        .description("Music's name to search")
+                        .type(ApplicationCommandOptionType.STRING.getValue())
+                        .required(false)
+                        .build())
+                .build();
     }
 
-    private Mono<Musixmatch> getMusixmatch(String search) {
+    @Override
+    public Mono<?> execute(Context context) {
+        final String search = LyricsCmd.getSearch(context);
+        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading lyrics...", context.getAuthorName())
+                .flatMap(messageId -> LyricsCmd.getMusixmatch(search)
+                        .flatMap(musixmatch -> context.editFollowupMessage(messageId,
+                                LyricsCmd.formatEmbed(musixmatch, context.getAuthorAvatarUrl())))
+                        .switchIfEmpty(context.editFollowupMessage(messageId,
+                                Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
+                                context.getAuthorName(), search)));
+    }
+
+    private static Consumer<EmbedCreateSpec> formatEmbed(final Musixmatch musixmatch, final String avatarUrl) {
+        final String artist = StringUtils.abbreviate(musixmatch.getArtist(), MAX_TITLE_LENGTH);
+        final String title = StringUtils.abbreviate(musixmatch.getTitle(), MAX_TITLE_LENGTH);
+        return ShadbotUtils.getDefaultEmbed(
+                embed -> embed.setAuthor(String.format("Lyrics: %s - %s", artist, title),
+                        musixmatch.getUrl(), avatarUrl)
+                        .setThumbnail(musixmatch.getImageUrl())
+                        .setDescription(StringUtils.abbreviate(musixmatch.getLyrics(), MAX_LYRICS_LENGTH))
+                        .setFooter("Click on the title to see the full version",
+                                "https://i.imgur.com/G7q6Hmq.png"));
+    }
+
+    private static Mono<Musixmatch> getMusixmatch(String search) {
         return LyricsCmd.getCorrectedUrl(search)
                 .flatMap(url -> LyricsCmd.getLyricsDocument(url)
                         .map(doc -> doc.outputSettings(PRESERVE_FORMAT))
@@ -86,13 +97,11 @@ public class LyricsCmd extends BaseCmd {
                 .filter(musixmatch -> !musixmatch.getLyrics().isBlank());
     }
 
-    */
-/**
- * @return The search term, either the current playing music title or the context argument.
- *//*
-
+    /*
+     * @return The search term, either the current playing music title or the context argument.
+     */
     private static String getSearch(Context context) {
-        return context.getArg()
+        return context.getOption("music")
                 .orElseGet(() -> {
                     final GuildMusic guildMusic = MusicManager.getInstance()
                             .getGuildMusic(context.getGuildId())
@@ -140,14 +149,4 @@ public class LyricsCmd extends BaseCmd {
                 .map(trackList -> HOME_URL + trackList.getElementsByClass("title").attr("href"));
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show lyrics for a song."
-                        + "\nCan also be used without argument when a music is being played to find corresponding lyrics.")
-                .addArg("search", true)
-                .setSource(HOME_URL)
-                .build();
-    }
 }
-*/

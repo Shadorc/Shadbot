@@ -1,10 +1,8 @@
-/*
 package com.shadorc.shadbot.command.info;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
@@ -40,7 +38,7 @@ public class UserInfoCmd extends BaseCmd {
         return builder
                 .addOption(ApplicationCommandOptionData.builder()
                         .name("user")
-                        .description("if not specified, it will show your info")
+                        .description("If not specified, it will show your info")
                         .type(ApplicationCommandOptionType.USER.getValue())
                         .required(false)
                         .build())
@@ -49,14 +47,11 @@ public class UserInfoCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final Mono<Member> getMemberOrAuthor = context.getGuild()
-                .flatMap(guild -> DiscordUtils.extractMemberOrAuthor(guild, context.getMessage()))
-                .cache();
+        final Mono<Member> getMemberOrAuthor = context.getOptionAsMember("user").cache();
 
         return Mono.zip(getMemberOrAuthor, getMemberOrAuthor.flatMapMany(Member::getRoles).collectList())
                 .map(TupleUtils.function((user, roles) -> this.getEmbed(user, roles, context.getAuthorAvatarUrl())))
-                .flatMap(embed -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)));
+                .flatMap(context::createFollowupMessage);
     }
 
     private Consumer<EmbedCreateSpec> getEmbed(Member member, List<Role> roles, String avatarUrl) {
@@ -76,8 +71,8 @@ public class UserInfoCmd extends BaseCmd {
             usernameBuilder.append(" (Booster)");
         }
 
-        return ShadbotUtils.getDefaultEmbed()
-                .andThen(embed -> {
+        return ShadbotUtils.getDefaultEmbed(
+                embed -> {
                     embed.setAuthor(String.format("User Info: %s", usernameBuilder), null, avatarUrl)
                             .setThumbnail(member.getAvatarUrl())
                             .addField("Display name", member.getDisplayName(), false)
@@ -92,4 +87,3 @@ public class UserInfoCmd extends BaseCmd {
     }
 
 }
-*/

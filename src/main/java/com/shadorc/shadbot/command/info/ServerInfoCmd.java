@@ -1,10 +1,8 @@
-/*
 package com.shadorc.shadbot.command.info;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.utils.DiscordUtils;
 import com.shadorc.shadbot.utils.FormatUtils;
 import com.shadorc.shadbot.utils.ShadbotUtils;
 import com.shadorc.shadbot.utils.TimeUtils;
@@ -45,8 +43,7 @@ public class ServerInfoCmd extends BaseCmd {
                 getGuild.flatMap(Guild::getRegion),
                 Mono.just(context.getAuthorAvatarUrl()))
                 .map(TupleUtils.function(this::getEmbed))
-                .flatMap(embed -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)));
+                .flatMap(context::createFollowupMessage);
     }
 
     private Consumer<EmbedCreateSpec> getEmbed(Guild guild, List<GuildChannel> channels, Member owner, Region region, String avatarUrl) {
@@ -56,16 +53,15 @@ public class ServerInfoCmd extends BaseCmd {
         final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
         final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
 
-        return ShadbotUtils.getDefaultEmbed()
-                .andThen(embed -> embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, avatarUrl)
+        return ShadbotUtils.getDefaultEmbed(
+                embed -> embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, avatarUrl)
                         .setThumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
                         .addField("Owner", owner.getUsername(), false)
                         .addField("Server ID", guild.getId().asString(), false)
                         .addField("Creation date", creationDate, false)
                         .addField("Region", region.getName(), false)
                         .addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), false)
-                        .addField("Members", Integer.toString(guild.getMemberCount()), false));
+                        .addField("Members", FormatUtils.number(guild.getMemberCount()), false));
     }
 
 }
-*/

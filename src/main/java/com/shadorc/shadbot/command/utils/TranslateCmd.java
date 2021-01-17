@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class TranslateCmd extends BaseCmd {
 
     public TranslateCmd() {
-        super(CommandCategory.UTILS, List.of("translate"));
+        super(CommandCategory.UTILS, "translate");
         this.setDefaultRateLimiter();
     }
 

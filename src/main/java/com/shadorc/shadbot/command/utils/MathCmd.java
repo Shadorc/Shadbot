@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.utils;
 
 import com.fathzer.soft.javaluator.DoubleEvaluator;
@@ -7,14 +6,13 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
 import java.text.DecimalFormat;
-import java.util.List;
-import java.util.function.Consumer;
 
 public class MathCmd extends BaseCmd {
 
@@ -22,7 +20,7 @@ public class MathCmd extends BaseCmd {
     private final DecimalFormat formatter;
 
     public MathCmd() {
-        super(CommandCategory.UTILS, List.of("math", "calc"));
+        super(CommandCategory.UTILS, "math", "Calculate an expression");
         this.setDefaultRateLimiter();
 
         this.evaluator = new DoubleEvaluator();
@@ -30,26 +28,24 @@ public class MathCmd extends BaseCmd {
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final String arg = context.requireArg();
-
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
-                        context.getUsername(), arg.replace("*", "\\*"),
-                        this.formatter.format(this.evaluator.evaluate(arg))), channel))
-                .onErrorMap(IllegalArgumentException.class, err -> new CommandException(err.getMessage()))
-                .then();
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Calculate an expression.")
-                .addArg("expression", false)
-                .setExample(String.format("`%s%s 3+3*3+3`%n`%s%s 2*cos(pi)`",
-                        context.getPrefix(), this.getName(), context.getPrefix(), this.getName()))
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("expression")
+                        .description("Expression to evaluate (e.g. 2*cos(pi))")
+                        .type(ApplicationCommandOptionType.STRING.getValue())
+                        .required(true)
+                        .build())
                 .build();
     }
 
+    @Override
+    public Mono<?> execute(Context context) {
+        final String arg = context.getOption("expression").orElseThrow();
+        return context.createFollowupMessage(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
+                context.getAuthorName(), arg.replace("*", "\\*"),
+                this.formatter.format(this.evaluator.evaluate(arg)))
+                .onErrorMap(IllegalArgumentException.class, err -> new CommandException(err.getMessage()));
+    }
+
 }
-*/
