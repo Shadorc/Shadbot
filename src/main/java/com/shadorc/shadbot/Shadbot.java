@@ -116,7 +116,7 @@ public class Shadbot {
                         .setMapping(new CaffeineStoreService(
                                 builder -> builder.expireAfterWrite(Duration.ofMinutes(30))), MessageData.class)
                         .setFallback(new JdkStoreService()))
-                .setInitialStatus(ignored -> ShadbotUtils.getRandomStatus())
+                .setInitialStatus(__ -> ShadbotUtils.getRandomStatus())
                 .setMemberRequestFilter(MemberRequestFilter.none())
                 .withGateway(gateway -> {
                     Shadbot.gateway = gateway;

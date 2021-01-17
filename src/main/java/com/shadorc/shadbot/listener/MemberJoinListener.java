@@ -39,7 +39,7 @@ public class MemberJoinListener implements EventListener<MemberJoinEvent> {
                 .flatMap(Guild::getSelfMember)
                 .flatMapMany(self -> self.getBasePermissions()
                         .filter(permissions -> permissions.contains(Permission.MANAGE_ROLES))
-                        .flatMap(ignored -> DatabaseManager.getGuilds().getSettings(event.getGuildId()))
+                        .flatMap(__ -> DatabaseManager.getGuilds().getSettings(event.getGuildId()))
                         .flatMapMany(settings -> Flux.fromIterable(settings.getAutoRoleIds())
                                 .flatMap(roleId -> event.getClient().getRoleById(event.getGuildId(), roleId))
                                 .filterWhen(role -> self.hasHigherRoles(Set.of(role.getId())))

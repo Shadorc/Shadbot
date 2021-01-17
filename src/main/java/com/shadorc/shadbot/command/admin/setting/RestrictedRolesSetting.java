@@ -109,7 +109,7 @@ public class RestrictedRolesSetting extends BaseSetting {
 
                     switch (action) {
                         case ADD -> {
-                            restrictedRoles.computeIfAbsent(mentionedRole.getId(), ignored -> new HashSet<>())
+                            restrictedRoles.computeIfAbsent(mentionedRole.getId(), __ -> new HashSet<>())
                                     .addAll(commands);
                             strBuilder.append(
                                     String.format("Command(s) %s can now only be used by role **%s**.",

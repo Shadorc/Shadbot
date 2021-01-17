@@ -42,7 +42,7 @@ public class SkipCmd extends BaseCmd {
                         playlistSize)));
             }
             return sendMessage
-                    .doOnNext(ignored -> {
+                    .doOnNext(__ -> {
                         guildMusic.getTrackScheduler().skipTo(num);
                         // If the music has been started correctly, we resume it in case the previous music was paused
                         guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
@@ -50,7 +50,7 @@ public class SkipCmd extends BaseCmd {
                     .then();
         } else {
             return sendMessage
-                    .flatMap(ignored -> {
+                    .flatMap(__ -> {
                         // If the music has been started correctly
                         if (guildMusic.getTrackScheduler().nextTrack()) {
                             // we resume it in case the previous music was paused.

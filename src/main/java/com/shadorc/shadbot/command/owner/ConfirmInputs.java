@@ -32,7 +32,7 @@ public class ConfirmInputs extends Inputs {
         return Mono.justOrEmpty(event.getMessage().getAuthor())
                 .map(User::getId)
                 .filter(Shadbot.getOwnerId()::equals)
-                .map(ignored -> event.getMessage().getContent())
+                .map(__ -> event.getMessage().getContent())
                 .map(content -> {
                     if ("n".equalsIgnoreCase(content) || "no".equalsIgnoreCase(content)) {
                         this.isCancelled.set(true);

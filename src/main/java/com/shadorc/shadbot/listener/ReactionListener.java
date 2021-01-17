@@ -111,7 +111,7 @@ public class ReactionListener {
                 .filter(selfId -> !userId.equals(selfId))
                 // If the bot is not the author of the message, this is not an Iam message
                 .filter(selfId -> message.getAuthor().map(User::getId).map(selfId::equals).orElse(false))
-                .flatMap(ignored -> message.getGuild().flatMap(guild -> guild.getMemberById(userId)))
+                .flatMap(__ -> message.getGuild().flatMap(guild -> guild.getMemberById(userId)))
                 .flatMap(member -> ReactionListener.execute(message, member, action));
     }
 

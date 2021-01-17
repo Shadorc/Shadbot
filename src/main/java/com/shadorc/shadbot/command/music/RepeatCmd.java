@@ -29,7 +29,7 @@ public class RepeatCmd extends BaseCmd {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
         return DiscordUtils.requireVoiceChannel(context)
-                .map(ignored -> {
+                .map(__ -> {
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
                     final TrackScheduler.RepeatMode oldMode = scheduler.getRepeatMode();
                     final TrackScheduler.RepeatMode newMode = context.getArg()

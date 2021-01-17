@@ -109,7 +109,7 @@ public class RestrictedChannelsSetting extends BaseSetting {
                             .getRestrictedChannels();
                     switch (action) {
                         case ADD -> {
-                            restrictedCategories.computeIfAbsent(mentionedChannel.getId(), ignored -> new HashSet<>())
+                            restrictedCategories.computeIfAbsent(mentionedChannel.getId(), __ -> new HashSet<>())
                                     .addAll(commands);
                             strBuilder.append(
                                     String.format("Command(s) %s can now only be used in channel **#%s**.",

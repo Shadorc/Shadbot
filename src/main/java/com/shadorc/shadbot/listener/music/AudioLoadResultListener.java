@@ -104,7 +104,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                             .map(avatarUrl -> this.getPlaylistEmbed(playlist, avatarUrl))
                             .flatMap(embed -> guildMusic.getMessageChannel()
                                     .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
-                            .flatMapMany(ignored ->
+                            .flatMapMany(__ ->
                                     AudioLoadResultInputs.create(guildMusic.getGateway(), Duration.ofSeconds(30),
                                             guildMusic.getMessageChannelId(), this)
                                             .waitForInputs()

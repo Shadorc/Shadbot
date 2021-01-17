@@ -4,7 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.shadorc.shadbot.api.ServerAccessException;
 import com.shadorc.shadbot.api.html.musixmatch.Musixmatch;
-import com.shadorc.shadbot.command.MissingArgumentException;
+import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -105,11 +105,11 @@ public class LyricsCmd extends BaseCmd {
                 .orElseGet(() -> {
                     final GuildMusic guildMusic = MusicManager.getInstance()
                             .getGuildMusic(context.getGuildId())
-                            .orElseThrow(MissingArgumentException::new);
+                            .orElseThrow(() -> new CommandException("No music is playing. Argument should be provided."));
 
                     final AudioTrack track = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack();
                     if (track == null) {
-                        throw new MissingArgumentException();
+                        throw new CommandException("No music is playing. Argument should be provided.");
                     }
                     final AudioTrackInfo info = track.getInfo();
                     // Remove from title (case insensitive): official, video, music, [, ], (, )

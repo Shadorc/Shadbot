@@ -49,7 +49,7 @@ public class AudioLoadResultInputs extends Inputs {
                 .flatMap(guildMusic -> {
                     final String content = event.getMessage().getContent();
 
-                    if (content.equals("/cancel")) {
+                    if ("/cancel".equals(content)) {
                         guildMusic.setWaitingForChoice(false);
                         return guildMusic.getMessageChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(
@@ -59,7 +59,7 @@ public class AudioLoadResultInputs extends Inputs {
                     }
 
                     // Remove prefix and command name from message content
-                    String contentCleaned = StringUtils.remove(content, "/play");
+                    final String contentCleaned = StringUtils.remove(content, "/play");
 
                     final Set<Integer> choices = new HashSet<>();
                     for (final String choice : contentCleaned.split(",")) {

@@ -37,7 +37,7 @@ public class TaskManager {
     public void schedulePresenceUpdates(GatewayDiscordClient gateway) {
         LOGGER.info("Scheduling presence updates");
         final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofMinutes(15), DEFAULT_SCHEDULER)
-                .map(ignored -> ShadbotUtils.getRandomStatus())
+                .map(__ -> ShadbotUtils.getRandomStatus())
                 .flatMap(gateway::updatePresence)
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
@@ -47,7 +47,7 @@ public class TaskManager {
 /*    public void scheduleLottery(GatewayDiscordClient gateway) {
         LOGGER.info("Starting lottery (next draw in {})", FormatUtils.formatDurationWords(LotteryCmd.getDelay()));
         final Disposable task = Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), DEFAULT_SCHEDULER)
-                .flatMap(ignored -> LotteryCmd.draw(gateway))
+                .flatMap(__ -> LotteryCmd.draw(gateway))
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
         this.tasks.add(task);
@@ -74,7 +74,7 @@ public class TaskManager {
                     Telemetry.GC_TIME_GAUGE.set(ProcessUtils.getGCTime());
                     Telemetry.GUILD_COUNT_GAUGE.set(guildCount);
                 })
-                .flatMap(ignored -> getResponseTimes)
+                .flatMap(__ -> getResponseTimes)
                 .doOnNext(responseTimeMap -> responseTimeMap
                         .forEach((key, value) -> Telemetry.RESPONSE_TIME_GAUGE.labels(key.toString()).set(value)))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
@@ -85,7 +85,7 @@ public class TaskManager {
     public void schedulePostStats(BotListStats botListStats) {
         LOGGER.info("Starting bot list stats scheduler");
         final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofHours(3), DEFAULT_SCHEDULER)
-                .flatMap(ignored -> botListStats.postStats())
+                .flatMap(__ -> botListStats.postStats())
                 .subscribe(null, ExceptionHandler::handleUnknownError);
         this.tasks.add(task);
     }

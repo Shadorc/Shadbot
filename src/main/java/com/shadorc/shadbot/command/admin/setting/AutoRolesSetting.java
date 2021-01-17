@@ -107,7 +107,7 @@ public class AutoRolesSetting extends BaseSetting {
                                             " I can't automatically add this role because I'm lower or " +
                                             "at the same level in the role hierarchy.", channel)
                                             .then(Mono.empty()))
-                                    .map(ignored -> roles)));
+                                    .map(__ -> roles)));
         }
         return Mono.just(roles);
     }

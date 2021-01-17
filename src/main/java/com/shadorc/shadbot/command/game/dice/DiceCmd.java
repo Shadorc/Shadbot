@@ -93,7 +93,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
 
             return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), args.get(1))
                     .map(bet -> this.getManagers().computeIfAbsent(context.getChannelId(),
-                            ignored -> new DiceGame(this, context, bet)))
+                            __ -> new DiceGame(this, context, bet)))
                     .flatMap(diceManager -> {
                         final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(),
                                 diceManager.getBet(), number);

@@ -94,7 +94,7 @@ public class MusicManager {
                     final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
 
                     return this.joinVoiceChannel(gateway, guildId, voiceChannelId, audioProvider)
-                            .flatMap(ignored -> DatabaseManager.getGuilds().getDBGuild(guildId))
+                            .flatMap(__ -> DatabaseManager.getGuilds().getDBGuild(guildId))
                             .map(DBGuild::getSettings)
                             .map(Settings::getDefaultVol)
                             .map(volume -> new TrackScheduler(audioPlayer, volume))
@@ -126,8 +126,8 @@ public class MusicManager {
         return gateway.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
                 // Do not join the voice channel if the current voice connection is in not disconnected
-                .filterWhen(ignored -> isDisconnected)
-                .doOnNext(ignored -> LOGGER.info("{Guild ID: {}} Joining voice channel...", guildId.asLong()))
+                .filterWhen(__ -> isDisconnected)
+                .doOnNext(__ -> LOGGER.info("{Guild ID: {}} Joining voice channel...", guildId.asLong()))
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
                 .doOnTerminate(() -> this.guildJoining.remove(guildId));
     }

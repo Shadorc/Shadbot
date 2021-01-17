@@ -109,7 +109,7 @@ public class DiscordUtils {
                         .filter(err -> err instanceof PrematureCloseException
                                 || err instanceof Errors.NativeIoException
                                 || err instanceof TimeoutException))
-                .doOnSuccess(ignored -> Telemetry.MESSAGE_SENT_COUNTER.inc());
+                .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc());
     }
 
     public static Mono<Member> extractMemberOrAuthor(Guild guild, Message message) {

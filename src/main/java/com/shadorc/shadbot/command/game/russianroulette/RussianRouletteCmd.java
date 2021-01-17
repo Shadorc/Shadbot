@@ -37,7 +37,7 @@ public class RussianRouletteCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
-                .map(ignored -> this.getPlayer(context.getGuildId(), context.getAuthorId()))
+                .map(__ -> this.getPlayer(context.getGuildId(), context.getAuthorId()))
                 .filter(RussianRoulettePlayer::isAlive)
                 .switchIfEmpty(context.getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(

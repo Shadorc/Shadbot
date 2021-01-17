@@ -30,7 +30,7 @@ public class SlotMachineCmd extends BaseCmd {
     @Override
     public Mono<Void> execute(Context context) {
         return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
-                .map(ignored -> new GamblerPlayer(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST))
+                .map(__ -> new GamblerPlayer(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST))
                 .flatMap(player -> player.bet().thenReturn(player))
                 .flatMap(player -> {
                     final List<SlotOptions> slots = SlotMachineCmd.randSlots();

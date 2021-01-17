@@ -43,7 +43,7 @@ public class RateLimiter {
 
     public boolean isLimitedAndWarn(Snowflake channelId, Member member) {
         final LimitedUser limitedUser = this.guildsLimitedMap.computeIfAbsent(member.getGuildId(),
-                ignored -> new LimitedGuild(this.bandwidth))
+                __ -> new LimitedGuild(this.bandwidth))
                 .getUser(member.getId());
 
         // The token could not been consumed, the user is limited

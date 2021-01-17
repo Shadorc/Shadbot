@@ -51,7 +51,7 @@ public abstract class Game<G extends GameCmd<?>> {
         this.cancelScheduledTask();
         this.isScheduled.set(true);
         this.scheduledTask = Mono.delay(this.duration, Schedulers.boundedElastic())
-                .doOnNext(ignored -> this.isScheduled.set(false))
+                .doOnNext(__ -> this.isScheduled.set(false))
                 .then(mono)
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }

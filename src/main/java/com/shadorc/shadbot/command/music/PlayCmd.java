@@ -103,7 +103,7 @@ public class PlayCmd extends BaseCmd {
         return DatabaseManager.getPremium()
                 .isPremium(context.getGuildId(), context.getAuthorId())
                 .filter(isPremium -> guildMusic.getTrackScheduler().getPlaylist().size() < Config.PLAYLIST_SIZE - 1 || isPremium)
-                .doOnNext(ignored -> {
+                .doOnNext(__ -> {
                     final boolean insertFirst = context.getCommandName().endsWith("first");
                     final AudioLoadResultListener resultListener = new AudioLoadResultListener(
                             context.getGuildId(), context.getAuthorId(), identifier, insertFirst);

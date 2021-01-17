@@ -96,7 +96,7 @@ public class BotListStats {
                         .and(this.postOnDiscordextremelistDotXyz(guildCount))
                         .and(this.postOnDiscordBotsDotGg(shardCount, guildCount))
                         .and(this.postOnTopDotGg(shardCount, guildCount)))
-                .doOnSuccess(ignored -> LOGGER.info("Statistics posted"));
+                .doOnSuccess(__ -> LOGGER.info("Statistics posted"));
     }
 
     /**

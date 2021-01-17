@@ -54,8 +54,8 @@ public class GuildMusic {
     public void scheduleLeave() {
         LOGGER.debug("{Guild ID: {}} Scheduling auto-leave", this.guildId);
         this.leavingTask.set(Mono.delay(LEAVE_DELAY, Schedulers.boundedElastic())
-                .filter(ignored -> this.isLeavingScheduled())
-                .map(ignored -> this.gateway.getVoiceConnectionRegistry())
+                .filter(__ -> this.isLeavingScheduled())
+                .map(__ -> this.gateway.getVoiceConnectionRegistry())
                 .flatMap(registry -> registry.getVoiceConnection(Snowflake.of(this.guildId)))
                 .flatMap(VoiceConnection::disconnect)
                 .subscribe(null, ExceptionHandler::handleUnknownError));
@@ -89,7 +89,7 @@ public class GuildMusic {
         LOGGER.debug("{Guild ID: {}} Ending guild music", this.guildId);
         return this.getGateway()
                 .getVoiceConnectionRegistry()
-                .getVoiceConnection(Snowflake.of(this.guildId))
+                .getVoiceConnection(this.getGuildId())
                 .flatMap(VoiceConnection::disconnect)
                 .then(this.getMessageChannel())
                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel))

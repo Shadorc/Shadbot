@@ -65,10 +65,10 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
     private Mono<Void> loadWords(Difficulty difficulty) {
         if (difficulty == Difficulty.EASY && !this.easyWords.isLoaded()) {
             return this.easyWords.load()
-                    .doOnSuccess(ignored -> DEFAULT_LOGGER.info("Hangman word list (difficulty: easy) obtained"));
+                    .doOnSuccess(__ -> DEFAULT_LOGGER.info("Hangman word list (difficulty: easy) obtained"));
         } else if (difficulty == Difficulty.HARD && !this.hardWords.isLoaded()) {
             return this.hardWords.load()
-                    .doOnSuccess(ignored -> DEFAULT_LOGGER.info("Hangman word list (difficulty: hard) obtained"));
+                    .doOnSuccess(__ -> DEFAULT_LOGGER.info("Hangman word list (difficulty: hard) obtained"));
         }
         return Mono.empty();
     }

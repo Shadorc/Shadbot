@@ -121,14 +121,14 @@ public class Context {
         // The author is a bot's owner
         final Mono<CommandPermission> ownerPerm = Mono.just(this.getAuthorId())
                 .filter(Shadbot.getOwnerId()::equals)
-                .map(ignored -> CommandPermission.OWNER);
+                .map(__ -> CommandPermission.OWNER);
 
         // The member is an administrator or it's a private message
         final Mono<CommandPermission> adminPerm = this.getChannel()
                 .filterWhen(channel -> BooleanUtils.or(
                         DiscordUtils.hasPermission(channel, this.getAuthorId(), Permission.ADMINISTRATOR),
                         Mono.just(channel.getType() == Channel.Type.DM)))
-                .map(ignored -> CommandPermission.ADMIN);
+                .map(__ -> CommandPermission.ADMIN);
 
         return Flux.merge(ownerPerm, adminPerm, Mono.just(CommandPermission.USER));
     }
