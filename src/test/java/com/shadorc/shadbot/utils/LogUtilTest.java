@@ -10,13 +10,13 @@ public class LogUtilTest {
     public void testGetLogger() {
         assertEquals("shadbot", LogUtil.getLogger().getName());
         assertEquals("shadbot.music", LogUtil.getLogger(LogUtil.Category.MUSIC).getName());
-        assertEquals("shadbot.music.LogUtilsTest",
+        assertEquals("shadbot.music.LogUtilTest",
                 LogUtil.getLogger(LogUtilTest.class, LogUtil.Category.MUSIC).getName());
         assertEquals("shadbot.music.database",
                 LogUtil.getLogger(LogUtil.Category.MUSIC, LogUtil.Category.DATABASE).getName());
-        assertEquals("shadbot.music.database.LogUtilsTest",
+        assertEquals("shadbot.music.database.LogUtilTest",
                 LogUtil.getLogger(LogUtilTest.class, LogUtil.Category.MUSIC, LogUtil.Category.DATABASE).getName());
-        assertEquals("shadbot.LogUtilsTest", LogUtil.getLogger(LogUtilTest.class).getName());
+        assertEquals("shadbot.LogUtilTest", LogUtil.getLogger(LogUtilTest.class).getName());
     }
 
 }
