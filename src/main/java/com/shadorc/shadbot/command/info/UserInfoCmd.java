@@ -3,9 +3,9 @@ package com.shadorc.shadbot.command.info;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -55,13 +55,13 @@ public class UserInfoCmd extends BaseCmd {
     }
 
     private Consumer<EmbedCreateSpec> getEmbed(Member member, List<Role> roles, String avatarUrl) {
-        final LocalDateTime createTime = TimeUtils.toLocalDateTime(member.getId().getTimestamp());
+        final LocalDateTime createTime = TimeUtil.toLocalDateTime(member.getId().getTimestamp());
         final String creationDate = String.format("%s%n(%s)",
-                createTime.format(this.dateFormatter), FormatUtils.formatLongDuration(createTime));
+                createTime.format(this.dateFormatter), FormatUtil.formatLongDuration(createTime));
 
-        final LocalDateTime joinTime = TimeUtils.toLocalDateTime(member.getJoinTime());
+        final LocalDateTime joinTime = TimeUtil.toLocalDateTime(member.getJoinTime());
         final String joinDate = String.format("%s%n(%s)",
-                joinTime.format(this.dateFormatter), FormatUtils.formatLongDuration(joinTime));
+                joinTime.format(this.dateFormatter), FormatUtil.formatLongDuration(joinTime));
 
         final StringBuilder usernameBuilder = new StringBuilder(member.getUsername());
         if (member.isBot()) {
@@ -71,7 +71,7 @@ public class UserInfoCmd extends BaseCmd {
             usernameBuilder.append(" (Booster)");
         }
 
-        return ShadbotUtils.getDefaultEmbed(
+        return ShadbotUtil.getDefaultEmbed(
                 embed -> {
                     embed.setAuthor(String.format("User Info: %s", usernameBuilder), null, avatarUrl)
                             .setThumbnail(member.getAvatarUrl())
@@ -81,7 +81,7 @@ public class UserInfoCmd extends BaseCmd {
                             .addField("Join date", joinDate, false);
 
                     if (!roles.isEmpty()) {
-                        embed.addField("Roles", FormatUtils.format(roles, Role::getMention, "\n"), true);
+                        embed.addField("Roles", FormatUtil.format(roles, Role::getMention, "\n"), true);
                     }
                 });
     }

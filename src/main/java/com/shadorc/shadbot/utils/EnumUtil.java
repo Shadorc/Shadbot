@@ -2,7 +2,7 @@ package com.shadorc.shadbot.utils;
 
 import reactor.util.annotation.Nullable;
 
-public class EnumUtils {
+public class EnumUtil {
 
     /**
      * @param enumClass The {@link Enum} class.
@@ -27,7 +27,7 @@ public class EnumUtils {
      * @throws X if the value is null.
      */
     public static <T extends Enum<T>, X extends Throwable> T parseEnum(Class<T> enumClass, @Nullable String value, X exception) throws X {
-        final T enumValue = EnumUtils.parseEnum(enumClass, value);
+        final T enumValue = EnumUtil.parseEnum(enumClass, value);
         if (enumValue != null) {
             return enumValue;
         } else {

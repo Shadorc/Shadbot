@@ -3,9 +3,9 @@ package com.shadorc.shadbot.command.info;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.object.Region;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
@@ -47,13 +47,13 @@ public class ServerInfoCmd extends BaseCmd {
     }
 
     private Consumer<EmbedCreateSpec> getEmbed(Guild guild, List<GuildChannel> channels, Member owner, Region region, String avatarUrl) {
-        final LocalDateTime creationTime = TimeUtils.toLocalDateTime(guild.getId().getTimestamp());
+        final LocalDateTime creationTime = TimeUtil.toLocalDateTime(guild.getId().getTimestamp());
         final String creationDate = String.format("%s%n(%s)",
-                creationTime.format(this.dateFormatter), FormatUtils.formatLongDuration(creationTime));
+                creationTime.format(this.dateFormatter), FormatUtil.formatLongDuration(creationTime));
         final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
         final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
 
-        return ShadbotUtils.getDefaultEmbed(
+        return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, avatarUrl)
                         .setThumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
                         .addField("Owner", owner.getUsername(), false)
@@ -61,7 +61,7 @@ public class ServerInfoCmd extends BaseCmd {
                         .addField("Creation date", creationDate, false)
                         .addField("Region", region.getName(), false)
                         .addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), false)
-                        .addField("Members", FormatUtils.number(guild.getMemberCount()), false));
+                        .addField("Members", FormatUtil.number(guild.getMemberCount()), false));
     }
 
 }

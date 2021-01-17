@@ -3,8 +3,8 @@ package com.shadorc.shadbot.listener;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.LogUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.LogUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.object.VoiceState;
@@ -15,7 +15,7 @@ import reactor.util.Logger;
 
 public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateEvent> {
 
-    private static final Logger LOGGER = LogUtils.getLogger(VoiceStateUpdateListener.class, LogUtils.Category.MUSIC);
+    private static final Logger LOGGER = LogUtil.getLogger(VoiceStateUpdateListener.class, LogUtil.Category.MUSIC);
 
     @Override
     public Class<VoiceStateUpdateEvent> getEventType() {
@@ -84,7 +84,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
                             return strBuilder.toString();
                         })
                         .flatMap(content -> guildMusic.getMessageChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(content, channel))));
+                                .flatMap(channel -> DiscordUtil.sendMessage(content, channel))));
     }
 
 }

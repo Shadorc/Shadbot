@@ -6,10 +6,10 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.NumberUtil;
+import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
@@ -41,16 +41,16 @@ public class BackwardCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
-        return DiscordUtils.requireVoiceChannel(context)
+        return DiscordUtil.requireVoiceChannel(context)
                 .flatMap(__ -> {
                     final String option = context.getOption("time").orElseThrow();
 
                     // If the argument is a number of seconds...
-                    Long time = NumberUtils.toPositiveLongOrNull(option);
+                    Long time = NumberUtil.toPositiveLongOrNull(option);
                     if (time == null) {
                         try {
                             // ... else, try to parse it
-                            time = TimeUtils.parseTime(option);
+                            time = TimeUtil.parseTime(option);
                         } catch (final IllegalArgumentException err) {
                             return Mono.error(new CommandException(String.format("`%s` is not a valid number / time.", option)));
                         }
@@ -59,7 +59,7 @@ public class BackwardCmd extends BaseCmd {
                     final long newPosition = guildMusic.getTrackScheduler()
                             .changePosition(-TimeUnit.SECONDS.toMillis(time));
                     return context.createFollowupMessage(Emoji.CHECK_MARK + " (**%s**) New position set to **%s**.",
-                            FormatUtils.formatDuration(newPosition), context.getAuthorName());
+                            FormatUtil.formatDuration(newPosition), context.getAuthorName());
                 });
     }
 

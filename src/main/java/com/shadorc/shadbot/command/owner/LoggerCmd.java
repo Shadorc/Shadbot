@@ -8,7 +8,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
@@ -42,7 +42,7 @@ public class LoggerCmd extends BaseCmd {
                         .build())
                 .addOption(ApplicationCommandOptionData.builder()
                         .name("level")
-                        .description(FormatUtils.format(LogLevel.class, ", "))
+                        .description(FormatUtil.format(LogLevel.class, ", "))
                         .type(ApplicationCommandOptionType.STRING.getValue())
                         .required(true)
                         .build())
@@ -56,7 +56,7 @@ public class LoggerCmd extends BaseCmd {
         final Level level = Level.toLevel(levelStr.toUpperCase(), null);
         if (level == null) {
             return Mono.error(new CommandException(String.format("`%s` in not a valid level. %s",
-                    levelStr, FormatUtils.options(LogLevel.class))));
+                    levelStr, FormatUtil.options(LogLevel.class))));
         }
 
         final Logger logger;

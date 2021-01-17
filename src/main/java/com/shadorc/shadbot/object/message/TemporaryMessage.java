@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.object.message;
 
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.MessageChannel;
@@ -39,7 +39,7 @@ public class TemporaryMessage {
     public Mono<Void> send(String content) {
         return this.gateway.getChannelById(this.channelId)
                 .cast(MessageChannel.class)
-                .flatMap(channel -> DiscordUtils.sendMessage(content, channel))
+                .flatMap(channel -> DiscordUtil.sendMessage(content, channel))
                 .flatMap(message -> Mono.delay(this.duration, Schedulers.boundedElastic())
                         .then(message.delete()))
                 // TODO: Remove once the empty on 404 issue is fixed

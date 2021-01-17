@@ -5,7 +5,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
 import reactor.core.publisher.Mono;
 
 public class NameCmd extends BaseCmd {
@@ -24,6 +24,6 @@ public class NameCmd extends BaseCmd {
                 .getInfo();
 
         return context.createFollowupMessage(Emoji.MUSICAL_NOTE + " (**%s**) Currently playing: **%s**",
-                context.getAuthorName(), FormatUtils.trackName(trackInfo));
+                context.getAuthorName(), FormatUtil.trackName(trackInfo));
     }
 }

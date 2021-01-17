@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.data.credential;
 
-import com.shadorc.shadbot.utils.LogUtils;
+import com.shadorc.shadbot.utils.LogUtil;
 import reactor.util.Logger;
 import reactor.util.annotation.Nullable;
 
@@ -13,7 +13,7 @@ import java.util.Properties;
 
 public class CredentialManager {
 
-    private static final Logger LOGGER = LogUtils.getLogger(CredentialManager.class);
+    private static final Logger LOGGER = LogUtil.getLogger(CredentialManager.class);
 
     private static CredentialManager instance;
 

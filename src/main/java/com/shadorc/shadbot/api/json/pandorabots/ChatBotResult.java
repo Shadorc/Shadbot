@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.api.json.pandorabots;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.StringUtil;
 
 public class ChatBotResult {
 
@@ -11,7 +11,7 @@ public class ChatBotResult {
     private String custid;
 
     public String getResponse() {
-        return StringUtils.normalizeSpace(this.response.replace("<br>", "\n"));
+        return StringUtil.normalizeSpace(this.response.replace("<br>", "\n"));
     }
 
     public String getCustId() {

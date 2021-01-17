@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.shadorc.shadbot.api.HeaderException;
 import com.shadorc.shadbot.api.ServerAccessException;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.utils.LogUtils;
-import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.LogUtil;
+import com.shadorc.shadbot.utils.NetUtil;
 import io.netty.channel.unix.Errors;
 import io.netty.handler.codec.http.*;
 import org.json.JSONException;
@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 
 public class RequestHelper {
 
-    private static final Logger LOGGER = LogUtils.getLogger(RequestHelper.class);
+    private static final Logger LOGGER = LogUtil.getLogger(RequestHelper.class);
     private static final HttpClient HTTP_CLIENT = HttpClient.create().followRedirect(true);
 
     private final String url;
@@ -103,7 +103,7 @@ public class RequestHelper {
                         LOGGER.debug("JSON deserialized from {}: {}",
                                 resp.fullPath(), new JSONObject(json).toString(2));
                     }
-                    return NetUtils.MAPPER.readValue(json, type);
+                    return NetUtil.MAPPER.readValue(json, type);
                 })
                         .onErrorMap(err -> err instanceof JSONException || err instanceof JsonProcessingException,
                                 err -> new IOException(err.getMessage(),

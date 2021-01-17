@@ -5,7 +5,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import reactor.core.publisher.Mono;
 
 public class PauseCmd extends BaseCmd {
@@ -19,7 +19,7 @@ public class PauseCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final AudioPlayer audioPlayer = context.requireGuildMusic().getTrackScheduler().getAudioPlayer();
 
-        return DiscordUtils.requireVoiceChannel(context)
+        return DiscordUtil.requireVoiceChannel(context)
                 .map(__ -> {
                     audioPlayer.setPaused(!audioPlayer.isPaused());
                     if (audioPlayer.isPaused()) {

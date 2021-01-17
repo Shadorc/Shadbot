@@ -12,10 +12,10 @@ import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.music.TrackScheduler;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.ExceptionHandler;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -57,9 +57,9 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .filter(guildMusic -> !guildMusic.getTrackScheduler().startOrQueue(audioTrack, this.insertFirst))
                 .flatMap(GuildMusic::getMessageChannel)
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(
+                .flatMap(channel -> DiscordUtil.sendMessage(String.format(
                         Emoji.MUSICAL_NOTE + " **%s** has been added to the playlist.",
-                        FormatUtils.trackName(audioTrack.getInfo())), channel))
+                        FormatUtil.trackName(audioTrack.getInfo())), channel))
                 .then(this.terminate())
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, ExceptionHandler::handleUnknownError);
@@ -103,7 +103,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                             .map(User::getAvatarUrl)
                             .map(avatarUrl -> this.getPlaylistEmbed(playlist, avatarUrl))
                             .flatMap(embed -> guildMusic.getMessageChannel()
-                                    .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
+                                    .flatMap(channel -> DiscordUtil.sendMessage(embed, channel)))
                             .flatMapMany(__ ->
                                     AudioLoadResultInputs.create(guildMusic.getGateway(), Duration.ofSeconds(30),
                                             guildMusic.getMessageChannelId(), this)
@@ -128,14 +128,14 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                         musicsAdded++;
                         // The playlist limit is reached and the user / guild is not premium
                         if (trackScheduler.getPlaylist().size() >= Config.PLAYLIST_SIZE - 1 && !isPremium) {
-                            strBuilder.append(ShadbotUtils.PLAYLIST_LIMIT_REACHED + "\n");
+                            strBuilder.append(ShadbotUtil.PLAYLIST_LIMIT_REACHED + "\n");
                             break;
                         }
                     }
 
                     strBuilder.append(String.format(Emoji.MUSICAL_NOTE + " %d musics have been added to the playlist.", musicsAdded));
                     return guildMusic.getMessageChannel()
-                            .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel));
+                            .flatMap(channel -> DiscordUtil.sendMessage(strBuilder.toString(), channel));
                 }))
                 .then(this.terminate())
                 .subscribeOn(Schedulers.boundedElastic())
@@ -143,14 +143,14 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
     private Consumer<EmbedCreateSpec> getPlaylistEmbed(AudioPlaylist playlist, String avatarUrl) {
-        final String choices = FormatUtils.numberedList(Config.MUSIC_SEARCHES, playlist.getTracks().size(),
+        final String choices = FormatUtil.numberedList(Config.MUSIC_SEARCHES, playlist.getTracks().size(),
                 count -> {
                     final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
-                    return String.format("\t**%d.** [%s](%s)", count, FormatUtils.trackName(info), info.uri);
+                    return String.format("\t**%d.** [%s](%s)", count, FormatUtil.trackName(info), info.uri);
                 });
 
-        final String playlistName = StringUtils.abbreviate(playlist.getName(), MAX_PLAYLIST_NAME_LENGTH);
-        return ShadbotUtils.getDefaultEmbed(
+        final String playlistName = StringUtil.abbreviate(playlist.getName(), MAX_PLAYLIST_NAME_LENGTH);
+        return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(playlistName, null, avatarUrl)
                         .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
                         .setDescription("**Select a music by typing the corresponding number.**"
@@ -166,10 +166,10 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
         LOGGER.debug("{Guild ID: {}} Load failed: {}", this.guildId.asLong(), err);
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .flatMap(guildMusic -> {
-                    final String errMessage = ShadbotUtils.cleanLavaplayerErr(err);
+                    final String errMessage = ShadbotUtil.cleanLavaplayerErr(err);
                     LOGGER.info("{Guild ID: {}} Load failed: {}", this.guildId.asLong(), errMessage);
                     return guildMusic.getMessageChannel()
-                            .flatMap(channel -> DiscordUtils.sendMessage(
+                            .flatMap(channel -> DiscordUtil.sendMessage(
                                     String.format(Emoji.RED_CROSS + " Something went wrong while loading the track: %s",
                                             errMessage.toLowerCase()), channel));
                 })
@@ -187,8 +187,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     private void onNoMatches() {
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .flatMap(GuildMusic::getMessageChannel)
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
-                        StringUtils.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
+                .flatMap(channel -> DiscordUtil.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
+                        StringUtil.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
                 .then(this.terminate())
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, ExceptionHandler::handleUnknownError);

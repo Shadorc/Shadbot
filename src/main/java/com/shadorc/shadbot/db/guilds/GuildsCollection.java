@@ -8,8 +8,8 @@ import com.shadorc.shadbot.db.guilds.bean.DBGuildBean;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
-import com.shadorc.shadbot.utils.LogUtils;
-import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.LogUtil;
+import com.shadorc.shadbot.utils.NetUtil;
 import discord4j.common.util.Snowflake;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
@@ -23,7 +23,7 @@ import java.util.Set;
 
 public class GuildsCollection extends DatabaseCollection {
 
-    public static final Logger LOGGER = LogUtils.getLogger(GuildsCollection.class, LogUtils.Category.DATABASE);
+    public static final Logger LOGGER = LogUtil.getLogger(GuildsCollection.class, LogUtil.Category.DATABASE);
     public static final String NAME = "guilds";
 
     public GuildsCollection(MongoDatabase database) {
@@ -39,7 +39,7 @@ public class GuildsCollection extends DatabaseCollection {
 
         return Mono.from(request)
                 .flatMap(document -> Mono.fromCallable(() ->
-                        new DBGuild(NetUtils.MAPPER.readValue(document.toJson(JSON_WRITER_SETTINGS), DBGuildBean.class))))
+                        new DBGuild(NetUtil.MAPPER.readValue(document.toJson(JSON_WRITER_SETTINGS), DBGuildBean.class))))
                 .doOnSuccess(consumer -> {
                     if (consumer == null) {
                         LOGGER.debug("[DBGuild {}] Not found", guildId.asLong());

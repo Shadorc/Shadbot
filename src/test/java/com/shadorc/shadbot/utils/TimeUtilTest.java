@@ -10,14 +10,14 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TimeUtilsTest {
+public class TimeUtilTest {
 
     @Test
     public void testIsLocalDateInTheSameWeek() {
-        assertTrue(TimeUtils.isLocalDateInTheSameWeek(LocalDate.now(), LocalDate.now()));
-        assertTrue(TimeUtils.isLocalDateInTheSameWeek(
+        assertTrue(TimeUtil.isLocalDateInTheSameWeek(LocalDate.now(), LocalDate.now()));
+        assertTrue(TimeUtil.isLocalDateInTheSameWeek(
                 LocalDate.of(2020, 4, 11), LocalDate.of(2020, 4, 6)));
-        assertFalse(TimeUtils.isLocalDateInTheSameWeek(
+        assertFalse(TimeUtil.isLocalDateInTheSameWeek(
                 LocalDate.of(2020, 4, 11), LocalDate.of(2020, 4, 13)));
     }
 
@@ -25,7 +25,7 @@ public class TimeUtilsTest {
     public void testGetMillisUntilInstant() {
         final int offset = 30;
         final int millis = new Random().nextInt(10_000);
-        final long elapsed = TimeUtils.getMillisUntil(Instant.now().minusMillis(millis));
+        final long elapsed = TimeUtil.getMillisUntil(Instant.now().minusMillis(millis));
         assertTrue(elapsed >= millis - offset && elapsed <= millis + offset);
     }
 
@@ -33,23 +33,23 @@ public class TimeUtilsTest {
     public void testGetMillisUntilLong() {
         final int offset = 30;
         final int millis = new Random().nextInt(10_000);
-        final long elapsed = TimeUtils.getMillisUntil(Instant.now().minusMillis(millis).toEpochMilli());
+        final long elapsed = TimeUtil.getMillisUntil(Instant.now().minusMillis(millis).toEpochMilli());
         assertTrue(elapsed >= millis - offset && elapsed <= millis + offset);
     }
 
     @Test
     public void testParseTime() {
-        assertEquals(60, TimeUtils.parseTime("1m"));
-        assertEquals(60, TimeUtils.parseTime("1m 00s"));
-        assertEquals(3600 + 10 * 60 + 6, TimeUtils.parseTime("01h10m6s"));
-        assertThrows(IllegalArgumentException.class, () -> TimeUtils.parseTime("1m00"));
-        assertThrows(IllegalArgumentException.class, () -> TimeUtils.parseTime("26d01h10m6s"));
-        assertThrows(IllegalArgumentException.class, () -> TimeUtils.parseTime("-10s"));
+        assertEquals(60, TimeUtil.parseTime("1m"));
+        assertEquals(60, TimeUtil.parseTime("1m 00s"));
+        assertEquals(3600 + 10 * 60 + 6, TimeUtil.parseTime("01h10m6s"));
+        assertThrows(IllegalArgumentException.class, () -> TimeUtil.parseTime("1m00"));
+        assertThrows(IllegalArgumentException.class, () -> TimeUtil.parseTime("26d01h10m6s"));
+        assertThrows(IllegalArgumentException.class, () -> TimeUtil.parseTime("-10s"));
     }
 
     @Test
     public void testToLocalDateTime() {
         final Instant now = Instant.now();
-        assertEquals(LocalDateTime.ofInstant(now, ZoneId.systemDefault()), TimeUtils.toLocalDateTime(now));
+        assertEquals(LocalDateTime.ofInstant(now, ZoneId.systemDefault()), TimeUtil.toLocalDateTime(now));
     }
 }

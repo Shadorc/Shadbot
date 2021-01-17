@@ -5,7 +5,7 @@ import com.shadorc.shadbot.command.MissingPermissionException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.music.NoMusicException;
-import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -37,13 +37,13 @@ public class ExceptionHandler {
     }
 
     private static Mono<?> onMissingPermissionException(MissingPermissionException err, Context context) {
-        final String missingPerm = FormatUtils.capitalizeEnum(err.getPermission());
+        final String missingPerm = FormatUtil.capitalizeEnum(err.getPermission());
         DEFAULT_LOGGER.info("{Guild ID: {}} Missing permission: {}", context.getGuildId().asString(), missingPerm);
 
         return context.createFollowupMessage(
                 Emoji.ACCESS_DENIED + " (**%s**) I can't execute this command due to the lack of permission."
                         + "%nPlease, check my permissions and channel-specific ones to verify that **%s** is checked.",
-                context.getAuthorName(), FormatUtils.capitalizeEnum(err.getPermission()));
+                context.getAuthorName(), FormatUtil.capitalizeEnum(err.getPermission()));
     }
 
     private static Mono<?> onNoMusicException(Context context) {

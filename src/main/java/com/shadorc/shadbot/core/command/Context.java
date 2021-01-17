@@ -5,7 +5,7 @@ import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.music.NoMusicException;
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.InteractionCreateEvent;
@@ -126,7 +126,7 @@ public class Context {
         // The member is an administrator or it's a private message
         final Mono<CommandPermission> adminPerm = this.getChannel()
                 .filterWhen(channel -> BooleanUtils.or(
-                        DiscordUtils.hasPermission(channel, this.getAuthorId(), Permission.ADMINISTRATOR),
+                        DiscordUtil.hasPermission(channel, this.getAuthorId(), Permission.ADMINISTRATOR),
                         Mono.just(channel.getType() == Channel.Type.DM)))
                 .map(__ -> CommandPermission.ADMIN);
 

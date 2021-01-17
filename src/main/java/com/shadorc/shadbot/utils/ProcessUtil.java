@@ -5,7 +5,7 @@ import com.sun.management.OperatingSystemMXBean;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 
-public class ProcessUtils {
+public class ProcessUtil {
 
     private static final int MB_UNIT = 1024 << 10;
 

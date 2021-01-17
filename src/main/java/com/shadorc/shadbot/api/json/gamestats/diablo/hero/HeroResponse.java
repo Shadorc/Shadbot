@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.api.json.gamestats.diablo.hero;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.StringUtil;
 import reactor.util.annotation.Nullable;
 
 import java.util.Optional;
@@ -27,7 +27,7 @@ public class HeroResponse {
     }
 
     public String getClassName() {
-        return StringUtils.capitalize(this.className.replace("-", " "));
+        return StringUtil.capitalize(this.className.replace("-", " "));
     }
 
     public HeroStats getStats() {

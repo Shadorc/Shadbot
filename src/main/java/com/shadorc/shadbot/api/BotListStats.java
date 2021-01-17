@@ -8,8 +8,8 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.LogUtils;
-import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.LogUtil;
+import com.shadorc.shadbot.utils.NetUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -32,7 +32,7 @@ import java.util.stream.IntStream;
 
 public class BotListStats {
 
-    private static final Logger LOGGER = LogUtils.getLogger(BotListStats.class);
+    private static final Logger LOGGER = LogUtil.getLogger(BotListStats.class);
 
     private static final String BOTLIST_DOT_SPACE = "https://botlist.space";
     private static final String BOTS_ONDISCORD_DOT_XYZ = "https://bots.ondiscord.xyz";
@@ -68,7 +68,7 @@ public class BotListStats {
                                             .asString()
                                             .doOnNext(content -> LOGGER.debug("Webhook event received: {}", content))
                                             .flatMap(content -> Mono.fromCallable(() ->
-                                                    NetUtils.MAPPER.readValue(content, TopGgWebhookResponse.class)))
+                                                    NetUtil.MAPPER.readValue(content, TopGgWebhookResponse.class)))
                                             .map(TopGgWebhookResponse::getUserId)
                                             .map(Snowflake::of)
                                             .flatMap(DatabaseManager.getUsers()::getDBUser)

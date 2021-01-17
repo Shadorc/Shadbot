@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.api.json.gamestats.overwatch.stats;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
 
 import java.util.List;
 
@@ -16,12 +16,12 @@ public class Quickplay {
     private List<HeroEliminations> eliminationsPerLife;
 
     public String getPlayed() {
-        return FormatUtils.numberedList(RANKING_SIZE, this.played.size(), count -> String.format(FORMAT,
+        return FormatUtil.numberedList(RANKING_SIZE, this.played.size(), count -> String.format(FORMAT,
                 count, this.played.get(count - 1).getHero(), this.played.get(count - 1).getPlayed()));
     }
 
     public String getEliminationsPerLife() {
-        return FormatUtils.numberedList(RANKING_SIZE, this.eliminationsPerLife.size(), count -> String.format(FORMAT,
+        return FormatUtil.numberedList(RANKING_SIZE, this.eliminationsPerLife.size(), count -> String.format(FORMAT,
                 count, this.eliminationsPerLife.get(count - 1).getHero(),
                 this.eliminationsPerLife.get(count - 1).getEliminationsPerLife()));
     }

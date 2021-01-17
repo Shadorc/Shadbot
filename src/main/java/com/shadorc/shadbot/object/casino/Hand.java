@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.object.casino;
 
-import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,7 +58,7 @@ public class Hand {
 
     public String format() {
         return String.format("%s%nValue: %d",
-                FormatUtils.format(this.getCards(),
+                FormatUtil.format(this.getCards(),
                         card -> String.format("`%s` %s", card.getValue().getIdent(), card.getSuit().getEmoji()),
                         " | "),
                 this.getValue());

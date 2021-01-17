@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.data;
 
-import com.shadorc.shadbot.utils.LogUtils;
+import com.shadorc.shadbot.utils.LogUtil;
 import discord4j.rest.util.Color;
 import reactor.util.Logger;
 
@@ -11,7 +11,7 @@ import java.util.Properties;
 
 public class Config {
 
-    private static final Logger LOGGER = LogUtils.getLogger(Config.class);
+    private static final Logger LOGGER = LogUtil.getLogger(Config.class);
 
     private static final Properties PROPERTIES = Config.loadProperties();
 

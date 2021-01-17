@@ -8,9 +8,9 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ProcessUtils;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ProcessUtil;
+import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.common.GitProperties;
 import discord4j.core.object.entity.User;
 import discord4j.gateway.GatewayClient;
@@ -62,9 +62,9 @@ public class InfoCmd extends BaseCmd {
     private static String getPerformanceSection() {
         return String.format("%n%n-= Performance =-")
                 + String.format("%nMemory: %s/%s MB",
-                FormatUtils.number(ProcessUtils.getMemoryUsed()), FormatUtils.number(ProcessUtils.getMaxMemory()))
-                + String.format("%nCPU (Process): %.1f%%", ProcessUtils.getCpuUsage())
-                + String.format("%nThreads: %s", FormatUtils.number(Thread.activeCount()));
+                FormatUtil.number(ProcessUtil.getMemoryUsed()), FormatUtil.number(ProcessUtil.getMaxMemory()))
+                + String.format("%nCPU (Process): %.1f%%", ProcessUtil.getCpuUsage())
+                + String.format("%nThreads: %s", FormatUtil.number(Thread.activeCount()));
     }
 
     private static String getInternetSection(Context context, long start) {
@@ -75,20 +75,20 @@ public class InfoCmd extends BaseCmd {
                 .orElseThrow();
 
         return String.format("%n%n-= Internet =-")
-                + String.format("%nPing: %dms", TimeUtils.getMillisUntil(start))
+                + String.format("%nPing: %dms", TimeUtil.getMillisUntil(start))
                 + String.format("%nGateway Latency: %dms", gatewayLatency);
     }
 
     private static String getShadbotSection(Context context, User owner, long guildCount) {
-        final String uptime = FormatUtils.formatDurationWords(
-                Duration.ofMillis(TimeUtils.getMillisUntil(Shadbot.getLaunchTime())));
+        final String uptime = FormatUtil.formatDurationWords(
+                Duration.ofMillis(TimeUtil.getMillisUntil(Shadbot.getLaunchTime())));
 
         return String.format("%n%n-= Shadbot =-")
                 + String.format("%nUptime: %s", uptime)
                 + String.format("%nDeveloper: %s", owner.getTag())
                 + String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
-                + String.format("%nServers: %s", FormatUtils.number(guildCount))
-                + String.format("%nVoice Channels: %s", FormatUtils.number(Telemetry.VOICE_COUNT_GAUGE.get()));
+                + String.format("%nServers: %s", FormatUtil.number(guildCount))
+                + String.format("%nVoice Channels: %s", FormatUtil.number(Telemetry.VOICE_COUNT_GAUGE.get()));
     }
 
 }

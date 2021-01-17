@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -26,7 +26,7 @@ public class XkcdCmd extends BaseCmd {
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading XKCD comic...", context.getAuthorName())
                 .flatMap(messageId -> XkcdCmd.getRandomXkcd()
                         .flatMap(xkcd -> context.editFollowupMessage(messageId,
-                                ShadbotUtils.getDefaultEmbed(spec -> spec.setAuthor(
+                                ShadbotUtil.getDefaultEmbed(spec -> spec.setAuthor(
                                         String.format("XKCD: %s", xkcd.getTitle()),
                                         String.format("%s/%d", HOME_URL, xkcd.getNum()),
                                         context.getAuthorAvatarUrl())

@@ -8,9 +8,9 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.RandUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.NetUtil;
+import com.shadorc.shadbot.utils.RandUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
@@ -50,7 +50,7 @@ public class Rule34Cmd extends BaseCmd {
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return context.createFollowupMessage(ShadbotUtils.mustBeNsfw());
+                        return context.createFollowupMessage(ShadbotUtil.mustBeNsfw());
                     }
 
                     return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading rule34 image...", context.getAuthorName())
@@ -75,7 +75,7 @@ public class Rule34Cmd extends BaseCmd {
 
     private static Mono<R34Post> getR34Post(String search) {
         final String url = String.format("%s?page=dapi&s=post&q=index&tags=%s",
-                HOME_URL, NetUtils.encode(search.replace(" ", "_")));
+                HOME_URL, NetUtil.encode(search.replace(" ", "_")));
 
         return RequestHelper.fromUrl(url)
                 .to(R34Response.class)
@@ -83,7 +83,7 @@ public class Rule34Cmd extends BaseCmd {
                 .flatMap(Mono::justOrEmpty)
                 .map(R34Posts::getPosts)
                 .flatMap(Mono::justOrEmpty)
-                .map(RandUtils::randValue);
+                .map(RandUtil::randValue);
     }
 
     private static boolean containsChildren(R34Post post, List<String> tags) {
@@ -91,10 +91,10 @@ public class Rule34Cmd extends BaseCmd {
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(final R34Post post, final String tag, final String avatarUrl) {
-        return ShadbotUtils.getDefaultEmbed(
+        return ShadbotUtil.getDefaultEmbed(
                 embed -> {
                     post.getSource().ifPresent(source -> {
-                        if (NetUtils.isUrl(source)) {
+                        if (NetUtil.isUrl(source)) {
                             embed.setDescription(String.format("%n[**Source**](%s)", source));
                         } else {
                             embed.addField("Source", source, false);

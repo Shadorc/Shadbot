@@ -5,9 +5,9 @@ import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.Inputs;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.NumberUtil;
+import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -52,19 +52,19 @@ public class AudioLoadResultInputs extends Inputs {
                     if ("/cancel".equals(content)) {
                         guildMusic.setWaitingForChoice(false);
                         return guildMusic.getMessageChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(
+                                .flatMap(channel -> DiscordUtil.sendMessage(
                                         String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.",
                                                 event.getMember().orElseThrow().getUsername()), channel))
                                 .then(Mono.empty());
                     }
 
                     // Remove prefix and command name from message content
-                    final String contentCleaned = StringUtils.remove(content, "/play");
+                    final String contentCleaned = StringUtil.remove(content, "/play");
 
                     final Set<Integer> choices = new HashSet<>();
                     for (final String choice : contentCleaned.split(",")) {
                         // If the choice is not valid, ignore the message
-                        final Integer num = NumberUtils.toIntBetweenOrNull(choice.trim(), 1,
+                        final Integer num = NumberUtil.toIntBetweenOrNull(choice.trim(), 1,
                                 Math.min(Config.MUSIC_SEARCHES, this.listener.getResultTracks().size()));
                         if (num == null) {
                             return Mono.empty();

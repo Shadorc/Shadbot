@@ -16,14 +16,14 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class FormatUtils {
+public class FormatUtil {
 
     /**
      * @param coins The number of coins to format.
      * @return {@code X coin(s)} where {@code X} is the number of coins formatted using English locale.
      */
     public static String coins(long coins) {
-        return String.format("%s coin%s", FormatUtils.number(coins), Math.abs(coins) > 1 ? "s" : "");
+        return String.format("%s coin%s", FormatUtil.number(coins), Math.abs(coins) > 1 ? "s" : "");
     }
 
     /**
@@ -35,11 +35,11 @@ public class FormatUtils {
         if (enumeration == null) {
             return null;
         }
-        return StringUtils.capitalize(enumeration.toString().toLowerCase().replace("_", " "));
+        return StringUtil.capitalize(enumeration.toString().toLowerCase().replace("_", " "));
     }
 
     public static List<ImmutableEmbedFieldData> createColumns(List<String> list, int rowSize) {
-        return ListUtils.partition(list, rowSize)
+        return ListUtil.partition(list, rowSize)
                 .stream()
                 .map(sublist -> ImmutableEmbedFieldData.of(
                         "\u200C",
@@ -60,16 +60,16 @@ public class FormatUtils {
 
         final StringBuilder strBuilder = new StringBuilder();
         if (days > 0) {
-            strBuilder.append(String.format("%s ", StringUtils.pluralOf(days, "day")));
+            strBuilder.append(String.format("%s ", StringUtil.pluralOf(days, "day")));
         }
         if (hours > 0) {
-            strBuilder.append(String.format("%s ", StringUtils.pluralOf(hours, "hour")));
+            strBuilder.append(String.format("%s ", StringUtil.pluralOf(hours, "hour")));
         }
         if (minutes > 0) {
-            strBuilder.append(String.format("%s ", StringUtils.pluralOf(minutes, "minute")));
+            strBuilder.append(String.format("%s ", StringUtil.pluralOf(minutes, "minute")));
         }
         if (seconds > 0 || days == 0 && hours == 0 && minutes == 0) {
-            strBuilder.append(StringUtils.pluralOf(seconds, "second"));
+            strBuilder.append(StringUtil.pluralOf(seconds, "second"));
         }
 
         return strBuilder.toString().trim();
@@ -82,13 +82,13 @@ public class FormatUtils {
     public static String formatLongDuration(LocalDateTime date) {
         final Duration diff = Duration.between(date, LocalDateTime.now(ZoneId.systemDefault()));
         if (diff.toHours() < Duration.ofDays(1).toHours()) {
-            return FormatUtils.formatDuration(diff);
+            return FormatUtil.formatDuration(diff);
         }
 
         final Period period = Period.between(date.toLocalDate(), LocalDate.now(ZoneId.systemDefault()));
         return period.getUnits().stream()
                 .filter(unit -> period.get(unit) != 0)
-                .map(unit -> StringUtils.pluralOf(period.get(unit), StringUtils.removeLastLetter(unit.toString().toLowerCase())))
+                .map(unit -> StringUtil.pluralOf(period.get(unit), StringUtil.removeLastLetter(unit.toString().toLowerCase())))
                 .collect(Collectors.joining(", "));
     }
 
@@ -97,7 +97,7 @@ public class FormatUtils {
      * @return The formatted duration as (H:)(mm:)ss.
      */
     public static String formatDuration(long millis) {
-        return FormatUtils.formatDuration(Duration.ofMillis(millis));
+        return FormatUtil.formatDuration(Duration.ofMillis(millis));
     }
 
     /**
@@ -115,15 +115,15 @@ public class FormatUtils {
     }
 
     public static <T extends Enum<T>> String format(Class<T> enumClass, CharSequence delimiter) {
-        return FormatUtils.format(enumClass.getEnumConstants(), value -> value.name().toLowerCase(), delimiter);
+        return FormatUtil.format(enumClass.getEnumConstants(), value -> value.name().toLowerCase(), delimiter);
     }
 
     public static <T> String format(T[] array, Function<T, String> mapper, CharSequence delimiter) {
-        return FormatUtils.format(Arrays.stream(array), mapper, delimiter);
+        return FormatUtil.format(Arrays.stream(array), mapper, delimiter);
     }
 
     public static <T> String format(Collection<T> collection, Function<T, String> mapper, CharSequence delimiter) {
-        return FormatUtils.format(collection.stream(), mapper, delimiter);
+        return FormatUtil.format(collection.stream(), mapper, delimiter);
     }
 
     public static <T> String format(Stream<T> stream, Function<T, String> mapper, CharSequence delimiter) {
@@ -164,7 +164,7 @@ public class FormatUtils {
             throw new IllegalArgumentException("There must be at least two enum constants.");
         }
         return String.format("Options: %s",
-                FormatUtils.format(enumClass.getEnumConstants(), value -> String.format("`%s`",
+                FormatUtil.format(enumClass.getEnumConstants(), value -> String.format("`%s`",
                         value.name().toLowerCase()), ", "));
     }
 
@@ -185,7 +185,7 @@ public class FormatUtils {
         if (info.isStream) {
             strBuilder.append(" (Stream)");
         } else {
-            strBuilder.append(String.format(" (%s)", FormatUtils.formatDuration(info.length)));
+            strBuilder.append(String.format(" (%s)", FormatUtil.formatDuration(info.length)));
         }
 
         return strBuilder.toString();

@@ -3,7 +3,7 @@ package com.shadorc.shadbot.utils;
 import java.util.AbstractList;
 import java.util.List;
 
-public class ListUtils {
+public class ListUtil {
 
     private static class Partition<T> extends AbstractList<List<T>> {
 

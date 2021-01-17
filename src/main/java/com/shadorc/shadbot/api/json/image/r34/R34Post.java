@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.api.json.image.r34;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.StringUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +23,7 @@ public class R34Post {
     private boolean hasChildren;
 
     public List<String> getTags() {
-        return StringUtils.split(this.tags, " ");
+        return StringUtil.split(this.tags, " ");
     }
 
     public String getFileUrl() {

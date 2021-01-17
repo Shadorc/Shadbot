@@ -2,8 +2,8 @@ package com.shadorc.shadbot.object.help;
 
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
@@ -102,7 +102,7 @@ public abstract class HelpBuilder {
     }
 
     public Consumer<EmbedCreateSpec> build() {
-        return ShadbotUtils.getDefaultEmbed(embed -> {
+        return ShadbotUtil.getDefaultEmbed(embed -> {
             if (this.authorName != null && !this.authorName.isBlank()) {
                 embed.setAuthor(this.authorName, this.authorUrl, this.context.getAuthorAvatarUrl());
             }
@@ -150,7 +150,7 @@ public abstract class HelpBuilder {
         }
 
         return String.format("`/%s %s`", this.getCommandName(),
-                FormatUtils.format(this.args,
+                FormatUtil.format(this.args,
                         arg -> String.format(arg.isOptional() ? "[<%s>]" : "<%s>", arg.getName()), this.delimiter));
     }
 

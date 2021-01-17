@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.NumberUtils;
+import com.shadorc.shadbot.utils.NumberUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Guild;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
@@ -39,7 +39,7 @@ public class LeaveGuildCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final String arg = context.getOption("guildId").orElseThrow();
 
-        final Long guildId = NumberUtils.toPositiveLongOrNull(arg);
+        final Long guildId = NumberUtil.toPositiveLongOrNull(arg);
         if (guildId == null) {
             return Mono.error(new CommandException(String.format("`%s` is not a valid guild ID.", arg)));
         }

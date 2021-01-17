@@ -9,7 +9,7 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.DBUser;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.NumberUtils;
+import com.shadorc.shadbot.utils.NumberUtil;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
@@ -50,7 +50,7 @@ public class BassBoostCmd extends BaseCmd {
                 .map(__ -> {
                     final String arg = context.getOption("percentage").orElseThrow();
 
-                    final Integer percentage = NumberUtils.toIntBetweenOrNull(arg, VALUE_MIN, VALUE_MAX);
+                    final Integer percentage = NumberUtil.toIntBetweenOrNull(arg, VALUE_MIN, VALUE_MAX);
                     if (percentage == null) {
                         throw new CommandException(
                                 String.format("Incorrect value. Must be between **%d** and **%d**.", VALUE_MIN, VALUE_MAX));

@@ -19,7 +19,7 @@ import reactor.util.annotation.NonNull;
 
 import java.util.function.Consumer;
 
-public class ShadbotUtils {
+public class ShadbotUtil {
 
     public static final String NOT_ENOUGH_COINS =
             "You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";
@@ -40,7 +40,7 @@ public class ShadbotUtils {
         if (err.getMessage() == null) {
             return "Error not specified.";
         }
-        return Jsoup.parse(StringUtils.remove(err.getMessage(), "Watch on YouTube")).text().trim();
+        return Jsoup.parse(StringUtil.remove(err.getMessage(), "Watch on YouTube")).text().trim();
     }
 
     public static String mustBeNsfw() {
@@ -66,11 +66,11 @@ public class ShadbotUtils {
      *                          enough coins.
      */
     public static Mono<Long> requireValidBet(Snowflake guildId, Snowflake userId, String betStr) {
-        final Long bet = NumberUtils.toPositiveLongOrNull(betStr);
+        final Long bet = NumberUtil.toPositiveLongOrNull(betStr);
         if (bet == null) {
             throw new CommandException(String.format("`%s` is not a valid amount of coins.", betStr));
         }
-        return ShadbotUtils.requireValidBet(guildId, userId, bet);
+        return ShadbotUtil.requireValidBet(guildId, userId, bet);
     }
 
     /**

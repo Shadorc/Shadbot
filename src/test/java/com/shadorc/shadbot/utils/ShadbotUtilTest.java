@@ -5,16 +5,16 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ShadbotUtilsTest {
+public class ShadbotUtilTest {
 
     @Test
     public void testCleanLavaplayerErr() {
         final FriendlyException errWithMsg = new FriendlyException("<url src=\"youtube\">Watch on YouTube</url>Error",
                 FriendlyException.Severity.COMMON, null);
-        assertEquals("Error", ShadbotUtils.cleanLavaplayerErr(errWithMsg));
+        assertEquals("Error", ShadbotUtil.cleanLavaplayerErr(errWithMsg));
 
         final FriendlyException errWithoutMsg = new FriendlyException(null, FriendlyException.Severity.COMMON, null);
-        assertEquals("Error not specified.", ShadbotUtils.cleanLavaplayerErr(errWithoutMsg));
+        assertEquals("Error not specified.", ShadbotUtil.cleanLavaplayerErr(errWithoutMsg));
     }
 
 }

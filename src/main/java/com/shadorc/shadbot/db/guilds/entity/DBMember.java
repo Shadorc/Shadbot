@@ -12,7 +12,7 @@ import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.guilds.GuildsCollection;
 import com.shadorc.shadbot.db.guilds.bean.DBMemberBean;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
-import com.shadorc.shadbot.utils.NumberUtils;
+import com.shadorc.shadbot.utils.NumberUtil;
 import discord4j.common.util.Snowflake;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -49,7 +49,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
     }
 
     public Mono<UpdateResult> addCoins(long gains) {
-        final long coins = NumberUtils.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS);
+        final long coins = NumberUtil.truncateBetween(this.getCoins() + gains, 0, Config.MAX_COINS);
 
         // If the new coins amount is equal to the current one, no need to request an update
         if (coins == this.getCoins()) {

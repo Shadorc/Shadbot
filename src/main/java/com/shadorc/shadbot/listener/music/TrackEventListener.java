@@ -10,9 +10,9 @@ import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.ExceptionHandler;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -39,9 +39,9 @@ public class TrackEventListener extends AudioEventAdapter {
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .flatMap(guildMusic -> {
                     final String message = String.format(Emoji.MUSICAL_NOTE + " Currently playing: **%s**",
-                            FormatUtils.trackName(track.getInfo()));
+                            FormatUtil.trackName(track.getInfo()));
                     return guildMusic.getMessageChannel()
-                            .flatMap(channel -> DiscordUtils.sendMessage(message, channel));
+                            .flatMap(channel -> DiscordUtil.sendMessage(message, channel));
                 })
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(null, ExceptionHandler::handleUnknownError);
@@ -67,12 +67,12 @@ public class TrackEventListener extends AudioEventAdapter {
                     if (this.errorCount.get() > MAX_ERROR_COUNT) {
                         LOGGER.error("{Guild ID: {}} Stopping playlist due to too many errors.", this.guildId.asLong());
                         return guildMusic.getMessageChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_FLAG
+                                .flatMap(channel -> DiscordUtil.sendMessage(Emoji.RED_FLAG
                                         + " Something is going wrong, I will stop retrying. Please try again later.", channel))
                                 .then(guildMusic.end());
                     }
 
-                    final String errMessage = ShadbotUtils.cleanLavaplayerErr(exception);
+                    final String errMessage = ShadbotUtil.cleanLavaplayerErr(exception);
                     LOGGER.info("{Guild ID: {}} {}Track exception: {}", this.guildId.asLong(),
                             this.errorCount.get() > IGNORED_ERROR_THRESHOLD ? "(Ignored) " : "", errMessage);
 
@@ -91,7 +91,7 @@ public class TrackEventListener extends AudioEventAdapter {
 
                     return guildMusic.getMessageChannel()
                             .filter(__ -> !strBuilder.isEmpty())
-                            .flatMap(channel -> DiscordUtils.sendMessage(strBuilder.toString(), channel))
+                            .flatMap(channel -> DiscordUtil.sendMessage(strBuilder.toString(), channel))
                             .then(this.nextOrEnd());
                 })
                 .subscribeOn(Schedulers.boundedElastic())
@@ -104,7 +104,7 @@ public class TrackEventListener extends AudioEventAdapter {
         Telemetry.MUSIC_ERROR_COUNTER.labels("StuckException").inc();
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .flatMap(GuildMusic::getMessageChannel)
-                .flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll "
+                .flatMap(channel -> DiscordUtil.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll "
                         + "try to play the next available song.", channel))
                 .then(this.nextOrEnd())
                 .subscribeOn(Schedulers.boundedElastic())

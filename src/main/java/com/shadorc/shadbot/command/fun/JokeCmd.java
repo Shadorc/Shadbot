@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import reactor.core.publisher.Mono;
@@ -26,7 +26,7 @@ public class JokeCmd extends BaseCmd {
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading joke...", context.getAuthorName())
                 .zipWith(JokeCmd.getRandomJoke())
                 .flatMap(TupleUtils.function((messageId, joke) ->
-                        context.editFollowupMessage(messageId, ShadbotUtils.getDefaultEmbed(
+                        context.editFollowupMessage(messageId, ShadbotUtil.getDefaultEmbed(
                                 embed -> embed.setAuthor("Joke", HOME_URL, context.getAuthorAvatarUrl())
                                         .setDescription(joke)))));
     }

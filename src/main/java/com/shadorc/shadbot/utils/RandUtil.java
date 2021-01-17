@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class RandUtils {
+public class RandUtil {
 
     /**
      * @param list The list from which to take a random element.
@@ -26,7 +26,7 @@ public class RandUtils {
      */
     @Nullable
     public static <T> T randValue(T[] array) {
-        return RandUtils.randValue(Arrays.asList(array));
+        return RandUtil.randValue(Arrays.asList(array));
     }
 
 }

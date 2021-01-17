@@ -5,7 +5,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import reactor.core.publisher.Mono;
 
 public class VoteCmd extends BaseCmd {
@@ -17,7 +17,7 @@ public class VoteCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return context.createFollowupMessage(ShadbotUtils.getDefaultEmbed(
+        return context.createFollowupMessage(ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor("Vote on top.gg", Config.TOP_GG_URL, context.getAuthorAvatarUrl())
                         .setThumbnail("https://i.imgur.com/4Rf7SlR.png")
                         .setDescription(String.format("If you like me, you can vote for me on **top.gg**!" +

@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.object.message;
 
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Message;
@@ -35,7 +35,7 @@ public class ReactionMessage {
     public Mono<Message> send(Consumer<EmbedCreateSpec> embed) {
         return this.gateway.getChannelById(this.channelId)
                 .cast(MessageChannel.class)
-                .flatMap(channel -> DiscordUtils.sendMessage(embed, channel))
+                .flatMap(channel -> DiscordUtil.sendMessage(embed, channel))
                 .flatMap(message -> Flux.fromIterable(this.reactions)
                         .flatMap(message::addReaction)
                         .then(Mono.just(message)));

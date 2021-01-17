@@ -8,7 +8,7 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
 import com.shadorc.shadbot.db.premium.RelicType;
 import com.shadorc.shadbot.db.premium.bean.RelicBean;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
@@ -60,7 +60,7 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
 
     public boolean isExpired() {
         return this.getActivation()
-                .map(TimeUtils::getMillisUntil)
+                .map(TimeUtil::getMillisUntil)
                 .map(elapsedMillis -> elapsedMillis >= this.getDuration().toMillis())
                 .orElse(false);
     }

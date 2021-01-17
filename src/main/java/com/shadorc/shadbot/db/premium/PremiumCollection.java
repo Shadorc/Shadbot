@@ -7,8 +7,8 @@ import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.premium.bean.RelicBean;
 import com.shadorc.shadbot.db.premium.entity.Relic;
-import com.shadorc.shadbot.utils.LogUtils;
-import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.LogUtil;
+import com.shadorc.shadbot.utils.NetUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
@@ -23,7 +23,7 @@ import java.util.UUID;
 
 public class PremiumCollection extends DatabaseCollection {
 
-    public static final Logger LOGGER = LogUtils.getLogger(PremiumCollection.class, LogUtils.Category.DATABASE);
+    public static final Logger LOGGER = LogUtil.getLogger(PremiumCollection.class, LogUtil.Category.DATABASE);
     public static final String NAME = "premium";
 
     public PremiumCollection(MongoDatabase database) {
@@ -43,7 +43,7 @@ public class PremiumCollection extends DatabaseCollection {
 
         return Mono.from(request)
                 .map(document -> document.toJson(JSON_WRITER_SETTINGS))
-                .flatMap(json -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(json, RelicBean.class)))
+                .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, RelicBean.class)))
                 .map(Relic::new)
                 .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(PremiumCollection.NAME).inc());
     }
@@ -60,7 +60,7 @@ public class PremiumCollection extends DatabaseCollection {
 
         return Flux.from(request)
                 .map(document -> document.toJson(JSON_WRITER_SETTINGS))
-                .flatMap(json -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(json, RelicBean.class)))
+                .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, RelicBean.class)))
                 .map(Relic::new)
                 .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(PremiumCollection.NAME).inc());
     }

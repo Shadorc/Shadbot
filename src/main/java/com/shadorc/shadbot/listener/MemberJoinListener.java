@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
@@ -52,7 +52,7 @@ public class MemberJoinListener implements EventListener<MemberJoinEvent> {
     public static Mono<Message> sendAutoMessage(GatewayDiscordClient gateway, User user, Snowflake channelId, String message) {
         return gateway.getChannelById(channelId)
                 .cast(MessageChannel.class)
-                .flatMap(channel -> DiscordUtils.sendMessage(message
+                .flatMap(channel -> DiscordUtil.sendMessage(message
                         .replace("{username}", user.getUsername())
                         .replace("{userId}", user.getId().asString())
                         .replace("{mention}", user.getMention()), channel));

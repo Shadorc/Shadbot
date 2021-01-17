@@ -12,8 +12,8 @@ import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
 import com.shadorc.shadbot.db.lottery.bean.LotteryHistoricBean;
 import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
 import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
-import com.shadorc.shadbot.utils.LogUtils;
-import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.LogUtil;
+import com.shadorc.shadbot.utils.NetUtil;
 import discord4j.common.util.Snowflake;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
@@ -23,7 +23,7 @@ import reactor.util.Logger;
 
 public class LotteryCollection extends DatabaseCollection {
 
-    public static final Logger LOGGER = LogUtils.getLogger(LotteryCollection.class, LogUtils.Category.DATABASE);
+    public static final Logger LOGGER = LogUtil.getLogger(LotteryCollection.class, LogUtil.Category.DATABASE);
     public static final String NAME = "lottery";
 
     public LotteryCollection(MongoDatabase database) {
@@ -40,7 +40,7 @@ public class LotteryCollection extends DatabaseCollection {
         return Mono.from(request)
                 .flatMapIterable(document -> document.getList("gamblers", Document.class))
                 .map(Document::toJson)
-                .flatMap(json -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(json, LotteryGamblerBean.class)))
+                .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, LotteryGamblerBean.class)))
                 .map(LotteryGambler::new)
                 .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }
@@ -54,7 +54,7 @@ public class LotteryCollection extends DatabaseCollection {
 
         return Mono.from(request)
                 .map(Document::toJson)
-                .flatMap(json -> Mono.fromCallable(() -> NetUtils.MAPPER.readValue(json, LotteryHistoricBean.class)))
+                .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, LotteryHistoricBean.class)))
                 .map(LotteryHistoric::new)
                 .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
     }

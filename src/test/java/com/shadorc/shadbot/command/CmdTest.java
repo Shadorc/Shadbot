@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command;
 
-import com.shadorc.shadbot.utils.LogUtils;
+import com.shadorc.shadbot.utils.LogUtil;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 
@@ -17,7 +17,7 @@ public abstract class CmdTest<T> {
     @SuppressWarnings("unchecked")
     public CmdTest() {
         this.cmdClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        this.logger = LogUtils.getLogger(this.cmdClass, LogUtils.Category.TEST);
+        this.logger = LogUtil.getLogger(this.cmdClass, LogUtil.Category.TEST);
         try {
             this.cmd = this.cmdClass.getConstructor().newInstance();
         } catch (final Exception err) {

@@ -8,8 +8,8 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.LogUtils;
-import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.LogUtil;
+import com.shadorc.shadbot.utils.NetUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatCmd extends BaseCmd {
 
-    private static final Logger LOGGER = LogUtils.getLogger(ChatCmd.class, LogUtils.Category.COMMAND);
+    private static final Logger LOGGER = LogUtil.getLogger(ChatCmd.class, LogUtil.Category.COMMAND);
     private static final String HOME_URl = "https://www.pandorabots.com/pandora/talk-xml";
     private static final Map<String, String> BOTS = Map.of(
             "Marvin", "efc39100ce34d038",
@@ -76,7 +76,7 @@ public class ChatCmd extends BaseCmd {
 
     private Mono<String> talk(Snowflake channelId, String botId, String message) {
         final String url = String.format("%s?botid=%s&input=%s&custid=%s",
-                HOME_URl, botId, NetUtils.encode(message), this.channelsCustid.getOrDefault(channelId, ""));
+                HOME_URl, botId, NetUtil.encode(message), this.channelsCustid.getOrDefault(channelId, ""));
 
         return RequestHelper.fromUrl(url)
                 .to(ChatBotResponse.class)

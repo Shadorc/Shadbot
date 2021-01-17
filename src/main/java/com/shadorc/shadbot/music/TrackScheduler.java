@@ -4,7 +4,7 @@ import com.sedmelluq.discord.lavaplayer.filter.equalizer.EqualizerFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
-import com.shadorc.shadbot.utils.NumberUtils;
+import com.shadorc.shadbot.utils.NumberUtil;
 import reactor.util.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -83,7 +83,7 @@ public class TrackScheduler {
 
     public long changePosition(long time) {
         final AudioTrack track = this.audioPlayer.getPlayingTrack();
-        final long newPosition = NumberUtils.truncateBetween(track.getPosition() + time, 0, track.getDuration() - 1);
+        final long newPosition = NumberUtil.truncateBetween(track.getPosition() + time, 0, track.getDuration() - 1);
         track.setPosition(newPosition);
         return newPosition;
     }

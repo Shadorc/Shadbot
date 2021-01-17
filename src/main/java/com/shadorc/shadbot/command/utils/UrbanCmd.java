@@ -8,9 +8,9 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.NetUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.object.Embed;
 import discord4j.core.object.Embed.Field;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -53,7 +53,7 @@ public class UrbanCmd extends BaseCmd {
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return context.createFollowupMessage(ShadbotUtils.mustBeNsfw());
+                        return context.createFollowupMessage(ShadbotUtil.mustBeNsfw());
                     }
 
                     return context.createFollowupMessage(
@@ -68,9 +68,9 @@ public class UrbanCmd extends BaseCmd {
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(final UrbanDefinition urbanDef, final String avatarUrl) {
-        final String definition = StringUtils.abbreviate(urbanDef.getDefinition(), Embed.MAX_DESCRIPTION_LENGTH);
-        final String example = StringUtils.abbreviate(urbanDef.getExample(), Field.MAX_VALUE_LENGTH);
-        return ShadbotUtils.getDefaultEmbed(
+        final String definition = StringUtil.abbreviate(urbanDef.getDefinition(), Embed.MAX_DESCRIPTION_LENGTH);
+        final String example = StringUtil.abbreviate(urbanDef.getExample(), Field.MAX_VALUE_LENGTH);
+        return ShadbotUtil.getDefaultEmbed(
                 embed -> {
                     embed.setAuthor(String.format("Urban Dictionary: %s",
                             urbanDef.getWord()), urbanDef.getPermalink(), avatarUrl)
@@ -84,7 +84,7 @@ public class UrbanCmd extends BaseCmd {
     }
 
     private static Mono<UrbanDefinition> getUrbanDefinition(String search) {
-        final String url = String.format("%s?term=%s", HOME_URL, NetUtils.encode(search));
+        final String url = String.format("%s?term=%s", HOME_URL, NetUtil.encode(search));
         return RequestHelper.fromUrl(url)
                 .to(UrbanDictionaryResponse.class)
                 .flatMapIterable(UrbanDictionaryResponse::getDefinitions)

@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.object.message;
 
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Message;
@@ -80,7 +80,7 @@ public class UpdatableMessage {
         return this.deleteMessage()
                 .then(this.gateway.getChannelById(this.channelId))
                 .cast(MessageChannel.class)
-                .flatMap(channel -> DiscordUtils.sendMessage(consumer, channel, embed != null))
+                .flatMap(channel -> DiscordUtil.sendMessage(consumer, channel, embed != null))
                 .doOnNext(message -> this.messageId.set(message.getId().asLong()));
     }
 

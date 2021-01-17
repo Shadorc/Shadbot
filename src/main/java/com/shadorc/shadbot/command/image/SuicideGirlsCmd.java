@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -25,13 +25,13 @@ public class SuicideGirlsCmd extends BaseCmd {
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return context.createFollowupMessage(ShadbotUtils.mustBeNsfw());
+                        return context.createFollowupMessage(ShadbotUtil.mustBeNsfw());
                     }
 
                     return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Suicide Girl picture...", context.getAuthorName())
                             .zipWith(SuicideGirlsCmd.getRandomSuicideGirl())
                             .flatMap(TupleUtils.function((messageId, post) ->
-                                    context.editFollowupMessage(messageId, ShadbotUtils.getDefaultEmbed(
+                                    context.editFollowupMessage(messageId, ShadbotUtil.getDefaultEmbed(
                                             embed -> embed.setAuthor("SuicideGirls", post.getUrl(), context.getAuthorAvatarUrl())
                                                     .setDescription(String.format("Name: **%s**", post.getName()))
                                                     .setImage(post.getImageUrl())))));

@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
@@ -39,7 +39,7 @@ public class CoinsCmd extends BaseCmd {
                 .flatMap(user -> DatabaseManager.getGuilds()
                         .getDBMember(context.getGuildId(), user.getId())
                         .map(DBMember::getCoins)
-                        .map(FormatUtils::coins)
+                        .map(FormatUtil::coins)
                         .map(coins -> {
                             if (user.getId().equals(context.getAuthorId())) {
                                 return String.format("(**%s**) You have **%s**.", user.getUsername(), coins);

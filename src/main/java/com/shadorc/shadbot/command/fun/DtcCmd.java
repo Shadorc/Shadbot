@@ -9,10 +9,10 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.RandUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.NetUtil;
+import com.shadorc.shadbot.utils.RandUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -40,20 +40,20 @@ public class DtcCmd extends BaseCmd {
     }
 
     private static Mono<Quote> getRandomQuote() {
-        final JavaType valueType = NetUtils.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
+        final JavaType valueType = NetUtil.MAPPER.getTypeFactory().constructCollectionType(List.class, Quote.class);
         return RequestHelper.fromUrl(RANDOM_QUOTE_URL)
                 .<List<Quote>>to(valueType)
                 .map(quotes -> {
                     Quote quote;
                     do {
-                        quote = RandUtils.randValue(quotes);
+                        quote = RandUtil.randValue(quotes);
                     } while (quote.getContent().length() > 1000);
                     return quote;
                 });
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(final Quote quote, final String avatarUrl) {
-        return ShadbotUtils.getDefaultEmbed(
+        return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor("Quote DansTonChat",
                         String.format("https://danstonchat.com/%s.html", quote.getId()), avatarUrl)
                         .setThumbnail("https://i.imgur.com/5YvTlAA.png")
@@ -62,7 +62,7 @@ public class DtcCmd extends BaseCmd {
 
     private static String formatContent(String content) {
         final String formattedContent = content.replace("*", "\\*");
-        return FormatUtils.format(formattedContent.split("\n"), DtcCmd::formatLine, "\n");
+        return FormatUtil.format(formattedContent.split("\n"), DtcCmd::formatLine, "\n");
     }
 
     private static String formatLine(String line) {

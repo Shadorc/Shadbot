@@ -6,8 +6,8 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.object.entity.User;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -39,14 +39,14 @@ public class LeaderboardCmd extends BaseCmd {
                     if (list.isEmpty()) {
                         return "\nEveryone is poor here.";
                     }
-                    return FormatUtils.numberedList(USER_COUNT, list.size(),
+                    return FormatUtil.numberedList(USER_COUNT, list.size(),
                             count -> {
                                 final Tuple2<String, Long> tuple = list.get(count - 1);
                                 return String.format("%d. **%s** - %s",
-                                        count, tuple.getT1(), FormatUtils.coins(tuple.getT2()));
+                                        count, tuple.getT1(), FormatUtil.coins(tuple.getT2()));
                             });
                 })
-                .map(description -> ShadbotUtils.getDefaultEmbed(
+                .map(description -> ShadbotUtil.getDefaultEmbed(
                         embed -> embed.setAuthor("Leaderboard", null, context.getAuthorAvatarUrl())
                                 .setDescription(description)))
                 .flatMap(context::createFollowupMessage);

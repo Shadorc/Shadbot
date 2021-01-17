@@ -3,9 +3,9 @@ package com.shadorc.shadbot;
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.ExceptionHandler;
-import com.shadorc.shadbot.utils.LogUtils;
-import com.shadorc.shadbot.utils.ProcessUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.LogUtil;
+import com.shadorc.shadbot.utils.ProcessUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.gateway.GatewayClient;
 import discord4j.gateway.GatewayClientGroup;
@@ -26,7 +26,7 @@ import java.util.Map;
 public class TaskManager {
 
     private static final Scheduler DEFAULT_SCHEDULER = Schedulers.boundedElastic();
-    private static final Logger LOGGER = LogUtils.getLogger(TaskManager.class);
+    private static final Logger LOGGER = LogUtil.getLogger(TaskManager.class);
 
     private final List<Disposable> tasks;
 
@@ -37,7 +37,7 @@ public class TaskManager {
     public void schedulePresenceUpdates(GatewayDiscordClient gateway) {
         LOGGER.info("Scheduling presence updates");
         final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofMinutes(15), DEFAULT_SCHEDULER)
-                .map(__ -> ShadbotUtils.getRandomStatus())
+                .map(__ -> ShadbotUtil.getRandomStatus())
                 .flatMap(gateway::updatePresence)
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
@@ -67,11 +67,11 @@ public class TaskManager {
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(15), DEFAULT_SCHEDULER)
                 .then(gateway.getGuilds().count())
                 .doOnNext(guildCount -> {
-                    Telemetry.RAM_USAGE_GAUGE.set(ProcessUtils.getMemoryUsed());
-                    Telemetry.CPU_USAGE_GAUGE.set(ProcessUtils.getCpuUsage());
+                    Telemetry.RAM_USAGE_GAUGE.set(ProcessUtil.getMemoryUsed());
+                    Telemetry.CPU_USAGE_GAUGE.set(ProcessUtil.getCpuUsage());
                     Telemetry.THREAD_COUNT_GAUGE.set(Thread.activeCount());
-                    Telemetry.GC_COUNT_GAUGE.set(ProcessUtils.getGCCount());
-                    Telemetry.GC_TIME_GAUGE.set(ProcessUtils.getGCTime());
+                    Telemetry.GC_COUNT_GAUGE.set(ProcessUtil.getGCCount());
+                    Telemetry.GC_TIME_GAUGE.set(ProcessUtil.getGCTime());
                     Telemetry.GUILD_COUNT_GAUGE.set(guildCount);
                 })
                 .flatMap(__ -> getResponseTimes)

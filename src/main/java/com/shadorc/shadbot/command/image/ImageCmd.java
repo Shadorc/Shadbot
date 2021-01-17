@@ -11,10 +11,10 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.RandUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.NetUtil;
+import com.shadorc.shadbot.utils.RandUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
@@ -64,7 +64,7 @@ public class ImageCmd extends BaseCmd {
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading image...", context.getAuthorName())
                 .flatMap(messageId -> this.getPopularImage(search)
                         .flatMap(image -> context.editFollowupMessage(messageId,
-                                ShadbotUtils.getDefaultEmbed(
+                                ShadbotUtil.getDefaultEmbed(
                                         embed -> embed.setAuthor(String.format("DeviantArt: %s", search), image.getUrl(), context.getAuthorAvatarUrl())
                                                 .setThumbnail("https://i.imgur.com/gT4hHUB.png")
                                                 .addField("Title", image.getTitle(), false)
@@ -84,13 +84,13 @@ public class ImageCmd extends BaseCmd {
                                 + "&limit=25" // The pagination limit (min: 1 max: 50)
                                 + "&offset=%d" // The pagination offset (min: 0 max: 50000)
                                 + "&access_token=%s",
-                        BROWSE_POPULAR_URL, NetUtils.encode(search), ThreadLocalRandom.current().nextInt(150),
+                        BROWSE_POPULAR_URL, NetUtil.encode(search), ThreadLocalRandom.current().nextInt(150),
                         token.getAccessToken()))
                 .flatMap(url -> RequestHelper.fromUrl(url).to(DeviantArtResponse.class))
                 .flatMapIterable(DeviantArtResponse::getResults)
                 .filter(image -> image.getContent().isPresent())
                 .collectList()
-                .map(list -> Optional.ofNullable(RandUtils.randValue(list)))
+                .map(list -> Optional.ofNullable(RandUtil.randValue(list)))
                 .flatMap(Mono::justOrEmpty);
     }
 
@@ -114,7 +114,7 @@ public class ImageCmd extends BaseCmd {
         if (this.token.get() == null) {
             return true;
         }
-        final long elapsedMs = TimeUtils.getMillisUntil(this.lastTokenGeneration.get());
+        final long elapsedMs = TimeUtil.getMillisUntil(this.lastTokenGeneration.get());
         final long expiresIn = TimeUnit.SECONDS.toMillis(this.token.get().getExpiresIn());
         return elapsedMs >= expiresIn;
     }

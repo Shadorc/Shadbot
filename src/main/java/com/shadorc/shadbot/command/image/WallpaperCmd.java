@@ -9,10 +9,10 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.RandUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.NetUtil;
+import com.shadorc.shadbot.utils.RandUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
@@ -51,11 +51,11 @@ public class WallpaperCmd extends BaseCmd {
                 .flatMap(messageId -> Mono.zip(WallpaperCmd.getWallpaper(search), context.isChannelNsfw())
                         .flatMap(TupleUtils.function((wallpaper, isNsfw) -> {
                             if (!"sfw".equals(wallpaper.getPurity()) && !isNsfw) {
-                                return context.editFollowupMessage(messageId, ShadbotUtils.mustBeNsfw());
+                                return context.editFollowupMessage(messageId, ShadbotUtil.mustBeNsfw());
                             }
 
                             final String title = String.format("Wallpaper: %s", search.isBlank() ? "random" : search);
-                            return context.editFollowupMessage(messageId, ShadbotUtils.getDefaultEmbed(
+                            return context.editFollowupMessage(messageId, ShadbotUtil.getDefaultEmbed(
                                     embed -> embed.setAuthor(title, wallpaper.getUrl(), context.getAuthorAvatarUrl())
                                             .setImage(wallpaper.getPath())
                                             .addField("Resolution", wallpaper.getResolution(), false)));
@@ -70,7 +70,7 @@ public class WallpaperCmd extends BaseCmd {
                 .to(WallhavenResponse.class)
                 .map(WallhavenResponse::getWallpapers)
                 .filter(Predicate.not(List::isEmpty))
-                .map(RandUtils::randValue);
+                .map(RandUtil::randValue);
     }
 
     private static String buildUrl(String arg) {
@@ -82,9 +82,9 @@ public class WallpaperCmd extends BaseCmd {
             urlBuilder.append("&sorting=toplist");
             urlBuilder.append("&purity=100");
         } else {
-            final String keywords = FormatUtils.format(
+            final String keywords = FormatUtil.format(
                     arg.split("[, ]"),
-                    keyword -> String.format("+%s", NetUtils.encode(keyword.trim())),
+                    keyword -> String.format("+%s", NetUtil.encode(keyword.trim())),
                     "");
             urlBuilder.append(String.format("&q=%s", keywords));
             urlBuilder.append("&sorting=relevance");

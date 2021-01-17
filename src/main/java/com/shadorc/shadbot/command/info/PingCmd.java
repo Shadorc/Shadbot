@@ -4,7 +4,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.TimeUtil;
 import reactor.core.publisher.Mono;
 
 public class PingCmd extends BaseCmd {
@@ -19,7 +19,7 @@ public class PingCmd extends BaseCmd {
         final long start = System.currentTimeMillis();
         return context.createFollowupMessage(Emoji.GEAR + " (**%s**) Testing ping...", context.getAuthorName())
                 .flatMap(messageId -> context.editFollowupMessage(messageId,
-                        Emoji.GEAR + " Ping: %dms", TimeUtils.getMillisUntil(start)));
+                        Emoji.GEAR + " Ping: %dms", TimeUtil.getMillisUntil(start)));
     }
 
 }

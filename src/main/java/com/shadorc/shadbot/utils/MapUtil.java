@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class MapUtils {
+public class MapUtil {
 
     /**
      * @param map The map to inverse.

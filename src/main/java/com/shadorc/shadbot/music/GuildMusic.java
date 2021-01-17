@@ -3,7 +3,7 @@ package com.shadorc.shadbot.music;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.ExceptionHandler;
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.MessageChannel;
@@ -92,7 +92,7 @@ public class GuildMusic {
                 .getVoiceConnection(this.getGuildId())
                 .flatMap(VoiceConnection::disconnect)
                 .then(this.getMessageChannel())
-                .flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel))
+                .flatMap(channel -> DiscordUtil.sendMessage(Emoji.INFO + " End of the playlist.", channel))
                 .then();
     }
 

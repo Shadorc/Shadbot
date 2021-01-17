@@ -6,8 +6,8 @@ import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.users.bean.DBUserBean;
 import com.shadorc.shadbot.db.users.entity.DBUser;
-import com.shadorc.shadbot.utils.LogUtils;
-import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.LogUtil;
+import com.shadorc.shadbot.utils.NetUtil;
 import discord4j.common.util.Snowflake;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
@@ -16,7 +16,7 @@ import reactor.util.Logger;
 
 public class UsersCollection extends DatabaseCollection {
 
-    public static final Logger LOGGER = LogUtils.getLogger(UsersCollection.class, LogUtils.Category.DATABASE);
+    public static final Logger LOGGER = LogUtil.getLogger(UsersCollection.class, LogUtil.Category.DATABASE);
     public static final String NAME = "users";
 
     public UsersCollection(MongoDatabase database) {
@@ -32,7 +32,7 @@ public class UsersCollection extends DatabaseCollection {
 
         return Mono.from(request)
                 .flatMap(document -> Mono.fromCallable(() ->
-                        new DBUser(NetUtils.MAPPER.readValue(document.toJson(JSON_WRITER_SETTINGS), DBUserBean.class))))
+                        new DBUser(NetUtil.MAPPER.readValue(document.toJson(JSON_WRITER_SETTINGS), DBUserBean.class))))
                 .doOnSuccess(consumer -> {
                     if (consumer == null) {
                         LOGGER.debug("[DBUser {}] Not found", id.asLong());

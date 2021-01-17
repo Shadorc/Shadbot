@@ -37,7 +37,7 @@ import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
-public class DiscordUtils {
+public class DiscordUtil {
 
     /**
      * @param content The string to send.
@@ -46,7 +46,7 @@ public class DiscordUtils {
      * it is emitted through the Mono.
      */
     public static Mono<Message> sendMessage(String content, MessageChannel channel) {
-        return DiscordUtils.sendMessage(spec -> spec.setContent(content), channel, false);
+        return DiscordUtil.sendMessage(spec -> spec.setContent(content), channel, false);
     }
 
     /**
@@ -56,7 +56,7 @@ public class DiscordUtils {
      * it is emitted through the Mono.
      */
     public static Mono<Message> sendMessage(Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
-        return DiscordUtils.sendMessage(spec -> spec.setEmbed(embed), channel, true);
+        return DiscordUtil.sendMessage(spec -> spec.setEmbed(embed), channel, true);
     }
 
     /**
@@ -67,7 +67,7 @@ public class DiscordUtils {
      * it is emitted through the Mono.
      */
     public static Mono<Message> sendMessage(String content, Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
-        return DiscordUtils.sendMessage(spec -> spec.setContent(content).setEmbed(embed), channel, true);
+        return DiscordUtil.sendMessage(spec -> spec.setContent(content).setEmbed(embed), channel, true);
     }
 
     /**
@@ -79,22 +79,22 @@ public class DiscordUtils {
      */
     public static Mono<Message> sendMessage(Consumer<MessageCreateSpec> spec, MessageChannel channel, boolean hasEmbed) {
         return Mono.zip(
-                DiscordUtils.hasPermission(channel, channel.getClient().getSelfId(), Permission.SEND_MESSAGES),
-                DiscordUtils.hasPermission(channel, channel.getClient().getSelfId(), Permission.EMBED_LINKS))
+                DiscordUtil.hasPermission(channel, channel.getClient().getSelfId(), Permission.SEND_MESSAGES),
+                DiscordUtil.hasPermission(channel, channel.getClient().getSelfId(), Permission.EMBED_LINKS))
                 .flatMap(TupleUtils.function((canSendMessage, canSendEmbed) -> {
                     if (!canSendMessage) {
                         DEFAULT_LOGGER.info("{Channel ID: {}} Missing permission: {}",
-                                channel.getId().asLong(), FormatUtils.capitalizeEnum(Permission.SEND_MESSAGES));
+                                channel.getId().asLong(), FormatUtil.capitalizeEnum(Permission.SEND_MESSAGES));
                         return Mono.empty();
                     }
 
                     if (!canSendEmbed && hasEmbed) {
                         DEFAULT_LOGGER.info("{Channel ID: {}} Missing permission: {}",
-                                channel.getId().asLong(), FormatUtils.capitalizeEnum(Permission.EMBED_LINKS));
-                        return DiscordUtils.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed" +
+                                channel.getId().asLong(), FormatUtil.capitalizeEnum(Permission.EMBED_LINKS));
+                        return DiscordUtil.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed" +
                                         " links.%nPlease, check my permissions "
                                         + "and channel-specific ones to verify that **%s** is checked.",
-                                FormatUtils.capitalizeEnum(Permission.EMBED_LINKS)), channel);
+                                FormatUtil.capitalizeEnum(Permission.EMBED_LINKS)), channel);
                     }
 
                     return channel.createMessage(spec
@@ -123,7 +123,7 @@ public class DiscordUtils {
         }
 
         return message.getUserMentions()
-                .switchIfEmpty(DiscordUtils.extractMembers(guild, message.getContent()))
+                .switchIfEmpty(DiscordUtil.extractMembers(guild, message.getContent()))
                 .next()
                 .flatMap(user -> user.asMember(guild.getId()))
                 .switchIfEmpty(Mono.error(new CommandException(String.format("User **%s** not found.", args[1]))));
@@ -135,7 +135,7 @@ public class DiscordUtils {
      * @return A {@link Member} {@link Flux} containing the extracted members.
      */
     public static Flux<Member> extractMembers(Guild guild, String str) {
-        final List<String> words = StringUtils.split(str);
+        final List<String> words = StringUtil.split(str);
         return guild.getMembers()
                 .filter(member -> words.contains(member.getDisplayName())
                         || words.contains(member.getUsername())
@@ -150,7 +150,7 @@ public class DiscordUtils {
      * @return A {@link GuildChannel} {@link Flux} containing the extracted channels.
      */
     public static Flux<GuildChannel> extractChannels(Guild guild, String str) {
-        final List<String> words = StringUtils.split(str);
+        final List<String> words = StringUtil.split(str);
         return guild.getChannels()
                 .filter(channel -> words.contains(channel.getName())
                         || words.contains(String.format("#%s", channel.getName()))
@@ -163,7 +163,7 @@ public class DiscordUtils {
      * @return A {@link Role} {@link Flux} containing the extracted roles.
      */
     public static Flux<Role> extractRoles(Guild guild, String str) {
-        final List<String> words = StringUtils.split(str);
+        final List<String> words = StringUtil.split(str);
         return guild.getRoles()
                 .filter(role -> words.contains(role.getName())
                         || words.contains(String.format("@%s", role.getName()))
@@ -207,7 +207,7 @@ public class DiscordUtils {
      */
     public static Mono<Void> requirePermissions(Channel channel, Permission... permissions) {
         return Flux.fromArray(permissions)
-                .flatMap(permission -> DiscordUtils.hasPermission(channel, channel.getClient().getSelfId(), permission)
+                .flatMap(permission -> DiscordUtil.hasPermission(channel, channel.getClient().getSelfId(), permission)
                         .filter(Boolean.TRUE::equals)
                         .switchIfEmpty(Mono.error(new MissingPermissionException(permission))))
                 .then();
@@ -258,7 +258,7 @@ public class DiscordUtils {
                 }))
                 .flatMap(context.getClient()::getChannelById)
                 .cast(VoiceChannel.class)
-                .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.CONNECT, Permission.SPEAK, Permission.VIEW_CHANNEL)
+                .flatMap(channel -> DiscordUtil.requirePermissions(channel, Permission.CONNECT, Permission.SPEAK, Permission.VIEW_CHANNEL)
                         .thenReturn(channel));
     }
 

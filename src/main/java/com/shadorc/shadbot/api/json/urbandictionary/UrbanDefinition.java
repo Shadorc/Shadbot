@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.api.json.urbandictionary;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.StringUtil;
 
 public class UrbanDefinition {
 
@@ -15,11 +15,11 @@ public class UrbanDefinition {
     private String permalink;
 
     public String getDefinition() {
-        return StringUtils.remove(this.definition, "[", "]");
+        return StringUtil.remove(this.definition, "[", "]");
     }
 
     public String getExample() {
-        return StringUtils.remove(this.example, "[", "]");
+        return StringUtil.remove(this.example, "[", "]");
     }
 
     public String getWord() {

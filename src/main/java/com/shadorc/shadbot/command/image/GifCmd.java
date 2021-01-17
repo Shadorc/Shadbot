@@ -11,8 +11,8 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.NetUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
@@ -52,7 +52,7 @@ public class GifCmd extends BaseCmd {
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading gif...", context.getAuthorName())
                 .flatMap(messageId -> GifCmd.getGifUrl(tag.orElse(""))
                         .flatMap(gifUrl -> context.editFollowupMessage(messageId,
-                                ShadbotUtils.getDefaultEmbed(spec -> spec.setImage(gifUrl))))
+                                ShadbotUtil.getDefaultEmbed(spec -> spec.setImage(gifUrl))))
                         .switchIfEmpty(context.editFollowupMessage(messageId,
                                 Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
                                 context.getAuthorName(), tag.orElse("random search"))));
@@ -60,7 +60,7 @@ public class GifCmd extends BaseCmd {
 
     private static Mono<String> getGifUrl(String search) {
         final String apiKey = CredentialManager.getInstance().get(Credential.GIPHY_API_KEY);
-        final String encodedSearch = Objects.requireNonNull(NetUtils.encode(search));
+        final String encodedSearch = Objects.requireNonNull(NetUtil.encode(search));
 
         final String url;
         if (encodedSearch.isBlank()) {

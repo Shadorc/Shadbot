@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.api.html.musixmatch;
 
-import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.NetUtil;
+import com.shadorc.shadbot.utils.StringUtil;
 import org.jsoup.nodes.Document;
 
 public class Musixmatch {
@@ -23,7 +23,7 @@ public class Musixmatch {
     }
 
     public String getTitle() {
-        return StringUtils.remove(this.document.getElementsByClass("mxm-track-title__track ").text(), "Lyrics");
+        return StringUtil.remove(this.document.getElementsByClass("mxm-track-title__track ").text(), "Lyrics");
     }
 
     public String getImageUrl() {
@@ -32,7 +32,7 @@ public class Musixmatch {
     }
 
     public String getLyrics() {
-        return NetUtils.cleanWithLinebreaks(this.document.getElementsByClass("mxm-lyrics__content ").html());
+        return NetUtil.cleanWithLinebreaks(this.document.getElementsByClass("mxm-lyrics__content ").html());
     }
 
 }

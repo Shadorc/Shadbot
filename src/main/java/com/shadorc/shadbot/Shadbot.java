@@ -10,8 +10,8 @@ import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.object.ExceptionHandler;
-import com.shadorc.shadbot.utils.LogUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.LogUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class Shadbot {
 
-    public static final Logger DEFAULT_LOGGER = LogUtils.getLogger();
+    public static final Logger DEFAULT_LOGGER = LogUtil.getLogger();
 
     private static final Instant LAUNCH_TIME = Instant.now();
     private static final AtomicLong OWNER_ID = new AtomicLong();
@@ -116,7 +116,7 @@ public class Shadbot {
                         .setMapping(new CaffeineStoreService(
                                 builder -> builder.expireAfterWrite(Duration.ofMinutes(30))), MessageData.class)
                         .setFallback(new JdkStoreService()))
-                .setInitialStatus(__ -> ShadbotUtils.getRandomStatus())
+                .setInitialStatus(__ -> ShadbotUtil.getRandomStatus())
                 .setMemberRequestFilter(MemberRequestFilter.none())
                 .withGateway(gateway -> {
                     Shadbot.gateway = gateway;

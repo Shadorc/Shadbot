@@ -8,9 +8,9 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.NetUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
@@ -63,8 +63,8 @@ public class WikipediaCmd extends BaseCmd {
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(final WikipediaPage page, final String avatarUrl) {
-        final String extract = StringUtils.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
-        return ShadbotUtils.getDefaultEmbed(
+        final String extract = StringUtil.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
+        return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
                         String.format("https://en.wikipedia.org/wiki/%s", page.getEncodedTitle()), avatarUrl)
                         .setThumbnail("https://i.imgur.com/7X7Cvhf.png")
@@ -82,7 +82,7 @@ public class WikipediaCmd extends BaseCmd {
                         + "&explaintext=true"
                         + "&exintro=true"
                         + "&exsentences=5",
-                NetUtils.encode(search));
+                NetUtil.encode(search));
 
         return RequestHelper.fromUrl(url)
                 .to(WikipediaResponse.class)

@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TimeUtils {
+public class TimeUtil {
 
     private static final Pattern LETTER_PATTERN = Pattern.compile("[a-z]");
     private static final Pattern NUMBER_PATTERN = Pattern.compile("[0-9]");
@@ -33,7 +33,7 @@ public class TimeUtils {
      * @return The amount of milliseconds elapsed since {@code instant}.
      */
     public static long getMillisUntil(@NonNull Instant instant) {
-        return Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), TimeUtils.toLocalDateTime(instant)));
+        return Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), TimeUtil.toLocalDateTime(instant)));
     }
 
     /**
@@ -41,7 +41,7 @@ public class TimeUtils {
      * @return The amount of milliseconds elapsed since {@code epochMillis}.
      */
     public static long getMillisUntil(long epochMilli) {
-        return TimeUtils.getMillisUntil(Instant.ofEpochMilli(epochMilli));
+        return TimeUtil.getMillisUntil(Instant.ofEpochMilli(epochMilli));
     }
 
     /**

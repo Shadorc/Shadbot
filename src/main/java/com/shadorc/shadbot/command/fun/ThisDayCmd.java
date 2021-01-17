@@ -6,8 +6,8 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.object.Embed;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
@@ -27,11 +27,11 @@ public class ThisDayCmd extends BaseCmd {
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading events...", context.getAuthorName())
                 .zipWith(ThisDayCmd.getThisDay())
                 .flatMap(TupleUtils.function((messageId, thisDay) ->
-                        context.editFollowupMessage(messageId, ShadbotUtils.getDefaultEmbed(
+                        context.editFollowupMessage(messageId, ShadbotUtil.getDefaultEmbed(
                                 embed -> embed.setAuthor(String.format("On This Day: %s", thisDay.getDate()),
                                         HOME_URL, context.getAuthorAvatarUrl())
                                         .setThumbnail("https://i.imgur.com/FdfyJDD.png")
-                                        .setDescription(StringUtils.abbreviate(thisDay.getEvents(), Embed.MAX_DESCRIPTION_LENGTH))))));
+                                        .setDescription(StringUtil.abbreviate(thisDay.getEvents(), Embed.MAX_DESCRIPTION_LENGTH))))));
     }
 
     private static Mono<ThisDay> getThisDay() {

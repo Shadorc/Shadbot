@@ -5,7 +5,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import reactor.core.publisher.Mono;
 
 public class InviteCmd extends BaseCmd {
@@ -17,7 +17,7 @@ public class InviteCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return context.createFollowupMessage(ShadbotUtils.getDefaultEmbed(
+        return context.createFollowupMessage(ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor("Links", Config.INVITE_URL, context.getAuthorAvatarUrl())
                         .setDescription("I'm glad you're willing to invite **Shadbot** in your own server, thank you!" +
                                 "\nHere are some useful links for you." +

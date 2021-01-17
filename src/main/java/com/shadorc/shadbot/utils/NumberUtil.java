@@ -2,7 +2,7 @@ package com.shadorc.shadbot.utils;
 
 import reactor.util.annotation.Nullable;
 
-public class NumberUtils {
+public class NumberUtil {
 
     /**
      * @param str The string to parse as an integer, may be {@code null}.
@@ -29,7 +29,7 @@ public class NumberUtils {
      */
     @Nullable
     public static Integer toPositiveIntOrNull(@Nullable String str) {
-        final Integer value = NumberUtils.toIntOrNull(str);
+        final Integer value = NumberUtil.toIntOrNull(str);
         if (value == null || value <= 0) {
             return null;
         }
@@ -45,8 +45,8 @@ public class NumberUtils {
      */
     @Nullable
     public static Integer toIntBetweenOrNull(@Nullable String str, int min, int max) {
-        final Integer value = NumberUtils.toIntOrNull(str);
-        if (value == null || !NumberUtils.isBetween(value, min, max)) {
+        final Integer value = NumberUtil.toIntOrNull(str);
+        if (value == null || !NumberUtil.isBetween(value, min, max)) {
             return null;
         }
         return value;
@@ -77,7 +77,7 @@ public class NumberUtils {
      */
     @Nullable
     public static Long toPositiveLongOrNull(@Nullable String str) {
-        final Long value = NumberUtils.toLongOrNull(str);
+        final Long value = NumberUtil.toLongOrNull(str);
         if (value == null || value <= 0) {
             return null;
         }
@@ -89,7 +89,7 @@ public class NumberUtils {
      * @return {@code true} if the string is a valid representation of a positive long number, {@code false} otherwise.
      */
     public static boolean isPositiveLong(@Nullable String str) {
-        return NumberUtils.toPositiveLongOrNull(str) != null;
+        return NumberUtil.toPositiveLongOrNull(str) != null;
     }
 
     /**

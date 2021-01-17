@@ -19,7 +19,7 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
-import com.shadorc.shadbot.utils.LogUtils;
+import com.shadorc.shadbot.utils.LogUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.VoiceChannel;
@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MusicManager {
 
-    public static final Logger LOGGER = LogUtils.getLogger(LogUtils.Category.MUSIC);
+    public static final Logger LOGGER = LogUtil.getLogger(LogUtil.Category.MUSIC);
 
     private static MusicManager instance;
 

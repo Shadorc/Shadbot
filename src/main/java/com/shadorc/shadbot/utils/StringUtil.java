@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class StringUtils {
+public class StringUtil {
 
     private static final Pattern SPACES_PATTERN = Pattern.compile(" +");
 
@@ -156,9 +156,9 @@ public class StringUtils {
             return null;
         }
         if (Math.abs(count) > 1) {
-            return String.format("%s %ss", FormatUtils.number(count), str);
+            return String.format("%s %ss", FormatUtil.number(count), str);
         }
-        return String.format("%s %s", FormatUtils.number(count), str);
+        return String.format("%s %s", FormatUtil.number(count), str);
     }
 
     /**
@@ -168,7 +168,7 @@ public class StringUtils {
      */
     @Nullable
     public static String remove(@Nullable String str, @NonNull List<String> toRemove) {
-        return StringUtils.remove(str, toRemove.toArray(new String[0]));
+        return StringUtil.remove(str, toRemove.toArray(new String[0]));
     }
 
     /**
@@ -193,7 +193,7 @@ public class StringUtils {
      * empty results.
      */
     public static List<String> split(@Nullable String str) {
-        return StringUtils.split(str, -1);
+        return StringUtil.split(str, -1);
     }
 
     /**
@@ -203,7 +203,7 @@ public class StringUtils {
      * empty results.
      */
     public static List<String> split(@Nullable String str, int limit) {
-        return StringUtils.split(str, limit, " ");
+        return StringUtil.split(str, limit, " ");
     }
 
     /**
@@ -230,7 +230,7 @@ public class StringUtils {
      * empty results.
      */
     public static List<String> split(@Nullable String str, @NonNull String delimiter) {
-        return StringUtils.split(str, -1, delimiter);
+        return StringUtil.split(str, -1, delimiter);
     }
 
 }

@@ -13,9 +13,9 @@ import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.NetUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
@@ -78,13 +78,13 @@ public class LyricsCmd extends BaseCmd {
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(final Musixmatch musixmatch, final String avatarUrl) {
-        final String artist = StringUtils.abbreviate(musixmatch.getArtist(), MAX_TITLE_LENGTH);
-        final String title = StringUtils.abbreviate(musixmatch.getTitle(), MAX_TITLE_LENGTH);
-        return ShadbotUtils.getDefaultEmbed(
+        final String artist = StringUtil.abbreviate(musixmatch.getArtist(), MAX_TITLE_LENGTH);
+        final String title = StringUtil.abbreviate(musixmatch.getTitle(), MAX_TITLE_LENGTH);
+        return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(String.format("Lyrics: %s - %s", artist, title),
                         musixmatch.getUrl(), avatarUrl)
                         .setThumbnail(musixmatch.getImageUrl())
-                        .setDescription(StringUtils.abbreviate(musixmatch.getLyrics(), MAX_LYRICS_LENGTH))
+                        .setDescription(StringUtil.abbreviate(musixmatch.getLyrics(), MAX_LYRICS_LENGTH))
                         .setFooter("Click on the title to see the full version",
                                 "https://i.imgur.com/G7q6Hmq.png"));
     }
@@ -138,7 +138,7 @@ public class LyricsCmd extends BaseCmd {
     }
 
     private static Mono<String> getCorrectedUrl(String search) {
-        final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtils.encode(search));
+        final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtil.encode(search));
         // Make a search request on the site
         return RequestHelper.request(url)
                 .map(Jsoup::parse)

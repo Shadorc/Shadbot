@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.core.object.entity.User;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
@@ -41,7 +41,7 @@ public class FeedbackCmd extends BaseCmd {
         return context.getClient()
                 .getUserById(Shadbot.getOwnerId())
                 .flatMap(User::getPrivateChannel)
-                .flatMap(channel -> DiscordUtils.sendMessage(
+                .flatMap(channel -> DiscordUtil.sendMessage(
                         String.format(Emoji.SPEECH + " Feedback from **%s** (User ID: %d, Guild ID: %d):%n%s",
                                 context.getAuthorName(), context.getAuthorId().asLong(),
                                 context.getGuildId().asLong(), context.getOption("text").orElseThrow()), channel))

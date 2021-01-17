@@ -7,7 +7,7 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.DBUser;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.object.entity.Member;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
@@ -47,7 +47,7 @@ public class AchievementsCmd extends BaseCmd {
     }
 
     private static Consumer<EmbedCreateSpec> formatAchievements(EnumSet<Achievement> achievements, Member member) {
-        return ShadbotUtils.getDefaultEmbed(embed -> {
+        return ShadbotUtil.getDefaultEmbed(embed -> {
             embed.setAuthor(String.format("%s's Achievements", member.getUsername()),
                     null, member.getAvatarUrl());
             embed.setThumbnail("https://i.imgur.com/IMHDI7D.png");
