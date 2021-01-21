@@ -97,8 +97,11 @@ public class Shadbot {
         Shadbot.APPLICATION_ID.set(Snowflake.asLong(applicationInfo.id()));
         DEFAULT_LOGGER.info("Owner ID: {} | Application ID: {}", Shadbot.OWNER_ID.get(), Shadbot.APPLICATION_ID.get());
 
-        // TODO: Exceptions handling
-        CommandManager.getInstance().register(client).blockLast();
+        DEFAULT_LOGGER.info("Commands registration");
+        CommandManager.getInstance().register(client)
+                .onErrorResume(err -> Mono.fromRunnable(() ->
+                        DEFAULT_LOGGER.error("An error occurred during commands registration: {}", err.getMessage())))
+                .blockLast();
 
         DEFAULT_LOGGER.info("Connecting to Discord");
         client.gateway()

@@ -14,6 +14,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.util.ImageUtil;
 import discord4j.discordjson.json.ImmutableWebhookMessageEditRequest;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.WebhookExecuteRequest;
@@ -27,6 +28,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import static discord4j.rest.util.Image.Format.GIF;
+import static discord4j.rest.util.Image.Format.PNG;
 
 public class Context {
 
@@ -80,6 +84,7 @@ public class Context {
         return new Member(this.event.getClient(), this.event.getMemberData(), this.event.getGuildId().asLong());
     }
 
+    // TODO: If this is not used frequently, remove
     public Mono<Member> getSelfMember() {
         return this.getGuild().flatMap(Guild::getSelfMember);
     }
@@ -91,7 +96,7 @@ public class Context {
 
     // TODO
     public String getAuthorAvatarUrl() {
-        return this.event.getMemberData().user().avatar().orElseThrow();
+        return this.getAuthor().getAvatarUrl();
     }
     // TODO
 
@@ -115,6 +120,11 @@ public class Context {
     public Optional<Long> getOptionAsLong(String name) {
         return this.getOption(name)
                 .map(Long::parseLong);
+    }
+
+    public Optional<Boolean> getOptionAsBool(String name) {
+        return this.getOption(name)
+                .map(Boolean::parseBoolean);
     }
 
     public Flux<CommandPermission> getPermissions() {
@@ -145,14 +155,10 @@ public class Context {
         return this.getChannel().map(TextChannel::isNsfw);
     }
 
-    public Mono<Snowflake> createFollowupMessage(String content) {
-        return this.event.getInteractionResponse().createFollowupMessage(content)
+    public Mono<Snowflake> createFollowupMessage(String format, Object... args) {
+        return this.event.getInteractionResponse().createFollowupMessage(String.format(format, args))
                 .map(MessageData::id)
                 .map(Snowflake::of);
-    }
-
-    public Mono<Snowflake> createFollowupMessage(String format, Object... args) {
-        return this.createFollowupMessage(String.format(format, args));
     }
 
     public Mono<Snowflake> createFollowupMessage(Consumer<EmbedCreateSpec> embed) {
@@ -166,15 +172,11 @@ public class Context {
                 .map(Snowflake::of);
     }
 
-    public Mono<MessageData> editFollowupMessage(Snowflake messageId, String content) {
+    public Mono<MessageData> editFollowupMessage(Snowflake messageId, String format, Object... args) {
         return this.event.getInteractionResponse()
                 .editFollowupMessage(messageId.asLong(), ImmutableWebhookMessageEditRequest.builder()
-                        .content(content)
+                        .content(String.format(format, args))
                         .build(), true);
-    }
-
-    public Mono<MessageData> editFollowupMessage(Snowflake messageId, String format, Object... args) {
-        return this.editFollowupMessage(messageId, String.format(format, args));
     }
 
     public Mono<MessageData> editFollowupMessage(Snowflake messageId, Consumer<EmbedCreateSpec> embed) {

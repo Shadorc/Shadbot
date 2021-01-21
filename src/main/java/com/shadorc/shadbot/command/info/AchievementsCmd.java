@@ -40,6 +40,7 @@ public class AchievementsCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         return context.getOptionAsMember("user")
+                .defaultIfEmpty(context.getAuthor())
                 .flatMap(member -> DatabaseManager.getUsers().getDBUser(member.getId())
                         .map(DBUser::getAchievements)
                         .map(achievements -> AchievementsCmd.formatAchievements(achievements, member)))
@@ -51,7 +52,7 @@ public class AchievementsCmd extends BaseCmd {
             embed.setAuthor(String.format("%s's Achievements", member.getUsername()),
                     null, member.getAvatarUrl());
             embed.setThumbnail("https://i.imgur.com/IMHDI7D.png");
-            embed.setTitle(String.format("%d/%d achievements unlocked.",
+            embed.setTitle(String.format("%d/%d achievement(s) unlocked.",
                     achievements.size(), Achievement.values().length));
 
             final StringBuilder description = new StringBuilder();

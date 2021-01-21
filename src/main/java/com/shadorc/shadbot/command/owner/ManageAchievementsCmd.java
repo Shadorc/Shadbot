@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -9,19 +8,16 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.EnumUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
+import com.shadorc.shadbot.utils.EnumUtil;
+import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.http.client.ClientException;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class ManageAchievementsCmd extends BaseCmd {
 
@@ -30,28 +26,51 @@ public class ManageAchievementsCmd extends BaseCmd {
     }
 
     public ManageAchievementsCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER,
-                List.of("manage_achievements", "manage_achievement"));
+        super(CommandCategory.OWNER, CommandPermission.OWNER, "manage_achievements", "Manage user's achievements");
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final List<String> args = context.requireArgs(3);
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        System.err.println(FormatUtil.options(Achievement.class).length());
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("action")
+                        .description(FormatUtil.options(Action.class))
+                        .type(ApplicationCommandOptionType.STRING.getValue())
+                        .required(true)
+                        .build())
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("achievement")
+                        .description(FormatUtil.options(Achievement.class))
+                        .type(ApplicationCommandOptionType.STRING.getValue())
+                        .required(true)
+                        .build())
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("user")
+                        .description("The user")
+                        .type(ApplicationCommandOptionType.USER.getValue())
+                        .required(true)
+                        .build())
+                .build();
+    }
 
-        final Action action = EnumUtils.parseEnum(Action.class, args.get(0),
+    @Override
+    public Mono<?> execute(Context context) {
+        final String actionOpt = context.getOption("action").orElseThrow();
+        final String achievementOpt = context.getOption("achievement").orElseThrow();
+        final Snowflake userId = Snowflake.of(context.getOption("user").orElseThrow());
+
+        final Action action = EnumUtil.parseEnum(Action.class, actionOpt,
                 new CommandException(String.format("`%s` is not a valid action. %s",
-                        args.get(0), FormatUtils.options(Action.class))));
+                        actionOpt, FormatUtil.options(Action.class))));
 
-        final Achievement achievement = EnumUtils.parseEnum(Achievement.class, args.get(1),
+        final Achievement achievement = EnumUtil.parseEnum(Achievement.class, achievementOpt,
                 new CommandException(String.format("`%s` is not a valid achievement. %s",
-                        args.get(1), FormatUtils.options(Achievement.class))));
+                        achievementOpt, FormatUtil.options(Achievement.class))));
 
-        final Long userId = NumberUtils.toPositiveLongOrNull(args.get(2));
-        if (userId == null) {
-            return Mono.error(new CommandException("Invalid user ID."));
-        }
         return context.getClient()
-                .getUserById(Snowflake.of(userId))
+                .getUserById(userId)
+                .switchIfEmpty(Mono.error(new CommandException("User not found.")))
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
                         err -> Mono.empty())
                 .flatMap(user -> DatabaseManager.getUsers().getDBUser(user.getId())
@@ -59,20 +78,8 @@ public class ManageAchievementsCmd extends BaseCmd {
                             case ADD -> dbUser.unlockAchievement(achievement);
                             case REMOVE -> dbUser.lockAchievement(achievement);
                         })
-                        .then(context.getChannel())
-                        .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s **%s** to **%s** done.",
-                                FormatUtils.capitalizeEnum(action), achievement.getTitle(), user.getTag()), channel)))
-                .switchIfEmpty(Mono.error(new CommandException("User not found.")))
-                .then();
+                        .then(context.createFollowupMessage(Emoji.CHECK_MARK + " %s **%s** to **%s** done.",
+                                FormatUtil.capitalizeEnum(action), achievement.getTitle(), user.getTag())));
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .addArg("action", FormatUtils.options(Action.class), false)
-                .addArg("achievement", FormatUtils.options(Achievement.class), false)
-                .addArg("userId", false)
-                .build();
-    }
 }
-*/

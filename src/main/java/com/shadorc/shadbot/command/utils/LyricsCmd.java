@@ -47,6 +47,8 @@ public class LyricsCmd extends BaseCmd {
     private static final String HOME_URL = "https://www.musixmatch.com";
     private static final int MAX_RETRY = 5;
     private static final Pattern PATTERN = Pattern.compile("(?i)official|officiel|clip|video|music|\\[|]|\\(|\\)");
+    private static CommandException NO_TRACK_EXCEPTION = new CommandException(
+            "You are currently not listening to music, please provide a music name to search.");
 
     public LyricsCmd() {
         super(CommandCategory.UTILS, "lyrics", "Show lyrics for a song or for the current music");
@@ -105,11 +107,11 @@ public class LyricsCmd extends BaseCmd {
                 .orElseGet(() -> {
                     final GuildMusic guildMusic = MusicManager.getInstance()
                             .getGuildMusic(context.getGuildId())
-                            .orElseThrow(() -> new CommandException("No music is playing. Argument should be provided."));
+                            .orElseThrow(() -> NO_TRACK_EXCEPTION);
 
                     final AudioTrack track = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack();
                     if (track == null) {
-                        throw new CommandException("No music is playing. Argument should be provided.");
+                        throw NO_TRACK_EXCEPTION;
                     }
                     final AudioTrackInfo info = track.getInfo();
                     // Remove from title (case insensitive): official, video, music, [, ], (, )

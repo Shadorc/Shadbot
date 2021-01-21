@@ -47,7 +47,9 @@ public class UserInfoCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final Mono<Member> getMemberOrAuthor = context.getOptionAsMember("user").cache();
+        final Mono<Member> getMemberOrAuthor = context.getOptionAsMember("user")
+                .defaultIfEmpty(context.getAuthor())
+                .cache();
 
         return Mono.zip(getMemberOrAuthor, getMemberOrAuthor.flatMapMany(Member::getRoles).collectList())
                 .map(TupleUtils.function((user, roles) -> this.getEmbed(user, roles, context.getAuthorAvatarUrl())))

@@ -30,7 +30,7 @@ public class GifCmd extends BaseCmd {
     private static final String SEARCH_ENDPOINT = String.format("%s/search", API_URL);
 
     public GifCmd() {
-        super(CommandCategory.IMAGE, "gif", "Show a random gif");
+        super(CommandCategory.IMAGE, "gif", "Search for a random gif");
         this.setDefaultRateLimiter();
     }
 
@@ -38,8 +38,8 @@ public class GifCmd extends BaseCmd {
     public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
         return builder
                 .addOption(ApplicationCommandOptionData.builder()
-                        .name("tag")
-                        .description("The tag to search")
+                        .name("keyword")
+                        .description("The keyword to search")
                         .type(ApplicationCommandOptionType.STRING.getValue())
                         .required(false)
                         .build())
@@ -48,19 +48,19 @@ public class GifCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final Optional<String> tag = context.getOption("tag");
+        final Optional<String> keyword = context.getOption("tag");
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading gif...", context.getAuthorName())
-                .flatMap(messageId -> GifCmd.getGifUrl(tag.orElse(""))
+                .flatMap(messageId -> GifCmd.getGifUrl(keyword.orElse(""))
                         .flatMap(gifUrl -> context.editFollowupMessage(messageId,
                                 ShadbotUtil.getDefaultEmbed(spec -> spec.setImage(gifUrl))))
                         .switchIfEmpty(context.editFollowupMessage(messageId,
                                 Emoji.MAGNIFYING_GLASS + " (**%s**) No gifs were found for the search `%s`",
-                                context.getAuthorName(), tag.orElse("random search"))));
+                                context.getAuthorName(), keyword.orElse("random search"))));
     }
 
-    private static Mono<String> getGifUrl(String search) {
+    private static Mono<String> getGifUrl(String keyword) {
         final String apiKey = CredentialManager.getInstance().get(Credential.GIPHY_API_KEY);
-        final String encodedSearch = Objects.requireNonNull(NetUtil.encode(search));
+        final String encodedSearch = Objects.requireNonNull(NetUtil.encode(keyword));
 
         final String url;
         if (encodedSearch.isBlank()) {

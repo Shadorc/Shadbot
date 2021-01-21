@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -8,56 +7,67 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
-import discord4j.core.object.entity.Message;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.NumberUtil;
+import discord4j.common.util.Snowflake;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.function.Consumer;
+import java.util.Optional;
 
 public class SkipCmd extends BaseCmd {
 
     public SkipCmd() {
-        super(CommandCategory.MUSIC, List.of("skip", "next"));
+        super(CommandCategory.MUSIC, "skip", "Skip current music and play the next one. " +
+                "You can also directly skip to a music in the playlist");
         this.setRateLimiter(new RateLimiter(1, Duration.ofSeconds(1)));
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("index")
+                        .description("the index of the music in the playlist to play")
+                        .type(ApplicationCommandOptionType.INTEGER.getValue())
+                        .required(false)
+                        .build())
+                .build();
+    }
+
+    @Override
+    public Mono<?> execute(Context context) {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
-        final Mono<Message> sendMessage = context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.TRACK_NEXT + " Music skipped by **%s**.",
-                        context.getUsername()), channel));
+        final Mono<Snowflake> sendMessage =
+                context.createFollowupMessage(Emoji.TRACK_NEXT + " Music skipped by **%s**.", context.getAuthorName());
 
-        if (context.getArg().isPresent()) {
+        final Optional<String> option = context.getOption("index");
+        if (option.isPresent()) {
             final int playlistSize = guildMusic.getTrackScheduler().getPlaylist().size();
-            final Integer num = NumberUtils.toIntBetweenOrNull(context.getArg().orElseThrow(), 1, playlistSize);
-            if (num == null) {
-                return Mono.error(new CommandException(String.format("Number must be between 1 and %d.",
-                        playlistSize)));
+            final Integer index = NumberUtil.toIntBetweenOrNull(option.orElseThrow(), 1, playlistSize);
+            if (index == null) {
+                return Mono.error(new CommandException(String.format("Number must be between 1 and %d.", playlistSize)));
             }
+
             return sendMessage
                     .doOnNext(__ -> {
-                        guildMusic.getTrackScheduler().skipTo(num);
+                        guildMusic.getTrackScheduler().skipTo(index);
                         // If the music has been started correctly, we resume it in case the previous music was paused
                         guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
-                    })
-                    .then();
+                    });
         } else {
             return sendMessage
                     .flatMap(__ -> {
-                        // If the music has been started correctly
+                        // If the music has been started correctly...
                         if (guildMusic.getTrackScheduler().nextTrack()) {
-                            // we resume it in case the previous music was paused.
+                            // ...we resume it in case the previous music was paused.
                             guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
                             return Mono.empty();
                         }
-                        // else
                         else {
                             // there is no more music, this is the end.
                             return guildMusic.end();
@@ -66,12 +76,4 @@ public class SkipCmd extends BaseCmd {
         }
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Skip current music and play the next one if it exists."
-                        + "\nYou can also directly skip to a music in the playlist by specifying its number.")
-                .addArg("num", "the number of the music in the playlist to play", true)
-                .build();
-    }
-}*/
+}

@@ -11,10 +11,16 @@ import com.shadorc.shadbot.command.fun.ThisDayCmd;
 import com.shadorc.shadbot.command.image.*;
 import com.shadorc.shadbot.command.info.*;
 import com.shadorc.shadbot.command.music.*;
+import com.shadorc.shadbot.command.owner.*;
+import com.shadorc.shadbot.command.utils.LyricsCmd;
+import com.shadorc.shadbot.command.utils.MathCmd;
+import com.shadorc.shadbot.command.utils.UrbanCmd;
+import com.shadorc.shadbot.command.utils.WikipediaCmd;
 import discord4j.discordjson.json.ApplicationCommandData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.rest.RestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -35,8 +41,8 @@ public class CommandManager {
     private CommandManager() {
         this.commandsMap = CommandManager.initialize(
                 // Utility Commands
-//                new WeatherCmd(), new MathCmd(), new TranslateCmd(), new WikipediaCmd(), new PollCmd(),
-//                new UrbanCmd(), new LyricsCmd(),
+                /*new WeatherCmd(),*/ new MathCmd(), /*new TranslateCmd(),*/ new WikipediaCmd(), /*new PollCmd(),*/
+                new UrbanCmd(), new LyricsCmd(),
                 // Fun Commands
                 new ChatCmd(), new ThisDayCmd(), new JokeCmd(), new DtcCmd(),
                 // Image Commands
@@ -57,15 +63,15 @@ public class CommandManager {
                 // Info Commands
                 new PingCmd(), new InfoCmd(), new UserInfoCmd(), new ServerInfoCmd(),
                 /*new RolelistCmd(),*/ new FeedbackCmd(), new InviteCmd(), new AchievementsCmd(),
-                new VoteCmd()
+                new VoteCmd(),
                 // Admin Commands
 //                new ManageCoinsCmd(), new PruneCmd(), new KickCmd(), new SoftBanCmd(), new BanCmd(),
 //                new IamCmd(), new SettingsCmd(),
                 // Owner Commands
-//                new LoggerCmd(), new LeaveGuildCmd(), new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(),
-//                new EnableCommandCmd(), new ManageAchievementsCmd(),
+                new LoggerCmd(), new LeaveGuildCmd(), new GenerateRelicCmd(), new SendMessageCmd(), /*new ShutdownCmd(),*/
+                new EnableCommandCmd(), new ManageAchievementsCmd()
                 // Hidden Commands
-                /*new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd(), new PrefixCmd()*/);
+                /*new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd()*/);
     }
 
     private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {
@@ -89,7 +95,9 @@ public class CommandManager {
                         .createGuildApplicationCommand(applicationId, guildId,
                                 cmd.build(ApplicationCommandRequest.builder()
                                         .name(cmd.getName())
-                                        .description(cmd.getDescription()))));
+                                        .description(cmd.getDescription())))
+                        .onErrorResume(err -> Mono.fromRunnable(() ->
+                                DEFAULT_LOGGER.error("An error occurred during '{}' registration: {}", cmd.getName(), err.getMessage()))));
     }
 
     public Map<String, BaseCmd> getCommands() {
