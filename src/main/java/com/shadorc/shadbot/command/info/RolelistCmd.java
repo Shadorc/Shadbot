@@ -1,88 +1,93 @@
-/*
 package com.shadorc.shadbot.command.info;
 
-import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class RolelistCmd extends BaseCmd {
 
     public RolelistCmd() {
-        super(CommandCategory.INFO, List.of("rolelist"));
+        super(CommandCategory.INFO, "rolelist", "Show a list of members with specific role(s)");
         this.setDefaultRateLimiter();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final String arg = context.requireArg();
+    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+        return builder
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("role_1")
+                        .description("The first role to have")
+                        .type(ApplicationCommandOptionType.ROLE.getValue())
+                        .required(true)
+                        .build())
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("role_2")
+                        .description("The second role to have")
+                        .type(ApplicationCommandOptionType.ROLE.getValue())
+                        .required(false)
+                        .build())
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("role_3")
+                        .description("The third role to have")
+                        .type(ApplicationCommandOptionType.ROLE.getValue())
+                        .required(false)
+                        .build())
+                .build();
+    }
 
-        return context.getGuild()
-                .flatMapMany(guild -> DiscordUtils.extractRoles(guild, arg))
+    @Override
+    public Mono<?> execute(Context context) {
+        return Flux.merge(context.getOptionAsRole("role_1"),
+                context.getOptionAsRole("role_2"),
+                context.getOptionAsRole("role_3"))
                 .collectList()
                 .flatMap(mentionedRoles -> {
-                    if (mentionedRoles.isEmpty()) {
-                        return Mono.error(new CommandException(String.format("Role `%s` not found.", arg)));
-                    }
-
                     final List<Snowflake> mentionedRoleIds = mentionedRoles
                             .stream()
                             .map(Role::getId)
                             .collect(Collectors.toList());
 
-                    final Mono<List<String>> usernames = context.getGuild()
+                    final Mono<List<String>> getUsernames = context.getGuild()
                             .flatMapMany(Guild::getMembers)
                             .filter(member -> !Collections.disjoint(member.getRoleIds(), mentionedRoleIds))
                             .map(Member::getUsername)
                             .distinct()
                             .collectList();
 
-                    return Mono.zip(Mono.just(mentionedRoles), usernames);
+                    return Mono.zip(Mono.just(mentionedRoles), getUsernames);
                 })
-                .map(TupleUtils.function((mentionedRoles, usernames) -> ShadbotUtils.getDefaultEmbed()
-                        .andThen(embed -> {
-                            embed.setAuthor(
-                                    String.format("Rolelist: %s", FormatUtils.format(mentionedRoles, Role::getName, ", ")),
-                                    null, context.getAvatarUrl());
+                .map(TupleUtils.function((mentionedRoles, usernames) -> ShadbotUtil.getDefaultEmbed(
+                        embed -> {
+                            final String rolesFormatted = FormatUtil.format(mentionedRoles, Role::getName, ", ");
+                            embed.setAuthor(String.format("Rolelist: %s", rolesFormatted), null, context.getAuthorAvatarUrl());
 
                             if (usernames.isEmpty()) {
-                                embed.setDescription(
-                                        String.format("There is nobody with %s.", mentionedRoles.size() == 1 ? "this role" : "these " +
-                                                "roles"));
+                                embed.setDescription(String.format("There is nobody with %s.",
+                                        mentionedRoles.size() == 1 ? "this role" : "these roles"));
                                 return;
                             }
 
-                            FormatUtils.createColumns(usernames, 25)
+                            FormatUtil.createColumns(usernames, 25)
                                     .forEach(field -> embed.addField(field.name(), field.value(), true));
                         })))
-                .flatMap(embedConsumer -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
-                .then();
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show a list of members with specific role(s).")
-                .addArg("@role(s)", false)
-                .build();
+                .flatMap(context::createFollowupMessage);
     }
 
 }
-*/

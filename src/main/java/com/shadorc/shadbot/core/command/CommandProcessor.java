@@ -33,7 +33,7 @@ public class CommandProcessor {
             return Mono.empty();
         }
 
-        // The command has been temporarily disabled by the bot's owner
+        // The command has been disabled
         if (!command.isEnabled()) {
             return context.createFollowupMessage(
                     Emoji.ACCESS_DENIED + " (**%s**) Sorry, this command is temporary disabled. " +

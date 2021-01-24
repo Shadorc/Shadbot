@@ -1,40 +1,22 @@
-/*
 package com.shadorc.shadbot.command.hidden;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class BaguetteCmd extends BaseCmd {
 
     public BaguetteCmd() {
-        super(CommandCategory.HIDDEN, List.of("baguette"));
+        super(CommandCategory.HIDDEN, "baguette", "This command doesn't exist");
         this.setDefaultRateLimiter();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
-                .andThen(embed -> embed.setImage("https://i.imgur.com/2Ean5iI.jpg"));
-
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
-                .then();
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("This command doesn't exist.")
-                .build();
+    public Mono<?> execute(Context context) {
+        return context.createFollowupMessage(ShadbotUtil.getDefaultEmbed(
+                embed -> embed.setImage("https://i.imgur.com/2Ean5iI.jpg")));
     }
 
     // Essential part of Shadbot (Thanks to @Bluerin)
@@ -51,4 +33,3 @@ public class BaguetteCmd extends BaseCmd {
     }
 
 }
-*/

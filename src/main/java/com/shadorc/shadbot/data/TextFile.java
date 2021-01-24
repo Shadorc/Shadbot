@@ -25,7 +25,7 @@ public class TextFile {
                 DEFAULT_LOGGER.error(String.format("An error occurred while reading text file: %s", file.getPath()), err);
             }
         } else {
-            DEFAULT_LOGGER.error("An error occurred while reading {}, this text file does not exist", file.getPath());
+            DEFAULT_LOGGER.error("Text file {} not found", file.getPath());
         }
     }
 

@@ -73,9 +73,9 @@ public class Rule34Cmd extends BaseCmd {
                 });
     }
 
-    private static Mono<R34Post> getR34Post(String search) {
+    private static Mono<R34Post> getR34Post(String tag) {
         final String url = String.format("%s?page=dapi&s=post&q=index&tags=%s",
-                HOME_URL, NetUtil.encode(search.replace(" ", "_")));
+                HOME_URL, NetUtil.encode(tag.replace(" ", "_")));
 
         return RequestHelper.fromUrl(url)
                 .to(R34Response.class)

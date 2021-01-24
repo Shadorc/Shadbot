@@ -43,11 +43,11 @@ public class AchievementsCmd extends BaseCmd {
                 .defaultIfEmpty(context.getAuthor())
                 .flatMap(member -> DatabaseManager.getUsers().getDBUser(member.getId())
                         .map(DBUser::getAchievements)
-                        .map(achievements -> AchievementsCmd.formatAchievements(achievements, member)))
+                        .map(achievements -> AchievementsCmd.formatEmbed(achievements, member)))
                 .flatMap(context::createFollowupMessage);
     }
 
-    private static Consumer<EmbedCreateSpec> formatAchievements(EnumSet<Achievement> achievements, Member member) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(EnumSet<Achievement> achievements, Member member) {
         return ShadbotUtil.getDefaultEmbed(embed -> {
             embed.setAuthor(String.format("%s's Achievements", member.getUsername()),
                     null, member.getAvatarUrl());

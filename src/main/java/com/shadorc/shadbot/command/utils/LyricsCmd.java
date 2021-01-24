@@ -47,7 +47,7 @@ public class LyricsCmd extends BaseCmd {
     private static final String HOME_URL = "https://www.musixmatch.com";
     private static final int MAX_RETRY = 5;
     private static final Pattern PATTERN = Pattern.compile("(?i)official|officiel|clip|video|music|\\[|]|\\(|\\)");
-    private static CommandException NO_TRACK_EXCEPTION = new CommandException(
+    private static final CommandException NO_TRACK_EXCEPTION = new CommandException(
             "You are currently not listening to music, please provide a music name to search.");
 
     public LyricsCmd() {

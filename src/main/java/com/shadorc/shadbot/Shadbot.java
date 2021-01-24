@@ -46,7 +46,6 @@ public class Shadbot {
 
     private static final Instant LAUNCH_TIME = Instant.now();
     private static final AtomicLong OWNER_ID = new AtomicLong();
-    private static final AtomicLong APPLICATION_ID = new AtomicLong();
 
     private static GatewayDiscordClient gateway;
     private static TaskManager taskManager;
@@ -93,15 +92,13 @@ public class Shadbot {
                 .build();
 
         final ApplicationInfoData applicationInfo = client.getApplicationInfo().block();
+        Objects.requireNonNull(applicationInfo);
         Shadbot.OWNER_ID.set(Snowflake.asLong(applicationInfo.owner().id()));
-        Shadbot.APPLICATION_ID.set(Snowflake.asLong(applicationInfo.id()));
-        DEFAULT_LOGGER.info("Owner ID: {} | Application ID: {}", Shadbot.OWNER_ID.get(), Shadbot.APPLICATION_ID.get());
+        final long applicationId = Snowflake.asLong(applicationInfo.id());
+        DEFAULT_LOGGER.info("Owner ID: {} | Application ID: {}", Shadbot.OWNER_ID.get(), applicationId);
 
         DEFAULT_LOGGER.info("Commands registration");
-        CommandManager.getInstance().register(client)
-                .onErrorResume(err -> Mono.fromRunnable(() ->
-                        DEFAULT_LOGGER.error("An error occurred during commands registration: {}", err.getMessage())))
-                .blockLast();
+        CommandManager.getInstance().register(client, applicationId).block();
 
         DEFAULT_LOGGER.info("Connecting to Discord");
         client.gateway()
@@ -176,13 +173,6 @@ public class Shadbot {
      */
     public static Snowflake getOwnerId() {
         return Snowflake.of(Shadbot.OWNER_ID.get());
-    }
-
-    /**
-     * @return The ID of the current application.
-     */
-    public static Snowflake getApplicationId() {
-        return Snowflake.of(Shadbot.APPLICATION_ID.get());
     }
 
     public static Mono<Void> quit() {

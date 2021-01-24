@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.game.rps;
 
 import com.shadorc.shadbot.object.Emoji;
@@ -29,5 +28,4 @@ public enum Handsign {
                 || this == Handsign.PAPER && other == Handsign.ROCK
                 || this == Handsign.SCISSORS && other == Handsign.PAPER;
     }
-
-}*/
+}

@@ -11,10 +11,10 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.core.util.ImageUtil;
 import discord4j.discordjson.json.ImmutableWebhookMessageEditRequest;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.WebhookExecuteRequest;
@@ -28,9 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-
-import static discord4j.rest.util.Image.Format.GIF;
-import static discord4j.rest.util.Image.Format.PNG;
 
 public class Context {
 
@@ -115,6 +112,12 @@ public class Context {
         return Mono.justOrEmpty(this.getOption(name))
                 .map(Snowflake::of)
                 .flatMap(memberId -> this.event.getClient().getMemberById(this.getGuildId(), memberId));
+    }
+
+    public Mono<Role> getOptionAsRole(String name) {
+        return Mono.justOrEmpty(this.getOption(name))
+                .map(Snowflake::of)
+                .flatMap(roleId -> this.event.getClient().getRoleById(this.getGuildId(), roleId));
     }
 
     public Optional<Long> getOptionAsLong(String name) {

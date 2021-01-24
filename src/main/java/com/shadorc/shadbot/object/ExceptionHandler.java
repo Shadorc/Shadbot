@@ -6,15 +6,28 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.music.NoMusicException;
 import com.shadorc.shadbot.utils.FormatUtil;
+import io.netty.channel.unix.Errors;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.PrematureCloseException;
+import reactor.util.retry.Retry;
+import reactor.util.retry.RetryBackoffSpec;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class ExceptionHandler {
+
+    public static Function<String, RetryBackoffSpec> RETRY_ON_INTERNET_FAILURES =
+            message -> Retry.backoff(3, Duration.ofSeconds(1))
+                    .filter(err -> err instanceof PrematureCloseException
+                            || err instanceof Errors.NativeIoException
+                            || err instanceof TimeoutException)
+                    .onRetryExhaustedThrow((spec, signal) -> new IOException(message));
 
     public static Mono<?> handleCommandError(Throwable err, BaseCmd cmd, Context context) {
         if (err instanceof CommandException) {

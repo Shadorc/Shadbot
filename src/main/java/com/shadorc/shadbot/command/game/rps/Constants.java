@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.game.rps;
 
 class Constants {
@@ -6,4 +5,3 @@ class Constants {
     protected static final int GAINS = 300;
 
 }
-*/

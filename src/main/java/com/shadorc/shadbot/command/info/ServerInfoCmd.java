@@ -28,7 +28,7 @@ public class ServerInfoCmd extends BaseCmd {
     private final DateTimeFormatter dateFormatter;
 
     public ServerInfoCmd() {
-        super(CommandCategory.INFO, "server_info", "Show info about this server.");
+        super(CommandCategory.INFO, "server_info", "Show info about this server");
         this.setDefaultRateLimiter();
 
         this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy - HH'h'mm", Locale.ENGLISH);
@@ -56,10 +56,10 @@ public class ServerInfoCmd extends BaseCmd {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, avatarUrl)
                         .setThumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
-                        .addField("Owner", owner.getUsername(), false)
                         .addField("Server ID", guild.getId().asString(), false)
-                        .addField("Creation date", creationDate, false)
+                        .addField("Owner", owner.getUsername(), false)
                         .addField("Region", region.getName(), false)
+                        .addField("Creation date", creationDate, false)
                         .addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), false)
                         .addField("Members", FormatUtil.number(guild.getMemberCount()), false));
     }

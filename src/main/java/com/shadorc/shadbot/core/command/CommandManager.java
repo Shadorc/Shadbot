@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.core.command;
 
-import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.command.currency.CoinsCmd;
 import com.shadorc.shadbot.command.currency.LeaderboardCmd;
 import com.shadorc.shadbot.command.currency.TransferCoinsCmd;
@@ -12,10 +11,12 @@ import com.shadorc.shadbot.command.image.*;
 import com.shadorc.shadbot.command.info.*;
 import com.shadorc.shadbot.command.music.*;
 import com.shadorc.shadbot.command.owner.*;
+import com.shadorc.shadbot.command.owner.shutdown.ShutdownCmd;
 import com.shadorc.shadbot.command.utils.LyricsCmd;
 import com.shadorc.shadbot.command.utils.MathCmd;
 import com.shadorc.shadbot.command.utils.UrbanCmd;
 import com.shadorc.shadbot.command.utils.WikipediaCmd;
+import com.shadorc.shadbot.data.Config;
 import discord4j.discordjson.json.ApplicationCommandData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.rest.RestClient;
@@ -68,7 +69,7 @@ public class CommandManager {
 //                new ManageCoinsCmd(), new PruneCmd(), new KickCmd(), new SoftBanCmd(), new BanCmd(),
 //                new IamCmd(), new SettingsCmd(),
                 // Owner Commands
-                new LoggerCmd(), new LeaveGuildCmd(), new GenerateRelicCmd(), new SendMessageCmd(), /*new ShutdownCmd(),*/
+                new LoggerCmd(), new LeaveGuildCmd(), new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(),
                 new EnableCommandCmd(), new ManageAchievementsCmd()
                 // Hidden Commands
                 /*new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd()*/);
@@ -79,25 +80,36 @@ public class CommandManager {
         for (final BaseCmd cmd : cmds) {
             if (map.putIfAbsent(cmd.getName(), cmd) != null) {
                 DEFAULT_LOGGER.error("Command name collision between {} and {}",
-                        cmd.getName(), map.get(cmd.getName()).getClass().getSimpleName());
+                        cmd.getClass().getSimpleName(), map.get(cmd.getName()).getClass().getSimpleName());
             }
         }
-        DEFAULT_LOGGER.info("{} commands initialized", cmds.length);
+        DEFAULT_LOGGER.info("{} commands initialized", map.size());
         return Collections.unmodifiableMap(map);
     }
 
-    // TODO
-    public Flux<ApplicationCommandData> register(RestClient restClient) {
-        final long applicationId = Shadbot.getApplicationId().asLong();
-        final long guildId = 339318275320184833L;
+    public Mono<Long> register(RestClient restClient, long applicationId) {
         return Flux.fromIterable(this.commandsMap.values())
-                .flatMap(cmd -> restClient.getApplicationService()
-                        .createGuildApplicationCommand(applicationId, guildId,
-                                cmd.build(ApplicationCommandRequest.builder()
-                                        .name(cmd.getName())
-                                        .description(cmd.getDescription())))
+                .flatMap(cmd -> this.registerCommand(applicationId, restClient, cmd)
                         .onErrorResume(err -> Mono.fromRunnable(() ->
-                                DEFAULT_LOGGER.error("An error occurred during '{}' registration: {}", cmd.getName(), err.getMessage()))));
+                                DEFAULT_LOGGER.error("An error occurred during '{}' registration: {}", cmd.getName(), err.getMessage()))))
+                .count()
+                .doOnNext(cmdCount -> DEFAULT_LOGGER.info("{} commands registered", cmdCount));
+    }
+
+    private Mono<ApplicationCommandData> registerCommand(long applicationId, RestClient restClient, BaseCmd cmd) {
+        final ApplicationCommandRequest request = cmd.build(ApplicationCommandRequest.builder()
+                .name(cmd.getName())
+                .description(cmd.getDescription()));
+        if (cmd.getPermission().equals(CommandPermission.OWNER)) {
+            return restClient.getApplicationService()
+                    .createGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, request);
+        } else {
+            // TODO
+            // return restClient.getApplicationService()
+            //       .createGlobalApplicationCommand(applicationId, request);
+            return restClient.getApplicationService()
+                    .createGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, request);
+        }
     }
 
     public Map<String, BaseCmd> getCommands() {

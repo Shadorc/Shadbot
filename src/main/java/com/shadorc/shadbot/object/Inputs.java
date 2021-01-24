@@ -4,7 +4,9 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import org.reactivestreams.Publisher;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
@@ -20,7 +22,7 @@ public abstract class Inputs {
         this.channelId = channelId;
     }
 
-    public Flux<Void> waitForInputs() {
+    public Flux<?> waitForInputs() {
         return this.gateway.getEventDispatcher()
                 .on(MessageCreateEvent.class)
                 .filter(event -> event.getMember().isPresent()
@@ -28,12 +30,13 @@ public abstract class Inputs {
                         && event.getMessage().getChannelId().equals(this.channelId))
                 .takeWhile(this::takeEventWile)
                 .filterWhen(this::isValidEvent)
-                .flatMap(this::processEvent)
+                .flatMap(event -> this.processEvent(event)
+                        .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
                 .take(this.timeout);
     }
 
-    public void listen() {
-        this.waitForInputs()
+    public Disposable listen() {
+        return this.waitForInputs()
                 .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
@@ -63,6 +66,6 @@ public abstract class Inputs {
      * @param event The event to process.
      * @return A {@link Publisher} which emits when the event has been processed.
      */
-    public abstract Publisher<Void> processEvent(MessageCreateEvent event);
+    public abstract Mono<?> processEvent(MessageCreateEvent event);
 
 }

@@ -65,7 +65,7 @@ public class UserInfoCmd extends BaseCmd {
         final String joinDate = String.format("%s%n(%s)",
                 joinTime.format(this.dateFormatter), FormatUtil.formatLongDuration(joinTime));
 
-        final StringBuilder usernameBuilder = new StringBuilder(member.getUsername());
+        final StringBuilder usernameBuilder = new StringBuilder(member.getTag());
         if (member.isBot()) {
             usernameBuilder.append(" (Bot)");
         }
@@ -77,13 +77,13 @@ public class UserInfoCmd extends BaseCmd {
                 embed -> {
                     embed.setAuthor(String.format("User Info: %s", usernameBuilder), null, avatarUrl)
                             .setThumbnail(member.getAvatarUrl())
-                            .addField("Display name", member.getDisplayName(), false)
-                            .addField("User ID", member.getId().asString(), false)
+                            .addField("User ID", member.getId().asString(), true)
+                            .addField("Display name", member.getDisplayName(), true)
                             .addField("Creation date", creationDate, false)
                             .addField("Join date", joinDate, false);
 
                     if (!roles.isEmpty()) {
-                        embed.addField("Roles", FormatUtil.format(roles, Role::getMention, "\n"), true);
+                        embed.addField("Roles", FormatUtil.format(roles, Role::getMention, "\n"), false);
                     }
                 });
     }

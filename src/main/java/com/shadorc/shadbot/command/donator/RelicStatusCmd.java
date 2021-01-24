@@ -1,5 +1,4 @@
-/*
-package com.shadorc.shadbot.command.hidden;
+package com.shadorc.shadbot.command.donator;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
@@ -9,13 +8,10 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.premium.RelicType;
 import com.shadorc.shadbot.db.premium.entity.Relic;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.object.entity.Guild;
-import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
 import reactor.core.publisher.Mono;
@@ -25,17 +21,17 @@ import reactor.util.function.Tuple2;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class RelicStatusCmd extends BaseCmd {
 
     public RelicStatusCmd() {
-        super(CommandCategory.HIDDEN, List.of("contributor_status", "donator_status", "relic_status"));
+        super(CommandCategory.DONATOR, "relic_status", "Show your donator status");
         this.setDefaultRateLimiter();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
+    public Mono<?> execute(Context context) {
         return DatabaseManager.getPremium()
                 .getUserRelics(context.getAuthorId())
                 .flatMap(relic -> RelicStatusCmd.getRelicAndGuild(context, relic))
@@ -47,15 +43,15 @@ public class RelicStatusCmd extends BaseCmd {
                                     guild.getName(), guild.getId().asLong())));
 
                     descBuilder.append(String.format("%n**Duration:** %s",
-                            FormatUtils.formatDurationWords(relic.getDuration())));
+                            FormatUtil.formatDurationWords(relic.getDuration())));
 
                     if (!relic.isExpired()) {
                         relic.getActivation()
                                 .ifPresent(activation -> {
                                     final Duration durationLeft = relic.getDuration()
-                                            .minusMillis(TimeUtils.getMillisUntil(activation.toEpochMilli()));
+                                            .minusMillis(TimeUtil.getMillisUntil(activation.toEpochMilli()));
                                     descBuilder.append(String.format("%n**Expires in:** %s",
-                                            FormatUtils.formatDurationWords(durationLeft)));
+                                            FormatUtil.formatDurationWords(durationLeft)));
                                 });
                     }
 
@@ -68,23 +64,20 @@ public class RelicStatusCmd extends BaseCmd {
                     return ImmutableEmbedFieldData.of(titleBuilder.toString(), descBuilder.toString(), Possible.of(false));
                 }))
                 .collectList()
-                .filter(list -> !list.isEmpty())
-                .map(fields -> ShadbotUtils.getDefaultEmbed()
-                        .andThen(embed -> {
-                            embed.setAuthor("Contributor Status", null, context.getAvatarUrl())
+                .filter(Predicate.not(List::isEmpty))
+                .map(fields -> ShadbotUtil.getDefaultEmbed(
+                        embed -> {
+                            embed.setAuthor("Donator Status", null, context.getAuthorAvatarUrl())
                                     .setThumbnail("https://i.imgur.com/R0N6kW3.png");
 
                             fields.forEach(field -> embed.addField(field.name(), field.value(), field.inline().get()));
                         }))
-                .flatMap(embed -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
-                .switchIfEmpty(context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(
-                                String.format(Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
-                                                + "you can help me keep it alive by making a donation on <%s>."
-                                                + "%nAll donations are important and really help me %s",
-                                        context.getUsername(), Config.PATREON_URL, Emoji.HEARTS), channel)))
-                .then();
+                .flatMap(context::createFollowupMessage)
+                .switchIfEmpty(context.createFollowupMessage(
+                        Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
+                                + "you can help me keep it alive by making a donation on my [Patreon](%s)."
+                                + "%nAll donations are important and really help me %s",
+                        context.getAuthorName(), Config.PATREON_URL, Emoji.HEARTS));
     }
 
     private static Mono<Tuple2<Relic, Optional<Guild>>> getRelicAndGuild(Context context, Relic relic) {
@@ -96,11 +89,4 @@ public class RelicStatusCmd extends BaseCmd {
         return Mono.zip(Mono.just(relic), getGuild);
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show your contributor status.")
-                .build();
-    }
 }
-*/

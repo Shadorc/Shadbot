@@ -47,7 +47,7 @@ public class ChatCmd extends BaseCmd {
         return builder
                 .addOption(ApplicationCommandOptionData.builder()
                         .name("message")
-                        .description(String.format("the message to send, must not exceed %d characters", MAX_CHARACTERS))
+                        .description(String.format("The message to send, must not exceed %d characters", MAX_CHARACTERS))
                         .type(ApplicationCommandOptionType.STRING.getValue())
                         .required(true)
                         .build())

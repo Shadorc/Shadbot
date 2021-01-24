@@ -30,7 +30,7 @@ public class BackwardCmd extends BaseCmd {
         return builder
                 .addOption(ApplicationCommandOptionData.builder()
                         .name("time")
-                        .description("can be seconds or time (e.g. 72 or 1m12s)")
+                        .description("Can be number of seconds or formatted time (e.g. 72 or 1m12s)")
                         .type(ApplicationCommandOptionType.STRING.getValue())
                         .required(true)
                         .build())

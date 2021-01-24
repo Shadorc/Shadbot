@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.object.help;
 
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -37,13 +36,11 @@ public abstract class HelpBuilder {
     private String source;
     @Nullable
     private String footer;
-    private String delimiter;
 
     protected HelpBuilder(Context context) {
         this.context = context;
         this.args = new ArrayList<>();
         this.fields = new ArrayList<>();
-        this.delimiter = Config.COMMAND_DELIMITER;
     }
 
     public HelpBuilder setAuthor(String authorName, String authorUrl) {
@@ -74,11 +71,6 @@ public abstract class HelpBuilder {
 
     public HelpBuilder setSource(String source) {
         this.source = source;
-        return this;
-    }
-
-    public HelpBuilder setDelimiter(String delimiter) {
-        this.delimiter = delimiter;
         return this;
     }
 
@@ -151,7 +143,7 @@ public abstract class HelpBuilder {
 
         return String.format("`/%s %s`", this.getCommandName(),
                 FormatUtil.format(this.args,
-                        arg -> String.format(arg.isOptional() ? "[<%s>]" : "<%s>", arg.getName()), this.delimiter));
+                        arg -> String.format(arg.isOptional() ? "[<%s>]" : "<%s>", arg.getName()), " "));
     }
 
     private String getArguments() {

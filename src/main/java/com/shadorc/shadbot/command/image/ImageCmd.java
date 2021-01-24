@@ -49,8 +49,8 @@ public class ImageCmd extends BaseCmd {
     public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
         return builder
                 .addOption(ApplicationCommandOptionData.builder()
-                        .name("search")
-                        .description("The term to search")
+                        .name("keyword")
+                        .description("The keyword to search")
                         .type(ApplicationCommandOptionType.STRING.getValue())
                         .required(true)
                         .build())
@@ -59,13 +59,13 @@ public class ImageCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String search = context.getOption("search").orElseThrow();
+        final String keyword = context.getOption("keyword").orElseThrow();
 
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading image...", context.getAuthorName())
-                .flatMap(messageId -> this.getPopularImage(search)
+                .flatMap(messageId -> this.getPopularImage(keyword)
                         .flatMap(image -> context.editFollowupMessage(messageId,
                                 ShadbotUtil.getDefaultEmbed(
-                                        embed -> embed.setAuthor(String.format("DeviantArt: %s", search), image.getUrl(), context.getAuthorAvatarUrl())
+                                        embed -> embed.setAuthor(String.format("DeviantArt: %s", keyword), image.getUrl(), context.getAuthorAvatarUrl())
                                                 .setThumbnail("https://i.imgur.com/gT4hHUB.png")
                                                 .addField("Title", image.getTitle(), false)
                                                 .addField("Author", image.getAuthor().getUsername(), false)
@@ -73,10 +73,10 @@ public class ImageCmd extends BaseCmd {
                                                 .setImage(image.getContent().map(Content::getSource).orElseThrow()))))
                         .switchIfEmpty(context.editFollowupMessage(messageId, Emoji.MAGNIFYING_GLASS
                                         + " (**%s**) No images were found for the search `%s`",
-                                context.getAuthorName(), search)));
+                                context.getAuthorName(), keyword)));
     }
 
-    private Mono<Image> getPopularImage(String search) {
+    private Mono<Image> getPopularImage(String keyword) {
         return this.requestAccessToken()
                 .map(token -> String.format("%s?"
                                 + "q=%s"
@@ -84,7 +84,7 @@ public class ImageCmd extends BaseCmd {
                                 + "&limit=25" // The pagination limit (min: 1 max: 50)
                                 + "&offset=%d" // The pagination offset (min: 0 max: 50000)
                                 + "&access_token=%s",
-                        BROWSE_POPULAR_URL, NetUtil.encode(search), ThreadLocalRandom.current().nextInt(150),
+                        BROWSE_POPULAR_URL, NetUtil.encode(keyword), ThreadLocalRandom.current().nextInt(150),
                         token.getAccessToken()))
                 .flatMap(url -> RequestHelper.fromUrl(url).to(DeviantArtResponse.class))
                 .flatMapIterable(DeviantArtResponse::getResults)

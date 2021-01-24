@@ -3,11 +3,13 @@ package com.shadorc.shadbot.utils;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.command.MissingPermissionException;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.ExceptionHandler;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Guild;
@@ -20,19 +22,14 @@ import discord4j.core.spec.MessageCreateSpec;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.AllowedMentions;
 import discord4j.rest.util.Permission;
-import io.netty.channel.unix.Errors;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
-import reactor.netty.http.client.PrematureCloseException;
-import reactor.util.retry.Retry;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
@@ -104,11 +101,8 @@ public class DiscordUtil {
                 }))
                 // 403 Forbidden means that the bot is not in the guild
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
-                .timeout(Duration.ofSeconds(15))
-                .retryWhen(Retry.backoff(3, Duration.ofSeconds(1))
-                        .filter(err -> err instanceof PrematureCloseException
-                                || err instanceof Errors.NativeIoException
-                                || err instanceof TimeoutException))
+                .timeout(Config.TIMEOUT)
+                .retryWhen(ExceptionHandler.RETRY_ON_INTERNET_FAILURES.apply("Retries exhausted trying to send message"))
                 .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc());
     }
 
