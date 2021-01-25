@@ -60,18 +60,19 @@ public class CommandProcessor {
                 .switchIfEmpty(context.createFollowupMessage(Emoji.ACCESS_DENIED
                         + " (**%s**) You do not have the permission to execute this command.", context.getAuthorName())
                         .then(Mono.empty()))
-                // The command is allowed in the guild and the user is not rate limited
-                .filter(__ -> context.getDbGuild().getSettings().isCommandAllowed(command)
-                        && !CommandProcessor.isRateLimited(context, command))
+                // The command is allowed in the guild
+                .filter(__ -> context.getDbGuild().getSettings().isCommandAllowed(command))
+                // The user is not rate limited
+                .filterWhen(__ -> BooleanUtils.not(CommandProcessor.isRateLimited(context, command)))
                 .flatMap(__ -> command.execute(context))
                 .onErrorResume(err -> ExceptionHandler.handleCommandError(err, command, context)
                         .then(Mono.empty()));
     }
 
-    private static boolean isRateLimited(Context context, BaseCmd cmd) {
-        return cmd.getRateLimiter()
-                .map(rateLimiter -> rateLimiter.isLimitedAndWarn(context.getChannelId(), context.getAuthor()))
-                .orElse(false);
+    private static Mono<Boolean> isRateLimited(Context context, BaseCmd cmd) {
+        return Mono.justOrEmpty(cmd.getRateLimiter())
+                .flatMap(rateLimiter -> rateLimiter.isLimitedAndWarn(context))
+                .defaultIfEmpty(false);
     }
 
 }

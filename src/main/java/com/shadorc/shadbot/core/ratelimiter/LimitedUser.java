@@ -22,12 +22,8 @@ public class LimitedUser {
         return this.isWarned.get();
     }
 
-    public void warn() {
-        this.isWarned.set(true);
-    }
-
-    public void unwarn() {
-        this.isWarned.set(false);
+    public void warned(boolean warned) {
+        this.isWarned.set(warned);
     }
 
 }

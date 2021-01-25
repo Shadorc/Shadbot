@@ -1,16 +1,14 @@
 package com.shadorc.shadbot.core.ratelimiter;
 
+import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.ExceptionHandler;
-import com.shadorc.shadbot.object.message.TemporaryMessage;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.core.GatewayDiscordClient;
-import discord4j.core.object.entity.Member;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.Map;
@@ -41,38 +39,33 @@ public class RateLimiter {
         this.bandwidth = bandwidth;
     }
 
-    public boolean isLimitedAndWarn(Snowflake channelId, Member member) {
-        final LimitedUser limitedUser = this.guildsLimitedMap.computeIfAbsent(member.getGuildId(),
-                __ -> new LimitedGuild(this.bandwidth))
-                .getUser(member.getId());
+    public Mono<Boolean> isLimitedAndWarn(Context context) {
+        final LimitedUser limitedUser = this.guildsLimitedMap
+                .computeIfAbsent(context.getGuildId(), __ -> new LimitedGuild(this.bandwidth))
+                .getUser(context.getAuthorId());
 
         // The token could not been consumed, the user is limited
         if (!limitedUser.getBucket().tryConsume(1)) {
             // The user has not yet been warned
             if (!limitedUser.isWarned()) {
-                this.sendWarningMessage(member.getClient(), channelId, member.getId());
-                limitedUser.warn();
+                limitedUser.warned(true);
+                return this.sendWarningMessage(context)
+                        .thenReturn(true);
             }
-            return true;
+            return Mono.just(true);
         }
 
-        limitedUser.unwarn();
-        return false;
+        limitedUser.warned(false);
+        return Mono.just(false);
     }
 
-    private void sendWarningMessage(GatewayDiscordClient gateway, Snowflake channelId, Snowflake userId) {
-        gateway.getUserById(userId)
-                .map(author -> {
-                    final String username = author.getUsername();
-                    final String message = ShadbotUtil.SPAMS.getRandomLine();
-                    final String maxNum = StringUtil.pluralOf(this.bandwidth.getCapacity(), "time");
-                    final String durationStr = FormatUtil.formatDurationWords(
-                            Duration.ofNanos(this.bandwidth.getRefillPeriodNanos()));
-                    return String.format(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
-                            username, message, maxNum, durationStr);
-                })
-                .flatMap(new TemporaryMessage(gateway, channelId, Duration.ofSeconds(10))::send)
-                .subscribe(null, ExceptionHandler::handleUnknownError);
+    private Mono<Snowflake> sendWarningMessage(Context context) {
+        final String message = ShadbotUtil.SPAMS.getRandomLine();
+        final String maxNum = StringUtil.pluralOf(this.bandwidth.getCapacity(), "time");
+        final String duration = FormatUtil.formatDurationWords(
+                Duration.ofNanos(this.bandwidth.getRefillPeriodNanos()));
+        return context.createFollowupMessage(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
+                context.getAuthorName(), message, maxNum, duration);
     }
 
 }
