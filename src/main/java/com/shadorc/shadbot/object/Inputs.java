@@ -36,9 +36,7 @@ public abstract class Inputs {
     }
 
     public Disposable listen() {
-        return this.waitForInputs()
-                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
-                .subscribe(null, ExceptionHandler::handleUnknownError);
+        return this.waitForInputs().subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
     /**

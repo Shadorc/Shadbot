@@ -9,9 +9,6 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,31 +22,9 @@ public class RolelistCmd extends BaseCmd {
 
     public RolelistCmd() {
         super(CommandCategory.INFO, "rolelist", "Show a list of members with specific role(s)");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("role_1")
-                        .description("The first role to have")
-                        .type(ApplicationCommandOptionType.ROLE.getValue())
-                        .required(true)
-                        .build())
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("role_2")
-                        .description("The second role to have")
-                        .type(ApplicationCommandOptionType.ROLE.getValue())
-                        .required(false)
-                        .build())
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("role_3")
-                        .description("The third role to have")
-                        .type(ApplicationCommandOptionType.ROLE.getValue())
-                        .required(false)
-                        .build())
-                .build();
+        this.addOption("role_1", "The first role to have", true, ApplicationCommandOptionType.ROLE);
+        this.addOption("role_2", "The second role to have", false, ApplicationCommandOptionType.ROLE);
+        this.addOption("role_3", "The third role to have", false, ApplicationCommandOptionType.ROLE);
     }
 
     @Override

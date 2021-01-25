@@ -9,9 +9,6 @@ import com.shadorc.shadbot.music.TrackScheduler;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.EnumUtil;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -19,19 +16,10 @@ public class RepeatCmd extends BaseCmd {
 
     public RepeatCmd() {
         super(CommandCategory.MUSIC, "repeat", "Toggle song/playlist repetition");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("mode")
-                        .description("none/song/playlist (disable repetition or repeat the current song/playlist)")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(false)
-                        .build())
-                .build();
+        this.addOption("mode",
+                "none/song/playlist (disable repetition or repeat the current song/playlist)",
+                false,
+                ApplicationCommandOptionType.STRING);
     }
 
     @Override

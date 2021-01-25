@@ -10,9 +10,6 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.object.entity.Member;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -23,18 +20,10 @@ public class AchievementsCmd extends BaseCmd {
 
     public AchievementsCmd() {
         super(CommandCategory.INFO, "achievements", "Show user's achievements");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder.addOption(ApplicationCommandOptionData.builder()
-                .name("user")
-                .description("If not specified, it will show your achievements")
-                .type(ApplicationCommandOptionType.USER.getValue())
-                .required(false)
-                .build())
-                .build();
+        this.addOption("user",
+                "If not specified, it will show your achievements",
+                false,
+                ApplicationCommandOptionType.USER);
     }
 
     @Override

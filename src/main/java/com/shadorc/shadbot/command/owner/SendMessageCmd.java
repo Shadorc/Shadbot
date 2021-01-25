@@ -9,9 +9,6 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -21,24 +18,9 @@ public class SendMessageCmd extends BaseCmd {
 
     public SendMessageCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "send_message", "Send a private message to a user");
-    }
 
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("user")
-                        .description("The user to send a message to")
-                        .type(ApplicationCommandOptionType.USER.getValue())
-                        .required(true)
-                        .build())
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("message")
-                        .description("The message to send")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .build();
+        this.addOption("user", "The user to send a message to", true, ApplicationCommandOptionType.USER);
+        this.addOption("message", "The message to send", true, ApplicationCommandOptionType.STRING);
     }
 
     @Override

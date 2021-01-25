@@ -39,16 +39,15 @@ public class TaskManager {
         final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofMinutes(15), DEFAULT_SCHEDULER)
                 .map(__ -> ShadbotUtil.getRandomStatus())
                 .flatMap(gateway::updatePresence)
-                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
         this.tasks.add(task);
     }
 
-/*    public void scheduleLottery(GatewayDiscordClient gateway) {
-        LOGGER.info("Starting lottery (next draw in {})", FormatUtils.formatDurationWords(LotteryCmd.getDelay()));
+    /*public void scheduleLottery(GatewayDiscordClient gateway) {
+        LOGGER.info("Starting lottery (next draw in {})", FormatUtil.formatDurationWords(LotteryCmd.getDelay()));
         final Disposable task = Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), DEFAULT_SCHEDULER)
-                .flatMap(__ -> LotteryCmd.draw(gateway))
-                .onErrorContinue((err, obj) -> ExceptionHandler.handleUnknownError(err))
+                .flatMap(__ -> LotteryCmd.draw(gateway)
+                        .onErrorResume(err -> Mono.fromCallable(() -> ExceptionHandler.handleUnknownError(err))))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
         this.tasks.add(task);
     }*/

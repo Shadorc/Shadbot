@@ -18,9 +18,6 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -52,19 +49,7 @@ public class LyricsCmd extends BaseCmd {
 
     public LyricsCmd() {
         super(CommandCategory.UTILS, "lyrics", "Show lyrics for a song or for the current music");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("music")
-                        .description("Music's name to search")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(false)
-                        .build())
-                .build();
+        this.addOption("music", "Music's name to search", false, ApplicationCommandOptionType.STRING);
     }
 
     @Override

@@ -9,9 +9,6 @@ import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.NumberUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -24,18 +21,10 @@ public class SkipCmd extends BaseCmd {
         super(CommandCategory.MUSIC, "skip", "Skip current music and play the next one. " +
                 "You can also directly skip to a music in the playlist");
         this.setRateLimiter(new RateLimiter(1, Duration.ofSeconds(1)));
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("index")
-                        .description("the index of the music in the playlist to play")
-                        .type(ApplicationCommandOptionType.INTEGER.getValue())
-                        .required(false)
-                        .build())
-                .build();
+        this.addOption("index",
+                "The index of the music in the playlist to play",
+                false,
+                ApplicationCommandOptionType.INTEGER);
     }
 
     @Override
@@ -67,8 +56,7 @@ public class SkipCmd extends BaseCmd {
                             // ...we resume it in case the previous music was paused.
                             guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
                             return Mono.empty();
-                        }
-                        else {
+                        } else {
                             // there is no more music, this is the end.
                             return guildMusic.end();
                         }

@@ -11,7 +11,6 @@ public class PingCmd extends BaseCmd {
 
     public PingCmd() {
         super(CommandCategory.INFO, "ping", "Show bot's ping");
-        this.setDefaultRateLimiter();
     }
 
     @Override

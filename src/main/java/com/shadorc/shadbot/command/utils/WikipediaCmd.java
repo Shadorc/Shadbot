@@ -13,9 +13,6 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.object.Embed;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -26,27 +23,15 @@ public class WikipediaCmd extends BaseCmd {
 
     public WikipediaCmd() {
         super(CommandCategory.UTILS, "wikipedia", "Show Wikipedia description for a search");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("search")
-                        .description("The word to search")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .build();
+        this.addOption("word", "The word to search", true, ApplicationCommandOptionType.STRING);
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final String search = context.getOption("search").orElseThrow();
+        final String word = context.getOption("word").orElseThrow();
 
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Wikipedia...", context.getAuthorName())
-                .flatMap(messageId -> WikipediaCmd.getWikipediaPage(search)
+                .flatMap(messageId -> WikipediaCmd.getWikipediaPage(word)
                         .flatMap(page -> {
                             if (page.getExtract().endsWith("may refer to:")) {
                                 return context.editFollowupMessage(messageId,
@@ -59,7 +44,7 @@ public class WikipediaCmd extends BaseCmd {
                         })
                         .switchIfEmpty(context.editFollowupMessage(messageId,
                                 Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
-                                context.getAuthorName(), search)));
+                                context.getAuthorName(), word)));
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(final WikipediaPage page, final String avatarUrl) {

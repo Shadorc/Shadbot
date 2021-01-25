@@ -17,7 +17,6 @@ public class PlaylistCmd extends BaseCmd {
 
     public PlaylistCmd() {
         super(CommandCategory.MUSIC, "playlist", "Show current playlist");
-        this.setDefaultRateLimiter();
     }
 
     @Override

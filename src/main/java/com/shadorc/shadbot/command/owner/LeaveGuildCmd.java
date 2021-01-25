@@ -9,9 +9,6 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.NumberUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Guild;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -21,18 +18,8 @@ public class LeaveGuildCmd extends BaseCmd {
 
     public LeaveGuildCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "leave_guild", "Leave a guild");
-    }
 
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("guildId")
-                        .description("The ID of the guild to leave")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .build();
+        this.addOption("guildId", "The ID of the guild to leave", true, ApplicationCommandOptionType.STRING);
     }
 
     @Override

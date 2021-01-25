@@ -27,7 +27,6 @@ public class RelicStatusCmd extends BaseCmd {
 
     public RelicStatusCmd() {
         super(CommandCategory.DONATOR, "relic_status", "Show your donator status");
-        this.setDefaultRateLimiter();
     }
 
     @Override

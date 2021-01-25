@@ -12,9 +12,6 @@ import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -28,19 +25,7 @@ public class Rule34Cmd extends BaseCmd {
 
     public Rule34Cmd() {
         super(CommandCategory.IMAGE, "rule34", "Show a random image corresponding to a tag from Rule34 website");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("tag")
-                        .description("The tag to search")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .build();
+        this.addOption("tag", "The tag to search", true, ApplicationCommandOptionType.STRING);
     }
 
     @Override

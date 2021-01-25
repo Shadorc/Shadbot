@@ -10,9 +10,6 @@ import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -22,19 +19,10 @@ public class ForwardCmd extends BaseCmd {
 
     public ForwardCmd() {
         super(CommandCategory.MUSIC, "forward", "Fast forward the current music a given amount of time");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("time")
-                        .description("Can be number of seconds or formatted time (e.g. 72 or 1m12s)")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .build();
+        this.addOption("time",
+                "Can be number of seconds or formatted time (e.g. 72 or 1m12s)",
+                true,
+                ApplicationCommandOptionType.STRING);
     }
 
     @Override

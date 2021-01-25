@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.object.help;
 
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.Option;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -17,15 +18,15 @@ public abstract class HelpBuilder {
 
     protected final Context context;
 
-    private final List<Argument> args;
-    private final List<ImmutableEmbedFieldData> fields;
+    protected final List<Option> options;
+    protected final List<ImmutableEmbedFieldData> fields;
 
     @Nullable
     private String authorName;
     @Nullable
     private String authorUrl;
     @Nullable
-    private String thumbnail;
+    private String thumbnailUrl;
     @Nullable
     private String description;
     @Nullable
@@ -39,7 +40,7 @@ public abstract class HelpBuilder {
 
     protected HelpBuilder(Context context) {
         this.context = context;
-        this.args = new ArrayList<>();
+        this.options = new ArrayList<>();
         this.fields = new ArrayList<>();
     }
 
@@ -49,8 +50,8 @@ public abstract class HelpBuilder {
         return this;
     }
 
-    public HelpBuilder setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
+    public HelpBuilder setThumbnail(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
         return this;
     }
 
@@ -79,15 +80,6 @@ public abstract class HelpBuilder {
         return this;
     }
 
-    public HelpBuilder addArg(String name, String desc, boolean isOptional) {
-        this.args.add(new Argument(name, desc, isOptional));
-        return this;
-    }
-
-    public HelpBuilder addArg(String name, boolean isOptional) {
-        return this.addArg(name, null, isOptional);
-    }
-
     public HelpBuilder addField(String name, String value, boolean inline) {
         this.fields.add(ImmutableEmbedFieldData.of(name, value, Possible.of(inline)));
         return this;
@@ -104,8 +96,8 @@ public abstract class HelpBuilder {
                 embed.setDescription(this.description);
             }
 
-            if (this.thumbnail != null && !this.thumbnail.isBlank()) {
-                embed.setThumbnail(this.thumbnail);
+            if (this.thumbnailUrl != null && !this.thumbnailUrl.isBlank()) {
+                embed.setThumbnail(this.thumbnailUrl);
             }
 
             if (!this.getArguments().isEmpty()) {
@@ -137,19 +129,19 @@ public abstract class HelpBuilder {
             return String.format("`%s`", this.usage);
         }
 
-        if (this.args.isEmpty()) {
+        if (this.options.isEmpty()) {
             return String.format("`/%s`", this.getCommandName());
         }
 
         return String.format("`/%s %s`", this.getCommandName(),
-                FormatUtil.format(this.args,
-                        arg -> String.format(arg.isOptional() ? "[<%s>]" : "<%s>", arg.getName()), " "));
+                FormatUtil.format(this.options,
+                        option -> String.format(option.isRequired() ? "<%s>" : "[<%s>]", option.getName()), " "));
     }
 
     private String getArguments() {
-        return this.args.stream()
-                .filter(arg -> arg.getDescription() != null && !arg.getDescription().isBlank())
-                .map(arg -> String.format("%n**%s** %s - %s", arg.getName(), arg.isOptional() ? "[optional] " : "", arg.getDescription()))
+        return this.options.stream()
+                .map(option -> String.format("%n**%s** %s - %s",
+                        option.getName(), option.isRequired() ? "" : "[optional] ", option.getDescription()))
                 .collect(Collectors.joining());
     }
 }

@@ -7,25 +7,32 @@ import com.shadorc.shadbot.db.guilds.entity.Settings;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class HelpCmd extends BaseCmd {
 
     public HelpCmd() {
         super(CommandCategory.INFO, "help", "Show the list of available commands");
-        this.setDefaultRateLimiter();
+        this.addOption("command", "Show help about a specific command", false, ApplicationCommandOptionType.STRING);
     }
 
     @Override
     public Mono<?> execute(Context context) {
+        final Optional<String> cmdName = context.getOption("command");
+        if (cmdName.isPresent()) {
+            final BaseCmd cmd = CommandManager.getInstance().getCommand(cmdName.orElseThrow());
+            if (cmd == null) {
+                return Mono.empty();
+            }
+            return context.createFollowupMessage(cmd.getHelp(context));
+        }
+
         return context.getPermissions()
                 .collectList()
                 .flatMap(authorPermissions -> HelpCmd.getMultiMap(context, authorPermissions))

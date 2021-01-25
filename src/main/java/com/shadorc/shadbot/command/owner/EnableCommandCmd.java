@@ -3,9 +3,6 @@ package com.shadorc.shadbot.command.owner;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.object.Emoji;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -15,24 +12,9 @@ public class EnableCommandCmd extends BaseCmd {
 
     public EnableCommandCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "enable_command", "Enable/disable a command");
-    }
 
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("command")
-                        .description("The command to enable/disable")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("enabled")
-                        .description("True to enable, false to disable")
-                        .type(ApplicationCommandOptionType.BOOLEAN.getValue())
-                        .required(true)
-                        .build())
-                .build();
+        this.addOption("command", "The command to enable/disable", true, ApplicationCommandOptionType.STRING);
+        this.addOption("enabled", "True to enable, false to disable", true, ApplicationCommandOptionType.BOOLEAN);
     }
 
     @Override

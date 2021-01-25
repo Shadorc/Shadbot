@@ -18,7 +18,6 @@ public class JokeCmd extends BaseCmd {
 
     public JokeCmd() {
         super(CommandCategory.FUN, "joke", "Show a random joke");
-        this.setDefaultRateLimiter();
     }
 
     @Override

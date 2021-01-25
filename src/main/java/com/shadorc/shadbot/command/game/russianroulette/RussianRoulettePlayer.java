@@ -1,10 +1,10 @@
-/*
 package com.shadorc.shadbot.command.game.russianroulette;
 
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.common.util.Snowflake;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -44,16 +44,24 @@ public class RussianRoulettePlayer extends GamblerPlayer {
         return 6 - this.index;
     }
 
+    public Duration getResetDuration() {
+        if (this.deadInstant == null) {
+            return Duration.ZERO;
+        }
+        return Duration.ofHours(Constants.RESET_HOURS)
+                .minus(Duration.ofMillis(TimeUtil.getMillisUntil(this.deadInstant)));
+    }
+
     public boolean isAlive() {
-        // If the player has not played since one day, reset
+        // If the time is elapsed since the player last played, reset
         if (this.lastTimePlayed != null
-                && TimeUnit.MILLISECONDS.toHours(TimeUtils.getMillisUntil(this.lastTimePlayed)) >= Constants.RESET_HOURS) {
+                && TimeUnit.MILLISECONDS.toHours(TimeUtil.getMillisUntil(this.lastTimePlayed)) >= Constants.RESET_HOURS) {
             this.init();
         }
 
         // If the player has been dead for one day, reset
         if (this.deadInstant != null
-                && TimeUnit.MILLISECONDS.toHours(TimeUtils.getMillisUntil(this.deadInstant)) >= Constants.RESET_HOURS) {
+                && TimeUnit.MILLISECONDS.toHours(TimeUtil.getMillisUntil(this.deadInstant)) >= Constants.RESET_HOURS) {
             this.init();
             return true;
         }
@@ -62,4 +70,3 @@ public class RussianRoulettePlayer extends GamblerPlayer {
     }
 
 }
-*/

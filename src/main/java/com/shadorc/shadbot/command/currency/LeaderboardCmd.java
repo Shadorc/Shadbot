@@ -20,7 +20,6 @@ public class LeaderboardCmd extends BaseCmd {
 
     public LeaderboardCmd() {
         super(CommandCategory.CURRENCY, "leaderboard", "Show coins leaderboard for this server");
-        this.setDefaultRateLimiter();
     }
 
     @Override

@@ -7,9 +7,6 @@ import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -17,19 +14,10 @@ public class CoinsCmd extends BaseCmd {
 
     public CoinsCmd() {
         super(CommandCategory.CURRENCY, "coins", "Show how many coins a user has");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("user")
-                        .description("show your coins by default")
-                        .type(ApplicationCommandOptionType.USER.getValue())
-                        .required(false)
-                        .build())
-                .build();
+        this.addOption("user",
+                "If not specified, it will show your coins",
+                false,
+                ApplicationCommandOptionType.USER);
     }
 
     @Override

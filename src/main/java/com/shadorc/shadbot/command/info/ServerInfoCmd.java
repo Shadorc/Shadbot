@@ -29,8 +29,6 @@ public class ServerInfoCmd extends BaseCmd {
 
     public ServerInfoCmd() {
         super(CommandCategory.INFO, "server_info", "Show info about this server");
-        this.setDefaultRateLimiter();
-
         this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy - HH'h'mm", Locale.ENGLISH);
     }
 

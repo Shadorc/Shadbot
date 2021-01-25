@@ -8,9 +8,6 @@ import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.core.object.entity.User;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -22,18 +19,7 @@ public class FeedbackCmd extends BaseCmd {
         super(CommandCategory.INFO, "feedback",
                 "Send a message to my developer. This can be anything related to the bot");
         this.setRateLimiter(new RateLimiter(1, Duration.ofSeconds(5)));
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("text")
-                        .description("The message to send")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .build();
+        this.addOption("message", "The message to send", true, ApplicationCommandOptionType.STRING);
     }
 
     @Override
@@ -44,7 +30,7 @@ public class FeedbackCmd extends BaseCmd {
                 .flatMap(channel -> DiscordUtil.sendMessage(
                         String.format(Emoji.SPEECH + " Feedback from **%s** (User ID: %d, Guild ID: %d):%n%s",
                                 context.getAuthorName(), context.getAuthorId().asLong(),
-                                context.getGuildId().asLong(), context.getOption("text").orElseThrow()), channel))
+                                context.getGuildId().asLong(), context.getOption("message").orElseThrow()), channel))
                 .then(context.createFollowupMessage(Emoji.INFO + " (**%s**) Feedback sent, thank you!", context.getAuthorName()));
     }
 

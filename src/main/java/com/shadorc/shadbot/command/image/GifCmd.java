@@ -13,9 +13,6 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -31,19 +28,7 @@ public class GifCmd extends BaseCmd {
 
     public GifCmd() {
         super(CommandCategory.IMAGE, "gif", "Search for a random gif");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("keyword")
-                        .description("The keyword to search")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(false)
-                        .build())
-                .build();
+        this.addOption("keyword", "The keyword to search", false, ApplicationCommandOptionType.STRING);
     }
 
     @Override

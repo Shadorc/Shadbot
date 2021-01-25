@@ -30,7 +30,6 @@ public class InfoCmd extends BaseCmd {
 
     public InfoCmd() {
         super(CommandCategory.INFO, "info", "Show info");
-        this.setDefaultRateLimiter();
     }
 
     @Override

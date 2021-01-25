@@ -12,7 +12,6 @@ public class PauseCmd extends BaseCmd {
 
     public PauseCmd() {
         super(CommandCategory.MUSIC, "pause", "Toggle pause for current music");
-        this.setDefaultRateLimiter();
     }
 
     @Override

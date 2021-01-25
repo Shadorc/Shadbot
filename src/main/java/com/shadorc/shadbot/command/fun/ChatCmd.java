@@ -11,9 +11,6 @@ import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.LogUtil;
 import com.shadorc.shadbot.utils.NetUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -37,21 +34,12 @@ public class ChatCmd extends BaseCmd {
 
     public ChatCmd() {
         super(CommandCategory.FUN, "chat", "Chat with an artificial intelligence");
-        this.setDefaultRateLimiter();
+        this.addOption("message",
+                String.format("The message to send, must not exceed %d characters", MAX_CHARACTERS),
+                true,
+                ApplicationCommandOptionType.STRING);
 
         this.channelsCustid = new ConcurrentHashMap<>();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("message")
-                        .description(String.format("The message to send, must not exceed %d characters", MAX_CHARACTERS))
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .build();
     }
 
     @Override

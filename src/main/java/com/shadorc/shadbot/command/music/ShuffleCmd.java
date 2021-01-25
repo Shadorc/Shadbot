@@ -12,7 +12,6 @@ public class ShuffleCmd extends BaseCmd {
 
     public ShuffleCmd() {
         super(CommandCategory.MUSIC, "shuffle", "Shuffle current playlist");
-        this.setDefaultRateLimiter();
     }
 
     @Override

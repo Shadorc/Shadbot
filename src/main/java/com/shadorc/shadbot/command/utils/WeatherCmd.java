@@ -37,7 +37,6 @@ public class WeatherCmd extends BaseCmd {
 
     public WeatherCmd() {
         super(CommandCategory.UTILS, List.of("weather"));
-        this.setDefaultRateLimiter();
 
         this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy 'at' hh:mm aa", Locale.ENGLISH);
         final String apiKey = CredentialManager.getInstance().get(Credential.OPENWEATHERMAP_API_KEY);

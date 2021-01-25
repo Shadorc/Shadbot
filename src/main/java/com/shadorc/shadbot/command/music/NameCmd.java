@@ -12,7 +12,6 @@ public class NameCmd extends BaseCmd {
 
     public NameCmd() {
         super(CommandCategory.MUSIC, "name", "Show current music name");
-        this.setDefaultRateLimiter();
     }
 
     @Override

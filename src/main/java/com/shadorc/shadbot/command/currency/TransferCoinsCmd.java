@@ -11,9 +11,6 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -21,25 +18,8 @@ public class TransferCoinsCmd extends BaseCmd {
 
     public TransferCoinsCmd() {
         super(CommandCategory.CURRENCY, "transfer", "Transfer coins to a user");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("coins")
-                        .description("number of coins to transfer")
-                        .type(ApplicationCommandOptionType.INTEGER.getValue())
-                        .required(true)
-                        .build())
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("user")
-                        .description("user to transfer coins to")
-                        .type(ApplicationCommandOptionType.USER.getValue())
-                        .required(true)
-                        .build())
-                .build();
+        this.addOption("coins", "Number of coins to transfer", true, ApplicationCommandOptionType.INTEGER);
+        this.addOption("user", "User to transfer coins to", true, ApplicationCommandOptionType.USER);
     }
 
     @Override

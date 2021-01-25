@@ -10,7 +10,6 @@ public class ClearCmd extends BaseCmd {
 
     public ClearCmd() {
         super(CommandCategory.MUSIC, "clear", "Clear current playlist");
-        this.setDefaultRateLimiter();
     }
 
     @Override

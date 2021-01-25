@@ -28,7 +28,6 @@ public class DtcCmd extends BaseCmd {
 
     public DtcCmd() {
         super(CommandCategory.FUN, "dtc", "Show a random quote from DansTonChat.com");
-        this.setDefaultRateLimiter();
     }
 
     @Override

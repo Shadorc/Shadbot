@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.game.slotmachine;
 
 class Constants {
@@ -7,4 +6,3 @@ class Constants {
     protected static final int PAID_COST = 25;
 
 }
-*/

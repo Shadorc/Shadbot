@@ -11,7 +11,6 @@ public class StopCmd extends BaseCmd {
 
     public StopCmd() {
         super(CommandCategory.MUSIC, "stop", "Stop current music");
-        this.setDefaultRateLimiter();
     }
 
     @Override

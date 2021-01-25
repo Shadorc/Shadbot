@@ -14,6 +14,10 @@ public class SettingHelpBuilder extends HelpBuilder {
     private SettingHelpBuilder(BaseSetting setting, Context context) {
         super(context);
         this.setting = setting;
+
+        this.setAuthor(String.format("Help for setting: %s", this.setting.getName()),
+                "https://github.com/Shadorc/Shadbot/wiki/Settings")
+                .setDescription(String.format("**%s**", this.setting.getDescription()));
     }
 
     public static SettingHelpBuilder create(BaseSetting setting, Context context) {
@@ -25,13 +29,5 @@ public class SettingHelpBuilder extends HelpBuilder {
         return this.setting.getCommandName();
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> build() {
-        this.setAuthor(String.format("Help for setting: %s", this.setting.getName()),
-                "https://github.com/Shadorc/Shadbot/wiki/Settings")
-                .setDescription(String.format("**%s**", this.setting.getDescription()));
-
-        return super.build();
-    }
 }
 */

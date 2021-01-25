@@ -12,7 +12,6 @@ public class InviteCmd extends BaseCmd {
 
     public InviteCmd() {
         super(CommandCategory.INFO, "invite", "Explain how to invite the bot in a server");
-        this.setDefaultRateLimiter();
     }
 
     @Override

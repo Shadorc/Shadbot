@@ -13,9 +13,6 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -29,19 +26,10 @@ public class WallpaperCmd extends BaseCmd {
 
     public WallpaperCmd() {
         super(CommandCategory.IMAGE, "wallpaper", "Search for a wallpaper");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("search")
-                        .description("Keywords to search (e.g. doom game)")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(false)
-                        .build())
-                .build();
+        this.addOption("search",
+                "Keywords to search (e.g. doom game)",
+                false,
+                ApplicationCommandOptionType.STRING);
     }
 
     @Override

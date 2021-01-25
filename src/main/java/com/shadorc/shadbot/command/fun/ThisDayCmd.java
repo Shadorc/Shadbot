@@ -19,7 +19,6 @@ public class ThisDayCmd extends BaseCmd {
 
     public ThisDayCmd() {
         super(CommandCategory.FUN, "this_day", "Show significant events of the day");
-        this.setDefaultRateLimiter();
     }
 
     @Override

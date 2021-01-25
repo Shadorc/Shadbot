@@ -11,9 +11,6 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.EnumUtil;
 import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -27,31 +24,10 @@ public class ManageAchievementsCmd extends BaseCmd {
 
     public ManageAchievementsCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "manage_achievements", "Manage user's achievements");
-    }
 
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        System.err.println(FormatUtil.options(Achievement.class).length());
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("action")
-                        .description(FormatUtil.options(Action.class))
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("achievement")
-                        .description(FormatUtil.options(Achievement.class))
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("user")
-                        .description("The user")
-                        .type(ApplicationCommandOptionType.USER.getValue())
-                        .required(true)
-                        .build())
-                .build();
+        this.addOption("action", FormatUtil.options(Action.class), true, ApplicationCommandOptionType.STRING);
+        this.addOption("achievement", FormatUtil.options(Achievement.class), true, ApplicationCommandOptionType.STRING);
+        this.addOption("user", "The user", true, ApplicationCommandOptionType.USER);
     }
 
     @Override

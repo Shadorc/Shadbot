@@ -10,7 +10,6 @@ public class BaguetteCmd extends BaseCmd {
 
     public BaguetteCmd() {
         super(CommandCategory.HIDDEN, "baguette", "This command doesn't exist");
-        this.setDefaultRateLimiter();
     }
 
     @Override

@@ -15,9 +15,6 @@ import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -39,22 +36,10 @@ public class ImageCmd extends BaseCmd {
 
     public ImageCmd() {
         super(CommandCategory.IMAGE, "image", "Search for a random image on DeviantArt");
-        this.setDefaultRateLimiter();
+        this.addOption("keyword", "The keyword to search", true, ApplicationCommandOptionType.STRING);
 
         this.lastTokenGeneration = new AtomicLong();
         this.token = new AtomicReference<>();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("keyword")
-                        .description("The keyword to search")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .build();
     }
 
     @Override

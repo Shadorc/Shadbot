@@ -17,7 +17,6 @@ public class SuicideGirlsCmd extends BaseCmd {
 
     public SuicideGirlsCmd() {
         super(CommandCategory.IMAGE, "suicide_girls", "Show a random Suicide Girl image");
-        this.setDefaultRateLimiter();
     }
 
     @Override

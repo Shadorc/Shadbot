@@ -27,7 +27,6 @@ public class TranslateCmd extends BaseCmd {
 
     public TranslateCmd() {
         super(CommandCategory.UTILS, "translate");
-        this.setDefaultRateLimiter();
     }
 
     @Override

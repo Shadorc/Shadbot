@@ -11,9 +11,6 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.EnumUtil;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.StringUtil;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -21,18 +18,11 @@ public class GenerateRelicCmd extends BaseCmd {
 
     public GenerateRelicCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "generate_relic", "Generate a relic");
-    }
 
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("type")
-                        .description(FormatUtil.format(RelicType.class, "/"))
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(false)
-                        .build())
-                .build();
+        this.addOption("type",
+                FormatUtil.format(RelicType.class, "/"),
+                false,
+                ApplicationCommandOptionType.STRING);
     }
 
     @Override

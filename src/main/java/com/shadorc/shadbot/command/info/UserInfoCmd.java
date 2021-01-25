@@ -9,9 +9,6 @@ import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -28,21 +25,12 @@ public class UserInfoCmd extends BaseCmd {
 
     public UserInfoCmd() {
         super(CommandCategory.INFO, "user_info", "Show info about a user");
-        this.setDefaultRateLimiter();
+        this.addOption("user",
+                "If not specified, it will show your info",
+                false,
+                ApplicationCommandOptionType.USER);
 
         this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("user")
-                        .description("If not specified, it will show your info")
-                        .type(ApplicationCommandOptionType.USER.getValue())
-                        .required(false)
-                        .build())
-                .build();
     }
 
     @Override

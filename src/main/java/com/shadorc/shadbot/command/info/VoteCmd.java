@@ -12,7 +12,6 @@ public class VoteCmd extends BaseCmd {
 
     public VoteCmd() {
         super(CommandCategory.INFO, "vote", "If you like me, vote for me on top.gg!");
-        this.setDefaultRateLimiter();
     }
 
     @Override

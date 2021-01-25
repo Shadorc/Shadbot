@@ -6,9 +6,6 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -21,22 +18,13 @@ public class MathCmd extends BaseCmd {
 
     public MathCmd() {
         super(CommandCategory.UTILS, "math", "Calculate an expression");
-        this.setDefaultRateLimiter();
+        this.addOption("expression",
+                "Expression to evaluate (e.g. 2*cos(pi))",
+                true,
+                ApplicationCommandOptionType.STRING);
 
         this.evaluator = new DoubleEvaluator();
         this.formatter = new DecimalFormat("#.##");
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("expression")
-                        .description("Expression to evaluate (e.g. 2*cos(pi))")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .build();
     }
 
     @Override

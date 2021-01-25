@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.game.slotmachine;
 
 public enum SlotOptions {
@@ -21,4 +20,4 @@ public enum SlotOptions {
     public String getEmoji() {
         return String.format(":%s:", this.toString().toLowerCase());
     }
-}*/
+}

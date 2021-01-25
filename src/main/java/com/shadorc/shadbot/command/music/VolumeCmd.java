@@ -10,9 +10,6 @@ import com.shadorc.shadbot.music.TrackScheduler;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -22,19 +19,10 @@ public class VolumeCmd extends BaseCmd {
 
     public VolumeCmd() {
         super(CommandCategory.MUSIC, "volume", "Show or change current volume level");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("volume")
-                        .description(String.format("Volume to set. Must be between 1%% and %d%%", Config.VOLUME_MAX))
-                        .type(ApplicationCommandOptionType.INTEGER.getValue())
-                        .required(false)
-                        .build())
-                .build();
+        this.addOption("volume",
+                String.format("Volume to set, must be between 1%% and %d%%", Config.VOLUME_MAX),
+                false,
+                ApplicationCommandOptionType.INTEGER);
     }
 
     @Override

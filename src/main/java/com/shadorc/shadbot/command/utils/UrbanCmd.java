@@ -14,9 +14,6 @@ import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.object.Embed;
 import discord4j.core.object.Embed.Field;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
@@ -31,24 +28,12 @@ public class UrbanCmd extends BaseCmd {
 
     public UrbanCmd() {
         super(CommandCategory.UTILS, "urban", "Show the first Urban Dictionary definition for a search");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("search")
-                        .description("The word to search")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .build();
+        this.addOption("word", "The word to search", true, ApplicationCommandOptionType.STRING);
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final String search = context.getOption("search").orElseThrow();
+        final String word = context.getOption("word").orElseThrow();
 
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
@@ -58,12 +43,12 @@ public class UrbanCmd extends BaseCmd {
 
                     return context.createFollowupMessage(
                             Emoji.HOURGLASS + " (**%s**) Loading Urban Dictionary definition...", context.getAuthorName())
-                            .flatMap(messageId -> UrbanCmd.getUrbanDefinition(search)
+                            .flatMap(messageId -> UrbanCmd.getUrbanDefinition(word)
                                     .flatMap(urbanDef -> context.editFollowupMessage(messageId,
                                             UrbanCmd.formatEmbed(urbanDef, context.getAuthorAvatarUrl())))
                                     .switchIfEmpty(context.editFollowupMessage(messageId,
                                             Emoji.MAGNIFYING_GLASS + " (**%s**) No Urban Dictionary definition found for `%s`",
-                                            context.getAuthorName(), search)));
+                                            context.getAuthorName(), word)));
                 });
     }
 

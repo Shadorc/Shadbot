@@ -18,7 +18,6 @@ public class XkcdCmd extends BaseCmd {
 
     public XkcdCmd() {
         super(CommandCategory.IMAGE, "xkcd", "Show a random XKCD comic");
-        this.setDefaultRateLimiter();
     }
 
     @Override

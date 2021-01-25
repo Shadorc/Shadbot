@@ -10,9 +10,6 @@ import com.shadorc.shadbot.db.users.entity.DBUser;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.NumberUtil;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -23,19 +20,10 @@ public class BassBoostCmd extends BaseCmd {
 
     public BassBoostCmd() {
         super(CommandCategory.MUSIC, "bass_boost", "Drop the bass");
-        this.setDefaultRateLimiter();
-    }
-
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("percentage")
-                        .description(String.format("must be between **%d%%** and **%d%%**.", VALUE_MIN, VALUE_MAX))
-                        .type(ApplicationCommandOptionType.INTEGER.getValue())
-                        .required(true)
-                        .build())
-                .build();
+        this.addOption("percentage",
+                String.format("Bass boost in percent, must be between **%d%%** and **%d%%**.", VALUE_MIN, VALUE_MAX),
+                true,
+                ApplicationCommandOptionType.INTEGER);
     }
 
     @Override

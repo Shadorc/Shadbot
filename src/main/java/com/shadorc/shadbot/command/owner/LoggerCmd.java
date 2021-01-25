@@ -9,9 +9,6 @@ import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -29,24 +26,9 @@ public class LoggerCmd extends BaseCmd {
 
     public LoggerCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "logger", "Change the level of a logger");
-    }
 
-    @Override
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
-        return builder
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("name")
-                        .description("Can be `root` to change root logger")
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("level")
-                        .description(FormatUtil.format(LogLevel.class, ", "))
-                        .type(ApplicationCommandOptionType.STRING.getValue())
-                        .required(true)
-                        .build())
-                .build();
+        this.addOption("name", "Can be `root` to change root logger", true, ApplicationCommandOptionType.STRING);
+        this.addOption("level", FormatUtil.format(LogLevel.class, ", "), true, ApplicationCommandOptionType.STRING);
     }
 
     @Override

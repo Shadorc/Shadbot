@@ -99,11 +99,6 @@ public class PruneCmd extends BaseCmd {
                         .flatMap(messageIds -> ((GuildMessageChannel) channel).bulkDelete(Flux.fromIterable(messageIds))
                                 .count()
                                 .map(messagesNotDeleted -> messageIds.size() - messagesNotDeleted))
-                        // TODO: Remove once the empty on 404 issue is fixed
-                        .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.NOT_FOUND.code()), err -> {
-                            DEFAULT_LOGGER.error("404 detected on Message::delete (3)");
-                            return Mono.empty();
-                        })
                         .map(deletedMessages -> String.format(Emoji.CHECK_MARK + " (Requested by **%s**) %s deleted.",
                                 context.getUsername(),
                                 StringUtils.pluralOf(deletedMessages - MESSAGES_OFFSET, "message"))))
