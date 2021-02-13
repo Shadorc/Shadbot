@@ -64,7 +64,7 @@ public class TrackEventListener extends AudioEventAdapter {
         Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 .flatMap(guildMusic -> {
                     this.errorCount.incrementAndGet();
-                    if(this.errorCount.get() > MAX_ERROR_COUNT) {
+                    if (this.errorCount.get() > MAX_ERROR_COUNT) {
                         LOGGER.error("{Guild ID: {}} Stopping playlist due to too many errors.", this.guildId.asLong());
                         return guildMusic.getMessageChannel()
                                 .flatMap(channel -> DiscordUtils.sendMessage(Emoji.RED_FLAG
