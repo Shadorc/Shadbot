@@ -176,9 +176,13 @@ public class Context {
     }
 
     public Mono<MessageData> editFollowupMessage(Snowflake messageId, String format, Object... args) {
+        return this.editFollowupMessage(messageId, String.format(format, args));
+    }
+
+    public Mono<MessageData> editFollowupMessage(Snowflake messageId, String content) {
         return this.event.getInteractionResponse()
                 .editFollowupMessage(messageId.asLong(), ImmutableWebhookMessageEditRequest.builder()
-                        .content(String.format(format, args))
+                        .content(content)
                         .build(), true);
     }
 

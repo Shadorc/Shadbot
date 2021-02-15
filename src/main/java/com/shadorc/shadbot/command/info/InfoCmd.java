@@ -42,52 +42,50 @@ public class InfoCmd extends BaseCmd {
                     final long start = System.currentTimeMillis();
                     return context.createFollowupMessage(Emoji.GEAR + " (**%s**) Testing ping...", context.getAuthorName())
                             .flatMap(messageId -> context.editFollowupMessage(messageId,
-                                    "```prolog%s%s%s%s```",
-                                    InfoCmd.getVersionSection(),
-                                    InfoCmd.getPerformanceSection(),
-                                    InfoCmd.getInternetSection(context, start),
-                                    InfoCmd.getShadbotSection(context, owner, guildCount)));
+                                    InfoCmd.formatContent(context, start, owner, guildCount)));
                 }));
     }
 
-    private static String getVersionSection() {
-        return String.format("%n-= Versions =-")
-                + String.format("%nJava: %s", JAVA_VERSION)
-                + String.format("%nShadbot: %s", Config.VERSION)
-                + String.format("%n%s: %s", D4J_NAME, D4J_VERSION)
-                + String.format("%nLavaPlayer: %s", LAVAPLAYER_VERSION);
-    }
-
-    private static String getPerformanceSection() {
-        return String.format("%n%n-= Performance =-")
-                + String.format("%nMemory: %s/%s MB",
-                FormatUtil.number(ProcessUtil.getMemoryUsed()), FormatUtil.number(ProcessUtil.getMaxMemory()))
-                + String.format("%nCPU (Process): %.1f%%", ProcessUtil.getCpuUsage())
-                + String.format("%nThreads: %s", FormatUtil.number(Thread.activeCount()));
-    }
-
-    private static String getInternetSection(Context context, long start) {
+    private static String formatContent(Context context, long start, User owner, long guildCount) {
         final long gatewayLatency = context.getClient().getGatewayClientGroup()
                 .find(context.getEvent().getShardInfo().getIndex())
                 .map(GatewayClient::getResponseTime)
                 .map(Duration::toMillis)
                 .orElseThrow();
-
-        return String.format("%n%n-= Internet =-")
-                + String.format("%nPing: %dms", TimeUtil.getMillisUntil(start))
-                + String.format("%nGateway Latency: %dms", gatewayLatency);
-    }
-
-    private static String getShadbotSection(Context context, User owner, long guildCount) {
         final String uptime = FormatUtil.formatDurationWords(
                 Duration.ofMillis(TimeUtil.getMillisUntil(Shadbot.getLaunchTime())));
 
-        return String.format("%n%n-= Shadbot =-")
-                + String.format("%nUptime: %s", uptime)
-                + String.format("%nDeveloper: %s", owner.getTag())
-                + String.format("%nShard: %d/%d", context.getShardIndex() + 1, context.getShardCount())
-                + String.format("%nServers: %s", FormatUtil.number(guildCount))
-                + String.format("%nVoice Channels: %s", FormatUtil.number(Telemetry.VOICE_COUNT_GAUGE.get()));
+        return """
+                ```prolog
+                -= Versions =-
+                Java: %s
+                Shadbot: %s
+                %s: %s
+                LavaPlayer: %s
+                                
+                -= Performance =-
+                Memory: %s/%s MB
+                CPU (Process): %.1f%%
+                Threads: %s
+                                
+                -= Internet =-
+                Ping: %dms
+                Gateway Latency: %dms
+                                
+                -= Shadbot =-
+                Uptime: %s
+                Developer: %s
+                Shard: %d/%d
+                Servers: %s
+                Voice Channels: %s
+                ```
+                """
+                .formatted(JAVA_VERSION, Config.VERSION, D4J_NAME, D4J_VERSION, LAVAPLAYER_VERSION,
+                        FormatUtil.number(ProcessUtil.getMemoryUsed()), FormatUtil.number(ProcessUtil.getMaxMemory()),
+                        ProcessUtil.getCpuUsage(), FormatUtil.number(Thread.activeCount()),
+                        TimeUtil.getMillisUntil(start), gatewayLatency,
+                        uptime, owner.getTag(), context.getShardIndex() + 1, context.getShardCount(),
+                        FormatUtil.number(guildCount), FormatUtil.number(Telemetry.VOICE_COUNT_GAUGE.get()));
     }
 
 }
