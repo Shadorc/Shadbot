@@ -41,12 +41,12 @@ public class InfoCmd extends BaseCmd {
                 .flatMap(TupleUtils.function((owner, channel, guildCount) -> {
                     final long start = System.currentTimeMillis();
                     return context.createFollowupMessage(Emoji.GEAR + " (**%s**) Testing ping...", context.getAuthorName())
-                            .flatMap(messageId -> context.editFollowupMessage(messageId, "```prolog"
-                                    + InfoCmd.getVersionSection()
-                                    + InfoCmd.getPerformanceSection()
-                                    + InfoCmd.getInternetSection(context, start)
-                                    + InfoCmd.getShadbotSection(context, owner, guildCount)
-                                    + "```"));
+                            .flatMap(messageId -> context.editFollowupMessage(messageId,
+                                    "```prolog%s%s%s%s```",
+                                    InfoCmd.getVersionSection(),
+                                    InfoCmd.getPerformanceSection(),
+                                    InfoCmd.getInternetSection(context, start),
+                                    InfoCmd.getShadbotSection(context, owner, guildCount)));
                 }));
     }
 
