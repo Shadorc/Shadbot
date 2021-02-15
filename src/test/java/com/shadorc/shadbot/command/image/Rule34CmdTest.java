@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.r34.R34Post;
@@ -27,4 +26,3 @@ public class Rule34CmdTest extends CmdTest<Rule34Cmd> {
     }
 
 }
-*/

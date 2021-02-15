@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.wallhaven.Wallpaper;
@@ -43,4 +42,3 @@ public class WallpaperCmdTest extends CmdTest<WallpaperCmd> {
     }
 
 }
-*/

@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.html.suicidegirl.SuicideGirl;
@@ -17,4 +16,3 @@ public class SuicideGirlsCmdTest extends CmdTest<SuicideGirlsCmd> {
         assertNotNull(result.getUrl());
     }
 }
-*/

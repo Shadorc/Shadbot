@@ -1,9 +1,8 @@
-/*
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.deviantart.Image;
 import com.shadorc.shadbot.command.CmdTest;
-import com.shadorc.shadbot.utils.NetUtils;
+import com.shadorc.shadbot.utils.NetUtil;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -24,9 +23,8 @@ public class ImageCmdTest extends CmdTest<ImageCmd> {
     @Test
     public void testGetPopularImageSpecial() {
         final Image result = this.invoke(
-                "getPopularImage", NetUtils.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+*-/"));
+                "getPopularImage", NetUtil.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+*-/"));
         assertNull(result);
     }
 
 }
-*/

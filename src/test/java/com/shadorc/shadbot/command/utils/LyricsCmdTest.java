@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.api.html.musixmatch.Musixmatch;
@@ -28,4 +27,3 @@ public class LyricsCmdTest extends CmdTest<LyricsCmd> {
     }
 
 }
-*/

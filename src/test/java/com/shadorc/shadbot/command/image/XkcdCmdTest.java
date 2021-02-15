@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.xkcd.XkcdResponse;
@@ -19,4 +18,3 @@ public class XkcdCmdTest extends CmdTest<XkcdCmd> {
     }
 
 }
-*/

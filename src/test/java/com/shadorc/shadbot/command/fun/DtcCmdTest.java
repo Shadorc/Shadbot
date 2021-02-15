@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.fun;
 
 import com.shadorc.shadbot.api.json.dtc.Quote;
@@ -17,4 +16,3 @@ public class DtcCmdTest extends CmdTest<DtcCmd> {
     }
 
 }
-*/

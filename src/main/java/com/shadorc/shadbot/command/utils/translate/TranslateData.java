@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-class TranslateData {
+public class TranslateData {
 
     private static final IllegalArgumentException EQUAL_LANGS_EXCEPTION =
             new IllegalArgumentException("The destination language must be different from the source one");
@@ -29,6 +29,10 @@ class TranslateData {
     private String destLang;
     private String sourceLang;
     private String sourceText;
+
+    public TranslateData() {
+        this.sourceLang = AUTO;
+    }
 
     public void setSourceText(final String sourceText) {
         if (sourceText.length() > CHARACTERS_LIMIT) {
