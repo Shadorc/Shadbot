@@ -11,32 +11,44 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TranslateCmdTest extends CmdTest<TranslateCmd> {
 
     @Test
-    public void testGetTranslation() {
-        final TranslateData data1 = new TranslateData();
-        data1.setSourceLang("english");
-        data1.setDestLang("french");
-        data1.setSourceText("Hello, how are you?");
-        assertEquals("Bonjour comment vas-tu?", this.invoke("getTranslation", data1));
+    public void testGetTranslationLangFullName() {
+        final TranslateData data = new TranslateData();
+        data.setSourceLang("english");
+        data.setDestLang("french");
+        data.setSourceText("Hello, how are you?");
+        assertEquals("Bonjour comment vas-tu?", this.invoke("getTranslation", data));
+    }
 
-        final TranslateData data2 = new TranslateData();
-        data2.setSourceLang("en");
-        data2.setDestLang("fr");
-        data2.setSourceText("Hello, how are you?");
-        assertEquals("Bonjour comment vas-tu?", this.invoke("getTranslation", data2));
+    @Test
+    public void testGetTranslationLangShortName() {
+        final TranslateData data = new TranslateData();
+        data.setSourceLang("en");
+        data.setDestLang("fr");
+        data.setSourceText("Hello, how are you?");
+        assertEquals("Bonjour comment vas-tu?", this.invoke("getTranslation", data));
+    }
 
-        final TranslateData data3 = new TranslateData();
-        data3.setDestLang("fr");
-        data3.setSourceText("Hello, how are you?");
-        assertEquals("Bonjour comment vas-tu?", this.invoke("getTranslation", data3));
+    @Test
+    public void testGetTranslationOnlyDest() {
+        final TranslateData data = new TranslateData();
+        data.setDestLang("fr");
+        data.setSourceText("Hello, how are you?");
+        assertEquals("Bonjour comment vas-tu?", this.invoke("getTranslation", data));
+    }
 
-        final TranslateData data4 = new TranslateData();
-        data4.setDestLang("something");
-        data4.setSourceText("Hello, how are you?");
-        assertThrows(IllegalArgumentException.class, () -> this.invoke("getTranslation", data4));
+    @Test
+    public void testGetTranslationWrongDest() {
+        final TranslateData data = new TranslateData();
+        data.setDestLang("something");
+        data.setSourceText("Hello, how are you?");
+        assertThrows(IllegalArgumentException.class, () -> this.invoke("getTranslation", data));
+    }
 
-        final TranslateData data6 = new TranslateData();
-        data6.setSourceLang("en");
-        assertThrows(IllegalArgumentException.class, () -> data6.setDestLang("en"));
+    @Test
+    public void testGetTranslationNoText() {
+        final TranslateData data = new TranslateData();
+        data.setSourceLang("en");
+        assertThrows(IllegalArgumentException.class, () -> data.setDestLang("en"));
     }
 
 }

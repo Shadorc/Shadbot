@@ -4,24 +4,26 @@ import com.shadorc.shadbot.api.json.urbandictionary.UrbanDefinition;
 import com.shadorc.shadbot.command.CmdTest;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class UrbanCmdTest extends CmdTest<UrbanCmd> {
 
     @Test
     public void testGetUrbanDefinition() {
         final UrbanDefinition result = this.invoke("getUrbanDefinition", "dab");
-        assertNotNull(result.getDefinition());
-        assertNotNull(result.getExample());
-        assertNotNull(result.getPermalink());
-        assertNotNull(result.getWord());
+        assertFalse(result.getDefinition().isBlank());
+        assertFalse(result.getExample().isBlank());
+        assertFalse(result.getPermalink().isBlank());
+        assertFalse(result.getWord().isBlank());
     }
 
     @Test
-    public void testGetUrbanDefinitionSpecial() {
-        final UrbanDefinition result = this.invoke(
-                "getUrbanDefinition", "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+*-/");
-        assertNotNull(result);
+    public void testGetUrbanDefinitionSpecialChars() {
+        final UrbanDefinition result = this.invoke("getUrbanDefinition", SPECIAL_CHARS);
+        assertFalse(result.getDefinition().isBlank());
+        assertFalse(result.getExample().isBlank());
+        assertFalse(result.getPermalink().isBlank());
+        assertFalse(result.getWord().isBlank());
     }
 
 }

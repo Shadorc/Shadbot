@@ -10,6 +10,8 @@ import java.util.Arrays;
 
 public abstract class CmdTest<T> {
 
+    protected static final String SPECIAL_CHARS = "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/";
+
     private final Logger logger;
     private final Class<T> cmdClass;
     private final T cmd;
@@ -34,9 +36,7 @@ public abstract class CmdTest<T> {
 
             final Object resultObj = method.invoke(this.cmd, args);
             final R result = resultObj instanceof Mono ? ((Mono<R>) resultObj).block() : (R) resultObj;
-            if (this.logger.isDebugEnabled()) {
-                this.logger.debug("{}: {}", this.cmdClass.getSimpleName(), result);
-            }
+            this.logger.info("{}#{}{} result:\n{}", this.cmdClass.getSimpleName(), name, Arrays.toString(args), result);
             return result;
         } catch (final RuntimeException err) {
             throw err;

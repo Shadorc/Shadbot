@@ -1,11 +1,11 @@
 package com.shadorc.shadbot.command.image;
 
+import com.shadorc.shadbot.api.json.image.deviantart.Content;
 import com.shadorc.shadbot.api.json.image.deviantart.Image;
 import com.shadorc.shadbot.command.CmdTest;
-import com.shadorc.shadbot.utils.NetUtil;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ImageCmdTest extends CmdTest<ImageCmd> {
@@ -13,17 +13,16 @@ public class ImageCmdTest extends CmdTest<ImageCmd> {
     @Test
     public void testGetPopularImage() {
         final Image result = this.invoke("getPopularImage", "dab");
-        assertNotNull(result.getContent());
-        assertNotNull(result.getAuthor());
-        assertNotNull(result.getCategoryPath());
-        assertNotNull(result.getTitle());
-        assertNotNull(result.getUrl());
+        assertFalse(result.getContent().map(Content::getSource).orElseThrow().isBlank());
+        assertFalse(result.getAuthor().getUsername().isBlank());
+        assertFalse(result.getCategoryPath().isBlank());
+        assertFalse(result.getTitle().isBlank());
+        assertFalse(result.getUrl().isBlank());
     }
 
     @Test
-    public void testGetPopularImageSpecial() {
-        final Image result = this.invoke(
-                "getPopularImage", NetUtil.encode("&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+*-/"));
+    public void testGetPopularImageSpecialChars() {
+        final Image result = this.invoke("getPopularImage", SPECIAL_CHARS);
         assertNull(result);
     }
 

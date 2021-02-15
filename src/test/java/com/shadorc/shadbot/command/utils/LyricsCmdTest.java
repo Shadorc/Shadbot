@@ -4,7 +4,7 @@ import com.shadorc.shadbot.api.html.musixmatch.Musixmatch;
 import com.shadorc.shadbot.command.CmdTest;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class LyricsCmdTest extends CmdTest<LyricsCmd> {
@@ -12,17 +12,16 @@ public class LyricsCmdTest extends CmdTest<LyricsCmd> {
     @Test
     public void testGetMusixmatch() {
         final Musixmatch result = this.invoke("getMusixmatch", "21 guns");
-        assertNotNull(result.getLyrics());
-        assertNotNull(result.getArtist());
-        assertNotNull(result.getImageUrl());
-        assertNotNull(result.getTitle());
-        assertNotNull(result.getUrl());
+        assertFalse(result.getLyrics().isBlank());
+        assertFalse(result.getArtist().isBlank());
+        assertFalse(result.getImageUrl().isBlank());
+        assertFalse(result.getTitle().isBlank());
+        assertFalse(result.getUrl().isBlank());
     }
 
     @Test
     public void testGetMusixmatchSpecial() {
-        final Musixmatch result = this.invoke(
-                "getMusixmatch", "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+*-/");
+        final Musixmatch result = this.invoke("getMusixmatch", SPECIAL_CHARS);
         assertNull(result);
     }
 

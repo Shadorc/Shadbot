@@ -9,35 +9,41 @@ import static org.junit.jupiter.api.Assertions.*;
 public class WallpaperCmdTest extends CmdTest<WallpaperCmd> {
 
     @Test
-    public void TestGetWallpaper_Keyword() {
+    public void testGetWallpaperKeyword() {
         final Wallpaper result = this.invoke("getWallpaper", "doom");
-        assertNotNull(result.getPath());
+        assertFalse(result.getPath().isBlank());
         assertEquals("sfw", result.getPurity());
-        assertNotNull(result.getResolution());
-        assertNotNull(result.getUrl());
+        assertFalse(result.getResolution().isBlank());
+        assertFalse(result.getUrl().isBlank());
     }
 
     @Test
-    public void TestGetWallpaper_Keywords() {
+    public void testGetWallpaperKeywords() {
         final Wallpaper result = this.invoke("getWallpaper", "doom, video game");
-        assertNotNull(result.getPath());
+        assertFalse(result.getPath().isBlank());
         assertEquals("sfw", result.getPurity());
-        assertNotNull(result.getResolution());
-        assertNotNull(result.getUrl());
+        assertFalse(result.getResolution().isBlank());
+        assertFalse(result.getUrl().isBlank());
     }
 
     @Test
-    public void TestGetWallpaper_Random() {
+    public void testGetWallpaperRandom() {
         final Wallpaper result = this.invoke("getWallpaper", "");
-        assertNotNull(result.getPath());
+        assertFalse(result.getPath().isBlank());
         assertEquals("sfw", result.getPurity());
-        assertNotNull(result.getResolution());
-        assertNotNull(result.getUrl());
+        assertFalse(result.getResolution().isBlank());
+        assertFalse(result.getUrl().isBlank());
     }
 
     @Test
-    public void TestGetWallpaper_NotFound() {
+    public void testGetWallpaperNotFound() {
         final Wallpaper result = this.invoke("getWallpaper", "this is not a keyword");
+        assertNull(result);
+    }
+
+    @Test
+    public void testGetWallpaperSpecialChars() {
+        final Wallpaper result = this.invoke("getWallpaper", SPECIAL_CHARS);
         assertNull(result);
     }
 
