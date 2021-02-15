@@ -12,7 +12,6 @@ import com.shadorc.shadbot.command.fun.ThisDayCmd;
 import com.shadorc.shadbot.command.game.rps.RpsCmd;
 import com.shadorc.shadbot.command.game.russianroulette.RussianRouletteCmd;
 import com.shadorc.shadbot.command.game.slotmachine.SlotMachineCmd;
-import com.shadorc.shadbot.command.hidden.BaguetteCmd;
 import com.shadorc.shadbot.command.image.*;
 import com.shadorc.shadbot.command.info.*;
 import com.shadorc.shadbot.command.music.*;
