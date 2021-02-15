@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.utils;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -7,13 +6,12 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.EnumUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.EnumUtil;
+import com.shadorc.shadbot.utils.NumberUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import net.aksingh.owmjapis.api.APIException;
 import net.aksingh.owmjapis.core.OWM;
 import net.aksingh.owmjapis.core.OWM.Country;
@@ -26,8 +24,8 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class WeatherCmd extends BaseCmd {
@@ -36,12 +34,14 @@ public class WeatherCmd extends BaseCmd {
     private final OWM owm;
 
     public WeatherCmd() {
-        super(CommandCategory.UTILS, List.of("weather"));
+        super(CommandCategory.UTILS, "weather", "Show weather report for a city");
+        this.addOption("city", "The city", true, ApplicationCommandOptionType.STRING);
+        this.addOption("country", "The country", false, ApplicationCommandOptionType.STRING);
 
         this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy 'at' hh:mm aa", Locale.ENGLISH);
         final String apiKey = CredentialManager.getInstance().get(Credential.OPENWEATHERMAP_API_KEY);
         if (apiKey != null) {
-            this.owm = new OWM(CredentialManager.getInstance().get(Credential.OPENWEATHERMAP_API_KEY));
+            this.owm = new OWM(apiKey);
             this.owm.setUnit(Unit.METRIC);
         } else {
             this.owm = null;
@@ -49,110 +49,99 @@ public class WeatherCmd extends BaseCmd {
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final List<String> args = context.requireArgs(1, 2, ",");
+    public Mono<?> execute(Context context) {
+        final String city = context.getOption("city").orElseThrow();
+        final Optional<String> countryOpt = context.getOption("country");
 
-        final UpdatableMessage updatableMessage = new UpdatableMessage(context.getClient(), context.getChannelId());
+        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading weather...", context.getAuthorName())
+                .flatMap(messageId -> Mono
+                        .fromCallable(() -> {
+                            if (countryOpt.isPresent()) {
+                                final Country country = EnumUtil.parseEnum(Country.class,
+                                        countryOpt.orElseThrow().replace(" ", "_"));
+                                if (country == null) {
+                                    throw new IllegalArgumentException(String.format("Country `%s` not found",
+                                            countryOpt.orElseThrow()));
+                                }
+                                return this.owm.currentWeatherByCityName(city, country);
+                            } else {
+                                return this.owm.currentWeatherByCityName(city);
+                            }
+                        })
+                        .map(currentWeather -> this.formatEmbed(context.getAuthorAvatarUrl(), currentWeather))
+                        .onErrorMap(APIException.class, err -> {
+                            if (err.getCode() == HttpStatus.SC_NOT_FOUND) {
+                                final StringBuilder strBuilder = new StringBuilder(
+                                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s`", context.getAuthorName(), city));
+                                countryOpt.ifPresent(country -> strBuilder.append(String.format(" in country `%s`", country)));
+                                strBuilder.append(" not found.");
+                                return new IllegalArgumentException(strBuilder.toString());
+                            }
+                            return new IOException(err);
+                        })
+                        .onErrorResume(IllegalArgumentException.class, err -> context.editFollowupMessage(messageId,
+                                Emoji.MAGNIFYING_GLASS + " (**%s**) %s.", context.getAuthorName(), err.getMessage())
+                                .then(Mono.empty()))
+                        .flatMap(embed -> context.editFollowupMessage(messageId, embed)));
+    }
 
-        return updatableMessage.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading weather...",
-                context.getUsername()))
-                .send()
-                .then(Mono.fromCallable(() -> {
-                    final CurrentWeather currentWeather;
-                    if (args.size() == 2) {
-                        final Country country = EnumUtils.parseEnum(Country.class, args.get(1).replace(" ", "_"));
-                        if (country == null) {
-                            return updatableMessage.setContent(
-                                    String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) Country `%s` not found.",
-                                            context.getUsername(), args.get(1)));
-                        }
-                        currentWeather = this.owm.currentWeatherByCityName(args.get(0), country);
-                    } else {
-                        currentWeather = this.owm.currentWeatherByCityName(args.get(0));
-                    }
+    @SuppressWarnings("ConstantConditions") // Removes NullPointerException warnings
+    private Consumer<EmbedCreateSpec> formatEmbed(String avatarUrl, CurrentWeather currentWeather) {
+        final Weather weather = currentWeather.getWeatherList().get(0);
+        final Main main = currentWeather.getMainData();
 
-                    final Weather weather = currentWeather.getWeatherList().get(0);
-                    final Main main = currentWeather.getMainData();
+        final String countryCode = currentWeather.getSystemData().getCountryCode();
+        final String title = String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode);
+        final String url = String.format("https://openweathermap.org/city/%d", currentWeather.getCityId());
+        final String lastUpdated = this.dateFormatter.format(currentWeather.getDateTime());
+        final String clouds = StringUtil.capitalize(weather.getDescription());
+        final double windSpeed = currentWeather.getWindData().getSpeed() * 3.6;
+        final String windDesc = WeatherCmd.getWindDesc(windSpeed);
+        final String wind = String.format("%s%n%.1f km/h", windDesc, windSpeed);
+        final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ?
+                String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
+        final String humidity = String.format("%.1f%%", main.getHumidity());
+        final String temperature = String.format("%.1f°C", main.getTemp());
 
-                    final String countryCode = currentWeather.getSystemData().getCountryCode();
-                    final String title = String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode);
-                    final String url = String.format("https://openweathermap.org/city/%d", currentWeather.getCityId());
-                    final String lastUpdated = this.dateFormatter.format(currentWeather.getDateTime());
-                    final String clouds = StringUtils.capitalize(weather.getDescription());
-                    final double windSpeed = currentWeather.getWindData().getSpeed() * 3.6;
-                    final String windDesc = WeatherCmd.getWindDesc(windSpeed);
-                    final String wind = String.format("%s%n%.1f km/h", windDesc, windSpeed);
-                    final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ?
-                            String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
-                    final String humidity = String.format("%.1f%%", main.getHumidity());
-                    final String temperature = String.format("%.1f°C", main.getTemp());
-
-                    return updatableMessage.setEmbed(ShadbotUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor(title, url, context.getAvatarUrl())
-                                    .setThumbnail(weather.getIconLink())
-                                    .setDescription(String.format("Last updated %s", lastUpdated))
-                                    .addField(Emoji.CLOUD + " Clouds", clouds, true)
-                                    .addField(Emoji.WIND + " Wind", wind, true)
-                                    .addField(Emoji.RAIN + " Rain", rain, true)
-                                    .addField(Emoji.DROPLET + " Humidity", humidity, true)
-                                    .addField(Emoji.THERMOMETER + " Temperature", temperature, true)));
-                }))
-                .onErrorResume(APIException.class, err -> {
-                    if (err.getCode() == HttpStatus.SC_NOT_FOUND) {
-                        final StringBuilder strBuilder = new StringBuilder(
-                                String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s`", context.getUsername(), args.get(0)));
-                        if (args.size() == 2) {
-                            strBuilder.append(String.format(" in country `%s`", args.get(1)));
-                        }
-                        strBuilder.append(" not found.");
-                        return Mono.just(updatableMessage.setContent(strBuilder.toString()));
-                    }
-                    return Mono.error(new IOException(err));
-                })
-                .flatMap(UpdatableMessage::send)
-                .then();
+        return ShadbotUtil.getDefaultEmbed(
+                embed -> embed.setAuthor(title, url, avatarUrl)
+                        .setThumbnail(weather.getIconLink())
+                        .setDescription(String.format("Last updated %s", lastUpdated))
+                        .addField(Emoji.CLOUD + " Clouds", clouds, true)
+                        .addField(Emoji.WIND + " Wind", wind, true)
+                        .addField(Emoji.RAIN + " Rain", rain, true)
+                        .addField(Emoji.DROPLET + " Humidity", humidity, true)
+                        .addField(Emoji.THERMOMETER + " Temperature", temperature, true));
     }
 
     private static String getWindDesc(double windSpeed) {
         if (windSpeed < 1) {
             return "Calm";
-        } else if (NumberUtils.isBetween(windSpeed, 1, 6)) {
+        } else if (NumberUtil.isBetween(windSpeed, 1, 6)) {
             return "Light air";
-        } else if (NumberUtils.isBetween(windSpeed, 6, 12)) {
+        } else if (NumberUtil.isBetween(windSpeed, 6, 12)) {
             return "Light breeze";
-        } else if (NumberUtils.isBetween(windSpeed, 12, 20)) {
+        } else if (NumberUtil.isBetween(windSpeed, 12, 20)) {
             return "Gentle breeze";
-        } else if (NumberUtils.isBetween(windSpeed, 20, 29)) {
+        } else if (NumberUtil.isBetween(windSpeed, 20, 29)) {
             return "Moderate breeze";
-        } else if (NumberUtils.isBetween(windSpeed, 29, 39)) {
+        } else if (NumberUtil.isBetween(windSpeed, 29, 39)) {
             return "Fresh breeze";
-        } else if (NumberUtils.isBetween(windSpeed, 39, 50)) {
+        } else if (NumberUtil.isBetween(windSpeed, 39, 50)) {
             return "Strong breeze";
-        } else if (NumberUtils.isBetween(windSpeed, 50, 62)) {
+        } else if (NumberUtil.isBetween(windSpeed, 50, 62)) {
             return "Near gale";
-        } else if (NumberUtils.isBetween(windSpeed, 62, 75)) {
+        } else if (NumberUtil.isBetween(windSpeed, 62, 75)) {
             return "Gale";
-        } else if (NumberUtils.isBetween(windSpeed, 75, 89)) {
+        } else if (NumberUtil.isBetween(windSpeed, 75, 89)) {
             return "Strong gale";
-        } else if (NumberUtils.isBetween(windSpeed, 89, 103)) {
+        } else if (NumberUtil.isBetween(windSpeed, 89, 103)) {
             return "Storm";
-        } else if (NumberUtils.isBetween(windSpeed, 103, 118)) {
+        } else if (NumberUtil.isBetween(windSpeed, 103, 118)) {
             return "Violent storm";
         } else {
             return "Hurricane";
         }
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show weather report for a city.")
-                .setDelimiter(", ")
-                .addArg("city", false)
-                .addArg("country", true)
-                .setExample(String.format("%s%s Toulon, United States", context.getPrefix(), this.getName()))
-                .setSource("https://openweathermap.org/")
-                .build();
-    }
 }
-*/

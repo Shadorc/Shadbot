@@ -18,10 +18,8 @@ import com.shadorc.shadbot.command.info.*;
 import com.shadorc.shadbot.command.music.*;
 import com.shadorc.shadbot.command.owner.*;
 import com.shadorc.shadbot.command.owner.shutdown.ShutdownCmd;
-import com.shadorc.shadbot.command.utils.LyricsCmd;
-import com.shadorc.shadbot.command.utils.MathCmd;
-import com.shadorc.shadbot.command.utils.UrbanCmd;
-import com.shadorc.shadbot.command.utils.WikipediaCmd;
+import com.shadorc.shadbot.command.utils.*;
+import com.shadorc.shadbot.command.utils.translate.TranslateCmd;
 import com.shadorc.shadbot.data.Config;
 import discord4j.discordjson.json.ApplicationCommandData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
@@ -48,7 +46,7 @@ public class CommandManager {
     private CommandManager() {
         this.commandsMap = CommandManager.initialize(
                 // Utility Commands
-                /*new WeatherCmd(),*/ new MathCmd(), /*new TranslateCmd(),*/ new WikipediaCmd(), /*new PollCmd(),*/
+                new WeatherCmd(), new MathCmd(), new TranslateCmd(), new WikipediaCmd(), /*new PollCmd(),*/
                 new UrbanCmd(), new LyricsCmd(),
                 // Fun Commands
                 new ChatCmd(), new ThisDayCmd(), new JokeCmd(), new DtcCmd(),
