@@ -106,6 +106,12 @@
         </repository>
     </repositories>
     <dependencies>
+        <!-- Discord4J and mongodb use different reactor-core versions -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+            <version>3.4.3</version>
+        </dependency>
         <!-- Discord4J -->
         <dependency>
             <groupId>com.discord4j</groupId>
@@ -154,7 +160,7 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-logback</artifactId>
-            <version>4.1.0</version>
+            <version>4.2.0</version>
         </dependency>
         <!-- Others -->
         <dependency>
@@ -170,7 +176,7 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-reactivestreams</artifactId>
-            <version>4.1.1</version>
+            <version>4.2.1</version>
         </dependency>
         <dependency>
             <groupId>net.aksingh</groupId>
