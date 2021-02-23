@@ -24,13 +24,13 @@ public class Rule34Cmd extends BaseCmd {
     private static final int MAX_TAGS_CHAR = 250;
 
     public Rule34Cmd() {
-        super(CommandCategory.IMAGE, "rule34", "Show a random image corresponding to a tag from Rule34 website");
-        this.addOption("tag", "The tag to search", true, ApplicationCommandOptionType.STRING);
+        super(CommandCategory.IMAGE, "rule34", "Show random image on Rule34");
+        this.addOption("query", "Search for a Rule34 image", true, ApplicationCommandOptionType.STRING);
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final String tag = context.getOption("tag").orElseThrow();
+        final String query = context.getOption("query").orElseThrow();
 
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
@@ -39,7 +39,7 @@ public class Rule34Cmd extends BaseCmd {
                     }
 
                     return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading rule34 image...", context.getAuthorName())
-                            .flatMap(messageId -> Rule34Cmd.getR34Post(tag)
+                            .flatMap(messageId -> Rule34Cmd.getR34Post(query)
                                     .flatMap(post -> {
                                         // Don't post images containing children
                                         if (Rule34Cmd.containsChildren(post, post.getTags())) {
@@ -50,11 +50,11 @@ public class Rule34Cmd extends BaseCmd {
                                         }
 
                                         return context.editFollowupMessage(messageId,
-                                                Rule34Cmd.formatEmbed(post, tag, context.getAuthorAvatarUrl()));
+                                                Rule34Cmd.formatEmbed(post, query, context.getAuthorAvatarUrl()));
                                     })
                                     .switchIfEmpty(context.editFollowupMessage(messageId,
-                                            Emoji.MAGNIFYING_GLASS + " (**%s**) No images were found for the search `%s`",
-                                            context.getAuthorName(), tag)));
+                                            Emoji.MAGNIFYING_GLASS + " (**%s**) No images found matching query `%s`",
+                                            context.getAuthorName(), query)));
                 });
     }
 

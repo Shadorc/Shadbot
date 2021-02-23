@@ -25,57 +25,54 @@ public class WallpaperCmd extends BaseCmd {
     private static final String HOME_URL = "https://wallhaven.cc/api/v1/search";
 
     public WallpaperCmd() {
-        super(CommandCategory.IMAGE, "wallpaper", "Search for a wallpaper");
-        this.addOption("search",
-                "Keywords to search (e.g. doom game)",
-                false,
-                ApplicationCommandOptionType.STRING);
+        super(CommandCategory.IMAGE, "wallpaper", "Search random wallpaper on Wallhaven");
+        this.addOption("query", "Search for a wallpaper", false, ApplicationCommandOptionType.STRING);
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final String search = context.getOption("search").orElse("");
+        final String query = context.getOption("query").orElse("");
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading wallpaper...", context.getAuthorName())
-                .flatMap(messageId -> Mono.zip(WallpaperCmd.getWallpaper(search), context.isChannelNsfw())
+                .flatMap(messageId -> Mono.zip(WallpaperCmd.getWallpaper(query), context.isChannelNsfw())
                         .flatMap(TupleUtils.function((wallpaper, isNsfw) -> {
                             if (!"sfw".equals(wallpaper.getPurity()) && !isNsfw) {
                                 return context.editFollowupMessage(messageId, ShadbotUtil.mustBeNsfw());
                             }
 
-                            final String title = String.format("Wallpaper: %s", search.isBlank() ? "random" : search);
+                            final String title = String.format("Wallpaper: %s", query.isBlank() ? "random" : query);
                             return context.editFollowupMessage(messageId, ShadbotUtil.getDefaultEmbed(
                                     embed -> embed.setAuthor(title, wallpaper.getUrl(), context.getAuthorAvatarUrl())
                                             .setImage(wallpaper.getPath())
                                             .addField("Resolution", wallpaper.getResolution(), false)));
                         }))
                         .switchIfEmpty(context.editFollowupMessage(messageId,
-                                Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers were found for the search `%s`",
-                                context.getAuthorName(), search)));
+                                Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers found matching query `%s`",
+                                context.getAuthorName(), query)));
     }
 
-    private static Mono<Wallpaper> getWallpaper(String arg) {
-        return RequestHelper.fromUrl(WallpaperCmd.buildUrl(arg))
+    private static Mono<Wallpaper> getWallpaper(String query) {
+        return RequestHelper.fromUrl(WallpaperCmd.buildUrl(query))
                 .to(WallhavenResponse.class)
                 .map(WallhavenResponse::getWallpapers)
                 .filter(Predicate.not(List::isEmpty))
                 .map(RandUtil::randValue);
     }
 
-    private static String buildUrl(String arg) {
+    private static String buildUrl(String query) {
         final StringBuilder urlBuilder = new StringBuilder(HOME_URL);
         urlBuilder.append(String.format("?apikey=%s",
                 CredentialManager.getInstance().get(Credential.WALLHAVEN_API_KEY)));
 
-        if (arg.isBlank()) {
-            urlBuilder.append("&sorting=toplist");
-            urlBuilder.append("&purity=100");
+        if (query.isBlank()) {
+            urlBuilder.append("&sorting=toplist")
+                    .append("&purity=100");
         } else {
             final String keywords = FormatUtil.format(
-                    arg.split("[, ]"),
+                    query.split("[, ]"),
                     keyword -> String.format("+%s", NetUtil.encode(keyword.trim())),
                     "");
-            urlBuilder.append(String.format("&q=%s", keywords));
-            urlBuilder.append("&sorting=relevance");
+            urlBuilder.append(String.format("&q=%s", keywords))
+                    .append("&sorting=relevance");
         }
 
         return urlBuilder.toString();

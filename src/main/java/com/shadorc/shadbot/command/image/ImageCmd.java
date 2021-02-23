@@ -35,8 +35,8 @@ public class ImageCmd extends BaseCmd {
     private final AtomicReference<TokenResponse> token;
 
     public ImageCmd() {
-        super(CommandCategory.IMAGE, "image", "Search for a random image on DeviantArt");
-        this.addOption("keyword", "The keyword to search", true, ApplicationCommandOptionType.STRING);
+        super(CommandCategory.IMAGE, "image", "Search random image on DeviantArt");
+        this.addOption("query", "Search for an image", true, ApplicationCommandOptionType.STRING);
 
         this.lastTokenGeneration = new AtomicLong();
         this.token = new AtomicReference<>();
@@ -44,24 +44,24 @@ public class ImageCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String keyword = context.getOption("keyword").orElseThrow();
+        final String query = context.getOption("query").orElseThrow();
 
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading image...", context.getAuthorName())
-                .flatMap(messageId -> this.getPopularImage(keyword)
+                .flatMap(messageId -> this.getPopularImage(query)
                         .flatMap(image -> context.editFollowupMessage(messageId,
                                 ShadbotUtil.getDefaultEmbed(
-                                        embed -> embed.setAuthor(String.format("DeviantArt: %s", keyword), image.getUrl(), context.getAuthorAvatarUrl())
+                                        embed -> embed.setAuthor(String.format("DeviantArt: %s", query), image.getUrl(), context.getAuthorAvatarUrl())
                                                 .setThumbnail("https://i.imgur.com/gT4hHUB.png")
                                                 .addField("Title", image.getTitle(), false)
                                                 .addField("Author", image.getAuthor().getUsername(), false)
                                                 .addField("Category", image.getCategoryPath(), false)
                                                 .setImage(image.getContent().map(Content::getSource).orElseThrow()))))
                         .switchIfEmpty(context.editFollowupMessage(messageId, Emoji.MAGNIFYING_GLASS
-                                        + " (**%s**) No images were found for the search `%s`",
-                                context.getAuthorName(), keyword)));
+                                        + " (**%s**) No images found matching query `%s`",
+                                context.getAuthorName(), query)));
     }
 
-    private Mono<Image> getPopularImage(String keyword) {
+    private Mono<Image> getPopularImage(String query) {
         return this.requestAccessToken()
                 .map(token -> String.format("%s?"
                                 + "q=%s"
@@ -69,7 +69,7 @@ public class ImageCmd extends BaseCmd {
                                 + "&limit=25" // The pagination limit (min: 1 max: 50)
                                 + "&offset=%d" // The pagination offset (min: 0 max: 50000)
                                 + "&access_token=%s",
-                        BROWSE_POPULAR_URL, NetUtil.encode(keyword), ThreadLocalRandom.current().nextInt(150),
+                        BROWSE_POPULAR_URL, NetUtil.encode(query), ThreadLocalRandom.current().nextInt(150),
                         token.getAccessToken()))
                 .flatMap(url -> RequestHelper.fromUrl(url).to(DeviantArtResponse.class))
                 .flatMapIterable(DeviantArtResponse::getResults)

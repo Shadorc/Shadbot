@@ -16,7 +16,7 @@ public class SuicideGirlsCmd extends BaseCmd {
     private static final String HOME_URL = "https://www.suicidegirls.com/photos/sg/recent/all/";
 
     public SuicideGirlsCmd() {
-        super(CommandCategory.IMAGE, "suicide_girls", "Show a random Suicide Girl image");
+        super(CommandCategory.IMAGE, "suicide_girls", "Show random image on SuicideGirls");
     }
 
     @Override
@@ -27,7 +27,7 @@ public class SuicideGirlsCmd extends BaseCmd {
                         return context.createFollowupMessage(ShadbotUtil.mustBeNsfw());
                     }
 
-                    return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Suicide Girl picture...", context.getAuthorName())
+                    return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading SuicideGirls image...", context.getAuthorName())
                             .zipWith(SuicideGirlsCmd.getRandomSuicideGirl())
                             .flatMap(TupleUtils.function((messageId, post) ->
                                     context.editFollowupMessage(messageId, ShadbotUtil.getDefaultEmbed(
