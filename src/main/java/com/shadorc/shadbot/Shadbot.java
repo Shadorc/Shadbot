@@ -10,6 +10,7 @@ import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.object.ExceptionHandler;
+import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.LogUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
@@ -44,6 +45,7 @@ public class Shadbot {
 
     public static final Logger DEFAULT_LOGGER = LogUtil.getLogger();
 
+    private static final Duration EVENT_TIMEOUT = Duration.ofHours(12);
     private static final Instant LAUNCH_TIME = Instant.now();
     private static final AtomicLong OWNER_ID = new AtomicLong();
 
@@ -156,7 +158,8 @@ public class Shadbot {
                 .on(eventListener.getEventType())
                 .doOnNext(event -> Telemetry.EVENT_COUNTER.labels(event.getClass().getSimpleName()).inc())
                 .flatMap(event -> eventListener.execute(event)
-                        .timeout(Duration.ofHours(12), Mono.error(new RuntimeException(String.format("%s timed out", event))))
+                        .timeout(EVENT_TIMEOUT, Mono.error(new RuntimeException(
+                                String.format("Event timed out after %s: %s", FormatUtil.formatDurationWords(EVENT_TIMEOUT), event))))
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
