@@ -4,8 +4,8 @@ import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.LogUtil;
-import com.shadorc.shadbot.utils.ProcessUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.SystemUtil;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.gateway.GatewayClient;
 import discord4j.gateway.GatewayClientGroup;
@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
+import reactor.function.TupleUtils;
 import reactor.util.Logger;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -64,18 +65,25 @@ public class TaskManager {
                 .collectMap(Tuple2::getT1, Tuple2::getT2);
 
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(15), DEFAULT_SCHEDULER)
-                .then(gateway.getGuilds().count())
-                .doOnNext(guildCount -> {
-                    Telemetry.RAM_USAGE_GAUGE.set(ProcessUtil.getMemoryUsed());
-                    Telemetry.CPU_USAGE_GAUGE.set(ProcessUtil.getCpuUsage());
-                    Telemetry.THREAD_COUNT_GAUGE.set(Thread.activeCount());
-                    Telemetry.GC_COUNT_GAUGE.set(ProcessUtil.getGCCount());
-                    Telemetry.GC_TIME_GAUGE.set(ProcessUtil.getGCTime());
+                .then(Mono.zip(gateway.getGuilds().count(), getResponseTimes))
+                .doOnNext(TupleUtils.consumer((guildCount, responseTimeMap) -> {
+                    Telemetry.UPTIME_GAUGE.set(SystemUtil.getUptime());
+                    Telemetry.PROCESS_CPU_USAGE_GAUGE.set(SystemUtil.getProcessCpuUsage());
+                    Telemetry.SYSTEM_CPU_USAGE_GAUGE.set(SystemUtil.getSystemCpuUsage());
+                    Telemetry.MAX_HEAP_MEMORY_GAUGE.set(SystemUtil.getMaxHeapMemory());
+                    Telemetry.TOTAL_HEAP_MEMORY_GAUGE.set(SystemUtil.getTotalHeapMemory());
+                    Telemetry.USED_HEAP_MEMORY_GAUGE.set(SystemUtil.getUsedHeapMemory());
+                    Telemetry.TOTAL_MEMORY_GAUGE.set(SystemUtil.getTotalMemory());
+                    Telemetry.FREE_MEMORY_GAUGE.set(SystemUtil.getFreeMemory());
+                    Telemetry.GC_COUNT_GAUGE.set(SystemUtil.getGCCount());
+                    Telemetry.GC_TIME_GAUGE.set(SystemUtil.getGCTime());
+                    Telemetry.THREAD_COUNT_GAUGE.set(SystemUtil.getThreadCount());
+                    Telemetry.DAEMON_THREAD_COUNT_GAUGE.set(SystemUtil.getDaemonThreadCount());
+
                     Telemetry.GUILD_COUNT_GAUGE.set(guildCount);
-                })
-                .flatMap(__ -> getResponseTimes)
-                .doOnNext(responseTimeMap -> responseTimeMap
-                        .forEach((key, value) -> Telemetry.RESPONSE_TIME_GAUGE.labels(key.toString()).set(value)))
+                    responseTimeMap
+                            .forEach((key, value) -> Telemetry.RESPONSE_TIME_GAUGE.labels(key.toString()).set(value));
+                }))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
         this.tasks.add(task);

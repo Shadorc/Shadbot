@@ -46,7 +46,6 @@ public class Shadbot {
     public static final Logger DEFAULT_LOGGER = LogUtil.getLogger();
 
     private static final Duration EVENT_TIMEOUT = Duration.ofHours(12);
-    private static final Instant LAUNCH_TIME = Instant.now();
     private static final AtomicLong OWNER_ID = new AtomicLong();
 
     private static GatewayDiscordClient gateway;
@@ -162,13 +161,6 @@ public class Shadbot {
                                 String.format("Event timed out after %s: %s", FormatUtil.formatDurationWords(EVENT_TIMEOUT), event))))
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
-    }
-
-    /**
-     * @return The time when this class was loaded.
-     */
-    public static Instant getLaunchTime() {
-        return Shadbot.LAUNCH_TIME;
     }
 
     /**

@@ -9,7 +9,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
-import com.shadorc.shadbot.utils.ProcessUtil;
+import com.shadorc.shadbot.utils.SystemUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.common.GitProperties;
 import discord4j.core.object.entity.User;
@@ -52,8 +52,7 @@ public class InfoCmd extends BaseCmd {
                 .map(GatewayClient::getResponseTime)
                 .map(Duration::toMillis)
                 .orElseThrow();
-        final String uptime = FormatUtil.formatDurationWords(
-                Duration.ofMillis(TimeUtil.getMillisUntil(Shadbot.getLaunchTime())));
+        final String uptime = FormatUtil.formatDurationWords(Duration.ofMillis(SystemUtil.getUptime()));
 
         return """
                 ```prolog
@@ -81,8 +80,8 @@ public class InfoCmd extends BaseCmd {
                 ```
                 """
                 .formatted(JAVA_VERSION, Config.VERSION, D4J_NAME, D4J_VERSION, LAVAPLAYER_VERSION,
-                        FormatUtil.number(ProcessUtil.getMemoryUsed()), FormatUtil.number(ProcessUtil.getMaxMemory()),
-                        ProcessUtil.getCpuUsage(), FormatUtil.number(Thread.activeCount()),
+                        FormatUtil.number(SystemUtil.getUsedHeapMemory()), FormatUtil.number(SystemUtil.getMaxHeapMemory()),
+                        SystemUtil.getProcessCpuUsage(), FormatUtil.number(SystemUtil.getThreadCount()),
                         TimeUtil.getMillisUntil(start), gatewayLatency,
                         uptime, owner.getTag(), context.getShardIndex() + 1, context.getShardCount(),
                         FormatUtil.number(guildCount), FormatUtil.number(Telemetry.VOICE_COUNT_GAUGE.get()));
