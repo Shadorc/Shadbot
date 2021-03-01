@@ -3,7 +3,6 @@ package com.shadorc.shadbot.utils;
 import com.sun.management.OperatingSystemMXBean;
 
 import java.lang.management.*;
-import java.time.Duration;
 import java.util.List;
 
 public class SystemUtil {

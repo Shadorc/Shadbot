@@ -7,22 +7,16 @@ import com.shadorc.shadbot.utils.LogUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.SystemUtil;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.gateway.GatewayClient;
 import discord4j.gateway.GatewayClientGroup;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
-import reactor.function.TupleUtils;
 import reactor.util.Logger;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class TaskManager {
 
@@ -57,16 +51,9 @@ public class TaskManager {
         LOGGER.info("Scheduling periodic stats log");
 
         final GatewayClientGroup group = gateway.getGatewayClientGroup();
-        final Mono<Map<Integer, Long>> getResponseTimes = Flux.range(0, group.getShardCount())
-                .flatMap(i -> Mono.justOrEmpty(group.find(i))
-                        .map(GatewayClient::getResponseTime)
-                        .map(Duration::toMillis)
-                        .map(millis -> Tuples.of(i, millis)))
-                .collectMap(Tuple2::getT1, Tuple2::getT2);
-
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(15), DEFAULT_SCHEDULER)
-                .then(Mono.zip(gateway.getGuilds().count(), getResponseTimes))
-                .doOnNext(TupleUtils.consumer((guildCount, responseTimeMap) -> {
+                .then(gateway.getGuilds().count())
+                .doOnNext(guildCount -> {
                     Telemetry.UPTIME_GAUGE.set(SystemUtil.getUptime());
                     Telemetry.PROCESS_CPU_USAGE_GAUGE.set(SystemUtil.getProcessCpuUsage());
                     Telemetry.SYSTEM_CPU_USAGE_GAUGE.set(SystemUtil.getSystemCpuUsage());
@@ -81,9 +68,12 @@ public class TaskManager {
                     Telemetry.DAEMON_THREAD_COUNT_GAUGE.set(SystemUtil.getDaemonThreadCount());
 
                     Telemetry.GUILD_COUNT_GAUGE.set(guildCount);
-                    responseTimeMap
-                            .forEach((key, value) -> Telemetry.RESPONSE_TIME_GAUGE.labels(key.toString()).set(value));
-                }))
+
+                    for (int i = 0; i < group.getShardCount(); ++i) {
+                        final long responseTime = group.find(i).orElseThrow().getResponseTime().toMillis();
+                        Telemetry.RESPONSE_TIME_GAUGE.labels(Integer.toString(i)).set(responseTime);
+                    }
+                })
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
         this.tasks.add(task);

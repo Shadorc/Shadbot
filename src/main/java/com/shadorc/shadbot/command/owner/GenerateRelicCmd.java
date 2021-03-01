@@ -19,10 +19,7 @@ public class GenerateRelicCmd extends BaseCmd {
     public GenerateRelicCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "generate_relic", "Generate a relic");
 
-        this.addOption("type",
-                FormatUtil.format(RelicType.class, "/"),
-                false,
-                ApplicationCommandOptionType.STRING);
+        this.addOption("type", FormatUtil.format(RelicType.class, "/"), false, ApplicationCommandOptionType.STRING);
     }
 
     @Override

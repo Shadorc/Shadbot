@@ -1,7 +1,6 @@
 package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
-import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.core.retriever.SpyRestEntityRetriever;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
@@ -36,7 +35,6 @@ import reactor.util.Logger;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
