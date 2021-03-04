@@ -52,8 +52,8 @@ public class Telemetry {
             "Voice channel error count").namespace(DISCORD_NAMESPACE).labelNames("exception").register();
     public static final Counter COMMAND_USAGE_COUNTER = Counter.build("command_usage", "Command usage")
             .namespace(SHADBOT_NAMESPACE).labelNames("command").register();
-    public static final Counter REST_REQUEST_COUNTER = Counter.build("rest_request", "Rest request count")
-            .namespace(SHARD_NAMESPACE).register();
+    public static final Counter REST_REQUEST_COUNTER = Counter.build("rest_request", "REST request count")
+            .namespace(SHARD_NAMESPACE).labelNames("route").register();
     public static final Counter DB_REQUEST_COUNTER = Counter.build("request_count", "Database request count")
             .namespace(DATABASE_NAMESPACE).labelNames("collection").register();
     public static final Counter MESSAGE_SENT_COUNTER = Counter.build("message_sent", "Message sent count")
