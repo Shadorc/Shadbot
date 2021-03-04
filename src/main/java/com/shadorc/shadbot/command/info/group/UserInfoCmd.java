@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-public class UserInfoCmd extends BaseCmd {
+class UserInfoCmd extends BaseCmd {
 
     private final DateTimeFormatter dateFormatter;
 

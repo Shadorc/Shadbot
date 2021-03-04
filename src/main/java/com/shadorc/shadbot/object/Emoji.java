@@ -61,7 +61,10 @@ public enum Emoji {
     DATE("date"),
     BUST_IN_SILHOUETTE("bust_in_silhouette"),
     MILITARY_MEDAL("military_medal"),
-    STAR("star2");
+    STAR("star2"),
+    ROBOT("robot"),
+    SATELLITE("satellite"),
+    SCREWDRIVER("screwdriver");
 
     private final String discordNotation;
 
