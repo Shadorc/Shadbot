@@ -37,7 +37,7 @@ public class RussianRouletteCmd extends BaseCmd {
         return ShadbotUtil.requireValidBet(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
                 .filter(__ -> player.isAlive())
                 .switchIfEmpty(context.createFollowupMessage(
-                        Emoji.BROCKEN_HEART + " (**%s**) Dead people can't play the Russian Roulette... " +
+                        Emoji.BROKEN_HEART + " (**%s**) Dead people can't play the Russian Roulette... " +
                                 "You will be able to play again in %s!",
                         context.getAuthorName(), FormatUtil.formatDurationWords(player.getResetDuration()))
                         .then(Mono.empty()))
