@@ -16,8 +16,14 @@ import reactor.util.annotation.Nullable;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public abstract class BaseCmd {
+
+    protected static final Supplier<RateLimiter> DEFAULT_RATELIMITER = () ->
+            new RateLimiter(3, Duration.ofSeconds(5));
+    protected static final Supplier<RateLimiter> DEFAULT_GAME_RATELIMITER = () ->
+            new RateLimiter(1, Duration.ofSeconds(3));
 
     private final CommandCategory category;
     private final CommandPermission permission;
@@ -35,7 +41,7 @@ public abstract class BaseCmd {
         this.name = name;
         this.description = description;
         this.options = new LinkedList<>();
-        this.rateLimiter = new RateLimiter(3, Duration.ofSeconds(5));
+        this.rateLimiter = DEFAULT_RATELIMITER.get();
         this.isEnabled = true;
     }
 
@@ -110,7 +116,7 @@ public abstract class BaseCmd {
     }
 
     public void setGameRateLimiter() {
-        this.setRateLimiter(new RateLimiter(1, Duration.ofSeconds(3)));
+        this.setRateLimiter(DEFAULT_GAME_RATELIMITER.get());
     }
 
     public void setEnabled(boolean isEnabled) {
