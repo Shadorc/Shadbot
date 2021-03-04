@@ -90,29 +90,14 @@ public class CommandManager {
         return Collections.unmodifiableMap(map);
     }
 
-    public Mono<Long> register(RestClient restClient, long applicationId) {
+    public Mono<Long> register(ApplicationService applicationService, long applicationId) {
         return Flux.fromIterable(this.commandsMap.values())
-                .flatMap(cmd -> this.registerCommand(applicationId, restClient, cmd)
+                .flatMap(cmd -> cmd.register(applicationService, applicationId)
                         .onErrorResume(err -> Mono.fromRunnable(() ->
-                                DEFAULT_LOGGER.error("An error occurred during '{}' registration: {}", cmd.getName(), err.getMessage()))))
+                                DEFAULT_LOGGER.error("An error occurred during '{}' registration: {}",
+                                        cmd.getName(), err.getMessage()))))
                 .count()
                 .doOnNext(cmdCount -> DEFAULT_LOGGER.info("{} commands registered", cmdCount));
-    }
-
-    private Mono<ApplicationCommandData> registerCommand(long applicationId, RestClient restClient, BaseCmd cmd) {
-        final ApplicationCommandRequest request = cmd.build(ApplicationCommandRequest.builder()
-                .name(cmd.getName())
-                .description(cmd.getDescription()));
-        if (cmd.getPermission().equals(CommandPermission.OWNER)) {
-            return restClient.getApplicationService()
-                    .createGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, request);
-        } else {
-            // TODO
-            // return restClient.getApplicationService()
-            //       .createGlobalApplicationCommand(applicationId, request);
-            return restClient.getApplicationService()
-                    .createGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, request);
-        }
     }
 
     public Map<String, BaseCmd> getCommands() {

@@ -15,6 +15,7 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandInteractionOptionData;
 import discord4j.discordjson.json.ImmutableWebhookMessageEditRequest;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.WebhookExecuteRequest;
@@ -24,6 +25,7 @@ import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -97,13 +99,20 @@ public class Context {
     }
     // TODO
 
+    private List<ApplicationCommandInteractionOptionData> getOptionRecursively(ApplicationCommandInteractionOptionData data,
+                                                                               List<ApplicationCommandInteractionOptionData> options) {
+        final List<ApplicationCommandInteractionOptionData> list = data.options().toOptional().orElse(Collections.emptyList());
+        options.addAll(list);
+        list.forEach(it -> getOptionRecursively(it, options));
+        return list;
+    }
+
     public Optional<String> getOption(String name) {
-        return this.event.getCommandInteractionData()
-                .options()
-                .toOptional()
-                .orElse(Collections.emptyList())
-                .stream()
-                .filter(option -> option.name().equals(name))
+        final List<ApplicationCommandInteractionOptionData> list = this.event.getCommandInteractionData().options()
+                .toOptional().orElse(Collections.emptyList());
+        return list.stream()
+                .flatMap(it -> this.getOptionRecursively(it, new ArrayList<>()).stream())
+                .filter(option -> option.name().equals(name) && !option.value().isAbsent())
                 .findFirst()
                 .flatMap(option -> option.value().toOptional());
     }

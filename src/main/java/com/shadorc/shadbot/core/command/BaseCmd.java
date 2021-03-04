@@ -1,20 +1,20 @@
 package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandData;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.rest.service.ApplicationService;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 public abstract class BaseCmd {
@@ -43,16 +43,32 @@ public abstract class BaseCmd {
         this(category, CommandPermission.USER, name, description);
     }
 
-    public ApplicationCommandRequest build(ImmutableApplicationCommandRequest.Builder builder) {
+    public List<ApplicationCommandOptionData> buildOptions() {
+        final List<ApplicationCommandOptionData> optionsData = new ArrayList<>();
         for (final Option option : this.options) {
-            builder.addOption(ApplicationCommandOptionData.builder()
+            optionsData.add(ApplicationCommandOptionData.builder()
                     .name(option.getName())
                     .description(option.getDescription())
                     .required(option.isRequired())
                     .type(option.getType())
                     .build());
         }
-        return builder.build();
+        return optionsData;
+    }
+
+    public Mono<ApplicationCommandData> register(ApplicationService applicationService, long applicationId) {
+        final ImmutableApplicationCommandRequest request = ApplicationCommandRequest.builder()
+                .name(this.getName())
+                .description(this.getDescription())
+                .addAllOptions(this.buildOptions())
+                .build();
+
+        // TODO
+        if (true/*this.getPermission().equals(CommandPermission.OWNER)*/) {
+            return applicationService.createGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, request);
+        } else {
+            return applicationService.createGlobalApplicationCommand(applicationId, request);
+        }
     }
 
     public abstract Mono<?> execute(Context context);
