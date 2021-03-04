@@ -1,8 +1,9 @@
-package com.shadorc.shadbot.command.info;
+package com.shadorc.shadbot.command.info.group;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
@@ -28,7 +29,7 @@ public class ServerInfoCmd extends BaseCmd {
     private final DateTimeFormatter dateFormatter;
 
     public ServerInfoCmd() {
-        super(CommandCategory.INFO, "server_info", "Show info about this server");
+        super(CommandCategory.INFO, "server", "Show server info");
         this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy - HH'h'mm", Locale.ENGLISH);
     }
 
@@ -40,11 +41,11 @@ public class ServerInfoCmd extends BaseCmd {
                 getGuild.flatMap(Guild::getOwner),
                 getGuild.flatMap(Guild::getRegion),
                 Mono.just(context.getAuthorAvatarUrl()))
-                .map(TupleUtils.function(this::getEmbed))
+                .map(TupleUtils.function(this::formatEmbed))
                 .flatMap(context::createFollowupMessage);
     }
 
-    private Consumer<EmbedCreateSpec> getEmbed(Guild guild, List<GuildChannel> channels, Member owner, Region region, String avatarUrl) {
+    private Consumer<EmbedCreateSpec> formatEmbed(Guild guild, List<GuildChannel> channels, Member owner, Region region, String avatarUrl) {
         final LocalDateTime creationTime = TimeUtil.toLocalDateTime(guild.getId().getTimestamp());
         final String creationDate = String.format("%s%n(%s)",
                 creationTime.format(this.dateFormatter), FormatUtil.formatLongDuration(creationTime));
@@ -54,12 +55,13 @@ public class ServerInfoCmd extends BaseCmd {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(String.format("Server Info: %s", guild.getName()), null, avatarUrl)
                         .setThumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
-                        .addField("Server ID", guild.getId().asString(), false)
-                        .addField("Owner", owner.getUsername(), false)
-                        .addField("Region", region.getName(), false)
-                        .addField("Creation date", creationDate, false)
-                        .addField("Channels", String.format("**Voice:** %d%n**Text:** %d", voiceChannels, textChannels), false)
-                        .addField("Members", FormatUtil.number(guild.getMemberCount()), false));
+                        .addField(Emoji.ID + " Server ID", guild.getId().asString(), true)
+                        .addField(Emoji.CROWN + " Owner", owner.getTag(), true)
+                        .addField(Emoji.MAP + " Region", region.getName(), true)
+                        .addField(Emoji.BIRTHDAY + " Creation date", creationDate, true)
+                        .addField(Emoji.SPEECH_BALLOON + " Channels", String.format("%s **Voice:** %d%n%s **Text:** %d",
+                                Emoji.MICROPHONE, voiceChannels, Emoji.KEYBOARD, textChannels), true)
+                        .addField(Emoji.BUSTS_IN_SILHOUETTE + " Members", FormatUtil.number(guild.getMemberCount()), true));
     }
 
 }

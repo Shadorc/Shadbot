@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.info;
+package com.shadorc.shadbot.command.info.group;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 import com.shadorc.shadbot.Shadbot;
@@ -20,7 +20,7 @@ import reactor.function.TupleUtils;
 import java.time.Duration;
 import java.util.Properties;
 
-public class InfoCmd extends BaseCmd {
+public class BotInfoCmd extends BaseCmd {
 
     private static final String JAVA_VERSION = System.getProperty("java.version");
     private static final Properties D4J_PROPERTIES = GitProperties.getProperties();
@@ -28,8 +28,8 @@ public class InfoCmd extends BaseCmd {
     private static final String D4J_VERSION = D4J_PROPERTIES.getProperty(GitProperties.APPLICATION_VERSION);
     private static final String LAVAPLAYER_VERSION = PlayerLibrary.VERSION;
 
-    public InfoCmd() {
-        super(CommandCategory.INFO, "info", "Show info");
+    public BotInfoCmd() {
+        super(CommandCategory.INFO, "bot", "Show bot info");
     }
 
     @Override
@@ -42,7 +42,7 @@ public class InfoCmd extends BaseCmd {
                     final long start = System.currentTimeMillis();
                     return context.createFollowupMessage(Emoji.GEAR + " (**%s**) Testing ping...", context.getAuthorName())
                             .flatMap(messageId -> context.editFollowupMessage(messageId,
-                                    InfoCmd.formatContent(context, start, owner, guildCount)));
+                                    BotInfoCmd.formatContent(context, start, owner, guildCount)));
                 }));
     }
 

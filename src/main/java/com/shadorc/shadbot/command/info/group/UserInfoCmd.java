@@ -1,8 +1,9 @@
-package com.shadorc.shadbot.command.info;
+package com.shadorc.shadbot.command.info.group;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
@@ -24,11 +25,8 @@ public class UserInfoCmd extends BaseCmd {
     private final DateTimeFormatter dateFormatter;
 
     public UserInfoCmd() {
-        super(CommandCategory.INFO, "user_info", "Show info about a user");
-        this.addOption("user",
-                "If not specified, it will show your info",
-                false,
-                ApplicationCommandOptionType.USER);
+        super(CommandCategory.INFO, "user", "Show user info");
+        this.addOption("user", "If not specified, it will show your info", false, ApplicationCommandOptionType.USER);
 
         this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
     }
@@ -40,11 +38,11 @@ public class UserInfoCmd extends BaseCmd {
                 .cache();
 
         return Mono.zip(getMemberOrAuthor, getMemberOrAuthor.flatMapMany(Member::getRoles).collectList())
-                .map(TupleUtils.function((user, roles) -> this.getEmbed(user, roles, context.getAuthorAvatarUrl())))
+                .map(TupleUtils.function((user, roles) -> this.formatEmbed(user, roles, context.getAuthorAvatarUrl())))
                 .flatMap(context::createFollowupMessage);
     }
 
-    private Consumer<EmbedCreateSpec> getEmbed(Member member, List<Role> roles, String avatarUrl) {
+    private Consumer<EmbedCreateSpec> formatEmbed(Member member, List<Role> roles, String avatarUrl) {
         final LocalDateTime createTime = TimeUtil.toLocalDateTime(member.getId().getTimestamp());
         final String creationDate = String.format("%s%n(%s)",
                 createTime.format(this.dateFormatter), FormatUtil.formatLongDuration(createTime));
@@ -52,6 +50,9 @@ public class UserInfoCmd extends BaseCmd {
         final LocalDateTime joinTime = TimeUtil.toLocalDateTime(member.getJoinTime());
         final String joinDate = String.format("%s%n(%s)",
                 joinTime.format(this.dateFormatter), FormatUtil.formatLongDuration(joinTime));
+
+        final String badges = FormatUtil.format(member.getPublicFlags(), FormatUtil::capitalizeEnum, "\n");
+        final String rolesMention = FormatUtil.format(roles, Role::getMention, "\n");
 
         final StringBuilder usernameBuilder = new StringBuilder(member.getTag());
         if (member.isBot()) {
@@ -65,13 +66,17 @@ public class UserInfoCmd extends BaseCmd {
                 embed -> {
                     embed.setAuthor(String.format("User Info: %s", usernameBuilder), null, avatarUrl)
                             .setThumbnail(member.getAvatarUrl())
-                            .addField("User ID", member.getId().asString(), true)
-                            .addField("Display name", member.getDisplayName(), true)
-                            .addField("Creation date", creationDate, false)
-                            .addField("Join date", joinDate, false);
+                            .addField(Emoji.ID + " User ID", member.getId().asString(), true)
+                            .addField(Emoji.BUST_IN_SILHOUETTE + " Display name", member.getDisplayName(), true)
+                            .addField(Emoji.BIRTHDAY + " Creation date", creationDate, true)
+                            .addField(Emoji.DATE + " Join date", joinDate, true);
 
-                    if (!roles.isEmpty()) {
-                        embed.addField("Roles", FormatUtil.format(roles, Role::getMention, "\n"), false);
+                    if (!badges.isEmpty()) {
+                        embed.addField(Emoji.MILITARY_MEDAL + " Badges", badges, true);
+                    }
+
+                    if (!rolesMention.isEmpty()) {
+                        embed.addField(Emoji.LOCK + " Roles", rolesMention, true);
                     }
                 });
     }
