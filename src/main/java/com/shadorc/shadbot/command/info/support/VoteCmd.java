@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.info;
+package com.shadorc.shadbot.command.info.support;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
@@ -19,10 +19,11 @@ public class VoteCmd extends BaseCmd {
         return context.createFollowupMessage(ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor("Vote on top.gg", Config.TOP_GG_URL, context.getAuthorAvatarUrl())
                         .setThumbnail("https://i.imgur.com/4Rf7SlR.png")
-                        .setDescription(String.format("If you like me, you can vote for me on **top.gg**!" +
-                                        "%n%s" +
-                                        "%nYou will unlock the **%s** achievement and the `bass_boost` command!",
-                                Config.TOP_GG_URL, Achievement.VOTER.getTitle()))));
+                        .setDescription("""
+                                If you like me, you can vote for me on **top.gg**!
+                                %s
+                                You will unlock the **%s** achievement and the `bass_boost` command!
+                                """.formatted(Config.TOP_GG_URL, Achievement.VOTER.getTitle()))));
     }
 
 }

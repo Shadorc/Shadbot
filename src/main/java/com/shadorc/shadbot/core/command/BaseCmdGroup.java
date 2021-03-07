@@ -1,8 +1,5 @@
-package com.shadorc.shadbot.command.info.group;
+package com.shadorc.shadbot.core.command;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.Context;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
@@ -13,13 +10,13 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class InfoCmd extends BaseCmd {
+public abstract class BaseCmdGroup extends BaseCmd {
 
-    private final Map<String, BaseCmd> infoCmds;
+    private final Map<String, BaseCmd> cmds;
 
-    public InfoCmd() {
-        super(CommandCategory.INFO, "info", "Show specific information");
-        this.infoCmds = List.of(new BotInfoCmd(), new ServerInfoCmd(), new UserInfoCmd()).stream()
+    public BaseCmdGroup(CommandCategory category, String name, String description, List<BaseCmd> cmds) {
+        super(category, name, description);
+        this.cmds = cmds.stream()
                 .collect(Collectors.toUnmodifiableMap(BaseCmd::getName, Function.identity()));
     }
 
@@ -27,13 +24,13 @@ public class InfoCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final String cmdName = context.getEvent().getCommandInteractionData().options()
                 .toOptional().orElseThrow().get(0).name();
-        return this.infoCmds.get(cmdName).execute(context);
+        return this.cmds.get(cmdName).execute(context);
     }
 
     @Override
     public List<ApplicationCommandOptionData> buildOptions() {
         final List<ApplicationCommandOptionData> options = new ArrayList<>();
-        for (final BaseCmd cmd : this.infoCmds.values()) {
+        for (final BaseCmd cmd : this.cmds.values()) {
             options.add(ApplicationCommandOptionData.builder()
                     .name(cmd.getName())
                     .description(cmd.getDescription())
@@ -43,4 +40,5 @@ public class InfoCmd extends BaseCmd {
         }
         return options;
     }
+
 }
