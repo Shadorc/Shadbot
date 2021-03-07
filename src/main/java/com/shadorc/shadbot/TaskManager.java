@@ -68,6 +68,7 @@ public class TaskManager {
                     Telemetry.DAEMON_THREAD_COUNT_GAUGE.set(SystemUtil.getDaemonThreadCount());
 
                     Telemetry.GUILD_COUNT_GAUGE.set(guildCount);
+                    Telemetry.UNIQUE_INTERACTING_USERS.set(Telemetry.INTERACTING_USERS.size());
 
                     for (int i = 0; i < group.getShardCount(); ++i) {
                         final long responseTime = group.find(i).orElseThrow().getResponseTime().toMillis();

@@ -4,7 +4,12 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.Summary;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Telemetry {
+
+    public static final Set<Long> INTERACTING_USERS = new HashSet<>();
 
     private static final String SYSTEM_NAMESPACE = "system";
     private static final String SHARD_NAMESPACE = "shard";
@@ -45,6 +50,8 @@ public class Telemetry {
             .namespace(SHARD_NAMESPACE).labelNames("shard_id").register();
     public static final Gauge VOICE_COUNT_GAUGE = Gauge.build("voice_count", "Connected voice channel count")
             .namespace(SHADBOT_NAMESPACE).register();
+    public static final Gauge UNIQUE_INTERACTING_USERS = Gauge.build("unique_interacting_users",
+            "Unique interacting users count").namespace(SHADBOT_NAMESPACE).register();
 
     public static final Counter EVENT_COUNTER = Counter.build("event_count", "Discord event count")
             .namespace(DISCORD_NAMESPACE).labelNames("type").register();

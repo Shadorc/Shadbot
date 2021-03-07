@@ -51,8 +51,6 @@ public class CommandProcessor {
             return Mono.empty();
         }
 
-        Telemetry.COMMAND_USAGE_COUNTER.labels(command.getName()).inc();
-
         return context.getPermissions()
                 .collectList()
                 // The author has the permission to execute this command
@@ -65,6 +63,10 @@ public class CommandProcessor {
                 // The user is not rate limited
                 .filterWhen(__ -> BooleanUtils.not(CommandProcessor.isRateLimited(context, command)))
                 .flatMap(__ -> command.execute(context))
+                .doOnSuccess(__ -> {
+                    Telemetry.COMMAND_USAGE_COUNTER.labels(command.getName()).inc();
+                    Telemetry.INTERACTING_USERS.add(context.getAuthorId().asLong());
+                })
                 .onErrorResume(err -> ExceptionHandler.handleCommandError(err, command, context)
                         .then(Mono.empty()));
     }
