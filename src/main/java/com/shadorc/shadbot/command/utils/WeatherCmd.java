@@ -50,8 +50,8 @@ public class WeatherCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String city = context.getOption("city").orElseThrow();
-        final Optional<String> countryOpt = context.getOption("country");
+        final String city = context.getOptionAsString("city").orElseThrow();
+        final Optional<String> countryOpt = context.getOptionAsString("country");
 
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading weather...", context.getAuthorName())
                 .flatMap(messageId -> Mono

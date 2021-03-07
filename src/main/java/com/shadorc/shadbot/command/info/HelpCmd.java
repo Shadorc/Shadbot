@@ -24,7 +24,7 @@ public class HelpCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final Optional<String> cmdName = context.getOption("command");
+        final Optional<String> cmdName = context.getOptionAsString("command");
         if (cmdName.isPresent()) {
             final BaseCmd cmd = CommandManager.getInstance().getCommand(cmdName.orElseThrow());
             if (cmd == null) {
@@ -67,7 +67,7 @@ public class HelpCmd extends BaseCmd {
 
 
         final Mono<Settings> getSettings = DatabaseManager.getGuilds()
-                .getSettings(context.getEvent().getGuildId())
+                .getSettings(context.getGuildId())
                 .cache();
 
         // Iterates over all commands...

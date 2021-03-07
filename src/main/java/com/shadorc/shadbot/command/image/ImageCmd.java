@@ -44,7 +44,7 @@ public class ImageCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String query = context.getOption("query").orElseThrow();
+        final String query = context.getOptionAsString("query").orElseThrow();
 
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading image...", context.getAuthorName())
                 .flatMap(messageId -> this.getPopularImage(query)

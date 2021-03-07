@@ -25,7 +25,7 @@ public class SendMessageCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final Snowflake userId = Snowflake.of(context.getOption("user").orElseThrow());
+        final Snowflake userId = Snowflake.of(context.getOptionAsString("user").orElseThrow());
         if (userId.equals(context.getClient().getSelfId())) {
             return Mono.error(new CommandException("I can't send a private message to myself."));
         }
@@ -38,7 +38,7 @@ public class SendMessageCmd extends BaseCmd {
                         return Mono.error(new CommandException("I can't send private message to other bots."));
                     }
 
-                    final String message = context.getOption("messahe").orElseThrow();
+                    final String message = context.getOptionAsString("messahe").orElseThrow();
                     return user.getPrivateChannel()
                             .cast(MessageChannel.class)
                             .flatMap(privateChannel -> DiscordUtil.sendMessage(message, privateChannel))

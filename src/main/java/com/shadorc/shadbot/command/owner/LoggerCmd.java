@@ -33,8 +33,8 @@ public class LoggerCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String name = context.getOption("name").orElseThrow();
-        final String levelStr = context.getOption("level").orElseThrow();
+        final String name = context.getOptionAsString("name").orElseThrow();
+        final String levelStr = context.getOptionAsString("level").orElseThrow();
         final Level level = Level.toLevel(levelStr.toUpperCase(), null);
         if (level == null) {
             return Mono.error(new CommandException(String.format("`%s` in not a valid level. %s",

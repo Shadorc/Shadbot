@@ -98,11 +98,8 @@
             <url>https://dl.bintray.com/sedmelluq/com.sedmelluq</url>
         </repository>
         <repository>
-            <id>oss.sonatype.org-snapshot</id>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+            <id>local-maven-repo</id>
+            <url>file:///C:/Users/dcecc/.m2/repository</url>
         </repository>
     </repositories>
     <dependencies>

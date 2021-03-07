@@ -38,7 +38,7 @@ public class RpsCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String handsign = context.getOption("handsign").orElseThrow();
+        final String handsign = context.getOptionAsString("handsign").orElseThrow();
 
         final Handsign userHandsign = EnumUtil.parseEnum(Handsign.class, handsign,
                 new CommandException(String.format("`%s` is not a valid handsign. %s.",

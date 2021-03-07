@@ -39,9 +39,9 @@ public class TranslateCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final Optional<String> sourceLang = context.getOption("source_lang");
-        final String destLang = context.getOption("destination_lang").orElseThrow();
-        final String text = context.getOption("text").orElseThrow();
+        final Optional<String> sourceLang = context.getOptionAsString("source_lang");
+        final String destLang = context.getOptionAsString("destination_lang").orElseThrow();
+        final String text = context.getOptionAsString("text").orElseThrow();
 
         final TranslateData data = new TranslateData();
         data.setSourceText(text);

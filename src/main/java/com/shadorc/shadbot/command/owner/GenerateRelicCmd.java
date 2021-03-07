@@ -24,7 +24,7 @@ public class GenerateRelicCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String typeStr = context.getOption("type").orElseThrow();
+        final String typeStr = context.getOptionAsString("type").orElseThrow();
 
         final RelicType type = EnumUtil.parseEnum(RelicType.class, typeStr,
                 new CommandException(String.format("`%s` in not a valid type. %s",

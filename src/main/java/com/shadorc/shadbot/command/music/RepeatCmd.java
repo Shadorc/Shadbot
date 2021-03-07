@@ -30,7 +30,7 @@ public class RepeatCmd extends BaseCmd {
                 .map(__ -> {
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
                     final TrackScheduler.RepeatMode oldMode = scheduler.getRepeatMode();
-                    final TrackScheduler.RepeatMode newMode = context.getOption("mode")
+                    final TrackScheduler.RepeatMode newMode = context.getOptionAsString("mode")
                             .map(str -> EnumUtil.parseEnum(TrackScheduler.RepeatMode.class, str,
                                     new CommandException(String.format("`%s` is not a valid mode.", str))))
                             .orElse(oldMode == TrackScheduler.RepeatMode.NONE ?

@@ -34,7 +34,7 @@ public class SkipCmd extends BaseCmd {
         final Mono<Snowflake> sendMessage =
                 context.createFollowupMessage(Emoji.TRACK_NEXT + " Music skipped by **%s**.", context.getAuthorName());
 
-        final Optional<String> option = context.getOption("index");
+        final Optional<String> option = context.getOptionAsString("index");
         if (option.isPresent()) {
             final int playlistSize = guildMusic.getTrackScheduler().getPlaylist().size();
             final Integer index = NumberUtil.toIntBetweenOrNull(option.orElseThrow(), 1, playlistSize);

@@ -23,7 +23,7 @@ public class ActivateRelicCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String arg = context.getOption("key").orElseThrow();
+        final String arg = context.getOptionAsString("key").orElseThrow();
 
         return DatabaseManager.getPremium().getRelicById(arg)
                 .switchIfEmpty(context.createFollowupMessage(

@@ -9,13 +9,15 @@ import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.InteractionCreateEvent;
+import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.ApplicationCommandInteractionOptionData;
 import discord4j.discordjson.json.ImmutableWebhookMessageEditRequest;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.WebhookExecuteRequest;
@@ -25,8 +27,6 @@ import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -49,94 +49,77 @@ public class Context {
         return this.dbGuild;
     }
 
-    public String getCommandName() {
-        return this.event.getCommandName();
-    }
-
     public GatewayDiscordClient getClient() {
         return this.event.getClient();
     }
 
+    public String getCommandName() {
+        return this.event.getCommandName();
+    }
+
     public Snowflake getGuildId() {
-        return this.event.getGuildId();
+        return this.event.getGuildId().orElseThrow();
     }
 
     public Snowflake getChannelId() {
         return this.event.getChannelId();
     }
 
-    public Snowflake getAuthorId() {
-        return Snowflake.of(this.event.getMemberData().user().id());
-    }
-
-    public Mono<Guild> getGuild() {
-        return this.event.getClient().getGuildById(this.getGuildId());
-    }
-
-    public Mono<TextChannel> getChannel() {
-        return this.event.getClient().getChannelById(this.getChannelId())
-                .cast(TextChannel.class);
-    }
-
-    // TODO: Do not build the member myself
     public Member getAuthor() {
-        return new Member(this.event.getClient(), this.event.getMemberData(), this.event.getGuildId().asLong());
+        return this.event.getMember().orElseThrow();
     }
 
-    // TODO: If this is not used frequently, remove
-    public Mono<Member> getSelfMember() {
-        return this.getGuild().flatMap(Guild::getSelfMember);
+    public Snowflake getAuthorId() {
+        return this.event.getUser().getId();
     }
 
-    // TODO
     public String getAuthorName() {
-        return this.event.getMemberData().user().username();
+        return this.getAuthor().getUsername();
     }
 
-    // TODO
     public String getAuthorAvatarUrl() {
         return this.getAuthor().getAvatarUrl();
     }
-    // TODO
 
-    private List<ApplicationCommandInteractionOptionData> getOptionRecursively(ApplicationCommandInteractionOptionData data,
-                                                                               List<ApplicationCommandInteractionOptionData> options) {
-        final List<ApplicationCommandInteractionOptionData> list = data.options().toOptional().orElse(Collections.emptyList());
-        options.addAll(list);
-        list.forEach(it -> getOptionRecursively(it, options));
-        return list;
+    public Mono<Guild> getGuild() {
+        return this.event.getGuild();
     }
 
-    public Optional<String> getOption(String name) {
-        final List<ApplicationCommandInteractionOptionData> list = this.event.getCommandInteractionData().options()
-                .toOptional().orElse(Collections.emptyList());
-        return list.stream()
-                .flatMap(it -> this.getOptionRecursively(it, new ArrayList<>()).stream())
-                .filter(option -> option.name().equals(name) && !option.value().isAbsent())
-                .findFirst()
-                .flatMap(option -> option.value().toOptional());
+    public Mono<TextChannel> getChannel() {
+        return this.event.getChannel();
     }
 
-    public Mono<Member> getOptionAsMember(String name) {
-        return Mono.justOrEmpty(this.getOption(name))
-                .map(Snowflake::of)
-                .flatMap(memberId -> this.event.getClient().getMemberById(this.getGuildId(), memberId));
+    public Optional<ApplicationCommandInteractionOptionValue> getOption(String name) {
+        return this.event.getCommandInteraction().getOption(name).flatMap(ApplicationCommandInteractionOption::getValue);
     }
 
-    public Mono<Role> getOptionAsRole(String name) {
-        return Mono.justOrEmpty(this.getOption(name))
-                .map(Snowflake::of)
-                .flatMap(roleId -> this.event.getClient().getRoleById(this.getGuildId(), roleId));
+    public Optional<String> getOptionAsString(String name) {
+        return this.getOption(name).map(ApplicationCommandInteractionOptionValue::asString);
+    }
+
+    public Optional<Snowflake> getOptionAsSnowflake(String name) {
+        return this.getOption(name).map(ApplicationCommandInteractionOptionValue::asSnowflake);
     }
 
     public Optional<Long> getOptionAsLong(String name) {
-        return this.getOption(name)
-                .map(Long::parseLong);
+        return this.getOption(name).map(ApplicationCommandInteractionOptionValue::asLong);
     }
 
     public Optional<Boolean> getOptionAsBool(String name) {
-        return this.getOption(name)
-                .map(Boolean::parseBoolean);
+        return this.getOption(name).map(ApplicationCommandInteractionOptionValue::asBoolean);
+    }
+
+    public Mono<Member> getOptionAsMember(String name) {
+        return Mono.justOrEmpty(this.getOption(name)).flatMap(ApplicationCommandInteractionOptionValue::asUser)
+                .flatMap(user -> user.asMember(getGuildId()));
+    }
+
+    public Mono<Role> getOptionAsRole(String name) {
+        return Mono.justOrEmpty(this.getOption(name)).flatMap(ApplicationCommandInteractionOptionValue::asRole);
+    }
+
+    public Mono<Channel> getOptionAsChannel(String name) {
+        return Mono.justOrEmpty(this.getOption(name)).flatMap(ApplicationCommandInteractionOptionValue::asChannel);
     }
 
     public Flux<CommandPermission> getPermissions() {

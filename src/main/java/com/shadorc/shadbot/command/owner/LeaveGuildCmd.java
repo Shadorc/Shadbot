@@ -24,7 +24,7 @@ public class LeaveGuildCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String arg = context.getOption("guildId").orElseThrow();
+        final String arg = context.getOptionAsString("guildId").orElseThrow();
 
         final Long guildId = NumberUtil.toPositiveLongOrNull(arg);
         if (guildId == null) {

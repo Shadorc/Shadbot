@@ -36,7 +36,7 @@ public class BassBoostCmd extends BaseCmd {
                                         "**%s** achievement (more information using `/achievements`).",
                                 Config.PATREON_URL, Achievement.VOTER.getTitle()))))
                 .map(__ -> {
-                    final String arg = context.getOption("percentage").orElseThrow();
+                    final String arg = context.getOptionAsString("percentage").orElseThrow();
 
                     final Integer percentage = NumberUtil.toIntBetweenOrNull(arg, VALUE_MIN, VALUE_MAX);
                     if (percentage == null) {

@@ -88,7 +88,7 @@ public class LyricsCmd extends BaseCmd {
      * @return The search term, either the current playing music title or the context argument.
      */
     private static String getSearch(Context context) {
-        return context.getOption("music")
+        return context.getOptionAsString("music")
                 .orElseGet(() -> {
                     final GuildMusic guildMusic = MusicManager.getInstance()
                             .getGuildMusic(context.getGuildId())

@@ -33,7 +33,7 @@ public class UrbanCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String word = context.getOption("word").orElseThrow();
+        final String word = context.getOptionAsString("word").orElseThrow();
 
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {

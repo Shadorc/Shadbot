@@ -31,7 +31,7 @@ public class ForwardCmd extends BaseCmd {
 
         return DiscordUtil.requireVoiceChannel(context)
                 .flatMap(__ -> {
-                    final String option = context.getOption("time").orElseThrow();
+                    final String option = context.getOptionAsString("time").orElseThrow();
 
                     // If the argument is a number of seconds...
                     Long time = NumberUtil.toPositiveLongOrNull(option);

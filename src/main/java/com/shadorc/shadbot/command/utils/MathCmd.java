@@ -29,7 +29,7 @@ public class MathCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String arg = context.getOption("expression").orElseThrow();
+        final String arg = context.getOptionAsString("expression").orElseThrow();
         return context.createFollowupMessage(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
                 context.getAuthorName(), arg.replace("*", "\\*"),
                 this.formatter.format(this.evaluator.evaluate(arg)))

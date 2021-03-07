@@ -32,9 +32,9 @@ public class ManageAchievementsCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String actionOpt = context.getOption("action").orElseThrow();
-        final String achievementOpt = context.getOption("achievement").orElseThrow();
-        final Snowflake userId = Snowflake.of(context.getOption("user").orElseThrow());
+        final String actionOpt = context.getOptionAsString("action").orElseThrow();
+        final String achievementOpt = context.getOptionAsString("achievement").orElseThrow();
+        final Snowflake userId = Snowflake.of(context.getOptionAsString("user").orElseThrow());
 
         final Action action = EnumUtil.parseEnum(Action.class, actionOpt,
                 new CommandException(String.format("`%s` is not a valid action. %s",

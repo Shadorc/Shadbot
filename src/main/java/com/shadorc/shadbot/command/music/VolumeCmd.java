@@ -31,7 +31,7 @@ public class VolumeCmd extends BaseCmd {
 
         return DiscordUtil.requireVoiceChannel(context)
                 .flatMap(__ -> {
-                    final Optional<String> option = context.getOption("volume");
+                    final Optional<String> option = context.getOptionAsString("volume");
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
                     if (option.isEmpty()) {
                         return context.createFollowupMessage(Emoji.SOUND + " (**%s**) Current volume level: **%d%%**",

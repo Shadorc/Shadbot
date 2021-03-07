@@ -24,7 +24,7 @@ public class FeedbackCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String message = context.getOption("text").orElseThrow();
+        final String message = context.getOptionAsString("text").orElseThrow();
         return context.getClient()
                 .getUserById(Shadbot.getOwnerId())
                 .flatMap(User::getPrivateChannel)

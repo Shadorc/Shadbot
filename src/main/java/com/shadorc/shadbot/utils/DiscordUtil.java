@@ -214,7 +214,8 @@ public class DiscordUtil {
      * connect and speak.
      */
     public static Mono<VoiceChannel> requireVoiceChannel(Context context) {
-        final Mono<Optional<Snowflake>> getBotVoiceChannelId = context.getSelfMember()
+        final Mono<Optional<Snowflake>> getBotVoiceChannelId = context.getGuild()
+                .flatMap(Guild::getSelfMember)
                 .flatMap(Member::getVoiceState)
                 .map(VoiceState::getChannelId)
                 .defaultIfEmpty(Optional.empty());
