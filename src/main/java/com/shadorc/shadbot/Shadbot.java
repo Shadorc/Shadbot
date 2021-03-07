@@ -1,6 +1,7 @@
 package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
+import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.core.retriever.SpyRestEntityRetriever;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
@@ -97,7 +98,7 @@ public class Shadbot {
         DEFAULT_LOGGER.info("Owner ID: {} | Application ID: {}", Shadbot.OWNER_ID.get(), applicationId);
 
         DEFAULT_LOGGER.info("Commands registration");
-        CommandManager.getInstance().register(client, applicationId).block();
+        CommandManager.getInstance().register(client.getApplicationService(), applicationId).block();
 
         DEFAULT_LOGGER.info("Connecting to Discord");
         client.gateway()
@@ -119,6 +120,17 @@ public class Shadbot {
                 .setMemberRequestFilter(MemberRequestFilter.none())
                 .withGateway(gateway -> {
                     Shadbot.gateway = gateway;
+
+                    /*gateway.getRestClient()
+                            .getApplicationService()
+                            .getGuildApplicationCommands(applicationId, Config.OWNER_GUILD_ID)
+                            .doOnNext(command -> DEFAULT_LOGGER.info("Deleting {}", command.name()))
+                            .flatMap(commandData -> gateway.getRestClient()
+                                    .getApplicationService()
+                                    .deleteGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, Long.parseLong(commandData.id()))
+                                    .doOnTerminate(() -> DEFAULT_LOGGER.info("Deleted: {}", commandData.name())))
+                            .doOnTerminate(() -> DEFAULT_LOGGER.info("Done!"))
+                            .subscribe();*/
 
                     Shadbot.taskManager = new TaskManager();
 //                    Shadbot.taskManager.scheduleLottery(gateway);
