@@ -17,7 +17,7 @@ public class XkcdCmd extends BaseCmd {
     private static final String LAST_URL = String.format("%s/info.0.json", HOME_URL);
 
     public XkcdCmd() {
-        super(CommandCategory.IMAGE, "xkcd", "Show random comic on XKCD");
+        super(CommandCategory.IMAGE, "xkcd", "Show random comic from XKCD");
     }
 
     @Override

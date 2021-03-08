@@ -24,7 +24,7 @@ public class Rule34Cmd extends BaseCmd {
     private static final int MAX_TAGS_CHAR = 250;
 
     public Rule34Cmd() {
-        super(CommandCategory.IMAGE, "rule34", "Show random image on Rule34");
+        super(CommandCategory.IMAGE, "rule34", "Show random image from Rule34");
         this.addOption("query", "Search for a Rule34 image", true, ApplicationCommandOptionType.STRING);
     }
 
@@ -58,8 +58,12 @@ public class Rule34Cmd extends BaseCmd {
                 });
     }
 
-    private static Mono<R34Post> getR34Post(String tag) {
-        final String url = String.format("%s?page=dapi&s=post&q=index&tags=%s",
+    private static Mono<R34Post> getR34Post(final String tag) {
+        final String url = String.format("%s?" +
+                        "page=dapi" +
+                        "&s=post" +
+                        "&q=index" +
+                        "&tags=%s",
                 HOME_URL, NetUtil.encode(tag.replace(" ", "_")));
 
         return RequestHelper.fromUrl(url)
@@ -71,7 +75,7 @@ public class Rule34Cmd extends BaseCmd {
                 .map(RandUtil::randValue);
     }
 
-    private static boolean containsChildren(R34Post post, List<String> tags) {
+    private static boolean containsChildren(final R34Post post, final List<String> tags) {
         return post.hasChildren() || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"));
     }
 
@@ -80,29 +84,29 @@ public class Rule34Cmd extends BaseCmd {
                 embed -> {
                     post.getSource().ifPresent(source -> {
                         if (NetUtil.isUrl(source)) {
-                            embed.setDescription(String.format("%n[**Source**](%s)", source));
+                            embed.setDescription("%n[**Source**](%s)".formatted(source));
                         } else {
                             embed.addField("Source", source, false);
                         }
                     });
 
-                    final String resolution = String.format("%dx%d", post.getWidth(), post.getHeight());
+                    final String resolution = "%dx%d".formatted(post.getWidth(), post.getHeight());
                     final String formattedTags = Rule34Cmd.formatTags(post.getTags());
-                    embed.setAuthor(String.format("Rule34: %s", tag), post.getFileUrl(), avatarUrl)
+                    embed.setAuthor("Rule34: %s".formatted(tag), post.getFileUrl(), avatarUrl)
                             .setThumbnail("https://i.imgur.com/t6JJWFN.png")
                             .addField("Resolution", resolution, false)
                             .addField("Tags", formattedTags, false)
                             .setImage(post.getFileUrl())
-                            .setFooter("If there is no preview, click on the title to " +
-                                    "see the media (probably a video)", null);
+                            .setFooter("If there is no preview, click on the title to see the " +
+                                    "media (probably a video)", null);
                 });
     }
 
-    private static String formatTags(List<String> tags) {
+    private static String formatTags(final List<String> tags) {
         final StringBuilder tagsBuilder = new StringBuilder();
         for (final String tag : tags) {
             if (tagsBuilder.length() + tag.length() < MAX_TAGS_CHAR) {
-                tagsBuilder.append(String.format("`%s` ", tag));
+                tagsBuilder.append("`%s` ".formatted(tag));
             } else {
                 tagsBuilder.append("...");
                 break;

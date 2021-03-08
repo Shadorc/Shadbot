@@ -13,11 +13,13 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class WallhavenCmd extends BaseCmd {
@@ -25,12 +27,12 @@ public class WallhavenCmd extends BaseCmd {
     private static final String HOME_URL = "https://wallhaven.cc/api/v1/search";
 
     public WallhavenCmd() {
-        super(CommandCategory.IMAGE, "wallhaven", "Search random wallpaper on Wallhaven");
+        super(CommandCategory.IMAGE, "wallhaven", "Search random wallpaper from Wallhaven");
         this.addOption("query", "Search for a wallpaper", false, ApplicationCommandOptionType.STRING);
     }
 
     @Override
-    public Mono<?> execute(Context context) {
+    public Mono<?> execute(final Context context) {
         final String query = context.getOptionAsString("query").orElse("");
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading wallpaper...", context.getAuthorName())
                 .flatMap(messageId -> Mono.zip(WallhavenCmd.getWallpaper(query), context.isChannelNsfw())
@@ -39,18 +41,23 @@ public class WallhavenCmd extends BaseCmd {
                                 return context.editFollowupMessage(messageId, ShadbotUtil.mustBeNsfw());
                             }
 
-                            final String title = String.format("Wallpaper: %s", query.isBlank() ? "random" : query);
-                            return context.editFollowupMessage(messageId, ShadbotUtil.getDefaultEmbed(
-                                    embed -> embed.setAuthor(title, wallpaper.getUrl(), context.getAuthorAvatarUrl())
-                                            .setImage(wallpaper.getPath())
-                                            .addField("Resolution", wallpaper.getResolution(), false)));
+                            final String title = "Wallpaper: %s".formatted(query.isBlank() ? "random" : query);
+                            return context.editFollowupMessage(messageId,
+                                    WallhavenCmd.formatEmbed(context.getAuthorAvatarUrl(), title, wallpaper));
                         }))
                         .switchIfEmpty(context.editFollowupMessage(messageId,
                                 Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers found matching query `%s`",
                                 context.getAuthorName(), query)));
     }
 
-    private static Mono<Wallpaper> getWallpaper(String query) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(final String avatarUrl, final String title, final Wallpaper wallpaper) {
+        return ShadbotUtil.getDefaultEmbed(
+                embed -> embed.setAuthor(title, wallpaper.getUrl(), avatarUrl)
+                        .setImage(wallpaper.getPath())
+                        .addField("Resolution", wallpaper.getResolution(), false));
+    }
+
+    private static Mono<Wallpaper> getWallpaper(final String query) {
         return RequestHelper.fromUrl(WallhavenCmd.buildUrl(query))
                 .to(WallhavenResponse.class)
                 .map(WallhavenResponse::getWallpapers)
@@ -58,7 +65,7 @@ public class WallhavenCmd extends BaseCmd {
                 .map(RandUtil::randValue);
     }
 
-    private static String buildUrl(String query) {
+    private static String buildUrl(final String query) {
         final StringBuilder urlBuilder = new StringBuilder(HOME_URL);
         urlBuilder.append(String.format("?apikey=%s",
                 CredentialManager.getInstance().get(Credential.WALLHAVEN_API_KEY)));
@@ -69,9 +76,9 @@ public class WallhavenCmd extends BaseCmd {
         } else {
             final String keywords = FormatUtil.format(
                     query.split("[, ]"),
-                    keyword -> String.format("+%s", NetUtil.encode(keyword.trim())),
+                    keyword -> "+%s".formatted(NetUtil.encode(keyword.trim())),
                     "");
-            urlBuilder.append(String.format("&q=%s", keywords))
+            urlBuilder.append("&q=%s".formatted(keywords))
                     .append("&sorting=relevance");
         }
 

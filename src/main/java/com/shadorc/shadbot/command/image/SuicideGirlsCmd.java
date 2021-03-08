@@ -7,16 +7,20 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.ShadbotUtil;
+import discord4j.core.spec.EmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
+
+import java.util.function.Consumer;
 
 public class SuicideGirlsCmd extends BaseCmd {
 
     private static final String HOME_URL = "https://www.suicidegirls.com/photos/sg/recent/all/";
 
     public SuicideGirlsCmd() {
-        super(CommandCategory.IMAGE, "suicidegirls", "Show random image on SuicideGirls");
+        super(CommandCategory.IMAGE, "suicidegirls",
+                "Show random image from SuicideGirls");
     }
 
     @Override
@@ -29,12 +33,16 @@ public class SuicideGirlsCmd extends BaseCmd {
 
                     return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading SuicideGirls image...", context.getAuthorName())
                             .zipWith(SuicideGirlsCmd.getRandomSuicideGirl())
-                            .flatMap(TupleUtils.function((messageId, post) ->
-                                    context.editFollowupMessage(messageId, ShadbotUtil.getDefaultEmbed(
-                                            embed -> embed.setAuthor("SuicideGirls", post.getUrl(), context.getAuthorAvatarUrl())
-                                                    .setDescription(String.format("Name: **%s**", post.getName()))
-                                                    .setImage(post.getImageUrl())))));
+                            .flatMap(TupleUtils.function((messageId, post) -> context.editFollowupMessage(messageId,
+                                    SuicideGirlsCmd.formatEmbed(context.getAuthorAvatarUrl(), post))));
                 });
+    }
+
+    private static Consumer<EmbedCreateSpec> formatEmbed(final String avatarUrl, final SuicideGirl post) {
+        return ShadbotUtil.getDefaultEmbed(
+                embed -> embed.setAuthor("SuicideGirls", post.getUrl(), avatarUrl)
+                        .setDescription("Name: **%s**".formatted(post.getName()))
+                        .setImage(post.getImageUrl()));
     }
 
     private static Mono<SuicideGirl> getRandomSuicideGirl() {

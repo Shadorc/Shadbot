@@ -15,6 +15,7 @@ import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -23,6 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
@@ -35,7 +37,7 @@ public class DeviantartCmd extends BaseCmd {
     private final AtomicReference<TokenResponse> token;
 
     public DeviantartCmd() {
-        super(CommandCategory.IMAGE, "deviantart", "Search random image on DeviantArt");
+        super(CommandCategory.IMAGE, "deviantart", "Search random image from DeviantArt");
         this.addOption("query", "Search for an image", true, ApplicationCommandOptionType.STRING);
 
         this.lastTokenGeneration = new AtomicLong();
@@ -43,25 +45,29 @@ public class DeviantartCmd extends BaseCmd {
     }
 
     @Override
-    public Mono<?> execute(Context context) {
+    public Mono<?> execute(final Context context) {
         final String query = context.getOptionAsString("query").orElseThrow();
 
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading image...", context.getAuthorName())
                 .flatMap(messageId -> this.getPopularImage(query)
                         .flatMap(image -> context.editFollowupMessage(messageId,
-                                ShadbotUtil.getDefaultEmbed(
-                                        embed -> embed.setAuthor(String.format("DeviantArt: %s", query), image.getUrl(), context.getAuthorAvatarUrl())
-                                                .setThumbnail("https://i.imgur.com/gT4hHUB.png")
-                                                .addField("Title", image.getTitle(), false)
-                                                .addField("Author", image.getAuthor().getUsername(), false)
-                                                .addField("Category", image.getCategoryPath(), false)
-                                                .setImage(image.getContent().map(Content::getSource).orElseThrow()))))
-                        .switchIfEmpty(context.editFollowupMessage(messageId, Emoji.MAGNIFYING_GLASS
-                                        + " (**%s**) No images found matching query `%s`",
+                                DeviantartCmd.formatEmbed(context.getAuthorAvatarUrl(), query, image)))
+                        .switchIfEmpty(context.editFollowupMessage(messageId,
+                                Emoji.MAGNIFYING_GLASS + " (**%s**) No images found matching query `%s`",
                                 context.getAuthorName(), query)));
     }
 
-    private Mono<Image> getPopularImage(String query) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(final String avatarUrl, final String query, final Image image) {
+        return ShadbotUtil.getDefaultEmbed(
+                embed -> embed.setAuthor("DeviantArt: %s".formatted(query), image.getUrl(), avatarUrl)
+                        .setThumbnail("https://i.imgur.com/gT4hHUB.png")
+                        .addField("Title", image.getTitle(), false)
+                        .addField("Author", image.getAuthor().getUsername(), false)
+                        .addField("Category", image.getCategoryPath(), false)
+                        .setImage(image.getContent().map(Content::getSource).orElseThrow()));
+    }
+
+    private Mono<Image> getPopularImage(final String query) {
         return this.requestAccessToken()
                 .map(token -> String.format("%s?"
                                 + "q=%s"
@@ -71,7 +77,8 @@ public class DeviantartCmd extends BaseCmd {
                                 + "&access_token=%s",
                         BROWSE_POPULAR_URL, NetUtil.encode(query), ThreadLocalRandom.current().nextInt(150),
                         token.getAccessToken()))
-                .flatMap(url -> RequestHelper.fromUrl(url).to(DeviantArtResponse.class))
+                .flatMap(url -> RequestHelper.fromUrl(url)
+                        .to(DeviantArtResponse.class))
                 .flatMapIterable(DeviantArtResponse::getResults)
                 .filter(image -> image.getContent().isPresent())
                 .collectList()
@@ -81,7 +88,9 @@ public class DeviantartCmd extends BaseCmd {
 
     private Mono<TokenResponse> requestAccessToken() {
         if (this.isTokenExpired()) {
-            final String url = String.format("%s?client_id=%s&client_secret=%s&grant_type=client_credentials",
+            final String url = String.format("%s?client_id=%s" +
+                            "&client_secret=%s" +
+                            "&grant_type=client_credentials",
                     OAUTH_URL, CredentialManager.getInstance().get(Credential.DEVIANTART_CLIENT_ID),
                     CredentialManager.getInstance().get(Credential.DEVIANTART_API_SECRET));
             return RequestHelper.fromUrl(url)
