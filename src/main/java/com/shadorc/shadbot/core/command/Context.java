@@ -11,6 +11,7 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
+import discord4j.core.object.command.Interaction;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
@@ -29,6 +30,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Context {
 
@@ -56,20 +58,24 @@ public class Context {
         return this.event.getCommandName();
     }
 
+    public Interaction getInteraction() {
+        return this.event.getInteraction();
+    }
+
     public Snowflake getGuildId() {
-        return this.event.getGuildId().orElseThrow();
+        return this.getInteraction().getGuildId().orElseThrow();
     }
 
     public Snowflake getChannelId() {
-        return this.event.getChannelId();
+        return this.getInteraction().getChannelId();
     }
 
     public Member getAuthor() {
-        return this.event.getMember().orElseThrow();
+        return this.getInteraction().getMember().orElseThrow();
     }
 
     public Snowflake getAuthorId() {
-        return this.event.getUser().getId();
+        return this.getInteraction().getUser().getId();
     }
 
     public String getAuthorName() {
@@ -81,15 +87,30 @@ public class Context {
     }
 
     public Mono<Guild> getGuild() {
-        return this.event.getGuild();
+        return this.getInteraction().getGuild();
     }
 
     public Mono<TextChannel> getChannel() {
-        return this.event.getChannel();
+        return this.getInteraction().getChannel();
+    }
+
+    private Optional<ApplicationCommandInteractionOption> getOptionRecursively(ApplicationCommandInteractionOption option, String name) {
+        final Optional<ApplicationCommandInteractionOption> optionOpt = option.getOption(name);
+        if (optionOpt.isPresent()) {
+            return optionOpt;
+        }
+        return option.getOptions().stream()
+                .map(optionItr -> this.getOptionRecursively(optionItr, name))
+                .findFirst()
+                .flatMap(Function.identity());
     }
 
     public Optional<ApplicationCommandInteractionOptionValue> getOption(String name) {
-        return this.event.getCommandInteraction().getOption(name).flatMap(ApplicationCommandInteractionOption::getValue);
+        return this.getInteraction().getCommandInteraction().getOptions().stream()
+                .map(option -> this.getOptionRecursively(option, name))
+                .findFirst()
+                .flatMap(Function.identity())
+                .flatMap(ApplicationCommandInteractionOption::getValue);
     }
 
     public Optional<String> getOptionAsString(String name) {

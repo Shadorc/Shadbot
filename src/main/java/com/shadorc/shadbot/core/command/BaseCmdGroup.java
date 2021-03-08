@@ -22,7 +22,7 @@ public abstract class BaseCmdGroup extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String cmdName = context.getEvent().getCommandInteraction().getOptions().get(0).getName();
+        final String cmdName = context.getEvent().getInteraction().getCommandInteraction().getOptions().get(0).getName();
         return this.cmds.get(cmdName).execute(context);
     }
 
