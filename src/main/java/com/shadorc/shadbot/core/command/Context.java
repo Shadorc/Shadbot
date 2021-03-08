@@ -27,10 +27,10 @@ import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class Context {
 
@@ -94,22 +94,13 @@ public class Context {
         return this.getInteraction().getChannel();
     }
 
-    private Optional<ApplicationCommandInteractionOption> getOptionRecursively(ApplicationCommandInteractionOption option, String name) {
-        final Optional<ApplicationCommandInteractionOption> optionOpt = option.getOption(name);
-        if (optionOpt.isPresent()) {
-            return optionOpt;
-        }
-        return option.getOptions().stream()
-                .map(optionItr -> this.getOptionRecursively(optionItr, name))
-                .findFirst()
-                .flatMap(Function.identity());
-    }
-
     public Optional<ApplicationCommandInteractionOptionValue> getOption(String name) {
-        return this.getInteraction().getCommandInteraction().getOptions().stream()
-                .map(option -> this.getOptionRecursively(option, name))
+        final List<ApplicationCommandInteractionOption> options = this.getInteraction().getCommandInteraction().getOptions();
+        final List<ApplicationCommandInteractionOption> list = new ArrayList<>(options);
+        options.forEach(option -> list.addAll(option.getOptions()));
+        return list.stream()
+                .filter(option -> option.getName().equals(name))
                 .findFirst()
-                .flatMap(Function.identity())
                 .flatMap(ApplicationCommandInteractionOption::getValue);
     }
 
@@ -130,7 +121,8 @@ public class Context {
     }
 
     public Mono<Member> getOptionAsMember(String name) {
-        return Mono.justOrEmpty(this.getOption(name)).flatMap(ApplicationCommandInteractionOptionValue::asUser)
+        return Mono.justOrEmpty(this.getOption(name))
+                .flatMap(ApplicationCommandInteractionOptionValue::asUser)
                 .flatMap(user -> user.asMember(getGuildId()));
     }
 

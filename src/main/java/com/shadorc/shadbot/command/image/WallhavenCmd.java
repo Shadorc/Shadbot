@@ -34,6 +34,7 @@ public class WallhavenCmd extends BaseCmd {
     @Override
     public Mono<?> execute(final Context context) {
         final String query = context.getOptionAsString("query").orElse("");
+
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading wallpaper...", context.getAuthorName())
                 .flatMap(messageId -> Mono.zip(WallhavenCmd.getWallpaper(query), context.isChannelNsfw())
                         .flatMap(TupleUtils.function((wallpaper, isNsfw) -> {
