@@ -1,5 +1,7 @@
 package com.shadorc.shadbot.core.command;
 
+import com.shadorc.shadbot.command.info.AchievementsCmd;
+import com.shadorc.shadbot.command.info.PingCmd;
 import com.shadorc.shadbot.command.info.info.InfoCmd;
 import com.shadorc.shadbot.command.info.support.SupportCmd;
 import discord4j.rest.service.ApplicationService;
@@ -23,7 +25,9 @@ public class CommandManager {
     private final Map<String, BaseCmd> commandsMap;
 
     private CommandManager() {
-        this.commandsMap = CommandManager.initialize(new InfoCmd(), new SupportCmd());
+        this.commandsMap = CommandManager.initialize(
+                new InfoCmd(), new SupportCmd(),
+                new AchievementsCmd(), new PingCmd());
     }
 
     private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {

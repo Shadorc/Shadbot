@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 public class RolelistCmd extends BaseCmd {
 
+    // TODO: Uses varargs when available
+    // TODO: Move to moderation category?
     public RolelistCmd() {
         super(CommandCategory.INFO, "rolelist", "Show a list of members with specific role(s)");
         this.addOption("role_1", "The first role to have", true, ApplicationCommandOptionType.ROLE);

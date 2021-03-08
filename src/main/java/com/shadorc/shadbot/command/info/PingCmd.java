@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 public class PingCmd extends BaseCmd {
 
     public PingCmd() {
-        super(CommandCategory.INFO, "ping", "Show bot's ping");
+        super(CommandCategory.INFO, "ping", "Show current ping");
     }
 
     @Override

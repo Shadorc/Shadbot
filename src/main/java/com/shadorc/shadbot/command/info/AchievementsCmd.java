@@ -38,11 +38,9 @@ public class AchievementsCmd extends BaseCmd {
 
     private static Consumer<EmbedCreateSpec> formatEmbed(EnumSet<Achievement> achievements, Member member) {
         return ShadbotUtil.getDefaultEmbed(embed -> {
-            embed.setAuthor(String.format("%s's Achievements", member.getUsername()),
-                    null, member.getAvatarUrl());
+            embed.setAuthor(String.format("%s's Achievements", member.getUsername()), null, member.getAvatarUrl());
             embed.setThumbnail("https://i.imgur.com/IMHDI7D.png");
-            embed.setTitle(String.format("%d/%d achievement(s) unlocked.",
-                    achievements.size(), Achievement.values().length));
+            embed.setTitle(String.format("%d/%d achievement(s) unlocked.", achievements.size(), Achievement.values().length));
 
             final StringBuilder description = new StringBuilder();
             for (final Achievement achievement : Achievement.values()) {
@@ -53,8 +51,8 @@ public class AchievementsCmd extends BaseCmd {
     }
 
     private static String formatAchievement(Achievement achievement, boolean unlocked) {
-        return String.format("%s **%s**%n%s%n",
-                unlocked ? achievement.getEmoji() : Emoji.LOCK, achievement.getTitle(), achievement.getDescription());
+        final Emoji emoji = unlocked ? achievement.getEmoji() : Emoji.LOCK;
+        return "%s **%s**%n%s%n".formatted(emoji, achievement.getTitle(), achievement.getDescription());
     }
 
 }

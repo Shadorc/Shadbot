@@ -16,8 +16,7 @@ import java.time.Duration;
 public class FeedbackCmd extends BaseCmd {
 
     public FeedbackCmd() {
-        super(CommandCategory.INFO, "feedback",
-                "Send a feedback about Shadbot");
+        super(CommandCategory.INFO, "feedback", "Send a feedback");
         this.setRateLimiter(new RateLimiter(1, Duration.ofMinutes(10)));
         this.addOption("text", "Your feedback", true, ApplicationCommandOptionType.STRING);
     }
