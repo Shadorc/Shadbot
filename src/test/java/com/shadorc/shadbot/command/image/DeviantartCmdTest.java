@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class ImageCmdTest extends CmdTest<ImageCmd> {
+public class DeviantartCmdTest extends CmdTest<DeviantartCmd> {
 
     @Test
     public void testGetPopularImage() {

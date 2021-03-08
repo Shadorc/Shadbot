@@ -20,12 +20,12 @@ import reactor.function.TupleUtils;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class WallpaperCmd extends BaseCmd {
+public class WallhavenCmd extends BaseCmd {
 
     private static final String HOME_URL = "https://wallhaven.cc/api/v1/search";
 
-    public WallpaperCmd() {
-        super(CommandCategory.IMAGE, "wallpaper", "Search random wallpaper on Wallhaven");
+    public WallhavenCmd() {
+        super(CommandCategory.IMAGE, "wallhaven", "Search random wallpaper on Wallhaven");
         this.addOption("query", "Search for a wallpaper", false, ApplicationCommandOptionType.STRING);
     }
 
@@ -33,7 +33,7 @@ public class WallpaperCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final String query = context.getOptionAsString("query").orElse("");
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading wallpaper...", context.getAuthorName())
-                .flatMap(messageId -> Mono.zip(WallpaperCmd.getWallpaper(query), context.isChannelNsfw())
+                .flatMap(messageId -> Mono.zip(WallhavenCmd.getWallpaper(query), context.isChannelNsfw())
                         .flatMap(TupleUtils.function((wallpaper, isNsfw) -> {
                             if (!"sfw".equals(wallpaper.getPurity()) && !isNsfw) {
                                 return context.editFollowupMessage(messageId, ShadbotUtil.mustBeNsfw());
@@ -51,7 +51,7 @@ public class WallpaperCmd extends BaseCmd {
     }
 
     private static Mono<Wallpaper> getWallpaper(String query) {
-        return RequestHelper.fromUrl(WallpaperCmd.buildUrl(query))
+        return RequestHelper.fromUrl(WallhavenCmd.buildUrl(query))
                 .to(WallhavenResponse.class)
                 .map(WallhavenResponse::getWallpapers)
                 .filter(Predicate.not(List::isEmpty))

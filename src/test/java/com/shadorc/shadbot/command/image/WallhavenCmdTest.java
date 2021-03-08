@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class WallpaperCmdTest extends CmdTest<WallpaperCmd> {
+public class WallhavenCmdTest extends CmdTest<WallhavenCmd> {
 
     @Test
     public void testGetWallpaperKeyword() {
