@@ -4,10 +4,7 @@ import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.ApplicationCommandData;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.discordjson.json.*;
 import discord4j.rest.service.ApplicationService;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
@@ -57,6 +54,7 @@ public abstract class BaseCmd {
                     .description(option.getDescription())
                     .required(option.isRequired())
                     .type(option.getType())
+                    .choices(option.getChoices())
                     .build());
         }
         return optionsData;
@@ -125,6 +123,11 @@ public abstract class BaseCmd {
 
     public void addOption(String name, String description, boolean isRequired, ApplicationCommandOptionType type) {
         this.options.add(new Option(name, description, isRequired, type));
+    }
+
+    public void addOption(String name, String description, boolean isRequired, ApplicationCommandOptionType type,
+                          List<ApplicationCommandOptionChoiceData> choices) {
+        this.options.add(new Option(name, description, isRequired, type, choices));
     }
 
 }
