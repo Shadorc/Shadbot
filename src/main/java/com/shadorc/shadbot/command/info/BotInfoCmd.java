@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.info.info;
+package com.shadorc.shadbot.command.info;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 import com.shadorc.shadbot.Shadbot;

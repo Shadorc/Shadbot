@@ -257,6 +257,11 @@ public class DiscordUtil {
                         .thenReturn(channel));
     }
 
+    /**
+     * @param enumClass The enumeration to convert as a list of choices.
+     * @param <T>       The type of enumeration.
+     * @return An ordered list of {@link ApplicationCommandOptionChoiceData} converted from {@code enumClass}.
+     */
     public static <T extends Enum<T>> List<ApplicationCommandOptionChoiceData> toOptions(Class<T> enumClass) {
         return Arrays.stream(enumClass.getEnumConstants())
                 .map(Enum::name)
