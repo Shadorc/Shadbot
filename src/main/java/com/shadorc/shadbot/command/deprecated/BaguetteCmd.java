@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.hidden;
+package com.shadorc.shadbot.command.deprecated;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;

@@ -7,6 +7,7 @@ import com.shadorc.shadbot.command.info.PingCmd;
 import com.shadorc.shadbot.command.info.info.InfoCmd;
 import com.shadorc.shadbot.command.info.support.SupportCmd;
 import com.shadorc.shadbot.command.moderation.ModerationCmd;
+import com.shadorc.shadbot.command.owner.OwnerCmd;
 import discord4j.rest.service.ApplicationService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -30,7 +31,7 @@ public class CommandManager {
     private CommandManager() {
         this.commandsMap = CommandManager.initialize(
                 new InfoCmd(), new SupportCmd(), new AchievementsCmd(), new PingCmd(), new ImageCmd(),
-                new ModerationCmd());
+                new ModerationCmd(), new OwnerCmd());
     }
 
     private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {

@@ -7,7 +7,6 @@ import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
-import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.ApplicationCommandOptionType;
@@ -18,27 +17,20 @@ public class SendMessageCmd extends BaseCmd {
 
     public SendMessageCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "send_message", "Send a private message to a user");
-
         this.addOption("user", "The user to send a message to", true, ApplicationCommandOptionType.USER);
         this.addOption("message", "The message to send", true, ApplicationCommandOptionType.STRING);
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final Snowflake userId = Snowflake.of(context.getOptionAsString("user").orElseThrow());
-        if (userId.equals(context.getClient().getSelfId())) {
-            return Mono.error(new CommandException("I can't send a private message to myself."));
-        }
-
-        return context.getClient()
-                .getUserById(userId)
+        return context.getOptionAsUser("user")
                 .switchIfEmpty(Mono.error(new CommandException("User not found.")))
+                .filter(user -> !user.getId().equals(context.getClient().getSelfId()))
+                .switchIfEmpty(Mono.error(new CommandException("I can't send a private message to myself.")))
+                .filter(user -> !user.isBot())
+                .switchIfEmpty(Mono.error(new CommandException("I can't send private message to other bots.")))
                 .flatMap(user -> {
-                    if (user.isBot()) {
-                        return Mono.error(new CommandException("I can't send private message to other bots."));
-                    }
-
-                    final String message = context.getOptionAsString("messahe").orElseThrow();
+                    final String message = context.getOptionAsString("message").orElseThrow();
                     return user.getPrivateChannel()
                             .cast(MessageChannel.class)
                             .flatMap(privateChannel -> DiscordUtil.sendMessage(message, privateChannel))

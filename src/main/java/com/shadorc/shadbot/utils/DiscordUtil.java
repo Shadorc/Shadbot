@@ -19,6 +19,7 @@ import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.channel.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionChoiceData;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.AllowedMentions;
 import discord4j.rest.util.Permission;
@@ -27,10 +28,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
@@ -255,6 +255,14 @@ public class DiscordUtil {
                 .cast(VoiceChannel.class)
                 .flatMap(channel -> DiscordUtil.requirePermissions(channel, Permission.CONNECT, Permission.SPEAK, Permission.VIEW_CHANNEL)
                         .thenReturn(channel));
+    }
+
+    public static <T extends Enum<T>> List<ApplicationCommandOptionChoiceData> toOptions(Class<T> enumClass) {
+        return Arrays.stream(enumClass.getEnumConstants())
+                .map(Enum::name)
+                .map(String::toLowerCase)
+                .map(it -> ApplicationCommandOptionChoiceData.builder().name(it).value(it).build())
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 
 }

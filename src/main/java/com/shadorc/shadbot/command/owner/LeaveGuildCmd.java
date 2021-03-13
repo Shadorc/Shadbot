@@ -18,7 +18,6 @@ public class LeaveGuildCmd extends BaseCmd {
 
     public LeaveGuildCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "leave_guild", "Leave a guild");
-
         this.addOption("guildId", "The ID of the guild to leave", true, ApplicationCommandOptionType.STRING);
     }
 
@@ -28,7 +27,7 @@ public class LeaveGuildCmd extends BaseCmd {
 
         final Long guildId = NumberUtil.toPositiveLongOrNull(arg);
         if (guildId == null) {
-            return Mono.error(new CommandException(String.format("`%s` is not a valid guild ID.", arg)));
+            return Mono.error(new CommandException("`%s` is not a valid guild ID.".formatted(arg)));
         }
 
         return context.getClient()
@@ -36,7 +35,7 @@ public class LeaveGuildCmd extends BaseCmd {
                 .onErrorMap(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
                         err -> new CommandException("Guild not found."))
                 .flatMap(Guild::leave)
-                .then(context.createFollowupMessage(Emoji.CHECK_MARK + " Guild with ID **%d** left.", guildId));
+                .then(context.createFollowupMessage(Emoji.CHECK_MARK + " Guild (ID: **%d**) left.", guildId));
     }
 
 }

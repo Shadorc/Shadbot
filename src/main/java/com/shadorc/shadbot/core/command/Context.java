@@ -6,6 +6,7 @@ import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.music.NoMusicException;
 import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.EnumUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.InteractionCreateEvent;
@@ -15,6 +16,7 @@ import discord4j.core.object.command.Interaction;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -108,6 +110,10 @@ public class Context {
         return this.getOption(name).map(ApplicationCommandInteractionOptionValue::asString);
     }
 
+    public <T extends Enum<T>> Optional<T> getOptionAsEnum(Class<T> enumClass, String name) {
+        return this.getOptionAsString(name).map(it -> EnumUtil.parseEnum(enumClass, it));
+    }
+
     public Optional<Snowflake> getOptionAsSnowflake(String name) {
         return this.getOption(name).map(ApplicationCommandInteractionOptionValue::asSnowflake);
     }
@@ -118,6 +124,11 @@ public class Context {
 
     public Optional<Boolean> getOptionAsBool(String name) {
         return this.getOption(name).map(ApplicationCommandInteractionOptionValue::asBoolean);
+    }
+
+    public Mono<User> getOptionAsUser(String name) {
+        return Mono.justOrEmpty(this.getOption(name))
+                .flatMap(ApplicationCommandInteractionOptionValue::asUser);
     }
 
     public Mono<Member> getOptionAsMember(String name) {
@@ -163,7 +174,7 @@ public class Context {
     }
 
     public Mono<Snowflake> createFollowupMessage(String format, Object... args) {
-        return this.event.getInteractionResponse().createFollowupMessage(String.format(format, args))
+        return this.event.getInteractionResponse().createFollowupMessage(format.formatted(args))
                 .map(MessageData::id)
                 .map(Snowflake::of);
     }
@@ -180,7 +191,7 @@ public class Context {
     }
 
     public Mono<MessageData> editFollowupMessage(Snowflake messageId, String format, Object... args) {
-        return this.editFollowupMessage(messageId, String.format(format, args));
+        return this.editFollowupMessage(messageId, format.formatted(args));
     }
 
     public Mono<MessageData> editFollowupMessage(Snowflake messageId, String content) {
@@ -195,7 +206,7 @@ public class Context {
         embed.accept(mutatedSpec);
         return this.event.getInteractionResponse()
                 .editFollowupMessage(messageId.asLong(), ImmutableWebhookMessageEditRequest.builder()
-                        .content("Done!") // TODO: Remove content
+                        .content("")
                         .embeds(List.of(mutatedSpec.asRequest()))
                         .build(), true);
     }

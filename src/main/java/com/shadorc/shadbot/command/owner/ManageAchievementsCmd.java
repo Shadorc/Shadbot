@@ -8,9 +8,8 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.EnumUtil;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.FormatUtil;
-import discord4j.common.util.Snowflake;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -24,28 +23,19 @@ public class ManageAchievementsCmd extends BaseCmd {
 
     public ManageAchievementsCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "manage_achievements", "Manage user's achievements");
-
-        this.addOption("action", FormatUtil.options(Action.class), true, ApplicationCommandOptionType.STRING);
-        this.addOption("achievement", FormatUtil.options(Achievement.class), true, ApplicationCommandOptionType.STRING);
+        this.addOption("action", "The action", true, ApplicationCommandOptionType.STRING,
+                DiscordUtil.toOptions(Action.class));
+        this.addOption("achievement", "The achievement", true,
+                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Achievement.class));
         this.addOption("user", "The user", true, ApplicationCommandOptionType.USER);
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final String actionOpt = context.getOptionAsString("action").orElseThrow();
-        final String achievementOpt = context.getOptionAsString("achievement").orElseThrow();
-        final Snowflake userId = Snowflake.of(context.getOptionAsString("user").orElseThrow());
+        final Action action = context.getOptionAsEnum(Action.class, "action").orElseThrow();
+        final Achievement achievement = context.getOptionAsEnum(Achievement.class, "achievement").orElseThrow();
 
-        final Action action = EnumUtil.parseEnum(Action.class, actionOpt,
-                new CommandException(String.format("`%s` is not a valid action. %s",
-                        actionOpt, FormatUtil.options(Action.class))));
-
-        final Achievement achievement = EnumUtil.parseEnum(Achievement.class, achievementOpt,
-                new CommandException(String.format("`%s` is not a valid achievement. %s",
-                        achievementOpt, FormatUtil.options(Achievement.class))));
-
-        return context.getClient()
-                .getUserById(userId)
+        return context.getOptionAsUser("user")
                 .switchIfEmpty(Mono.error(new CommandException("User not found.")))
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
                         err -> Mono.empty())
