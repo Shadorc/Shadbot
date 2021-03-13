@@ -19,8 +19,7 @@ public class SuicideGirlsCmd extends BaseCmd {
     private static final String HOME_URL = "https://www.suicidegirls.com/photos/sg/recent/all/";
 
     public SuicideGirlsCmd() {
-        super(CommandCategory.IMAGE, "suicidegirls",
-                "Show random image from SuicideGirls");
+        super(CommandCategory.IMAGE, "suicidegirls", "Show random image from SuicideGirls");
     }
 
     @Override
