@@ -9,7 +9,7 @@ public class ImageCmd extends BaseCmdGroup {
 
     public ImageCmd() {
         super(CommandCategory.IMAGE, "image", "Search random image from different sources",
-                List.of(new DeviantartCmd(), new Rule34Cmd(), new SuicideGirlsCmd(), new WallhavenCmd()));
+                List.of(new DeviantartCmd(), new Rule34Cmd(), new SuicideGirlsCmd(), new WallhavenCmd(), new XkcdCmd()));
     }
 
 }

@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.info;
+package com.shadorc.shadbot.command.moderation;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
@@ -21,9 +21,8 @@ import java.util.stream.Collectors;
 public class RolelistCmd extends BaseCmd {
 
     // TODO: Uses varargs when available
-    // TODO: Move to moderation category?
     public RolelistCmd() {
-        super(CommandCategory.INFO, "rolelist", "Show a list of members with specific role(s)");
+        super(CommandCategory.MODERATION, "rolelist", "Show a list of members with specific role(s)");
         this.addOption("role_1", "The first role to have", true, ApplicationCommandOptionType.ROLE);
         this.addOption("role_2", "The second role to have", false, ApplicationCommandOptionType.ROLE);
         this.addOption("role_3", "The third role to have", false, ApplicationCommandOptionType.ROLE);
@@ -31,7 +30,8 @@ public class RolelistCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return Flux.merge(context.getOptionAsRole("role_1"),
+        return Flux.merge(
+                context.getOptionAsRole("role_1"),
                 context.getOptionAsRole("role_2"),
                 context.getOptionAsRole("role_3"))
                 .collectList()
@@ -56,8 +56,8 @@ public class RolelistCmd extends BaseCmd {
                             embed.setAuthor(String.format("Rolelist: %s", rolesFormatted), null, context.getAuthorAvatarUrl());
 
                             if (usernames.isEmpty()) {
-                                embed.setDescription(String.format("There is nobody with %s.",
-                                        mentionedRoles.size() == 1 ? "this role" : "these roles"));
+                                embed.setDescription("There is nobody with %s."
+                                        .formatted(mentionedRoles.size() == 1 ? "this role" : "these roles"));
                                 return;
                             }
 

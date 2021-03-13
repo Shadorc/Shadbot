@@ -13,6 +13,7 @@ public enum CommandCategory {
     GAMESTATS("Game Stats"),
     INFO("Info"),
     ADMIN("Admin"),
+    MODERATION("Moderation"),
     OWNER("Owner");
 
     private final String name;
