@@ -27,13 +27,13 @@ public class UrbanCmd extends BaseCmd {
     private static final String HOME_URL = "http://api.urbandictionary.com/v0/define";
 
     public UrbanCmd() {
-        super(CommandCategory.UTILS, "urban", "Show the first Urban Dictionary definition for a search");
-        this.addOption("word", "The word to search", true, ApplicationCommandOptionType.STRING);
+        super(CommandCategory.UTILS, "urban", "Search for Urban Dictionary definition");
+        this.addOption("word", "Search for a word", true, ApplicationCommandOptionType.STRING);
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final String word = context.getOptionAsString("word").orElseThrow();
+        final String query = context.getOptionAsString("word").orElseThrow();
 
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
@@ -43,12 +43,12 @@ public class UrbanCmd extends BaseCmd {
 
                     return context.createFollowupMessage(
                             Emoji.HOURGLASS + " (**%s**) Loading Urban Dictionary definition...", context.getAuthorName())
-                            .flatMap(messageId -> UrbanCmd.getUrbanDefinition(word)
+                            .flatMap(messageId -> UrbanCmd.getUrbanDefinition(query)
                                     .flatMap(urbanDef -> context.editFollowupMessage(messageId,
                                             UrbanCmd.formatEmbed(urbanDef, context.getAuthorAvatarUrl())))
                                     .switchIfEmpty(context.editFollowupMessage(messageId,
-                                            Emoji.MAGNIFYING_GLASS + " (**%s**) No Urban Dictionary definition found for `%s`",
-                                            context.getAuthorName(), word)));
+                                            Emoji.MAGNIFYING_GLASS + " (**%s**) No definition matching word `%s`",
+                                            context.getAuthorName(), query)));
                 });
     }
 
@@ -57,8 +57,7 @@ public class UrbanCmd extends BaseCmd {
         final String example = StringUtil.abbreviate(urbanDef.getExample(), Field.MAX_VALUE_LENGTH);
         return ShadbotUtil.getDefaultEmbed(
                 embed -> {
-                    embed.setAuthor(String.format("Urban Dictionary: %s",
-                            urbanDef.getWord()), urbanDef.getPermalink(), avatarUrl)
+                    embed.setAuthor("Urban Dictionary: %s".formatted(urbanDef.getWord()), urbanDef.getPermalink(), avatarUrl)
                             .setThumbnail("https://i.imgur.com/7KJtwWp.png")
                             .setDescription(definition);
 
@@ -68,8 +67,8 @@ public class UrbanCmd extends BaseCmd {
                 });
     }
 
-    private static Mono<UrbanDefinition> getUrbanDefinition(String search) {
-        final String url = String.format("%s?term=%s", HOME_URL, NetUtil.encode(search));
+    private static Mono<UrbanDefinition> getUrbanDefinition(String query) {
+        final String url = String.format("%s?term=%s", HOME_URL, NetUtil.encode(query));
         return RequestHelper.fromUrl(url)
                 .to(UrbanDictionaryResponse.class)
                 .flatMapIterable(UrbanDictionaryResponse::getDefinitions)

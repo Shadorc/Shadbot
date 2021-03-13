@@ -32,24 +32,27 @@ import reactor.util.retry.Retry;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 public class LyricsCmd extends BaseCmd {
 
     private static final int MAX_LYRICS_LENGTH = Embed.MAX_DESCRIPTION_LENGTH / 3;
     private static final int MAX_TITLE_LENGTH = Embed.MAX_TITLE_LENGTH / 3;
+    private static final int MAX_RETRY = 5;
 
+    private static final String HOME_URL = "https://www.musixmatch.com";
     // Make html() preserve linebreak and spacing
     private static final OutputSettings PRESERVE_FORMAT = new OutputSettings().prettyPrint(false);
-    private static final String HOME_URL = "https://www.musixmatch.com";
-    private static final int MAX_RETRY = 5;
     private static final Pattern PATTERN = Pattern.compile("(?i)official|officiel|clip|video|music|\\[|]|\\(|\\)");
-    private static final CommandException NO_TRACK_EXCEPTION = new CommandException(
+    private static final Supplier<CommandException> NO_TRACK_EXCEPTION = () -> new CommandException(
             "You are currently not listening to music, please provide a music name to search.");
 
     public LyricsCmd() {
-        super(CommandCategory.UTILS, "lyrics", "Show lyrics for a song or for the current music");
-        this.addOption("music", "Music's name to search", false, ApplicationCommandOptionType.STRING);
+        super(CommandCategory.UTILS, "lyrics", "Search for music lyrics");
+        this.addOption("music", "Search lyrics for a music or for the music currently playing", false,
+                ApplicationCommandOptionType.STRING);
     }
 
     @Override
@@ -60,7 +63,7 @@ public class LyricsCmd extends BaseCmd {
                         .flatMap(musixmatch -> context.editFollowupMessage(messageId,
                                 LyricsCmd.formatEmbed(musixmatch, context.getAuthorAvatarUrl())))
                         .switchIfEmpty(context.editFollowupMessage(messageId,
-                                Emoji.MAGNIFYING_GLASS + " (**%s**) No Lyrics found for `%s`",
+                                Emoji.MAGNIFYING_GLASS + " (**%s**) No lyrics found matching `%s`",
                                 context.getAuthorName(), search)));
     }
 
@@ -68,8 +71,7 @@ public class LyricsCmd extends BaseCmd {
         final String artist = StringUtil.abbreviate(musixmatch.getArtist(), MAX_TITLE_LENGTH);
         final String title = StringUtil.abbreviate(musixmatch.getTitle(), MAX_TITLE_LENGTH);
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor(String.format("Lyrics: %s - %s", artist, title),
-                        musixmatch.getUrl(), avatarUrl)
+                embed -> embed.setAuthor("Lyrics: %s - %s".formatted(artist, title), musixmatch.getUrl(), avatarUrl)
                         .setThumbnail(musixmatch.getImageUrl())
                         .setDescription(StringUtil.abbreviate(musixmatch.getLyrics(), MAX_LYRICS_LENGTH))
                         .setFooter("Click on the title to see the full version",
@@ -84,7 +86,7 @@ public class LyricsCmd extends BaseCmd {
                 .filter(musixmatch -> !musixmatch.getLyrics().isBlank());
     }
 
-    /*
+    /**
      * @return The search term, either the current playing music title or the context argument.
      */
     private static String getSearch(Context context) {
@@ -92,11 +94,11 @@ public class LyricsCmd extends BaseCmd {
                 .orElseGet(() -> {
                     final GuildMusic guildMusic = MusicManager.getInstance()
                             .getGuildMusic(context.getGuildId())
-                            .orElseThrow(() -> NO_TRACK_EXCEPTION);
+                            .orElseThrow(NO_TRACK_EXCEPTION);
 
                     final AudioTrack track = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack();
                     if (track == null) {
-                        throw NO_TRACK_EXCEPTION;
+                        throw NO_TRACK_EXCEPTION.get();
                     }
                     final AudioTrackInfo info = track.getInfo();
                     // Remove from title (case insensitive): official, video, music, [, ], (, )
@@ -121,16 +123,16 @@ public class LyricsCmd extends BaseCmd {
                 .retryWhen(Retry.max(MAX_RETRY)
                         .filter(ServerAccessException.class::isInstance))
                 .onErrorMap(Exceptions::isRetryExhausted,
-                        err -> new IOException(String.format("Musixmatch does not redirect to the correct page: %s", url)));
+                        err -> new IOException("Musixmatch does not redirect to the correct page: %s".formatted(url)));
     }
 
-    private static Mono<String> getCorrectedUrl(String search) {
-        final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtil.encode(search));
+    private static Mono<String> getCorrectedUrl(String query) {
+        final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtil.encode(query));
         // Make a search request on the site
         return RequestHelper.request(url)
                 .map(Jsoup::parse)
                 .map(doc -> doc.getElementsByClass("media-card-title"))
-                .filter(elements -> !elements.isEmpty())
+                .filter(Predicate.not(Elements::isEmpty))
                 .map(Elements::first)
                 // Find the first element containing "title" (generally the best result) and get its URL
                 .map(trackList -> HOME_URL + trackList.getElementsByClass("title").attr("href"));

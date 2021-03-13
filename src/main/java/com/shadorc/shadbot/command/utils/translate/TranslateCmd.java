@@ -23,49 +23,43 @@ public class TranslateCmd extends BaseCmd {
 
     public TranslateCmd() {
         super(CommandCategory.UTILS, "translate", "Translate a text");
-        this.addOption("source_lang",
-                "Source language, if not specified, it will be automatically detected",
-                false,
+        this.addOption("source_lang", "Source language, 'auto' to automatically detect",
+                true, ApplicationCommandOptionType.STRING);
+        this.addOption("destination_lang", "Destination language", true,
                 ApplicationCommandOptionType.STRING);
-        this.addOption("destination_lang",
-                "Destination language",
-                true,
-                ApplicationCommandOptionType.STRING);
-        this.addOption("text",
-                "The text to translate",
-                true,
-                ApplicationCommandOptionType.STRING);
+        this.addOption("text", "The text to translate", true, ApplicationCommandOptionType.STRING);
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final Optional<String> sourceLang = context.getOptionAsString("source_lang");
+        final String sourceLang = context.getOptionAsString("source_lang").orElseThrow();
         final String destLang = context.getOptionAsString("destination_lang").orElseThrow();
         final String text = context.getOptionAsString("text").orElseThrow();
 
         final TranslateData data = new TranslateData();
         data.setSourceText(text);
         try {
-            data.setSourceLang(sourceLang.orElse(null));
+            data.setSourceLang(sourceLang);
             data.setDestLang(destLang);
         } catch (final IllegalArgumentException err) {
-            throw new CommandException(String.format("%s. Use `/help %s` to see a complete list of supported languages.",
-                    err.getMessage(), this.getName()));
+            return Mono.error(new CommandException("%s. Use `/help %s` to see a complete list of supported languages."
+                    .formatted(err.getMessage(), this.getName())));
         }
 
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading translation...", context.getAuthorName())
                 .zipWith(TranslateCmd.getTranslation(data))
-                .map(TupleUtils.function((messageId, translatedText) ->
-                        context.editFollowupMessage(messageId, TranslateCmd.formatEmbed(context.getAuthorAvatarUrl(), data, translatedText))))
+                .flatMap(TupleUtils.function((messageId, translatedText) ->
+                        context.editFollowupMessage(messageId,
+                                TranslateCmd.formatEmbed(data, context.getAuthorAvatarUrl(), translatedText))))
                 .onErrorMap(IllegalArgumentException.class,
-                        err -> new CommandException(String.format("%s. Use `/help %s` to see a complete list of supported languages.",
-                                err.getMessage(), this.getName())));
+                        err -> new CommandException("%s. Use `/help %s` to see a complete list of supported languages."
+                                .formatted(err.getMessage(), this.getName())));
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(String avatarUrl, TranslateData data, String translatedText) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(TranslateData data, String avatarUrl, String translatedText) {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor("Translation", null, avatarUrl)
-                        .setDescription(String.format("**%s**%n%s%n%n**%s**%n%s",
+                        .setDescription("**%s**%n%s%n%n**%s**%n%s".formatted(
                                 StringUtil.capitalize(TranslateData.isoToLang(data.getSourceLang())), data.getSourceText(),
                                 StringUtil.capitalize(TranslateData.isoToLang(data.getDestLang())), translatedText)));
     }
@@ -107,9 +101,9 @@ public class TranslateCmd extends BaseCmd {
     @Override
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return CommandHelpBuilder.create(this, context)
-                .setExample(String.format("`/%s en fr \"How are you ?\"`", this.getName()))
-                .addField("Documentation", "List of supported languages: "
-                        + "https://cloud.google.com/translate/docs/languages", false)
+                .setExample("`/%s en fr \"How are you ?\"`".formatted(this.getName()))
+                .addField("Documentation", "List of supported languages: " +
+                        "https://cloud.google.com/translate/docs/languages", false)
                 .build();
     }
 

@@ -9,20 +9,22 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class TranslateData {
 
-    private static final IllegalArgumentException EQUAL_LANGS_EXCEPTION =
-            new IllegalArgumentException("The destination language must be different from the source one");
     private static final String API_URL = "https://translate.googleapis.com/translate_a/single";
-    private static final int CHARACTERS_LIMIT = 150;
     private static final String AUTO = "auto";
+    private static final int CHARACTERS_LIMIT = 150;
 
+    private static final Supplier<IllegalArgumentException> EQUAL_LANGS_EXCEPTION = () ->
+            new IllegalArgumentException("The destination language must be different from the source one");
     private static final Map<String, String> LANG_ISO_MAP = Arrays.stream(Locale.getISOLanguages())
             .collect(Collectors.toUnmodifiableMap(
                     iso -> new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(),
-                    iso -> iso,
+                    Function.identity(),
                     (value1, value2) -> value1));
     private static final Map<String, String> ISO_LANG_MAP = MapUtil.inverse(LANG_ISO_MAP);
 
@@ -36,15 +38,14 @@ public class TranslateData {
 
     public void setSourceText(final String sourceText) {
         if (sourceText.length() > CHARACTERS_LIMIT) {
-            throw new CommandException(
-                    String.format("The text to translate cannot exceed %d characters.", CHARACTERS_LIMIT));
+            throw new CommandException("The text to translate cannot exceed %d characters.".formatted(CHARACTERS_LIMIT));
         }
 
         this.sourceText = sourceText;
     }
 
-    public void setSourceLang(@Nullable final String sourceLang) {
-        if (this.sourceLang == null) {
+    public void setSourceLang(final String sourceLang) {
+        if (sourceLang.equalsIgnoreCase(AUTO)) {
             this.sourceLang = AUTO;
         } else {
             this.sourceLang = TranslateData.langToIso(sourceLang);
@@ -54,7 +55,7 @@ public class TranslateData {
             throw new IllegalArgumentException("The source language isn't supported");
         }
         if (Objects.equals(this.sourceLang, this.destLang)) {
-            throw EQUAL_LANGS_EXCEPTION;
+            throw EQUAL_LANGS_EXCEPTION.get();
         }
     }
 
@@ -65,13 +66,14 @@ public class TranslateData {
             throw new IllegalArgumentException("The destination language isn't supported");
         }
         if (Objects.equals(this.sourceLang, this.destLang)) {
-            throw EQUAL_LANGS_EXCEPTION;
+            throw EQUAL_LANGS_EXCEPTION.get();
         }
     }
 
     public String getUrl() {
-        return String.format("%s?client=gtx&ie=UTF-8&oe=UTF-8&sl=%s&tl=%s&dt=t&q=%s",
-                API_URL, NetUtil.encode(this.sourceLang), NetUtil.encode(this.destLang), NetUtil.encode(this.sourceText));
+        return "%s?client=gtx&ie=UTF-8&oe=UTF-8&sl=%s&tl=%s&dt=t&q=%s"
+                .formatted(API_URL, NetUtil.encode(this.sourceLang),
+                        NetUtil.encode(this.destLang), NetUtil.encode(this.sourceText));
     }
 
     public String getDestLang() {

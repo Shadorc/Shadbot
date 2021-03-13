@@ -17,10 +17,8 @@ public class MathCmd extends BaseCmd {
     private final DecimalFormat formatter;
 
     public MathCmd() {
-        super(CommandCategory.UTILS, "math", "Calculate an expression");
-        this.addOption("expression",
-                "Expression to evaluate (e.g. 2*cos(pi))",
-                true,
+        super(CommandCategory.UTILS, "math", "Evaluate an expression");
+        this.addOption("expression", "Expression to evaluate (example: 2*cos(pi))", true,
                 ApplicationCommandOptionType.STRING);
 
         this.evaluator = new DoubleEvaluator();

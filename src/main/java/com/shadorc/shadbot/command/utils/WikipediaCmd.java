@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 public class WikipediaCmd extends BaseCmd {
 
     public WikipediaCmd() {
-        super(CommandCategory.UTILS, "wikipedia", "Show Wikipedia description for a search");
+        super(CommandCategory.UTILS, "wikipedia", "Search for Wikipedia article");
         this.addOption("word", "The word to search", true, ApplicationCommandOptionType.STRING);
     }
 
@@ -30,28 +30,28 @@ public class WikipediaCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final String word = context.getOptionAsString("word").orElseThrow();
 
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Wikipedia...", context.getAuthorName())
+        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Wikipedia article...", context.getAuthorName())
                 .flatMap(messageId -> WikipediaCmd.getWikipediaPage(word)
                         .flatMap(page -> {
                             if (page.getExtract().endsWith("may refer to:")) {
                                 return context.editFollowupMessage(messageId,
                                         Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
-                                                + "try with a more precise search.", context.getAuthorName());
+                                                + "try to refine your search.", context.getAuthorName());
                             }
 
                             return context.editFollowupMessage(messageId,
                                     WikipediaCmd.formatEmbed(page, context.getAuthorAvatarUrl()));
                         })
                         .switchIfEmpty(context.editFollowupMessage(messageId,
-                                Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia results found for `%s`",
+                                Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia article matching word `%s`",
                                 context.getAuthorName(), word)));
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(final WikipediaPage page, final String avatarUrl) {
         final String extract = StringUtil.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor(String.format("Wikipedia: %s", page.getTitle()),
-                        String.format("https://en.wikipedia.org/wiki/%s", page.getEncodedTitle()), avatarUrl)
+                embed -> embed.setAuthor("Wikipedia: %s".formatted(page.getTitle()),
+                        "https://en.wikipedia.org/wiki/%s".formatted(page.getEncodedTitle()), avatarUrl)
                         .setThumbnail("https://i.imgur.com/7X7Cvhf.png")
                         .setDescription(extract));
     }

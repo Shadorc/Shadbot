@@ -34,7 +34,7 @@ public class WeatherCmd extends BaseCmd {
     private final OWM owm;
 
     public WeatherCmd() {
-        super(CommandCategory.UTILS, "weather", "Show weather report for a city");
+        super(CommandCategory.UTILS, "weather", "Search for weather report for a city");
         this.addOption("city", "The city", true, ApplicationCommandOptionType.STRING);
         this.addOption("country", "The country", false, ApplicationCommandOptionType.STRING);
 
@@ -53,15 +53,15 @@ public class WeatherCmd extends BaseCmd {
         final String city = context.getOptionAsString("city").orElseThrow();
         final Optional<String> countryOpt = context.getOptionAsString("country");
 
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading weather...", context.getAuthorName())
+        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading weather report...", context.getAuthorName())
                 .flatMap(messageId -> Mono
                         .fromCallable(() -> {
                             if (countryOpt.isPresent()) {
+                                final String countryStr = countryOpt.get();
                                 final Country country = EnumUtil.parseEnum(Country.class,
-                                        countryOpt.orElseThrow().replace(" ", "_"));
+                                        countryStr.replace(" ", "_"));
                                 if (country == null) {
-                                    throw new IllegalArgumentException(String.format("Country `%s` not found",
-                                            countryOpt.orElseThrow()));
+                                    throw new IllegalArgumentException("Country `%s` not found".formatted(countryStr));
                                 }
                                 return this.owm.currentWeatherByCityName(city, country);
                             } else {
@@ -72,8 +72,8 @@ public class WeatherCmd extends BaseCmd {
                         .onErrorMap(APIException.class, err -> {
                             if (err.getCode() == HttpStatus.SC_NOT_FOUND) {
                                 final StringBuilder strBuilder = new StringBuilder(
-                                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s`", context.getAuthorName(), city));
-                                countryOpt.ifPresent(country -> strBuilder.append(String.format(" in country `%s`", country)));
+                                        Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s`".formatted(context.getAuthorName(), city));
+                                countryOpt.ifPresent(country -> strBuilder.append(" in country `%s`".formatted(country)));
                                 strBuilder.append(" not found.");
                                 return new IllegalArgumentException(strBuilder.toString());
                             }
@@ -91,17 +91,17 @@ public class WeatherCmd extends BaseCmd {
         final Main main = currentWeather.getMainData();
 
         final String countryCode = currentWeather.getSystemData().getCountryCode();
-        final String title = String.format("Weather: %s (%s)", currentWeather.getCityName(), countryCode);
-        final String url = String.format("https://openweathermap.org/city/%d", currentWeather.getCityId());
+        final String title = "Weather: %s (%s)".formatted(currentWeather.getCityName(), countryCode);
+        final String url = "https://openweathermap.org/city/%d".formatted(currentWeather.getCityId());
         final String lastUpdated = this.dateFormatter.format(currentWeather.getDateTime());
         final String clouds = StringUtil.capitalize(weather.getDescription());
         final double windSpeed = currentWeather.getWindData().getSpeed() * 3.6;
         final String windDesc = WeatherCmd.getWindDesc(windSpeed);
-        final String wind = String.format("%s%n%.1f km/h", windDesc, windSpeed);
+        final String wind = "%s%n%.1f km/h".formatted(windDesc, windSpeed);
         final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ?
-                String.format("%.1f mm/h", currentWeather.getRainData().getPrecipVol3h()) : "None";
-        final String humidity = String.format("%.1f%%", main.getHumidity());
-        final String temperature = String.format("%.1f°C", main.getTemp());
+                "%.1f mm/h".formatted(currentWeather.getRainData().getPrecipVol3h()) : "None";
+        final String humidity = "%.1f%%".formatted(main.getHumidity());
+        final String temperature = "%.1f°C".formatted(main.getTemp());
 
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(title, url, avatarUrl)
