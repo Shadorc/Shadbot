@@ -9,7 +9,7 @@ public class SupportCmd extends BaseCmdGroup {
 
     public SupportCmd() {
         super(CommandCategory.INFO, "support", "Show support information",
-                List.of(new FeedbackCmd(), new InviteCmd(), new VoteCmd()));
+                List.of(new FeedbackCmd(), new LinksCmd()));
     }
 
 }
