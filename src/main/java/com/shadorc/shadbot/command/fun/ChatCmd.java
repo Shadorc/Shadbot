@@ -18,6 +18,7 @@ import reactor.util.Logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 public class ChatCmd extends BaseCmd {
 
@@ -34,10 +35,8 @@ public class ChatCmd extends BaseCmd {
 
     public ChatCmd() {
         super(CommandCategory.FUN, "chat", "Chat with an artificial intelligence");
-        this.addOption("message",
-                String.format("The message to send, must not exceed %d characters", MAX_CHARACTERS),
-                true,
-                ApplicationCommandOptionType.STRING);
+        this.addOption("message", "The message to send, must not exceed %d characters".formatted(MAX_CHARACTERS),
+                true, ApplicationCommandOptionType.STRING);
 
         this.channelsCustid = new ConcurrentHashMap<>();
     }
@@ -46,8 +45,8 @@ public class ChatCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final String message = context.getOptionAsString("message").orElseThrow();
         if (message.length() > MAX_CHARACTERS) {
-            return Mono.error(new CommandException(String.format("The message must not exceed **%d characters**.",
-                    MAX_CHARACTERS)));
+            return Mono.error(new CommandException("The message must not exceed **%d characters**."
+                    .formatted(MAX_CHARACTERS)));
         }
 
         return this.getResponse(context.getChannelId(), message)
@@ -57,13 +56,16 @@ public class ChatCmd extends BaseCmd {
     private Mono<String> getResponse(Snowflake channelId, String message) {
         return Flux.fromIterable(BOTS.entrySet())
                 .flatMap(bot -> Mono.defer(() -> this.talk(channelId, bot.getValue(), message)
-                        .map(response -> String.format("**%s**: %s", bot.getKey(), response))))
-                .takeUntil(str -> !str.isBlank())
+                        .map(response -> "**%s**: %s".formatted(bot.getKey(), response))))
+                .takeUntil(Predicate.not(String::isBlank))
                 .next();
     }
 
     private Mono<String> talk(Snowflake channelId, String botId, String message) {
-        final String url = String.format("%s?botid=%s&input=%s&custid=%s",
+        final String url = String.format("%s" +
+                        "?botid=%s" +
+                        "&input=%s" +
+                        "&custid=%s",
                 HOME_URl, botId, NetUtil.encode(message), this.channelsCustid.getOrDefault(channelId, ""));
 
         return RequestHelper.fromUrl(url)

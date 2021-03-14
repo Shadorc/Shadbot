@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.core.command;
 
+import com.shadorc.shadbot.command.fun.FunCmd;
 import com.shadorc.shadbot.command.image.ImageCmd;
 import com.shadorc.shadbot.command.info.InfoCmd;
 import com.shadorc.shadbot.command.moderation.ModerationCmd;
@@ -28,7 +29,8 @@ public class CommandManager {
 
     private CommandManager() {
         this.commandsMap = CommandManager.initialize(
-                new InfoCmd(), new SupportCmd(), new ImageCmd(), new ModerationCmd(), new OwnerCmd(), new UtilsCmd());
+                new InfoCmd(), new SupportCmd(), new ImageCmd(), new ModerationCmd(), new OwnerCmd(), new UtilsCmd(),
+                new FunCmd());
     }
 
     private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {

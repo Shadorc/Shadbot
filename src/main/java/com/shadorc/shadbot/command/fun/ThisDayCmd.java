@@ -18,7 +18,7 @@ public class ThisDayCmd extends BaseCmd {
     private static final String HOME_URL = "https://www.onthisday.com/";
 
     public ThisDayCmd() {
-        super(CommandCategory.FUN, "this_day", "Show significant events of the day");
+        super(CommandCategory.FUN, "this_day", "Significant events of the day");
     }
 
     @Override
@@ -27,7 +27,7 @@ public class ThisDayCmd extends BaseCmd {
                 .zipWith(ThisDayCmd.getThisDay())
                 .flatMap(TupleUtils.function((messageId, thisDay) ->
                         context.editFollowupMessage(messageId, ShadbotUtil.getDefaultEmbed(
-                                embed -> embed.setAuthor(String.format("On This Day: %s", thisDay.getDate()),
+                                embed -> embed.setAuthor("On This Day: %s".formatted(thisDay.getDate()),
                                         HOME_URL, context.getAuthorAvatarUrl())
                                         .setThumbnail("https://i.imgur.com/FdfyJDD.png")
                                         .setDescription(StringUtil.abbreviate(thisDay.getEvents(), Embed.MAX_DESCRIPTION_LENGTH))))));
