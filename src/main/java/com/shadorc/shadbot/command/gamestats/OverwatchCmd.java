@@ -91,7 +91,7 @@ public class OverwatchCmd extends BaseCmd {
         final String profileUrl = OverwatchCmd.buildUrl("profile", platform, username);
         final Mono<ProfileResponse> getProfile = RequestHelper.fromUrl(profileUrl)
                 .to(ProfileResponse.class)
-                .filter(profile -> !profile.getMessage().orElse("").equals("Error: Profile not found"))
+                .filter(profile -> !"Error: Profile not found".equals(profile.getMessage().orElse("")))
                 .switchIfEmpty(Mono.error(
                         new CommandException("Profile not found. The specified platform may be incorrect.")));
 

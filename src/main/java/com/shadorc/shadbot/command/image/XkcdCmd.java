@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 public class XkcdCmd extends BaseCmd {
 
     private enum Sort {
-        LATEST, RANDOM;
+        LATEST, RANDOM
     }
 
     private static final String HOME_URL = "https://xkcd.com";

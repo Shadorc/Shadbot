@@ -134,7 +134,7 @@ public class Context {
     public Mono<Member> getOptionAsMember(String name) {
         return Mono.justOrEmpty(this.getOption(name))
                 .flatMap(ApplicationCommandInteractionOptionValue::asUser)
-                .flatMap(user -> user.asMember(getGuildId()));
+                .flatMap(user -> user.asMember(this.getGuildId()));
     }
 
     public Mono<Role> getOptionAsRole(String name) {

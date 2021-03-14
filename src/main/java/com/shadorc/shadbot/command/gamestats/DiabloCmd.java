@@ -68,7 +68,7 @@ public class DiabloCmd extends BaseCmd {
                         .flatMap(url -> RequestHelper.fromUrl(url)
                                 .to(ProfileResponse.class))
                         .flatMap(profile -> {
-                            if (profile.getCode().orElse("").equals("NOTFOUND")) {
+                            if ("NOTFOUND".equals(profile.getCode().orElse(""))) {
                                 return context.editFollowupMessage(messageId,
                                         Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
                                         context.getAuthorName());
@@ -100,7 +100,7 @@ public class DiabloCmd extends BaseCmd {
 
     private String buildProfileApiUrl(final Region region, final String battletag) {
         return "https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s"
-                .formatted(region.name().toLowerCase(), NetUtil.encode(battletag), this.token.get().getAccessToken());
+                .formatted(region, NetUtil.encode(battletag), this.token.get().getAccessToken());
     }
 
     private String buildHeroApiUrl(final Region region, final String battletag, final HeroId heroId) {

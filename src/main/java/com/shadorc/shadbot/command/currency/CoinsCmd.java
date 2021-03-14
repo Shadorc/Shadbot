@@ -14,9 +14,7 @@ public class CoinsCmd extends BaseCmd {
 
     public CoinsCmd() {
         super(CommandCategory.CURRENCY, "coins", "Show how many coins a user has");
-        this.addOption("user",
-                "If not specified, it will show your coins",
-                false,
+        this.addOption("user", "If not specified, it will show your coins", false,
                 ApplicationCommandOptionType.USER);
     }
 
@@ -30,12 +28,14 @@ public class CoinsCmd extends BaseCmd {
                         .map(FormatUtil::coins)
                         .map(coins -> {
                             if (user.getId().equals(context.getAuthorId())) {
-                                return String.format("(**%s**) You have **%s**.", user.getUsername(), coins);
+                                return Emoji.PURSE + " (**%s**) You have **%s**."
+                                        .formatted(user.getUsername(), coins);
                             } else {
-                                return String.format("**%s** has **%s**.", user.getUsername(), coins);
+                                return Emoji.PURSE + " (**%s**) **%s** has **%s**."
+                                        .formatted(context.getAuthorName(), user.getUsername(), coins);
                             }
                         }))
-                .flatMap(text -> context.createFollowupMessage(Emoji.PURSE + " " + text));
+                .flatMap(context::createFollowupMessage);
     }
 
 }

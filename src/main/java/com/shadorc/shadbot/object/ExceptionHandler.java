@@ -22,7 +22,7 @@ import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class ExceptionHandler {
 
-    public static Function<String, RetryBackoffSpec> RETRY_ON_INTERNET_FAILURES =
+    public static final Function<String, RetryBackoffSpec> RETRY_ON_INTERNET_FAILURES =
             message -> Retry.backoff(3, Duration.ofSeconds(1))
                     .filter(err -> err instanceof PrematureCloseException
                             || err instanceof Errors.NativeIoException

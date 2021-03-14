@@ -47,10 +47,10 @@ public class FortniteCmd extends BaseCmd {
 
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Fortnite stats...", context.getAuthorName())
                 .flatMap(messageId -> RequestHelper.fromUrl(url)
-                        .addHeaders("TRN-Api-Key", apiKey)
+                        .addHeaders("TRN-Api-Key", this.apiKey)
                         .to(FortniteResponse.class)
                         .flatMap(fortnite -> {
-                            if (fortnite.getError().orElse("").equals("Player Not Found")) {
+                            if ("Player Not Found".equals(fortnite.getError().orElse(""))) {
                                 throw Exceptions.propagate(new IOException("HTTP Error 400. The request URL is invalid."));
                             }
 
