@@ -15,10 +15,13 @@ import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -31,15 +34,14 @@ import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class DiabloCmd extends BaseCmd {
 
-    private static final String ACCESS_TOKEN_URL = String.format(
-            "https://us.battle.net/oauth/token?grant_type=client_credentials&client_id=%s&client_secret=%s",
-            CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_ID),
-            CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_SECRET));
+    private static final String ACCESS_TOKEN_URL = "https://us.battle.net/oauth/token?grant_type=client_credentials";
 
     private enum Region {
         EU, US, TW, KR
     }
 
+    private final String clientId;
+    private final String clientSecret;
     private final AtomicLong lastTokenGeneration;
     private final AtomicReference<TokenResponse> token;
 
@@ -49,6 +51,8 @@ public class DiabloCmd extends BaseCmd {
                 DiscordUtil.toOptions(Region.class));
         this.addOption("battletag", "User's battletag", true, ApplicationCommandOptionType.STRING);
 
+        this.clientId = CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_ID);
+        this.clientSecret = CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_SECRET);
         this.lastTokenGeneration = new AtomicLong();
         this.token = new AtomicReference<>();
     }
@@ -60,7 +64,8 @@ public class DiabloCmd extends BaseCmd {
 
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Diablo 3 statistics...", context.getAuthorName())
                 .flatMap(messageId -> this.requestAccessToken()
-                        .then(RequestHelper.fromUrl(this.buildProfileApiUrl(region, battletag))
+                        .then(Mono.fromCallable(() -> this.buildProfileApiUrl(region, battletag)))
+                        .flatMap(url -> RequestHelper.fromUrl(url)
                                 .to(ProfileResponse.class))
                         .flatMap(profile -> {
                             if (profile.getCode().orElse("").equals("NOTFOUND")) {
@@ -137,6 +142,8 @@ public class DiabloCmd extends BaseCmd {
     private Mono<TokenResponse> requestAccessToken() {
         if (this.isTokenExpired()) {
             return RequestHelper.fromUrl(ACCESS_TOKEN_URL)
+                    .setMethod(HttpMethod.POST)
+                    .addHeaders(HttpHeaderNames.AUTHORIZATION, this.buildAuthorizationValue())
                     .to(TokenResponse.class)
                     .doOnNext(token -> {
                         this.token.set(token);
@@ -145,6 +152,11 @@ public class DiabloCmd extends BaseCmd {
                     });
         }
         return Mono.just(this.token.get());
+    }
+
+    private String buildAuthorizationValue() {
+        return "Basic %s".formatted(Base64.getEncoder()
+                .encodeToString("%s:%s".formatted(this.clientId, this.clientSecret).getBytes()));
     }
 
 }
