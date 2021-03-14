@@ -3,7 +3,6 @@ package com.shadorc.shadbot.command.utils.translate;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.utils.MapUtil;
 import com.shadorc.shadbot.utils.NetUtil;
-import reactor.util.annotation.Nullable;
 
 import java.util.Arrays;
 import java.util.Locale;

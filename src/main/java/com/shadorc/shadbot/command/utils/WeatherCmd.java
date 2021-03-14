@@ -34,7 +34,7 @@ public class WeatherCmd extends BaseCmd {
     private final OWM owm;
 
     public WeatherCmd() {
-        super(CommandCategory.UTILS, "weather", "Search for weather report for a city");
+        super(CommandCategory.UTILS, "weather", "Search weather report for a city");
         this.addOption("city", "The city", true, ApplicationCommandOptionType.STRING);
         this.addOption("country", "The country", false, ApplicationCommandOptionType.STRING);
 

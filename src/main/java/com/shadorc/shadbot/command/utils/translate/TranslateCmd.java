@@ -16,7 +16,6 @@ import org.json.JSONException;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public class TranslateCmd extends BaseCmd {

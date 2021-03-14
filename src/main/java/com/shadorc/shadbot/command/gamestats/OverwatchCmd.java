@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.overwatch.OverwatchProfile;
@@ -10,18 +9,16 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.EnumUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.NetUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.function.Consumer;
 
 public class OverwatchCmd extends BaseCmd {
@@ -46,64 +43,61 @@ public class OverwatchCmd extends BaseCmd {
     }
 
     public OverwatchCmd() {
-        super(CommandCategory.GAMESTATS, List.of("overwatch"), "ow");
-        this.setDefaultRateLimiter();
+        super(CommandCategory.GAMESTATS, "overwatch", "Search for Overwatch statistics");
+        this.addOption("platform", "User's platform", true, ApplicationCommandOptionType.STRING,
+                DiscordUtil.toOptions(Platform.class));
+        this.addOption("battletag", "User's battletag, case sensitive", true,
+                ApplicationCommandOptionType.STRING);
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final List<String> args = context.requireArgs(2);
+    public Mono<?> execute(Context context) {
+        final Platform platform = context.getOptionAsEnum(Platform.class, "platform").orElseThrow();
+        final String battletag = context.getOptionAsString("username").orElseThrow();
 
-        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-
-        final Platform platform = EnumUtils.parseEnum(Platform.class, args.get(0),
-                new CommandException(String.format("`%s` is not a valid Platform. %s",
-                        args.get(0), FormatUtils.options(Platform.class))));
-        final String battletag = args.get(1);
-
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading Overwatch stats...", context.getUsername()))
-                .send()
-                .then(this.getOverwatchProfile(battletag, platform))
-                .map(profile -> {
+        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Overwatch stats...", context.getAuthorName())
+                .zipWith(this.getOverwatchProfile(battletag, platform))
+                .flatMap(TupleUtils.function((messageId, profile) -> {
                     if (profile.getProfile().isPrivate()) {
-                        return updatableMsg.setContent(
-                                String.format(Emoji.ACCESS_DENIED + " (**%s**) This profile is private.",
-                                        context.getUsername()));
+                        return context.editFollowupMessage(messageId,
+                                Emoji.ACCESS_DENIED + " (**%s**) This profile is private.", context.getAuthorName());
                     }
-                    return updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor("Overwatch Stats (Quickplay)",
-                                    String.format("https://playoverwatch.com/en-gb/career/%s/%s",
-                                            platform.getName(), profile.getProfile().getUsername()), context.getAvatarUrl())
-                                    .setThumbnail(profile.getProfile().getPortrait())
-                                    .setDescription(String.format("Stats for user **%s**", profile.getProfile().getUsername()))
-                                    .addField("Level", profile.getProfile().getLevel(), true)
-                                    .addField("Time played", profile.getProfile().getQuickplayPlaytime(), true)
-                                    .addField("Games won", FormatUtils.number(profile.getProfile().getGames().getQuickplayWon()), true)
-                                    .addField("Competitive ranks", profile.getProfile().formatCompetitive(), true)
-                                    .addField("Top hero (Time played)", profile.getQuickplay().getPlayed(), true)
-                                    .addField("Top hero (Eliminations per life)",
-                                            profile.getQuickplay().getEliminationsPerLife(), true)));
-                })
-                .flatMap(UpdatableMessage::send)
-                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
-                .then();
+                    return context.editFollowupMessage(messageId,
+                            OverwatchCmd.formatEmbed(profile, context.getAuthorAvatarUrl(), platform));
+                }));
+    }
+
+    private static Consumer<EmbedCreateSpec> formatEmbed(final OverwatchProfile profile, final String avatarUrl,
+                                                         final Platform platform) {
+        return ShadbotUtil.getDefaultEmbed(
+                embed -> embed.setAuthor("Overwatch Stats (Quickplay)",
+                        "https://playoverwatch.com/en-gb/career/%s/%s"
+                                .formatted(platform.getName(), profile.getProfile().getUsername()), avatarUrl)
+                        .setThumbnail(profile.getProfile().getPortrait())
+                        .setDescription("Stats for user **%s**".formatted(profile.getProfile().getUsername()))
+                        .addField("Level", profile.getProfile().getLevel(), true)
+                        .addField("Time played", profile.getProfile().getQuickplayPlaytime(), true)
+                        .addField("Games won",
+                                FormatUtil.number(profile.getProfile().getGames().getQuickplayWon()), true)
+                        .addField("Competitive ranks", profile.getProfile().formatCompetitive(), true)
+                        .addField("Top hero (Time played)", profile.getQuickplay().getPlayed(), true)
+                        .addField("Top hero (Eliminations per life)",
+                                profile.getQuickplay().getEliminationsPerLife(), true));
     }
 
     private Mono<OverwatchProfile> getOverwatchProfile(String battletag, Platform platform) {
-        final String username = NetUtils.encode(battletag.replace("#", "-"));
+        final String username = NetUtil.encode(battletag.replace("#", "-"));
 
-        final Mono<ProfileResponse> getProfile =
-                RequestHelper.fromUrl(OverwatchCmd.getUrl("profile", platform, username))
-                        .to(ProfileResponse.class)
-                        .map(profile -> {
-                            if (profile.getMessage().map("Error: Profile not found"::equals).orElse(false)) {
-                                throw new CommandException("Profile not found. The specified platform may be incorrect.");
-                            }
-                            return profile;
-                        });
-        final Mono<StatsResponse> getStats =
-                RequestHelper.fromUrl(OverwatchCmd.getUrl("stats", platform, username))
-                        .to(StatsResponse.class);
+        final String profileUrl = OverwatchCmd.buildUrl("profile", platform, username);
+        final Mono<ProfileResponse> getProfile = RequestHelper.fromUrl(profileUrl)
+                .to(ProfileResponse.class)
+                .filter(profile -> !profile.getMessage().orElse("").equals("Error: Profile not found"))
+                .switchIfEmpty(Mono.error(
+                        new CommandException("Profile not found. The specified platform may be incorrect.")));
+
+        final String statsUrl = OverwatchCmd.buildUrl("stats", platform, username);
+        final Mono<StatsResponse> getStats = RequestHelper.fromUrl(statsUrl)
+                .to(StatsResponse.class);
 
         return Mono.zip(Mono.just(platform), getProfile, getStats)
                 .map(TupleUtils.function(OverwatchProfile::new))
@@ -111,19 +105,8 @@ public class OverwatchCmd extends BaseCmd {
                 .switchIfEmpty(Mono.error(new IOException("Overwatch API returned malformed JSON")));
     }
 
-    private static String getUrl(String endpoint, Platform platform, String username) {
-        return String.format("%s/%s/%s/global/%s", HOME_URL, endpoint, platform.getName(), username);
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show player's stats for Overwatch.")
-                .addArg("platform", String.format("user's platform (%s)", FormatUtils.format(Platform.class, ", ")), false)
-                .addArg("username", "case sensitive", false)
-                .setExample(String.format("%s%s pc Shadorc#2503", context.getPrefix(), this.getName()))
-                .build();
+    private static String buildUrl(String endpoint, Platform platform, String username) {
+        return "%s/%s/%s/global/%s".formatted(HOME_URL, endpoint, platform.getName(), username);
     }
 
 }
-*/
