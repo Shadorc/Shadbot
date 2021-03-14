@@ -53,9 +53,9 @@ public class OverwatchCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         final Platform platform = context.getOptionAsEnum(Platform.class, "platform").orElseThrow();
-        final String battletag = context.getOptionAsString("username").orElseThrow();
+        final String battletag = context.getOptionAsString("battletag").orElseThrow();
 
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Overwatch stats...", context.getAuthorName())
+        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Overwatch statistics...", context.getAuthorName())
                 .zipWith(this.getOverwatchProfile(battletag, platform))
                 .flatMap(TupleUtils.function((messageId, profile) -> {
                     if (profile.getProfile().isPrivate()) {

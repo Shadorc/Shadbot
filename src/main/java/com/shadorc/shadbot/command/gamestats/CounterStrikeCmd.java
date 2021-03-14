@@ -37,7 +37,7 @@ public class CounterStrikeCmd extends BaseCmd {
 
     public CounterStrikeCmd() {
         super(CommandCategory.GAMESTATS, "csgo", "Search for Counter-Strike: Global Offensive statistics");
-        this.addOption("steamId", "Steam ID, custom ID or profile URL", true,
+        this.addOption("steamid", "Steam ID, custom ID or profile URL", true,
                 ApplicationCommandOptionType.STRING);
 
         this.apiKey = CredentialManager.getInstance().get(Credential.STEAM_API_KEY);
@@ -45,7 +45,7 @@ public class CounterStrikeCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String steamId = context.getOptionAsString("steamId").orElseThrow();
+        final String steamId = context.getOptionAsString("steamid").orElseThrow();
         final String identificator = CounterStrikeCmd.getIdentificator(steamId);
 
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading CS:GO statistics...", context.getAuthorName())
@@ -54,7 +54,7 @@ public class CounterStrikeCmd extends BaseCmd {
                         .flatMap(player -> {
                             if (player.getCommunityVisibilityState() != PlayerSummary.CommunityVisibilityState.PUBLIC) {
                                 return context.editFollowupMessage(messageId, Emoji.ACCESS_DENIED +
-                                                " (**%s**) This profile is private, more info [here](%s).",
+                                                " (**%s**) This profile is private, more info [here](<%s>).",
                                         context.getAuthorName(), PRIVACY_HELP_URL);
                             }
 
@@ -66,7 +66,7 @@ public class CounterStrikeCmd extends BaseCmd {
                                         if (body.contains("500 Internal Server Error")) {
                                             return context.editFollowupMessage(messageId, Emoji.ACCESS_DENIED +
                                                             " (**%s**) The game details of this profile are not " +
-                                                            "public, more info [here](%s).",
+                                                            "public, more info [here](<%s>).",
                                                     context.getAuthorName(), PRIVACY_HELP_URL);
                                         }
 
