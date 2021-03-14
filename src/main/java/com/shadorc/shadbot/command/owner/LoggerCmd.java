@@ -14,6 +14,8 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
+
 public class LoggerCmd extends BaseCmd {
 
     private enum LogLevel {
@@ -52,6 +54,7 @@ public class LoggerCmd extends BaseCmd {
 
         logger.setLevel(level);
 
+        DEFAULT_LOGGER.info("Logger {} set to level {}", name, level);
         return context.createFollowupMessage(Emoji.INFO + " Logger `%s` set to level `%s`.", name, level);
     }
 
