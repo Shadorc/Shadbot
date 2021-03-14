@@ -28,10 +28,14 @@ public class MathCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         final String arg = context.getOptionAsString("expression").orElseThrow();
+        final double result;
+        try {
+            result = this.evaluator.evaluate(arg);
+        } catch (final IllegalArgumentException err) {
+            return Mono.error(new CommandException(err.getMessage()));
+        }
         return context.createFollowupMessage(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
-                context.getAuthorName(), arg.replace("*", "\\*"),
-                this.formatter.format(this.evaluator.evaluate(arg)))
-                .onErrorMap(IllegalArgumentException.class, err -> new CommandException(err.getMessage()));
+                context.getAuthorName(), arg.replace("*", "\\*"), this.formatter.format(result));
     }
 
 }
