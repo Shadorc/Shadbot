@@ -18,7 +18,7 @@ public class WikipediaCmdTest extends CmdTest<WikipediaCmd> {
     }
 
     @Test
-    public void testGetWikipediaPageSpecialChars() {
+    public void testGetWikipediaPageFuzzy() {
         final WikipediaPage result = this.invoke("getWikipediaPage", SPECIAL_CHARS);
         assertNull(result);
     }

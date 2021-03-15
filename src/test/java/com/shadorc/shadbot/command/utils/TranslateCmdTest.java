@@ -29,6 +29,16 @@ public class TranslateCmdTest extends CmdTest<TranslateCmd> {
     }
 
     @Test
+    public void testGetTranslationFuzzy() {
+        final TranslateData data = new TranslateData();
+        data.setSourceLang("en");
+        data.setDestLang("fr");
+        data.setSourceText(SPECIAL_CHARS);
+        assertEquals("& ~ # {([- | `_\" '\\ ^ @)] =} ° + ¨ ^ $ £ ¤% * µ,?;.: /! § <> + - * /",
+                this.invoke("getTranslation", data));
+    }
+
+    @Test
     public void testGetTranslationOnlyDest() {
         final TranslateData data = new TranslateData();
         data.setDestLang("fr");

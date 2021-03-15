@@ -15,7 +15,7 @@ public class ChatCmdTest extends CmdTest<ChatCmd> {
     }
 
     @Test
-    public void testGetResponseSpecial() {
+    public void testGetResponseFuzzy() {
         final String result = this.invoke("getResponse", Snowflake.of(1234L), SPECIAL_CHARS);
         assertFalse(result.isBlank());
     }

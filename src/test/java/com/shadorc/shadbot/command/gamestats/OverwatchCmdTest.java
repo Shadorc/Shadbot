@@ -11,8 +11,8 @@ public class OverwatchCmdTest extends CmdTest<OverwatchCmd> {
 
     @Test
     public void testGetResponse() {
-        final OverwatchProfile result = this.invoke(
-                "getOverwatchProfile", "Shadorc#2503", OverwatchCmd.Platform.PC);
+        final String method = "getOverwatchProfile";
+        final OverwatchProfile result = this.invoke(method, "Shadorc#2503", OverwatchCmd.Platform.PC);
         assertEquals(OverwatchCmd.Platform.PC, result.getPlatform());
         assertNull(result.getProfile().getMessage().orElse(null));
         assertFalse(result.getProfile().isPrivate());
@@ -26,9 +26,9 @@ public class OverwatchCmdTest extends CmdTest<OverwatchCmd> {
     }
 
     @Test
-    public void testGetResponseWrongBattletag() {
-        assertThrows(CommandException.class, () -> this.invoke(
-                "getOverwatchProfile", "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%* µ,?;.:/!§<>+*-/", OverwatchCmd.Platform.PC));
+    public void testGetResponseFuzzy() {
+        final String method = "getOverwatchProfile";
+        assertThrows(CommandException.class, () -> this.invoke(method, SPECIAL_CHARS, OverwatchCmd.Platform.PC));
     }
 
 }

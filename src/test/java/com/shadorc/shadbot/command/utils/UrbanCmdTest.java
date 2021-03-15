@@ -18,7 +18,7 @@ public class UrbanCmdTest extends CmdTest<UrbanCmd> {
     }
 
     @Test
-    public void testGetUrbanDefinitionSpecialChars() {
+    public void testGetUrbanDefinitionFuzzy() {
         final UrbanDefinition result = this.invoke("getUrbanDefinition", SPECIAL_CHARS);
         assertFalse(result.getDefinition().isBlank());
         assertFalse(result.getExample().isBlank());

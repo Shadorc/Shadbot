@@ -11,29 +11,32 @@ public class CounterStrikeCmdTest extends CmdTest<CounterStrikeCmd> {
 
     @Test
     public void testGetIdentificator() {
-        assertEquals("76561198040113951", this.invoke("getIdentificator", "76561198040113951"));
-        assertEquals("shadorc", this.invoke("getIdentificator", "shadorc"));
-        assertEquals("shadorc", this.invoke("getIdentificator", "http://steamcommunity.com/id/shadorc"));
-        assertEquals("shadorc", this.invoke("getIdentificator", "http://steamcommunity.com/id/shadorc/"));
-        assertEquals("shadorc", this.invoke("getIdentificator", "/shadorc"));
-        assertEquals("shadorc", this.invoke("getIdentificator", "shadorc/"));
-        assertEquals("*", this.invoke("getIdentificator", "*"));
-        assertThrows(CommandException.class, () -> this.invoke("getIdentificator", "/"));
+        final String method = "getIdentificator";
+        assertEquals("76561198040113951", this.invoke(method, "76561198040113951"));
+        assertEquals("shadorc", this.invoke(method, "shadorc"));
+        assertEquals("shadorc", this.invoke(method, "http://steamcommunity.com/id/shadorc"));
+        assertEquals("shadorc", this.invoke(method, "http://steamcommunity.com/id/shadorc/"));
+        assertEquals("shadorc", this.invoke(method, "/shadorc"));
+        assertEquals("shadorc", this.invoke(method, "shadorc/"));
+        assertEquals("*", this.invoke(method, "*"));
+        assertThrows(CommandException.class, () -> this.invoke(method, "/"));
     }
 
     @Test
     public void testGetSteamId() {
-        assertEquals("76561198040113951", this.invoke("getSteamId", "76561198040113951"));
-        assertEquals("76561198040113951", this.invoke("getSteamId", "shadorc"));
-        assertNull(this.invoke("getSteamId", "-76561198040113951"));
-        assertNull(this.invoke("getSteamId", "thisuser_does_not_exist"));
-        assertNull(this.invoke("getSteamId", "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+*-/"));
-        assertNull(this.invoke("getSteamId", "*"));
+        final String method = "getSteamId";
+        assertEquals("76561198040113951", this.invoke(method, "76561198040113951"));
+        assertEquals("76561198040113951", this.invoke(method, "shadorc"));
+        assertNull(this.invoke(method, "-76561198040113951"));
+        assertNull(this.invoke(method, "thisuser_does_not_exist"));
+        assertNull(this.invoke(method, SPECIAL_CHARS));
+        assertNull(this.invoke(method, "*"));
     }
 
     @Test
     public void testGetPlayerSummary() {
-        final PlayerSummary result = this.invoke("getPlayerSummary", "76561198040113951");
+        final String method = "getPlayerSummary";
+        final PlayerSummary result = this.invoke(method, "76561198040113951");
         assertEquals("76561198040113951", result.getSteamId());
         assertFalse(result.getAvatarFull().isBlank());
         assertFalse(result.getPersonaName().isBlank());

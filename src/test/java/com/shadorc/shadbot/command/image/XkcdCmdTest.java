@@ -17,4 +17,12 @@ public class XkcdCmdTest extends CmdTest<XkcdCmd> {
         assertFalse(result.getTitle().isBlank());
     }
 
+    @Test
+    public void testGetLatestXkcd() {
+        final XkcdResponse result = this.invoke("getLatestXkcd");
+        assertFalse(result.getImg().isBlank());
+        assertTrue(result.getNum() > 0);
+        assertFalse(result.getTitle().isBlank());
+    }
+
 }

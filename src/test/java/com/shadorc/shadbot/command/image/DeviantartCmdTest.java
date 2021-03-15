@@ -21,7 +21,7 @@ public class DeviantartCmdTest extends CmdTest<DeviantartCmd> {
     }
 
     @Test
-    public void testGetPopularImageSpecialChars() {
+    public void testGetPopularImageFuzzy() {
         final Image result = this.invoke("getPopularImage", SPECIAL_CHARS);
         assertNull(result);
     }

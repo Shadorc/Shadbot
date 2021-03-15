@@ -20,7 +20,7 @@ public class LyricsCmdTest extends CmdTest<LyricsCmd> {
     }
 
     @Test
-    public void testGetMusixmatchSpecial() {
+    public void testGetMusixmatchFuzzy() {
         final Musixmatch result = this.invoke("getMusixmatch", SPECIAL_CHARS);
         assertNull(result);
     }

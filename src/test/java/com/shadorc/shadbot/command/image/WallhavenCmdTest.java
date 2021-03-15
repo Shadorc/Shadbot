@@ -42,7 +42,7 @@ public class WallhavenCmdTest extends CmdTest<WallhavenCmd> {
     }
 
     @Test
-    public void testGetWallpaperSpecialChars() {
+    public void testGetWallpaperFuzzy() {
         final Wallpaper result = this.invoke("getWallpaper", SPECIAL_CHARS);
         assertNull(result);
     }

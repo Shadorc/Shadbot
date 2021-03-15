@@ -11,7 +11,6 @@ public class Rule34CmdTest extends CmdTest<Rule34Cmd> {
     @Test
     public void testGetR34Post() {
         final R34Post result = this.invoke("getR34Post", "dab");
-        assertFalse(result.getSource().orElseThrow().isBlank());
         assertFalse(result.getFileUrl().isBlank());
         assertFalse(result.getTags().isEmpty());
         assertTrue(result.getHeight() > 0);
@@ -19,7 +18,7 @@ public class Rule34CmdTest extends CmdTest<Rule34Cmd> {
     }
 
     @Test
-    public void testGetR34PostSpecialChars() {
+    public void testGetR34PostFuzzy() {
         final R34Post result = this.invoke("getR34Post", SPECIAL_CHARS);
         assertNull(result);
     }
