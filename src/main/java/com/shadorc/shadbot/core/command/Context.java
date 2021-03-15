@@ -7,6 +7,7 @@ import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.music.NoMusicException;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.EnumUtil;
 import com.shadorc.shadbot.utils.FormatUtil;
@@ -15,7 +16,6 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
-import discord4j.core.object.command.Interaction;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
@@ -32,17 +32,23 @@ import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.MissingResourceException;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 public class Context {
 
     private final InteractionCreateEvent event;
     private final DBGuild dbGuild;
+    private final AtomicLong replyId;
 
     public Context(InteractionCreateEvent event, DBGuild dbGuild) {
         this.event = event;
         this.dbGuild = dbGuild;
+        this.replyId = new AtomicLong();
     }
 
     public InteractionCreateEvent getEvent() {
@@ -53,20 +59,16 @@ public class Context {
         return this.dbGuild;
     }
 
-    public Locale getLocale() {
-        return this.getDbGuild().getLocale();
-    }
-
     public String localize(String key) {
         try {
-            return I18nManager.getInstance().getBundle(this.getLocale()).getString(key);
+            return I18nManager.getInstance().getBundle(this.getDbGuild().getLocale()).getString(key);
         } catch (final MissingResourceException err) {
             return I18nManager.getInstance().getBundle(Config.DEFAULT_LOCALE).getString(key);
         }
     }
 
     public String localize(double number) {
-        return FormatUtil.number(number, this.getLocale());
+        return FormatUtil.number(number, this.getDbGuild().getLocale());
     }
 
     public GatewayDiscordClient getClient() {
@@ -77,44 +79,45 @@ public class Context {
         return this.event.getCommandName();
     }
 
-    public Interaction getInteraction() {
-        return this.event.getInteraction();
+    public Mono<Guild> getGuild() {
+        return this.getEvent().getInteraction().getGuild();
     }
 
     public Snowflake getGuildId() {
-        return this.getInteraction().getGuildId().orElseThrow();
+        return this.getEvent().getInteraction().getGuildId().orElseThrow();
+    }
+
+    public Mono<TextChannel> getChannel() {
+        return this.getEvent().getInteraction().getChannel();
+    }
+
+    public Mono<Boolean> isChannelNsfw() {
+        return this.getChannel().map(TextChannel::isNsfw);
     }
 
     public Snowflake getChannelId() {
-        return this.getInteraction().getChannelId();
+        return this.getEvent().getInteraction().getChannelId();
     }
 
     public Member getAuthor() {
-        return this.getInteraction().getMember().orElseThrow();
+        return this.getEvent().getInteraction().getMember().orElseThrow();
     }
 
     public Snowflake getAuthorId() {
-        return this.getInteraction().getUser().getId();
+        return this.getEvent().getInteraction().getUser().getId();
     }
 
     public String getAuthorName() {
         return this.getAuthor().getUsername();
     }
 
-    public String getAuthorAvatarUrl() {
+    public String getAuthorAvatar() {
         return this.getAuthor().getAvatarUrl();
     }
 
-    public Mono<Guild> getGuild() {
-        return this.getInteraction().getGuild();
-    }
-
-    public Mono<TextChannel> getChannel() {
-        return this.getInteraction().getChannel();
-    }
-
     public Optional<ApplicationCommandInteractionOptionValue> getOption(String name) {
-        final List<ApplicationCommandInteractionOption> options = this.getInteraction().getCommandInteraction().getOptions();
+        final List<ApplicationCommandInteractionOption> options = this.getEvent().getInteraction()
+                .getCommandInteraction().getOptions();
         final List<ApplicationCommandInteractionOption> list = new ArrayList<>(options);
         options.forEach(option -> list.addAll(option.getOptions()));
         return list.stream()
@@ -123,12 +126,12 @@ public class Context {
                 .flatMap(ApplicationCommandInteractionOption::getValue);
     }
 
-    public Optional<String> getOptionAsString(String name) {
-        return this.getOption(name).map(ApplicationCommandInteractionOptionValue::asString);
-    }
-
     public <T extends Enum<T>> Optional<T> getOptionAsEnum(Class<T> enumClass, String name) {
         return this.getOptionAsString(name).map(it -> EnumUtil.parseEnum(enumClass, it));
+    }
+
+    public Optional<String> getOptionAsString(String name) {
+        return this.getOption(name).map(ApplicationCommandInteractionOptionValue::asString);
     }
 
     public Optional<Snowflake> getOptionAsSnowflake(String name) {
@@ -178,24 +181,19 @@ public class Context {
         return Flux.merge(ownerPerm, adminPerm, Mono.just(CommandPermission.USER));
     }
 
-    public int getShardCount() {
-        return this.event.getShardInfo().getCount();
+    public Mono<Snowflake> reply(Emoji emoji, String message) {
+        return this.createFollowupMessage("%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message))
+                .doOnNext(messageId -> this.replyId.set(messageId.asLong()));
     }
 
-    public int getShardIndex() {
-        return this.event.getShardInfo().getIndex();
-    }
-
-    public Mono<Boolean> isChannelNsfw() {
-        return this.getChannel().map(TextChannel::isNsfw);
-    }
-
+    // TODO: Remove?
     public Mono<Snowflake> createFollowupMessage(String format, Object... args) {
         return this.event.getInteractionResponse().createFollowupMessage(format.formatted(args))
                 .map(MessageData::id)
                 .map(Snowflake::of);
     }
 
+    // TODO: Remove?
     public Mono<Snowflake> createFollowupMessage(Consumer<EmbedCreateSpec> embed) {
         final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
         embed.accept(mutatedSpec);
@@ -207,18 +205,45 @@ public class Context {
                 .map(Snowflake::of);
     }
 
-    public Mono<MessageData> editFollowupMessage(Snowflake messageId, String format, Object... args) {
-        return this.editFollowupMessage(messageId, format.formatted(args));
+    public Mono<MessageData> editReply(Emoji emoji, String message) {
+        return Mono.fromCallable(this.replyId::get)
+                .filter(replyId -> replyId != 0)
+                .switchIfEmpty(Mono.error(new RuntimeException("Context#reply must be called before Context#editReply")))
+                .map(Snowflake::of)
+                .flatMap(messageId -> this.editReply(messageId,
+                        "%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message)));
     }
 
-    public Mono<MessageData> editFollowupMessage(Snowflake messageId, String content) {
+    public Mono<MessageData> editReply(Consumer<EmbedCreateSpec> embed) {
+        return Mono.fromCallable(this.replyId::get)
+                .filter(replyId -> replyId != 0)
+                .switchIfEmpty(Mono.error(new RuntimeException("Context#reply must be called before Context#editReply")))
+                .flatMap(messageId -> {
+                    final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
+                    embed.accept(mutatedSpec);
+                    return this.event.getInteractionResponse()
+                            .editFollowupMessage(messageId, ImmutableWebhookMessageEditRequest.builder()
+                                    .content("")
+                                    .embeds(List.of(mutatedSpec.asRequest()))
+                                    .build(), true);
+                });
+    }
+
+    // TODO: Remove?
+    public Mono<MessageData> editReply(Snowflake messageId, String format, Object... args) {
+        return this.editReply(messageId, format.formatted(args));
+    }
+
+    // TODO: Remove?
+    public Mono<MessageData> editReply(Snowflake messageId, String content) {
         return this.event.getInteractionResponse()
                 .editFollowupMessage(messageId.asLong(), ImmutableWebhookMessageEditRequest.builder()
                         .content(content)
                         .build(), true);
     }
 
-    public Mono<MessageData> editFollowupMessage(Snowflake messageId, Consumer<EmbedCreateSpec> embed) {
+    // TODO: Remove?
+    public Mono<MessageData> editReply(Snowflake messageId, Consumer<EmbedCreateSpec> embed) {
         final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
         embed.accept(mutatedSpec);
         return this.event.getInteractionResponse()

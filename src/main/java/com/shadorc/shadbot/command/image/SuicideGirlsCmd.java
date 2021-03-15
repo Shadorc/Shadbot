@@ -32,8 +32,8 @@ public class SuicideGirlsCmd extends BaseCmd {
 
                     return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading SuicideGirls image...", context.getAuthorName())
                             .zipWith(SuicideGirlsCmd.getRandomSuicideGirl())
-                            .flatMap(TupleUtils.function((messageId, post) -> context.editFollowupMessage(messageId,
-                                    SuicideGirlsCmd.formatEmbed(context.getAuthorAvatarUrl(), post))));
+                            .flatMap(TupleUtils.function((messageId, post) -> context.editReply(messageId,
+                                    SuicideGirlsCmd.formatEmbed(context.getAuthorAvatar(), post))));
                 });
     }
 

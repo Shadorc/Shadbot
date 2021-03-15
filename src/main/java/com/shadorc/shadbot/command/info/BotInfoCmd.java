@@ -16,6 +16,7 @@ import discord4j.common.GitProperties;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.gateway.GatewayClient;
+import discord4j.gateway.ShardInfo;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
@@ -44,7 +45,7 @@ class BotInfoCmd extends BaseCmd {
                 .flatMap(TupleUtils.function((owner, channel, guildCount) -> {
                     final long start = System.currentTimeMillis();
                     return context.createFollowupMessage(Emoji.GEAR + " (**%s**) Testing ping...", context.getAuthorName())
-                            .flatMap(messageId -> context.editFollowupMessage(messageId,
+                            .flatMap(messageId -> context.editReply(messageId,
                                     BotInfoCmd.formatEmbed(context, start, owner, guildCount)));
                 }));
     }
@@ -56,11 +57,12 @@ class BotInfoCmd extends BaseCmd {
                 .map(Duration::toMillis)
                 .orElseThrow();
         final String uptime = FormatUtil.formatDurationWords(Duration.ofMillis(SystemUtil.getUptime()));
+        final ShardInfo shardInfo = context.getEvent().getShardInfo();
 
         return ShadbotUtil.getDefaultEmbed(embed -> embed
-                .setAuthor("Bot Info", null, context.getAuthorAvatarUrl())
+                .setAuthor("Bot Info", null, context.getAuthorAvatar())
                 .addField(Emoji.ROBOT + " Shadbot", "**Uptime:** %s%n**Developer:** %s%n**Shard:** %d/%d%n**Servers:** %s%n**Voice Channels:** %s"
-                        .formatted(uptime, owner.getTag(), context.getShardIndex() + 1, context.getShardCount(),
+                        .formatted(uptime, owner.getTag(), shardInfo.getIndex() + 1, shardInfo.getCount(),
                                 FormatUtil.number(guildCount), FormatUtil.number(Telemetry.VOICE_COUNT_GAUGE.get())), true)
                 .addField(Emoji.SATELLITE + " Network", "**Ping:** %dms%n**Gateway:** %dms"
                         .formatted(TimeUtil.elapsed(start), gatewayLatency), true)

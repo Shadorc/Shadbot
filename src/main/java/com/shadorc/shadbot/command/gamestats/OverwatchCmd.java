@@ -59,11 +59,11 @@ public class OverwatchCmd extends BaseCmd {
                 .zipWith(this.getOverwatchProfile(battletag, platform))
                 .flatMap(TupleUtils.function((messageId, profile) -> {
                     if (profile.getProfile().isPrivate()) {
-                        return context.editFollowupMessage(messageId,
+                        return context.editReply(messageId,
                                 Emoji.ACCESS_DENIED + " (**%s**) This profile is private.", context.getAuthorName());
                     }
-                    return context.editFollowupMessage(messageId,
-                            OverwatchCmd.formatEmbed(profile, context.getAuthorAvatarUrl(), platform));
+                    return context.editReply(messageId,
+                            OverwatchCmd.formatEmbed(profile, context.getAuthorAvatar(), platform));
                 }));
     }
 

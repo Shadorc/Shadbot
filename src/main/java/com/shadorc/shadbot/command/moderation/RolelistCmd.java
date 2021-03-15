@@ -53,7 +53,7 @@ public class RolelistCmd extends BaseCmd {
                 .map(TupleUtils.function((mentionedRoles, usernames) -> ShadbotUtil.getDefaultEmbed(
                         embed -> {
                             final String rolesFormatted = FormatUtil.format(mentionedRoles, Role::getName, ", ");
-                            embed.setAuthor(String.format("Rolelist: %s", rolesFormatted), null, context.getAuthorAvatarUrl());
+                            embed.setAuthor(String.format("Rolelist: %s", rolesFormatted), null, context.getAuthorAvatar());
 
                             if (usernames.isEmpty()) {
                                 embed.setDescription("There is nobody with %s."

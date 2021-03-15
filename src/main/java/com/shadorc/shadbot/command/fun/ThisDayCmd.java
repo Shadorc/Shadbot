@@ -26,9 +26,9 @@ public class ThisDayCmd extends BaseCmd {
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading events...", context.getAuthorName())
                 .zipWith(ThisDayCmd.getThisDay())
                 .flatMap(TupleUtils.function((messageId, thisDay) ->
-                        context.editFollowupMessage(messageId, ShadbotUtil.getDefaultEmbed(
+                        context.editReply(messageId, ShadbotUtil.getDefaultEmbed(
                                 embed -> embed.setAuthor("On This Day: %s".formatted(thisDay.getDate()),
-                                        HOME_URL, context.getAuthorAvatarUrl())
+                                        HOME_URL, context.getAuthorAvatar())
                                         .setThumbnail("https://i.imgur.com/FdfyJDD.png")
                                         .setDescription(StringUtil.abbreviate(thisDay.getEvents(), Embed.MAX_DESCRIPTION_LENGTH))))));
     }

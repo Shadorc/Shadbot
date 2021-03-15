@@ -88,7 +88,7 @@ public abstract class HelpBuilder {
     public Consumer<EmbedCreateSpec> build() {
         return ShadbotUtil.getDefaultEmbed(embed -> {
             if (this.authorName != null && !this.authorName.isBlank()) {
-                embed.setAuthor(this.authorName, this.authorUrl, this.context.getAuthorAvatarUrl());
+                embed.setAuthor(this.authorName, this.authorUrl, this.context.getAuthorAvatar());
             }
             embed.addField("Usage", this.getUsage(), false);
 

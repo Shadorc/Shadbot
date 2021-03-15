@@ -36,7 +36,7 @@ public class HelpCmd extends BaseCmd {
         return context.getPermissions()
                 .collectList()
                 .flatMap(authorPermissions -> HelpCmd.getMultiMap(context, authorPermissions))
-                .map(map -> HelpCmd.formatEmbed(map, context.getAuthorAvatarUrl()))
+                .map(map -> HelpCmd.formatEmbed(map, context.getAuthorAvatar()))
                 .flatMap(context::createFollowupMessage);
     }
 

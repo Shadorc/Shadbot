@@ -25,8 +25,8 @@ public class JokeCmd extends BaseCmd {
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading joke...", context.getAuthorName())
                 .zipWith(JokeCmd.getRandomJoke())
                 .flatMap(TupleUtils.function((messageId, joke) ->
-                        context.editFollowupMessage(messageId, ShadbotUtil.getDefaultEmbed(
-                                embed -> embed.setAuthor("Joke", HOME_URL, context.getAuthorAvatarUrl())
+                        context.editReply(messageId, ShadbotUtil.getDefaultEmbed(
+                                embed -> embed.setAuthor("Joke", HOME_URL, context.getAuthorAvatar())
                                         .setDescription(joke)))));
     }
 

@@ -45,8 +45,8 @@ public class XkcdCmd extends BaseCmd {
         final Sort sort = EnumUtil.parseEnum(Sort.class, context.getOption("sort").orElseThrow().asString());
         final Mono<XkcdResponse> getResponse = sort == Sort.LATEST ? XkcdCmd.getLatestXkcd() : this.getRandomXkcd();
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading XKCD comic...", context.getAuthorName())
-                .flatMap(messageId -> getResponse.flatMap(xkcd -> context.editFollowupMessage(messageId,
-                        XkcdCmd.formatEmbed(context.getAuthorAvatarUrl(), xkcd))));
+                .flatMap(messageId -> getResponse.flatMap(xkcd -> context.editReply(messageId,
+                        XkcdCmd.formatEmbed(context.getAuthorAvatar(), xkcd))));
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(final String avatarUrl, final XkcdResponse xkcd) {

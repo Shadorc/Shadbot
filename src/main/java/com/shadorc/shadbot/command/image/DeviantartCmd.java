@@ -33,6 +33,8 @@ public class DeviantartCmd extends BaseCmd {
     private static final String OAUTH_URL = "https://www.deviantart.com/oauth2/token";
     private static final String BROWSE_POPULAR_URL = "https://www.deviantart.com/api/v1/oauth2/browse/popular";
 
+    private final String clientId;
+    private final String apiSecret;
     private final AtomicLong lastTokenGeneration;
     private final AtomicReference<TokenResponse> token;
 
@@ -40,6 +42,8 @@ public class DeviantartCmd extends BaseCmd {
         super(CommandCategory.IMAGE, "deviantart", "Search random image from DeviantArt");
         this.addOption("query", "Search for an image", true, ApplicationCommandOptionType.STRING);
 
+        this.clientId = CredentialManager.getInstance().get(Credential.DEVIANTART_CLIENT_ID);
+        this.apiSecret = CredentialManager.getInstance().get(Credential.DEVIANTART_API_SECRET);
         this.lastTokenGeneration = new AtomicLong();
         this.token = new AtomicReference<>();
     }
@@ -48,19 +52,16 @@ public class DeviantartCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final String query = context.getOptionAsString("query").orElseThrow();
 
-        return context.createFollowupMessage("%s (**%s**) %s",
-                Emoji.HOURGLASS, context.getAuthorName(), context.localize("deviantart.loading"))
-                .flatMap(messageId -> this.getPopularImage(query)
-                        .flatMap(image -> context.editFollowupMessage(messageId,
-                                DeviantartCmd.formatEmbed(context, query, image)))
-                        .switchIfEmpty(context.editFollowupMessage(messageId, "%s (**%s**) %s",
-                                Emoji.MAGNIFYING_GLASS, context.getAuthorName(),
-                                context.localize("deviantart.not.found").formatted(query))));
+        return context.reply(Emoji.HOURGLASS, context.localize("deviantart.loading"))
+                .then(this.getPopularImage(query))
+                .flatMap(image -> context.editReply(DeviantartCmd.formatEmbed(context, query, image)))
+                .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
+                        context.localize("deviantart.not.found").formatted(query)));
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, String query, Image image) {
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor("DeviantArt: %s".formatted(query), image.getUrl(), context.getAuthorAvatarUrl())
+                embed -> embed.setAuthor("DeviantArt: %s".formatted(query), image.getUrl(), context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/gT4hHUB.png")
                         .addField(context.localize("deviantart.title"), image.getTitle(), false)
                         .addField(context.localize("deviantart.author"), image.getAuthor().getUsername(), false)
@@ -89,11 +90,8 @@ public class DeviantartCmd extends BaseCmd {
 
     private Mono<TokenResponse> requestAccessToken() {
         if (this.isTokenExpired()) {
-            final String url = String.format("%s?client_id=%s" +
-                            "&client_secret=%s" +
-                            "&grant_type=client_credentials",
-                    OAUTH_URL, CredentialManager.getInstance().get(Credential.DEVIANTART_CLIENT_ID),
-                    CredentialManager.getInstance().get(Credential.DEVIANTART_API_SECRET));
+            final String url = "%s?client_id=%s&client_secret=%s&grant_type=client_credentials"
+                    .formatted(OAUTH_URL, this.clientId, this.apiSecret);
             return RequestHelper.fromUrl(url)
                     .to(TokenResponse.class)
                     .doOnNext(token -> {

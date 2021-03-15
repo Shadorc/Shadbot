@@ -39,14 +39,14 @@ public class WallhavenCmd extends BaseCmd {
                 .flatMap(messageId -> Mono.zip(WallhavenCmd.getWallpaper(query), context.isChannelNsfw())
                         .flatMap(TupleUtils.function((wallpaper, isNsfw) -> {
                             if (!"sfw".equals(wallpaper.getPurity()) && !isNsfw) {
-                                return context.editFollowupMessage(messageId, ShadbotUtil.mustBeNsfw());
+                                return context.editReply(messageId, ShadbotUtil.mustBeNsfw());
                             }
 
                             final String title = "Wallpaper: %s".formatted(query.isBlank() ? "random" : query);
-                            return context.editFollowupMessage(messageId,
-                                    WallhavenCmd.formatEmbed(context.getAuthorAvatarUrl(), title, wallpaper));
+                            return context.editReply(messageId,
+                                    WallhavenCmd.formatEmbed(context.getAuthorAvatar(), title, wallpaper));
                         }))
-                        .switchIfEmpty(context.editFollowupMessage(messageId,
+                        .switchIfEmpty(context.editReply(messageId,
                                 Emoji.MAGNIFYING_GLASS + " (**%s**) No wallpapers found matching query `%s`",
                                 context.getAuthorName(), query)));
     }

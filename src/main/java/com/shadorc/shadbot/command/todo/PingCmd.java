@@ -19,7 +19,7 @@ public class PingCmd extends BaseCmd {
         final String message = "%s (**%s**) %s"
                 .formatted(Emoji.GEAR, context.getAuthorName(), context.localize("testing.ping"));
         return context.createFollowupMessage(message)
-                .flatMap(messageId -> context.editFollowupMessage(messageId,
+                .flatMap(messageId -> context.editReply(messageId,
                         "%s Ping: %sms", Emoji.GEAR, context.localize(TimeUtil.elapsed(start))));
     }
 

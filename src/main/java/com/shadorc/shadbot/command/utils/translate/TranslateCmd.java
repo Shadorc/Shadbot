@@ -48,8 +48,8 @@ public class TranslateCmd extends BaseCmd {
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading translation...", context.getAuthorName())
                 .zipWith(TranslateCmd.getTranslation(data))
                 .flatMap(TupleUtils.function((messageId, translatedText) ->
-                        context.editFollowupMessage(messageId,
-                                TranslateCmd.formatEmbed(data, context.getAuthorAvatarUrl(), translatedText))))
+                        context.editReply(messageId,
+                                TranslateCmd.formatEmbed(data, context.getAuthorAvatar(), translatedText))))
                 .onErrorMap(IllegalArgumentException.class,
                         err -> new CommandException("%s. Use `/help %s` to see a complete list of supported languages."
                                 .formatted(err.getMessage(), this.getName())));

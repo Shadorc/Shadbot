@@ -56,11 +56,11 @@ public class FortniteCmd extends BaseCmd {
 
                             final String profileUrl = FortniteCmd.buildProfileUrl(platform, encodedUsername);
                             final String desc = FortniteCmd.formatDescription(fortnite.getStats(), username);
-                            return context.editFollowupMessage(messageId,
-                                    FortniteCmd.formatEmbed(context.getAuthorAvatarUrl(), profileUrl, desc));
+                            return context.editReply(messageId,
+                                    FortniteCmd.formatEmbed(context.getAuthorAvatar(), profileUrl, desc));
                         })
                         .onErrorResume(FortniteCmd::isNotFound,
-                                err -> context.editFollowupMessage(messageId,
+                                err -> context.editReply(messageId,
                                         String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Fortnite " +
                                                         "on this platform or doesn't exist. Please make sure your spelling is" +
                                                         " correct, or follow this guide if you play on Console: " +

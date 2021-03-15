@@ -25,7 +25,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -69,7 +68,7 @@ public class WeatherCmd extends BaseCmd {
                                 return this.owm.currentWeatherByCityName(city);
                             }
                         })
-                        .map(currentWeather -> this.formatEmbed(context.getAuthorAvatarUrl(), currentWeather))
+                        .map(currentWeather -> this.formatEmbed(context.getAuthorAvatar(), currentWeather))
                         .onErrorMap(APIException.class, err -> {
                             if (err.getCode() == HttpStatus.SC_NOT_FOUND) {
                                 final StringBuilder strBuilder = new StringBuilder(
@@ -80,10 +79,10 @@ public class WeatherCmd extends BaseCmd {
                             }
                             return new IOException(err);
                         })
-                        .onErrorResume(IllegalArgumentException.class, err -> context.editFollowupMessage(messageId,
+                        .onErrorResume(IllegalArgumentException.class, err -> context.editReply(messageId,
                                 Emoji.MAGNIFYING_GLASS + " (**%s**) %s.", context.getAuthorName(), err.getMessage())
                                 .then(Mono.empty()))
-                        .flatMap(embed -> context.editFollowupMessage(messageId, embed)));
+                        .flatMap(embed -> context.editReply(messageId, embed)));
     }
 
     @SuppressWarnings("ConstantConditions") // Removes NullPointerException warnings

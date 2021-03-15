@@ -34,15 +34,15 @@ public class WikipediaCmd extends BaseCmd {
                 .flatMap(messageId -> WikipediaCmd.getWikipediaPage(word)
                         .flatMap(page -> {
                             if (page.getExtract().endsWith("may refer to:")) {
-                                return context.editFollowupMessage(messageId,
+                                return context.editReply(messageId,
                                         Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
                                                 + "try to refine your search.", context.getAuthorName());
                             }
 
-                            return context.editFollowupMessage(messageId,
-                                    WikipediaCmd.formatEmbed(page, context.getAuthorAvatarUrl()));
+                            return context.editReply(messageId,
+                                    WikipediaCmd.formatEmbed(page, context.getAuthorAvatar()));
                         })
-                        .switchIfEmpty(context.editFollowupMessage(messageId,
+                        .switchIfEmpty(context.editReply(messageId,
                                 Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia article matching word `%s`",
                                 context.getAuthorName(), word)));
     }

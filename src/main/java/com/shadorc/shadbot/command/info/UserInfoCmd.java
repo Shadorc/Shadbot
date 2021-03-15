@@ -39,7 +39,7 @@ class UserInfoCmd extends BaseCmd {
                 .cache();
 
         return Mono.zip(getMemberOrAuthor, getMemberOrAuthor.flatMapMany(Member::getRoles).collectList())
-                .map(TupleUtils.function((user, roles) -> this.formatEmbed(user, roles, context.getAuthorAvatarUrl())))
+                .map(TupleUtils.function((user, roles) -> this.formatEmbed(user, roles, context.getAuthorAvatar())))
                 .flatMap(context::createFollowupMessage);
     }
 

@@ -65,7 +65,7 @@ public class RussianRouletteCmd extends BaseCmd {
                 })
                 .map(StringBuilder::toString)
                 .map(description -> ShadbotUtil.getDefaultEmbed(
-                        embed -> embed.setAuthor("Russian Roulette", null, context.getAuthorAvatarUrl())
+                        embed -> embed.setAuthor("Russian Roulette", null, context.getAuthorAvatar())
                                 .addField("Tries", String.format("%d/6", player.getRemaining()), false)
                                 .setDescription(description)))
                 .flatMap(context::createFollowupMessage);

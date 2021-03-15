@@ -43,6 +43,7 @@ public class ShadbotUtil {
         return Jsoup.parse(StringUtil.remove(err.getMessage(), "Watch on YouTube")).text().trim();
     }
 
+    // TODO: Remove
     public static String mustBeNsfw() {
         return String.format(Emoji.GREY_EXCLAMATION
                 + " This must be a NSFW-channel. If you're an admin, you can use `/setting %s enable`", Setting.NSFW);

@@ -24,7 +24,7 @@ public class PlaylistCmd extends BaseCmd {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
         return context.createFollowupMessage(ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor("Playlist", null, context.getAuthorAvatarUrl())
+                embed -> embed.setAuthor("Playlist", null, context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
                         .setDescription(PlaylistCmd.formatPlaylist(guildMusic.getTrackScheduler()))));
     }

@@ -6,6 +6,7 @@ import com.shadorc.shadbot.api.json.image.r34.R34Response;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.NetUtil;
@@ -35,36 +36,28 @@ public class Rule34Cmd extends BaseCmd {
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return context.createFollowupMessage(ShadbotUtil.mustBeNsfw());
+                        return context.reply(Emoji.GREY_EXCLAMATION,
+                                context.localize("rule34.nsfw").formatted(Setting.NSFW));
                     }
 
-                    return context.createFollowupMessage("%s (**%s**) %s",
-                            Emoji.HOURGLASS, context.getAuthorName(), context.localize("rule34.loading"))
-                            .flatMap(messageId -> Rule34Cmd.getR34Post(query)
-                                    .flatMap(post -> {
-                                        // Don't post images containing children
-                                        if (Rule34Cmd.containsChildren(post, post.getTags())) {
-                                            return context.editFollowupMessage(messageId, "%s (**%s**) %s",
-                                                    Emoji.WARNING, context.getAuthorName(),
-                                                    context.localize("rule34.children"));
-                                        }
+                    return context.reply(Emoji.HOURGLASS, context.localize("rule34.loading"))
+                            .then(Rule34Cmd.getR34Post(query))
+                            .flatMap(post -> {
+                                // Don't post images containing children
+                                if (Rule34Cmd.containsChildren(post, post.getTags())) {
+                                    return context.editReply(Emoji.WARNING, context.localize("rule34.children"));
+                                }
 
-                                        return context.editFollowupMessage(messageId,
-                                                Rule34Cmd.formatEmbed(context, post, query));
-                                    })
-                                    .switchIfEmpty(context.editFollowupMessage(messageId, "%s (**%s**) %s",
-                                            Emoji.MAGNIFYING_GLASS, context.getAuthorName(),
-                                            context.localize("rule34.not.found").formatted(query))));
+                                return context.editReply(Rule34Cmd.formatEmbed(context, post, query));
+                            })
+                            .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
+                                    context.localize("rule34.not.found").formatted(query)));
                 });
     }
 
     private static Mono<R34Post> getR34Post(String tag) {
-        final String url = String.format("%s?" +
-                        "page=dapi" +
-                        "&s=post" +
-                        "&q=index" +
-                        "&tags=%s",
-                HOME_URL, NetUtil.encode(tag.replace(" ", "_")));
+        final String url = "%s?page=dapi&s=post&q=index&tags=%s"
+                .formatted(HOME_URL, NetUtil.encode(tag.replace(" ", "_")));
 
         return RequestHelper.fromUrl(url)
                 .to(R34Response.class)
@@ -92,7 +85,7 @@ public class Rule34Cmd extends BaseCmd {
 
                     final String resolution = "%dx%d".formatted(post.getWidth(), post.getHeight());
                     final String formattedTags = Rule34Cmd.formatTags(post.getTags());
-                    embed.setAuthor("Rule34: %s".formatted(tag), post.getFileUrl(), context.getAuthorAvatarUrl())
+                    embed.setAuthor("Rule34: %s".formatted(tag), post.getFileUrl(), context.getAuthorAvatar())
                             .setThumbnail("https://i.imgur.com/t6JJWFN.png")
                             .addField(context.localize("rule34.resolution"), resolution, false)
                             .addField(context.localize("rule34.tags"), formattedTags, false)

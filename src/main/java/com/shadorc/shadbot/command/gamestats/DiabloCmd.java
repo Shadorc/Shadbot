@@ -69,7 +69,7 @@ public class DiabloCmd extends BaseCmd {
                                 .to(ProfileResponse.class))
                         .flatMap(profile -> {
                             if ("NOTFOUND".equals(profile.getCode().orElse(""))) {
-                                return context.editFollowupMessage(messageId,
+                                return context.editReply(messageId,
                                         Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
                                         context.getAuthorName());
                             }
@@ -86,14 +86,14 @@ public class DiabloCmd extends BaseCmd {
                                     .collectList()
                                     .flatMap(heroResponses -> {
                                         if (heroResponses.isEmpty()) {
-                                            return context.editFollowupMessage(messageId,
+                                            return context.editReply(messageId,
                                                     Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't have " +
                                                             "any heroes or they are not found.",
                                                     context.getAuthorName());
                                         }
                                         Collections.reverse(heroResponses);
-                                        return context.editFollowupMessage(messageId,
-                                                DiabloCmd.formatEmbed(context.getAuthorAvatarUrl(), profile, heroResponses));
+                                        return context.editReply(messageId,
+                                                DiabloCmd.formatEmbed(context.getAuthorAvatar(), profile, heroResponses));
                                     });
                         }));
     }

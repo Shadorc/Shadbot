@@ -22,7 +22,6 @@ import reactor.function.TupleUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.Consumer;
 
 class ServerInfoCmd extends BaseCmd {
@@ -41,7 +40,7 @@ class ServerInfoCmd extends BaseCmd {
                 getGuild.flatMapMany(Guild::getChannels).collectList(),
                 getGuild.flatMap(Guild::getOwner),
                 getGuild.flatMap(Guild::getRegion),
-                Mono.just(context.getAuthorAvatarUrl()))
+                Mono.just(context.getAuthorAvatar()))
                 .map(TupleUtils.function(this::formatEmbed))
                 .flatMap(context::createFollowupMessage);
     }

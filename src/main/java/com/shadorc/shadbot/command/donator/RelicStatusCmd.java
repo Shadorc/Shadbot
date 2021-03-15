@@ -66,7 +66,7 @@ public class RelicStatusCmd extends BaseCmd {
                 .filter(Predicate.not(List::isEmpty))
                 .map(fields -> ShadbotUtil.getDefaultEmbed(
                         embed -> {
-                            embed.setAuthor("Donator Status", null, context.getAuthorAvatarUrl())
+                            embed.setAuthor("Donator Status", null, context.getAuthorAvatar())
                                     .setThumbnail("https://i.imgur.com/R0N6kW3.png");
 
                             fields.forEach(field -> embed.addField(field.name(), field.value(), field.inline().get()));
