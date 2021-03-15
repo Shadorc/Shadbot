@@ -44,12 +44,12 @@ public class XkcdCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final Sort sort = EnumUtil.parseEnum(Sort.class, context.getOption("sort").orElseThrow().asString());
         final Mono<XkcdResponse> getResponse = sort == Sort.LATEST ? XkcdCmd.getLatestXkcd() : this.getRandomXkcd();
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading XKCD comic...", context.getAuthorName())
-                .flatMap(messageId -> getResponse.flatMap(xkcd -> context.editReply(messageId,
-                        XkcdCmd.formatEmbed(context.getAuthorAvatar(), xkcd))));
+        return context.reply(Emoji.HOURGLASS, context.localize("xkcd.loading"))
+                .then(getResponse)
+                .flatMap(xkcd -> context.editReply(XkcdCmd.formatEmbed(context.getAuthorAvatar(), xkcd)));
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(final String avatarUrl, final XkcdResponse xkcd) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(String avatarUrl, XkcdResponse xkcd) {
         return ShadbotUtil.getDefaultEmbed(embed ->
                 embed.setAuthor("XKCD: %s".formatted(xkcd.getTitle()), "%s/%d".formatted(HOME_URL, xkcd.getNum()), avatarUrl)
                         .setImage(xkcd.getImg()));
