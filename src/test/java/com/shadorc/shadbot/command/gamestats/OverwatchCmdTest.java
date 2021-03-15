@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.overwatch.OverwatchProfile;
@@ -17,13 +16,13 @@ public class OverwatchCmdTest extends CmdTest<OverwatchCmd> {
         assertEquals(OverwatchCmd.Platform.PC, result.getPlatform());
         assertNull(result.getProfile().getMessage().orElse(null));
         assertFalse(result.getProfile().isPrivate());
-        assertNotNull(result.getProfile().getUsername());
+        assertFalse(result.getProfile().getUsername().isBlank());
         assertNotNull(result.getProfile().getGames().getQuickplayWon());
-        assertNotNull(result.getProfile().getLevel());
-        assertNotNull(result.getProfile().getPortrait());
-        assertNotNull(result.getProfile().getQuickplayPlaytime());
-        assertNotNull(result.getQuickplay().getEliminationsPerLife());
-        assertNotNull(result.getQuickplay().getPlayed());
+        assertFalse(result.getProfile().getLevel().isBlank());
+        assertFalse(result.getProfile().getPortrait().isBlank());
+        assertFalse(result.getProfile().getQuickplayPlaytime().isBlank());
+        assertFalse(result.getQuickplay().getEliminationsPerLife().isBlank());
+        assertFalse(result.getQuickplay().getPlayed().isBlank());
     }
 
     @Test
@@ -33,4 +32,3 @@ public class OverwatchCmdTest extends CmdTest<OverwatchCmd> {
     }
 
 }
-*/

@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.steam.player.PlayerSummary;
@@ -36,10 +35,9 @@ public class CounterStrikeCmdTest extends CmdTest<CounterStrikeCmd> {
     public void testGetPlayerSummary() {
         final PlayerSummary result = this.invoke("getPlayerSummary", "76561198040113951");
         assertEquals("76561198040113951", result.getSteamId());
-        assertNotNull(result.getAvatarFull());
-        assertNotNull(result.getPersonaName());
+        assertFalse(result.getAvatarFull().isBlank());
+        assertFalse(result.getPersonaName().isBlank());
         assertNotNull(result.getCommunityVisibilityState());
     }
 
 }
-*/
