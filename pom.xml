@@ -98,8 +98,11 @@
             <url>https://dl.bintray.com/sedmelluq/com.sedmelluq</url>
         </repository>
         <repository>
-            <id>local-maven-repo</id>
-            <url>file:///C:/Users/dcecc/.m2/repository</url>
+            <id>oss.sonatype.org-snapshot</id>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
     <dependencies>
@@ -107,7 +110,7 @@
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
-            <version>3.4.3</version>
+            <version>3.4.4</version>
         </dependency>
         <!-- Discord4J -->
         <dependency>
