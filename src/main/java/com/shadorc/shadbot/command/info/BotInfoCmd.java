@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
 import java.time.Duration;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.function.Consumer;
 
@@ -44,9 +45,8 @@ class BotInfoCmd extends BaseCmd {
                 context.getClient().getGuilds().count())
                 .flatMap(TupleUtils.function((owner, channel, guildCount) -> {
                     final long start = System.currentTimeMillis();
-                    return context.createFollowupMessage(Emoji.GEAR + " (**%s**) Testing ping...", context.getAuthorName())
-                            .flatMap(messageId -> context.editReply(messageId,
-                                    BotInfoCmd.formatEmbed(context, start, owner, guildCount)));
+                    return context.reply(Emoji.GEAR, context.localize("testing.ping"))
+                            .then(context.editReply(BotInfoCmd.formatEmbed(context, start, owner, guildCount)));
                 }));
     }
 
@@ -58,19 +58,36 @@ class BotInfoCmd extends BaseCmd {
                 .orElseThrow();
         final String uptime = FormatUtil.formatDurationWords(Duration.ofMillis(SystemUtil.getUptime()));
         final ShardInfo shardInfo = context.getEvent().getShardInfo();
+        final Locale locale = context.getLocale();
+
+        final String shadbotTitle = "%s Shadbot".formatted(Emoji.ROBOT);
+        final String shadbotField = context.localize("botinfo.field.shadbot")
+                .formatted(uptime, owner.getTag(),
+                        shardInfo.getIndex() + 1, shardInfo.getCount(),
+                        FormatUtil.number(guildCount, locale),
+                        FormatUtil.number(Telemetry.VOICE_COUNT_GAUGE.get(), locale));
+
+        final String networkTitle = "%s %s".formatted(Emoji.SATELLITE, context.localize("botinfo.title.network"));
+        final String networkField = context.localize("botinfo.field.network")
+                .formatted(TimeUtil.elapsed(start), gatewayLatency);
+
+        final String versionsTitle = "%s %s".formatted(Emoji.SCREWDRIVER, context.localize("botinfo.title.versions"));
+        final String versionsField = context.localize("botinfo.field.versions")
+                .formatted(JAVA_VERSION, Config.VERSION, D4J_NAME, D4J_VERSION, LAVAPLAYER_VERSION);
+
+        final String performanceTitle = "%s %s".formatted(Emoji.GEAR, context.localize("botinfo.title.performance"));
+        final String performanceField = context.localize("botinfo.field.performance")
+                .formatted(FormatUtil.number(SystemUtil.getUsedHeapMemory(), locale),
+                        FormatUtil.number(SystemUtil.getMaxHeapMemory(), locale),
+                        SystemUtil.getProcessCpuUsage(),
+                        FormatUtil.number(SystemUtil.getThreadCount(), locale));
 
         return ShadbotUtil.getDefaultEmbed(embed -> embed
-                .setAuthor("Bot Info", null, context.getAuthorAvatar())
-                .addField(Emoji.ROBOT + " Shadbot", "**Uptime:** %s%n**Developer:** %s%n**Shard:** %d/%d%n**Servers:** %s%n**Voice Channels:** %s"
-                        .formatted(uptime, owner.getTag(), shardInfo.getIndex() + 1, shardInfo.getCount(),
-                                FormatUtil.number(guildCount), FormatUtil.number(Telemetry.VOICE_COUNT_GAUGE.get())), true)
-                .addField(Emoji.SATELLITE + " Network", "**Ping:** %dms%n**Gateway:** %dms"
-                        .formatted(TimeUtil.elapsed(start), gatewayLatency), true)
-                .addField(Emoji.SCREWDRIVER + " Versions", "**Java:** %s%n**Shadbot:** %s%n**%s:** %s%n**LavaPlayer:** %s"
-                        .formatted(JAVA_VERSION, Config.VERSION, D4J_NAME, D4J_VERSION, LAVAPLAYER_VERSION), true)
-                .addField(Emoji.GEAR + " Performance", "**Memory:** %s/%s MB%n**CPU (Process):** %.1f%%%n**Threads:** %s"
-                        .formatted(FormatUtil.number(SystemUtil.getUsedHeapMemory()), FormatUtil.number(SystemUtil.getMaxHeapMemory()),
-                                SystemUtil.getProcessCpuUsage(), FormatUtil.number(SystemUtil.getThreadCount())), true));
+                .setAuthor(context.localize("botinfo.title"), null, context.getAuthorAvatar())
+                .addField(shadbotTitle, shadbotField, true)
+                .addField(networkTitle, networkField, true)
+                .addField(versionsTitle, versionsField, true)
+                .addField(performanceTitle, performanceField, true));
     }
 
 }
