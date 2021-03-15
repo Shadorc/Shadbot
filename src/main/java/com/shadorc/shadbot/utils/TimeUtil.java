@@ -32,7 +32,7 @@ public class TimeUtil {
      * @param instant The instant to get milliseconds from.
      * @return The amount of milliseconds elapsed since {@code instant}.
      */
-    public static long getMillisUntil(@NonNull Instant instant) {
+    public static long elapsed(@NonNull Instant instant) {
         return Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), TimeUtil.toLocalDateTime(instant)));
     }
 
@@ -40,8 +40,8 @@ public class TimeUtil {
      * @param epochMilli The epoch milliseconds.
      * @return The amount of milliseconds elapsed since {@code epochMillis}.
      */
-    public static long getMillisUntil(long epochMilli) {
-        return TimeUtil.getMillisUntil(Instant.ofEpochMilli(epochMilli));
+    public static long elapsed(long epochMilli) {
+        return TimeUtil.elapsed(Instant.ofEpochMilli(epochMilli));
     }
 
     /**

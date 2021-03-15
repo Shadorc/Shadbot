@@ -49,19 +49,19 @@ public class RussianRoulettePlayer extends GamblerPlayer {
             return Duration.ZERO;
         }
         return Duration.ofHours(Constants.RESET_HOURS)
-                .minus(Duration.ofMillis(TimeUtil.getMillisUntil(this.deadInstant)));
+                .minus(Duration.ofMillis(TimeUtil.elapsed(this.deadInstant)));
     }
 
     public boolean isAlive() {
         // If the time is elapsed since the player last played, reset
         if (this.lastTimePlayed != null
-                && TimeUnit.MILLISECONDS.toHours(TimeUtil.getMillisUntil(this.lastTimePlayed)) >= Constants.RESET_HOURS) {
+                && TimeUnit.MILLISECONDS.toHours(TimeUtil.elapsed(this.lastTimePlayed)) >= Constants.RESET_HOURS) {
             this.init();
         }
 
         // If the player has been dead for one day, reset
         if (this.deadInstant != null
-                && TimeUnit.MILLISECONDS.toHours(TimeUtil.getMillisUntil(this.deadInstant)) >= Constants.RESET_HOURS) {
+                && TimeUnit.MILLISECONDS.toHours(TimeUtil.elapsed(this.deadInstant)) >= Constants.RESET_HOURS) {
             this.init();
             return true;
         }

@@ -139,6 +139,15 @@ public class FormatUtil {
     }
 
     /**
+     * @param number The double number to format.
+     * @param locale The desired locale.
+     * @return The formatted number as a string using English locale.
+     */
+    public static String number(double number, Locale locale) {
+        return NumberFormat.getNumberInstance(locale).format(number);
+    }
+
+    /**
      * @param limit  The inclusive upper bound.
      * @param count  The number of elements the stream should be limited to.
      * @param mapper A function to apply to each element.

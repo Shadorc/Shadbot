@@ -108,7 +108,7 @@ public class DeviantartCmd extends BaseCmd {
         if (this.token.get() == null) {
             return true;
         }
-        final long elapsedMs = TimeUtil.getMillisUntil(this.lastTokenGeneration.get());
+        final long elapsedMs = TimeUtil.elapsed(this.lastTokenGeneration.get());
         final long expiresIn = TimeUnit.SECONDS.toMillis(this.token.get().getExpiresIn());
         return elapsedMs >= expiresIn;
     }

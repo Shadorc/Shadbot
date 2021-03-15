@@ -136,7 +136,7 @@ public class DiabloCmd extends BaseCmd {
         if (token == null) {
             return true;
         }
-        return TimeUtil.getMillisUntil(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(token.getExpiresIn());
+        return TimeUtil.elapsed(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(token.getExpiresIn());
     }
 
     private Mono<TokenResponse> requestAccessToken() {

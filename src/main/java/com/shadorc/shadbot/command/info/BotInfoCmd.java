@@ -63,7 +63,7 @@ class BotInfoCmd extends BaseCmd {
                         .formatted(uptime, owner.getTag(), context.getShardIndex() + 1, context.getShardCount(),
                                 FormatUtil.number(guildCount), FormatUtil.number(Telemetry.VOICE_COUNT_GAUGE.get())), true)
                 .addField(Emoji.SATELLITE + " Network", "**Ping:** %dms%n**Gateway:** %dms"
-                        .formatted(TimeUtil.getMillisUntil(start), gatewayLatency), true)
+                        .formatted(TimeUtil.elapsed(start), gatewayLatency), true)
                 .addField(Emoji.SCREWDRIVER + " Versions", "**Java:** %s%n**Shadbot:** %s%n**%s:** %s%n**LavaPlayer:** %s"
                         .formatted(JAVA_VERSION, Config.VERSION, D4J_NAME, D4J_VERSION, LAVAPLAYER_VERSION), true)
                 .addField(Emoji.GEAR + " Performance", "**Memory:** %s/%s MB%n**CPU (Process):** %.1f%%%n**Threads:** %s"

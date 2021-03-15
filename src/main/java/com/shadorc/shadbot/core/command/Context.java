@@ -8,6 +8,7 @@ import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.music.NoMusicException;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.EnumUtil;
+import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.InteractionCreateEvent;
@@ -32,6 +33,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -53,8 +55,16 @@ public class Context {
         return this.dbGuild;
     }
 
-    public String translate(String key) {
-        return I18nManager.getInstance().getBundle(this.dbGuild.getLocale()).getString(key);
+    public Locale getLocale() {
+        return this.getDbGuild().getLocale();
+    }
+
+    public String localize(String key) {
+        return I18nManager.getInstance().getBundle(this.getLocale()).getString(key);
+    }
+
+    public String localize(double number) {
+        return FormatUtil.number(number, this.getLocale());
     }
 
     public GatewayDiscordClient getClient() {

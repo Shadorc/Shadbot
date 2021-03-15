@@ -25,7 +25,7 @@ public class TimeUtilTest {
     public void testGetMillisUntilInstant() {
         final int offset = 30;
         final int millis = new Random().nextInt(10_000);
-        final long elapsed = TimeUtil.getMillisUntil(Instant.now().minusMillis(millis));
+        final long elapsed = TimeUtil.elapsed(Instant.now().minusMillis(millis));
         assertTrue(elapsed >= millis - offset && elapsed <= millis + offset);
     }
 
@@ -33,7 +33,7 @@ public class TimeUtilTest {
     public void testGetMillisUntilLong() {
         final int offset = 30;
         final int millis = new Random().nextInt(10_000);
-        final long elapsed = TimeUtil.getMillisUntil(Instant.now().minusMillis(millis).toEpochMilli());
+        final long elapsed = TimeUtil.elapsed(Instant.now().minusMillis(millis).toEpochMilli());
         assertTrue(elapsed >= millis - offset && elapsed <= millis + offset);
     }
 
