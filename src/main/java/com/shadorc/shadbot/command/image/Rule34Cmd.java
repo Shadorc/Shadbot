@@ -37,7 +37,7 @@ public class Rule34Cmd extends BaseCmd {
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
                         return context.reply(Emoji.GREY_EXCLAMATION,
-                                context.localize("rule34.nsfw").formatted(Setting.NSFW));
+                                context.localize("must.be.nsfw").formatted(Setting.NSFW));
                     }
 
                     return context.reply(Emoji.HOURGLASS, context.localize("rule34.loading"))

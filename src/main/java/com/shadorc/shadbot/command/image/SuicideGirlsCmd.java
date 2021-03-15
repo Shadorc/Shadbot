@@ -4,6 +4,7 @@ import com.shadorc.shadbot.api.html.suicidegirl.SuicideGirl;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.ShadbotUtil;
@@ -27,20 +28,20 @@ public class SuicideGirlsCmd extends BaseCmd {
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return context.createFollowupMessage(ShadbotUtil.mustBeNsfw());
+                        return context.reply(Emoji.GREY_EXCLAMATION,
+                                context.localize("must.be.nsfw").formatted(Setting.NSFW));
                     }
 
-                    return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading SuicideGirls image...", context.getAuthorName())
-                            .zipWith(SuicideGirlsCmd.getRandomSuicideGirl())
-                            .flatMap(TupleUtils.function((messageId, post) -> context.editReply(messageId,
-                                    SuicideGirlsCmd.formatEmbed(context.getAuthorAvatar(), post))));
+                    return context.reply(Emoji.HOURGLASS, context.localize("suicidegirls.loading"))
+                            .then(SuicideGirlsCmd.getRandomSuicideGirl())
+                            .flatMap(post -> context.editReply(SuicideGirlsCmd.formatEmbed(context, post)));
                 });
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(final String avatarUrl, final SuicideGirl post) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, SuicideGirl post) {
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor("SuicideGirls", post.getUrl(), avatarUrl)
-                        .setDescription("Name: **%s**".formatted(post.getName()))
+                embed -> embed.setAuthor("SuicideGirls", post.getUrl(), context.getAuthorAvatar())
+                        .setDescription(context.localize("suicidegirls.name").formatted(post.getName()))
                         .setImage(post.getImageUrl()));
     }
 
