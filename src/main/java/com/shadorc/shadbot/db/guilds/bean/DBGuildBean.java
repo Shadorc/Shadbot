@@ -16,15 +16,20 @@ public class DBGuildBean implements Bean {
     @Nullable
     @JsonProperty("settings")
     private SettingsBean settingsBean;
+    @Nullable
+    @JsonProperty("locale")
+    private String locale;
 
-    public DBGuildBean(String id, @Nullable List<DBMemberBean> members, @Nullable SettingsBean settingsBean) {
+    public DBGuildBean(String id, @Nullable List<DBMemberBean> members, @Nullable SettingsBean settingsBean,
+                       @Nullable String locale) {
         this.id = id;
         this.members = members;
         this.settingsBean = settingsBean;
+        this.locale = locale;
     }
 
     public DBGuildBean(String id) {
-        this(id, null, null);
+        this(id, null, null, null);
     }
 
     public DBGuildBean() {
@@ -44,12 +49,18 @@ public class DBGuildBean implements Bean {
         return this.settingsBean;
     }
 
+    @Nullable
+    public String getLocale() {
+        return this.locale;
+    }
+
     @Override
     public String toString() {
         return "DBGuildBean{" +
                 "id=" + this.id +
                 ", members=" + this.members +
                 ", settingsBean=" + this.settingsBean +
+                ", locale=" + this.locale +
                 '}';
     }
 }

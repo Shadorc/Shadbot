@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.Shadbot;
+import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
@@ -50,6 +51,10 @@ public class Context {
 
     public DBGuild getDbGuild() {
         return this.dbGuild;
+    }
+
+    public String translate(String key) {
+        return I18nManager.getInstance().getBundle(this.dbGuild.getLocale()).getString(key);
     }
 
     public GatewayDiscordClient getClient() {

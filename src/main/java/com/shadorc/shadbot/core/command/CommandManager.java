@@ -35,7 +35,7 @@ public class CommandManager {
     }
 
     private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {
-        final Map<String, BaseCmd> map = new LinkedHashMap<>();
+        final Map<String, BaseCmd> map = new LinkedHashMap<>(cmds.length);
         for (final BaseCmd cmd : cmds) {
             if (map.putIfAbsent(cmd.getName(), cmd) != null) {
                 DEFAULT_LOGGER.error("Command name collision between {} and {}",

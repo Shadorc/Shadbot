@@ -14,9 +14,7 @@ import com.shadorc.shadbot.db.guilds.bean.DBGuildBean;
 import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.shadorc.shadbot.db.guilds.GuildsCollection.LOGGER;
@@ -49,6 +47,12 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
 
     public Settings getSettings() {
         return new Settings(this.getBean().getSettingsBean());
+    }
+
+    public Locale getLocale() {
+        return Optional.ofNullable(this.getBean().getLocale())
+                .map(Locale::forLanguageTag)
+                .orElse(Locale.ENGLISH);
     }
 
     /**
