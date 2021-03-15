@@ -3,6 +3,7 @@ package com.shadorc.shadbot.command.info;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
@@ -17,7 +18,6 @@ import reactor.function.TupleUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.Consumer;
 
 class UserInfoCmd extends BaseCmd {
@@ -26,9 +26,10 @@ class UserInfoCmd extends BaseCmd {
 
     public UserInfoCmd() {
         super(CommandCategory.INFO, "user", "Show user info");
-        this.addOption("user", "If not specified, it will show your info", false, ApplicationCommandOptionType.USER);
+        this.addOption("user", "If not specified, it will show your info", false,
+                ApplicationCommandOptionType.USER);
 
-        this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Locale.ENGLISH);
+        this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Config.DEFAULT_LOCALE);
     }
 
     @Override

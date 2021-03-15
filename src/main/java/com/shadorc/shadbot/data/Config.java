@@ -7,6 +7,7 @@ import reactor.util.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.Locale;
 import java.util.Properties;
 
 public class Config {
@@ -27,6 +28,7 @@ public class Config {
     public static final String USER_AGENT = String.format("Shadbot/%s/D4J-DiscordBot (%s)", VERSION, GITHUB_URL);
     public static final Duration TIMEOUT = Duration.ofMillis(Long.parseLong(PROPERTIES.getProperty("timeout")));
 
+    public static final Locale DEFAULT_LOCALE = Locale.forLanguageTag(PROPERTIES.getProperty("default.locale"));
     public static final int DEFAULT_VOLUME = Integer.parseInt(PROPERTIES.getProperty("default.volume"));
     public static final int VOLUME_MAX = Integer.parseInt(PROPERTIES.getProperty("volume.max"));
     public static final int PLAYLIST_SIZE = Integer.parseInt(PROPERTIES.getProperty("playlist.size"));

@@ -3,6 +3,7 @@ package com.shadorc.shadbot.command.utils;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -38,7 +39,7 @@ public class WeatherCmd extends BaseCmd {
         this.addOption("city", "The city", true, ApplicationCommandOptionType.STRING);
         this.addOption("country", "The country", false, ApplicationCommandOptionType.STRING);
 
-        this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy 'at' hh:mm aa", Locale.ENGLISH);
+        this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy 'at' hh:mm aa", Config.DEFAULT_LOCALE);
         final String apiKey = CredentialManager.getInstance().get(Credential.OPENWEATHERMAP_API_KEY);
         if (apiKey != null) {
             this.owm = new OWM(apiKey);

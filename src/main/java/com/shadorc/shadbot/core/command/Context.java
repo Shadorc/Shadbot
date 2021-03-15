@@ -2,6 +2,7 @@ package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.core.i18n.I18nManager;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
@@ -31,10 +32,7 @@ import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class Context {
@@ -60,7 +58,11 @@ public class Context {
     }
 
     public String localize(String key) {
-        return I18nManager.getInstance().getBundle(this.getLocale()).getString(key);
+        try {
+            return I18nManager.getInstance().getBundle(this.getLocale()).getString(key);
+        } catch (final MissingResourceException err) {
+            return I18nManager.getInstance().getBundle(Config.DEFAULT_LOCALE).getString(key);
+        }
     }
 
     public String localize(double number) {

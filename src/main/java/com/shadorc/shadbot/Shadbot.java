@@ -52,8 +52,7 @@ public class Shadbot {
     private static BotListStats botListStats;
 
     public static void main(String[] args) {
-        // Set default to Locale US
-        Locale.setDefault(Locale.US);
+        Locale.setDefault(Config.DEFAULT_LOCALE);
 
         final String sentryDsn = CredentialManager.getInstance().get(Credential.SENTRY_DSN);
         if (sentryDsn != null && !Config.IS_SNAPSHOT) {

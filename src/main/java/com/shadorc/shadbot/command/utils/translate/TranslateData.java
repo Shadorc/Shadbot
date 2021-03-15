@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.command.utils.translate;
 
 import com.shadorc.shadbot.command.CommandException;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.utils.MapUtil;
 import com.shadorc.shadbot.utils.NetUtil;
 
@@ -22,7 +23,7 @@ public class TranslateData {
             new IllegalArgumentException("The destination language must be different from the source one");
     private static final Map<String, String> LANG_ISO_MAP = Arrays.stream(Locale.getISOLanguages())
             .collect(Collectors.toUnmodifiableMap(
-                    iso -> new Locale(iso).getDisplayLanguage(Locale.ENGLISH).toLowerCase(),
+                    iso -> new Locale(iso).getDisplayLanguage(Config.DEFAULT_LOCALE).toLowerCase(),
                     Function.identity(),
                     (value1, value2) -> value1));
     private static final Map<String, String> ISO_LANG_MAP = MapUtil.inverse(LANG_ISO_MAP);

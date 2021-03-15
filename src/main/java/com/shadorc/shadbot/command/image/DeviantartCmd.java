@@ -45,25 +45,26 @@ public class DeviantartCmd extends BaseCmd {
     }
 
     @Override
-    public Mono<?> execute(final Context context) {
+    public Mono<?> execute(Context context) {
         final String query = context.getOptionAsString("query").orElseThrow();
 
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading image...", context.getAuthorName())
+        return context.createFollowupMessage("%s (**%s**) %s",
+                Emoji.HOURGLASS, context.getAuthorName(), context.localize("deviantart.loading"))
                 .flatMap(messageId -> this.getPopularImage(query)
                         .flatMap(image -> context.editFollowupMessage(messageId,
-                                DeviantartCmd.formatEmbed(context.getAuthorAvatarUrl(), query, image)))
-                        .switchIfEmpty(context.editFollowupMessage(messageId,
-                                Emoji.MAGNIFYING_GLASS + " (**%s**) No images found matching query `%s`",
-                                context.getAuthorName(), query)));
+                                DeviantartCmd.formatEmbed(context, query, image)))
+                        .switchIfEmpty(context.editFollowupMessage(messageId, "%s (**%s**) %s",
+                                Emoji.MAGNIFYING_GLASS, context.getAuthorName(),
+                                context.localize("deviantart.not.found"), query)));
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(final String avatarUrl, final String query, final Image image) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, String query, Image image) {
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor("DeviantArt: %s".formatted(query), image.getUrl(), avatarUrl)
+                embed -> embed.setAuthor("DeviantArt: %s".formatted(query), image.getUrl(), context.getAuthorAvatarUrl())
                         .setThumbnail("https://i.imgur.com/gT4hHUB.png")
-                        .addField("Title", image.getTitle(), false)
-                        .addField("Author", image.getAuthor().getUsername(), false)
-                        .addField("Category", image.getCategoryPath(), false)
+                        .addField(context.localize("deviantart.title"), image.getTitle(), false)
+                        .addField(context.localize("deviantart.author"), image.getAuthor().getUsername(), false)
+                        .addField(context.localize("deviantart.category"), image.getCategoryPath(), false)
                         .setImage(image.getContent().map(Content::getSource).orElseThrow()));
     }
 

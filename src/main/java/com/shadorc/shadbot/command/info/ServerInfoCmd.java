@@ -3,6 +3,7 @@ package com.shadorc.shadbot.command.info;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
@@ -30,7 +31,7 @@ class ServerInfoCmd extends BaseCmd {
 
     public ServerInfoCmd() {
         super(CommandCategory.INFO, "server", "Show server info");
-        this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy - HH'h'mm", Locale.ENGLISH);
+        this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy - HH'h'mm", Config.DEFAULT_LOCALE);
     }
 
     @Override

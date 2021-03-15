@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.utils;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import com.shadorc.shadbot.data.Config;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
 import reactor.util.annotation.Nullable;
@@ -135,7 +136,7 @@ public class FormatUtil {
      * @return The formatted number as a string using English locale.
      */
     public static String number(double number) {
-        return NumberFormat.getNumberInstance(Locale.ENGLISH).format(number);
+        return NumberFormat.getNumberInstance(Config.DEFAULT_LOCALE).format(number);
     }
 
     /**
