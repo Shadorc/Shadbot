@@ -21,7 +21,7 @@ public class I18nManager {
 
     private static Map<Locale, ResourceBundle> initialize(Locale... locales) {
         final Map<Locale, ResourceBundle> map = new HashMap<>(locales.length);
-        for(final Locale locale : locales) {
+        for (final Locale locale : locales) {
             map.put(locale, ResourceBundle.getBundle("i18n/i18n", locale));
         }
         DEFAULT_LOGGER.info("{} locales initialized", map.size());

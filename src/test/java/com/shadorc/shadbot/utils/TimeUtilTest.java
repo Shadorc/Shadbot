@@ -22,7 +22,7 @@ public class TimeUtilTest {
     }
 
     @Test
-    public void testGetMillisUntilInstant() {
+    public void testElapsedInstant() {
         final int offset = 30;
         final int millis = new Random().nextInt(10_000);
         final long elapsed = TimeUtil.elapsed(Instant.now().minusMillis(millis));
@@ -30,7 +30,7 @@ public class TimeUtilTest {
     }
 
     @Test
-    public void testGetMillisUntilLong() {
+    public void testElapsedLong() {
         final int offset = 30;
         final int millis = new Random().nextInt(10_000);
         final long elapsed = TimeUtil.elapsed(Instant.now().minusMillis(millis).toEpochMilli());
