@@ -55,7 +55,7 @@ public class DeviantartCmd extends BaseCmd {
                                 DeviantartCmd.formatEmbed(context, query, image)))
                         .switchIfEmpty(context.editFollowupMessage(messageId, "%s (**%s**) %s",
                                 Emoji.MAGNIFYING_GLASS, context.getAuthorName(),
-                                context.localize("deviantart.not.found"), query)));
+                                context.localize("deviantart.not.found").formatted(query))));
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, String query, Image image) {

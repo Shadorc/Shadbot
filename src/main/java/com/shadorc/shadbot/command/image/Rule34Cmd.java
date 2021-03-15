@@ -38,27 +38,27 @@ public class Rule34Cmd extends BaseCmd {
                         return context.createFollowupMessage(ShadbotUtil.mustBeNsfw());
                     }
 
-                    return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading rule34 image...", context.getAuthorName())
+                    return context.createFollowupMessage("%s (**%s**) %s",
+                            Emoji.HOURGLASS, context.getAuthorName(), context.localize("rule34.loading"))
                             .flatMap(messageId -> Rule34Cmd.getR34Post(query)
                                     .flatMap(post -> {
                                         // Don't post images containing children
                                         if (Rule34Cmd.containsChildren(post, post.getTags())) {
-                                            return context.editFollowupMessage(messageId,
-                                                    Emoji.WARNING + " (**%s**) I don't display images " +
-                                                            "containing children or tagged with `loli` or `shota`.",
-                                                    context.getAuthorName());
+                                            return context.editFollowupMessage(messageId, "%s (**%s**) %s",
+                                                    Emoji.WARNING, context.getAuthorName(),
+                                                    context.localize("rule34.children"));
                                         }
 
                                         return context.editFollowupMessage(messageId,
-                                                Rule34Cmd.formatEmbed(post, query, context.getAuthorAvatarUrl()));
+                                                Rule34Cmd.formatEmbed(context, post, query));
                                     })
-                                    .switchIfEmpty(context.editFollowupMessage(messageId,
-                                            Emoji.MAGNIFYING_GLASS + " (**%s**) No images found matching query `%s`",
-                                            context.getAuthorName(), query)));
+                                    .switchIfEmpty(context.editFollowupMessage(messageId, "%s (**%s**) %s",
+                                            Emoji.MAGNIFYING_GLASS, context.getAuthorName(),
+                                            context.localize("rule34.not.found").formatted(query))));
                 });
     }
 
-    private static Mono<R34Post> getR34Post(final String tag) {
+    private static Mono<R34Post> getR34Post(String tag) {
         final String url = String.format("%s?" +
                         "page=dapi" +
                         "&s=post" +
@@ -75,30 +75,29 @@ public class Rule34Cmd extends BaseCmd {
                 .map(RandUtil::randValue);
     }
 
-    private static boolean containsChildren(final R34Post post, final List<String> tags) {
+    private static boolean containsChildren(R34Post post, List<String> tags) {
         return post.hasChildren() || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"));
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(final R34Post post, final String tag, final String avatarUrl) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, R34Post post, String tag) {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> {
                     post.getSource().ifPresent(source -> {
                         if (NetUtil.isUrl(source)) {
-                            embed.setDescription("%n[**Source**](%s)".formatted(source));
+                            embed.setDescription(context.localize("rule34.source.url").formatted(source));
                         } else {
-                            embed.addField("Source", source, false);
+                            embed.addField(context.localize("rule34.source"), source, false);
                         }
                     });
 
                     final String resolution = "%dx%d".formatted(post.getWidth(), post.getHeight());
                     final String formattedTags = Rule34Cmd.formatTags(post.getTags());
-                    embed.setAuthor("Rule34: %s".formatted(tag), post.getFileUrl(), avatarUrl)
+                    embed.setAuthor("Rule34: %s".formatted(tag), post.getFileUrl(), context.getAuthorAvatarUrl())
                             .setThumbnail("https://i.imgur.com/t6JJWFN.png")
-                            .addField("Resolution", resolution, false)
-                            .addField("Tags", formattedTags, false)
+                            .addField(context.localize("rule34.resolution"), resolution, false)
+                            .addField(context.localize("rule34.tags"), formattedTags, false)
                             .setImage(post.getFileUrl())
-                            .setFooter("If there is no preview, click on the title to see the " +
-                                    "media (probably a video)", null);
+                            .setFooter(context.localize("rule34.footer"), null);
                 });
     }
 
