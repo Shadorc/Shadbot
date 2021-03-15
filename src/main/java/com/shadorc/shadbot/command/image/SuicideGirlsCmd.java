@@ -11,7 +11,6 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
 
 import java.util.function.Consumer;
 

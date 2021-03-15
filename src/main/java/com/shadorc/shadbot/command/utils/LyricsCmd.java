@@ -60,9 +60,9 @@ public class LyricsCmd extends BaseCmd {
         final String search = LyricsCmd.getSearch(context);
         return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading lyrics...", context.getAuthorName())
                 .flatMap(messageId -> LyricsCmd.getMusixmatch(search)
-                        .flatMap(musixmatch -> context.editReply(messageId,
+                        .flatMap(musixmatch -> context.editFollowupMessage(messageId,
                                 LyricsCmd.formatEmbed(musixmatch, context.getAuthorAvatar())))
-                        .switchIfEmpty(context.editReply(messageId,
+                        .switchIfEmpty(context.editFollowupMessage(messageId,
                                 Emoji.MAGNIFYING_GLASS + " (**%s**) No lyrics found matching `%s`",
                                 context.getAuthorName(), search)));
     }

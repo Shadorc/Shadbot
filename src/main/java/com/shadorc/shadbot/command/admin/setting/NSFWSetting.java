@@ -52,7 +52,7 @@ public class NSFWSetting extends BaseSetting {
                             case ENABLE -> true;
                             default -> false;
                         }))
-                        .flatMap(nsfw -> channel.editReply(spec -> spec.setNsfw(nsfw))))
+                        .flatMap(nsfw -> channel.editFollowupMessage(spec -> spec.setNsfw(nsfw))))
                 .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " (**%s**) %s is now **%sSFW**.",
                         context.getUsername(), channel.getMention(), channel.isNsfw() ? "N" : ""), channel))
                 .then();

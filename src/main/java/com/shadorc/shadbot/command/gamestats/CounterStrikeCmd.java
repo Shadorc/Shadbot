@@ -53,7 +53,7 @@ public class CounterStrikeCmd extends BaseCmd {
                         .flatMap(this::getPlayerSummary)
                         .flatMap(player -> {
                             if (player.getCommunityVisibilityState() != PlayerSummary.CommunityVisibilityState.PUBLIC) {
-                                return context.editReply(messageId, Emoji.ACCESS_DENIED +
+                                return context.editFollowupMessage(messageId, Emoji.ACCESS_DENIED +
                                                 " (**%s**) This profile is private, more info [here](<%s>).",
                                         context.getAuthorName(), PRIVACY_HELP_URL);
                             }
@@ -64,7 +64,7 @@ public class CounterStrikeCmd extends BaseCmd {
                             return RequestHelper.request(userStatsUrl)
                                     .flatMap(body -> {
                                         if (body.contains("500 Internal Server Error")) {
-                                            return context.editReply(messageId, Emoji.ACCESS_DENIED +
+                                            return context.editFollowupMessage(messageId, Emoji.ACCESS_DENIED +
                                                             " (**%s**) The game details of this profile are not " +
                                                             "public, more info [here](<%s>).",
                                                     context.getAuthorName(), PRIVACY_HELP_URL);
@@ -74,15 +74,15 @@ public class CounterStrikeCmd extends BaseCmd {
                                                 .map(userStats -> userStats.getPlayerStats()
                                                         .flatMap(PlayerStats::getStats))
                                                 .flatMap(Mono::justOrEmpty)
-                                                .flatMap(stats -> context.editReply(messageId,
+                                                .flatMap(stats -> context.editFollowupMessage(messageId,
                                                         CounterStrikeCmd.formatEmbed(
                                                                 context.getAuthorAvatar(), player, stats)))
-                                                .switchIfEmpty(context.editReply(messageId, Emoji.MAGNIFYING_GLASS +
+                                                .switchIfEmpty(context.editFollowupMessage(messageId, Emoji.MAGNIFYING_GLASS +
                                                                 " (**%s**) This user doesn't play Counter-Strike: Global Offensive.",
                                                         context.getAuthorName()));
                                     });
                         })
-                        .switchIfEmpty(context.editReply(messageId, Emoji.MAGNIFYING_GLASS +
+                        .switchIfEmpty(context.editFollowupMessage(messageId, Emoji.MAGNIFYING_GLASS +
                                         " (**%s**) Steam player not found.",
                                 context.getAuthorName())));
     }

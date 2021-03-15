@@ -79,10 +79,10 @@ public class WeatherCmd extends BaseCmd {
                             }
                             return new IOException(err);
                         })
-                        .onErrorResume(IllegalArgumentException.class, err -> context.editReply(messageId,
+                        .onErrorResume(IllegalArgumentException.class, err -> context.editFollowupMessage(messageId,
                                 Emoji.MAGNIFYING_GLASS + " (**%s**) %s.", context.getAuthorName(), err.getMessage())
                                 .then(Mono.empty()))
-                        .flatMap(embed -> context.editReply(messageId, embed)));
+                        .flatMap(embed -> context.editFollowupMessage(messageId, embed)));
     }
 
     @SuppressWarnings("ConstantConditions") // Removes NullPointerException warnings

@@ -32,10 +32,7 @@ import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.MissingResourceException;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -57,6 +54,10 @@ public class Context {
 
     public DBGuild getDbGuild() {
         return this.dbGuild;
+    }
+
+    public Locale getLocale() {
+        return this.getDbGuild().getLocale();
     }
 
     public String localize(String key) {
@@ -210,7 +211,7 @@ public class Context {
                 .filter(replyId -> replyId != 0)
                 .switchIfEmpty(Mono.error(new RuntimeException("Context#reply must be called before Context#editReply")))
                 .map(Snowflake::of)
-                .flatMap(messageId -> this.editReply(messageId,
+                .flatMap(messageId -> this.editFollowupMessage(messageId,
                         "%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message)));
     }
 
@@ -230,12 +231,12 @@ public class Context {
     }
 
     // TODO: Remove?
-    public Mono<MessageData> editReply(Snowflake messageId, String format, Object... args) {
-        return this.editReply(messageId, format.formatted(args));
+    public Mono<MessageData> editFollowupMessage(Snowflake messageId, String format, Object... args) {
+        return this.editFollowupMessage(messageId, format.formatted(args));
     }
 
     // TODO: Remove?
-    public Mono<MessageData> editReply(Snowflake messageId, String content) {
+    public Mono<MessageData> editFollowupMessage(Snowflake messageId, String content) {
         return this.event.getInteractionResponse()
                 .editFollowupMessage(messageId.asLong(), ImmutableWebhookMessageEditRequest.builder()
                         .content(content)
@@ -243,7 +244,7 @@ public class Context {
     }
 
     // TODO: Remove?
-    public Mono<MessageData> editReply(Snowflake messageId, Consumer<EmbedCreateSpec> embed) {
+    public Mono<MessageData> editFollowupMessage(Snowflake messageId, Consumer<EmbedCreateSpec> embed) {
         final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
         embed.accept(mutatedSpec);
         return this.event.getInteractionResponse()

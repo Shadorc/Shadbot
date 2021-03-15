@@ -44,9 +44,9 @@ public class UrbanCmd extends BaseCmd {
                     return context.createFollowupMessage(
                             Emoji.HOURGLASS + " (**%s**) Loading Urban Dictionary definition...", context.getAuthorName())
                             .flatMap(messageId -> UrbanCmd.getUrbanDefinition(query)
-                                    .flatMap(urbanDef -> context.editReply(messageId,
+                                    .flatMap(urbanDef -> context.editFollowupMessage(messageId,
                                             UrbanCmd.formatEmbed(urbanDef, context.getAuthorAvatar())))
-                                    .switchIfEmpty(context.editReply(messageId,
+                                    .switchIfEmpty(context.editFollowupMessage(messageId,
                                             Emoji.MAGNIFYING_GLASS + " (**%s**) No definition matching word `%s`",
                                             context.getAuthorName(), query)));
                 });
