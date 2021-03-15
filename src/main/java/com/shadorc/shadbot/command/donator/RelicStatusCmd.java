@@ -71,7 +71,7 @@ public class RelicStatusCmd extends BaseCmd {
 
                             fields.forEach(field -> embed.addField(field.name(), field.value(), field.inline().get()));
                         }))
-                .flatMap(context::createFollowupMessage)
+                .flatMap(context::reply)
                 .switchIfEmpty(context.createFollowupMessage(
                         Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
                                 + "you can help me keep it alive by making a donation on my [Patreon](%s)."

@@ -33,19 +33,19 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class Context {
 
     private final InteractionCreateEvent event;
     private final DBGuild dbGuild;
-    private final AtomicLong replyId;
+    private final AtomicReference<Snowflake> replyId;
 
     public Context(InteractionCreateEvent event, DBGuild dbGuild) {
         this.event = event;
         this.dbGuild = dbGuild;
-        this.replyId = new AtomicLong();
+        this.replyId = new AtomicReference<>();
     }
 
     public InteractionCreateEvent getEvent() {
@@ -54,10 +54,6 @@ public class Context {
 
     public DBGuild getDbGuild() {
         return this.dbGuild;
-    }
-
-    public Locale getLocale() {
-        return this.getDbGuild().getLocale();
     }
 
     public String localize(String key) {
@@ -184,7 +180,7 @@ public class Context {
 
     public Mono<Snowflake> reply(Emoji emoji, String message) {
         return this.createFollowupMessage("%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message))
-                .doOnNext(messageId -> this.replyId.set(messageId.asLong()));
+                .doOnNext(this.replyId::set);
     }
 
     // TODO: Remove?
@@ -194,8 +190,7 @@ public class Context {
                 .map(Snowflake::of);
     }
 
-    // TODO: Remove?
-    public Mono<Snowflake> createFollowupMessage(Consumer<EmbedCreateSpec> embed) {
+    public Mono<Snowflake> reply(Consumer<EmbedCreateSpec> embed) {
         final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
         embed.accept(mutatedSpec);
         return this.event.getInteractionResponse().createFollowupMessage(new WebhookMultipartRequest(
@@ -207,23 +202,20 @@ public class Context {
     }
 
     public Mono<MessageData> editReply(Emoji emoji, String message) {
-        return Mono.fromCallable(this.replyId::get)
-                .filter(replyId -> replyId != 0)
+        return Mono.defer(() -> Mono.justOrEmpty(this.replyId.get()))
                 .switchIfEmpty(Mono.error(new RuntimeException("Context#reply must be called before Context#editReply")))
-                .map(Snowflake::of)
                 .flatMap(messageId -> this.editFollowupMessage(messageId,
                         "%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message)));
     }
 
     public Mono<MessageData> editReply(Consumer<EmbedCreateSpec> embed) {
-        return Mono.fromCallable(this.replyId::get)
-                .filter(replyId -> replyId != 0)
+        return Mono.defer(() -> Mono.justOrEmpty(this.replyId.get()))
                 .switchIfEmpty(Mono.error(new RuntimeException("Context#reply must be called before Context#editReply")))
                 .flatMap(messageId -> {
                     final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
                     embed.accept(mutatedSpec);
                     return this.event.getInteractionResponse()
-                            .editFollowupMessage(messageId, ImmutableWebhookMessageEditRequest.builder()
+                            .editFollowupMessage(messageId.asLong(), ImmutableWebhookMessageEditRequest.builder()
                                     .content("")
                                     .embeds(List.of(mutatedSpec.asRequest()))
                                     .build(), true);

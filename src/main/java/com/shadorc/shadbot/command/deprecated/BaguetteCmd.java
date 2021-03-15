@@ -14,7 +14,7 @@ public class BaguetteCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return context.createFollowupMessage(ShadbotUtil.getDefaultEmbed(
+        return context.reply(ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setImage("https://i.imgur.com/2Ean5iI.jpg")));
     }
 

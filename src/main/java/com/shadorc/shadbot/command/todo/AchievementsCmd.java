@@ -33,7 +33,7 @@ public class AchievementsCmd extends BaseCmd {
                 .flatMap(member -> DatabaseManager.getUsers().getDBUser(member.getId())
                         .map(DBUser::getAchievements)
                         .map(achievements -> AchievementsCmd.formatEmbed(achievements, member)))
-                .flatMap(context::createFollowupMessage);
+                .flatMap(context::reply);
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(EnumSet<Achievement> achievements, Member member) {

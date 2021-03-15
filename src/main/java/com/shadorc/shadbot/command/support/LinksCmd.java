@@ -17,7 +17,7 @@ public class LinksCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return context.createFollowupMessage(ShadbotUtil.getDefaultEmbed(
+        return context.reply(ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor("Links", Config.INVITE_URL, context.getAuthorAvatar())
                         .setDescription(
                                 """

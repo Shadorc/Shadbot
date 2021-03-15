@@ -89,6 +89,7 @@ public class FormatUtil {
         final Period period = Period.between(date.toLocalDate(), LocalDate.now(ZoneId.systemDefault()));
         return period.getUnits().stream()
                 .filter(unit -> period.get(unit) != 0)
+                // TODO: i18n
                 .map(unit -> StringUtil.pluralOf(period.get(unit), StringUtil.removeLastLetter(unit.toString().toLowerCase())))
                 .collect(Collectors.joining(", "));
     }

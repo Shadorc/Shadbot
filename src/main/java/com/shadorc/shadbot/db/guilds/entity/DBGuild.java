@@ -53,7 +53,8 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
     public Locale getLocale() {
         return Optional.ofNullable(this.getBean().getLocale())
                 .map(Locale::forLanguageTag)
-                .orElse(Config.DEFAULT_LOCALE);
+                .orElse(Locale.FRENCH);
+                // TODO .orElse(Config.DEFAULT_LOCALE);
     }
 
     /**

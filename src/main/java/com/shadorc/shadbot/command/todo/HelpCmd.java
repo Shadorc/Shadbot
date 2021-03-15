@@ -30,14 +30,14 @@ public class HelpCmd extends BaseCmd {
             if (cmd == null) {
                 return Mono.empty();
             }
-            return context.createFollowupMessage(cmd.getHelp(context));
+            return context.reply(cmd.getHelp(context));
         }
 
         return context.getPermissions()
                 .collectList()
                 .flatMap(authorPermissions -> HelpCmd.getMultiMap(context, authorPermissions))
                 .map(map -> HelpCmd.formatEmbed(map, context.getAuthorAvatar()))
-                .flatMap(context::createFollowupMessage);
+                .flatMap(context::reply);
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Map<CommandCategory, Collection<String>> map, String avatarUrl) {
