@@ -7,10 +7,12 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.ShadbotUtil;
+import discord4j.core.spec.EmbedCreateSpec;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
+
+import java.util.function.Consumer;
 
 public class JokeCmd extends BaseCmd {
 
@@ -22,12 +24,15 @@ public class JokeCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading joke...", context.getAuthorName())
-                .zipWith(JokeCmd.getRandomJoke())
-                .flatMap(TupleUtils.function((messageId, joke) ->
-                        context.editFollowupMessage(messageId, ShadbotUtil.getDefaultEmbed(
-                                embed -> embed.setAuthor("Joke", HOME_URL, context.getAuthorAvatar())
-                                        .setDescription(joke)))));
+        return context.reply(Emoji.HOURGLASS, context.localize("joke.loading"))
+                .then(JokeCmd.getRandomJoke())
+                .flatMap(joke -> context.editReply(JokeCmd.formatEmbed(context, joke)));
+    }
+
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, String joke) {
+        return ShadbotUtil.getDefaultEmbed(
+                embed -> embed.setAuthor(context.localize("joke.title"), HOME_URL, context.getAuthorAvatar())
+                        .setDescription(joke));
     }
 
     private static Mono<String> getRandomJoke() {

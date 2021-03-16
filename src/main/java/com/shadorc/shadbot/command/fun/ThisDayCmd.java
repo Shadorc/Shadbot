@@ -9,9 +9,11 @@ import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.object.Embed;
+import discord4j.core.spec.EmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
+
+import java.util.function.Consumer;
 
 public class ThisDayCmd extends BaseCmd {
 
@@ -23,14 +25,17 @@ public class ThisDayCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading events...", context.getAuthorName())
-                .zipWith(ThisDayCmd.getThisDay())
-                .flatMap(TupleUtils.function((messageId, thisDay) ->
-                        context.editFollowupMessage(messageId, ShadbotUtil.getDefaultEmbed(
-                                embed -> embed.setAuthor("On This Day: %s".formatted(thisDay.getDate()),
-                                        HOME_URL, context.getAuthorAvatar())
-                                        .setThumbnail("https://i.imgur.com/FdfyJDD.png")
-                                        .setDescription(StringUtil.abbreviate(thisDay.getEvents(), Embed.MAX_DESCRIPTION_LENGTH))))));
+        return context.reply(Emoji.HOURGLASS, context.localize("thisday.loading"))
+                .then(ThisDayCmd.getThisDay())
+                .flatMap(thisDay -> context.editReply(ThisDayCmd.formatEmbed(context, thisDay)));
+    }
+
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, ThisDay thisDay) {
+        return ShadbotUtil.getDefaultEmbed(
+                embed -> embed.setAuthor(context.localize("thisday.title").formatted(thisDay.getDate()),
+                        HOME_URL, context.getAuthorAvatar())
+                        .setThumbnail("https://i.imgur.com/FdfyJDD.png")
+                        .setDescription(StringUtil.abbreviate(thisDay.getEvents(), Embed.MAX_DESCRIPTION_LENGTH)));
     }
 
     private static Mono<ThisDay> getThisDay() {

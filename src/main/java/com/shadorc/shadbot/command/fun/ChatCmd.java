@@ -50,7 +50,7 @@ public class ChatCmd extends BaseCmd {
         }
 
         return this.getResponse(context.getChannelId(), message)
-                .flatMap(response -> context.createFollowupMessage(Emoji.SPEECH + " " + response));
+                .flatMap(response -> context.reply(Emoji.SPEECH, response));
     }
 
     private Mono<String> getResponse(Snowflake channelId, String message) {
@@ -62,11 +62,9 @@ public class ChatCmd extends BaseCmd {
     }
 
     private Mono<String> talk(Snowflake channelId, String botId, String message) {
-        final String url = String.format("%s" +
-                        "?botid=%s" +
-                        "&input=%s" +
-                        "&custid=%s",
-                HOME_URl, botId, NetUtil.encode(message), this.channelsCustid.getOrDefault(channelId, ""));
+        final String url = "%s?botid=%s&input=%s&custid=%s"
+                .formatted(HOME_URl, botId, NetUtil.encode(message),
+                        this.channelsCustid.getOrDefault(channelId, ""));
 
         return RequestHelper.fromUrl(url)
                 .to(ChatBotResponse.class)
