@@ -48,43 +48,37 @@ public class CounterStrikeCmd extends BaseCmd {
         final String steamId = context.getOptionAsString("steamid").orElseThrow();
         final String identificator = CounterStrikeCmd.getIdentificator(steamId);
 
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading CS:GO statistics...", context.getAuthorName())
-                .flatMap(messageId -> this.getSteamId(identificator)
-                        .flatMap(this::getPlayerSummary)
-                        .flatMap(player -> {
-                            if (player.getCommunityVisibilityState() != PlayerSummary.CommunityVisibilityState.PUBLIC) {
-                                return context.editFollowupMessage(messageId, Emoji.ACCESS_DENIED +
-                                                " (**%s**) This profile is private, more info [here](<%s>).",
-                                        context.getAuthorName(), PRIVACY_HELP_URL);
-                            }
+        return context.reply(Emoji.HOURGLASS, context.localize("cs.loading"))
+                .then(this.getSteamId(identificator))
+                .flatMap(this::getPlayerSummary)
+                .flatMap(player -> {
+                    if (player.getCommunityVisibilityState() != PlayerSummary.CommunityVisibilityState.PUBLIC) {
+                        return context.editReply(Emoji.ACCESS_DENIED,
+                                context.localize("cs.profile.private").formatted(PRIVACY_HELP_URL));
+                    }
 
-                            final String userStatsUrl = "%s?appid=730&key=%s&steamid=%s"
-                                    .formatted(USER_STATS_FOR_GAME_URL, this.apiKey, player.getSteamId());
+                    final String userStatsUrl = "%s?appid=730&key=%s&steamid=%s"
+                            .formatted(USER_STATS_FOR_GAME_URL, this.apiKey, player.getSteamId());
 
-                            return RequestHelper.request(userStatsUrl)
-                                    .flatMap(body -> {
-                                        if (body.contains("500 Internal Server Error")) {
-                                            return context.editFollowupMessage(messageId, Emoji.ACCESS_DENIED +
-                                                            " (**%s**) The game details of this profile are not " +
-                                                            "public, more info [here](<%s>).",
-                                                    context.getAuthorName(), PRIVACY_HELP_URL);
-                                        }
+                    return RequestHelper.request(userStatsUrl)
+                            .flatMap(body -> {
+                                if (body.contains("500 Internal Server Error")) {
+                                    return context.editReply(Emoji.ACCESS_DENIED,
+                                            context.localize("cs.games.private").formatted(PRIVACY_HELP_URL));
+                                }
 
-                                        return Mono.fromCallable(() -> NetUtil.MAPPER.readValue(body, UserStatsForGameResponse.class))
-                                                .map(userStats -> userStats.getPlayerStats()
-                                                        .flatMap(PlayerStats::getStats))
-                                                .flatMap(Mono::justOrEmpty)
-                                                .flatMap(stats -> context.editFollowupMessage(messageId,
-                                                        CounterStrikeCmd.formatEmbed(
-                                                                context.getAuthorAvatar(), player, stats)))
-                                                .switchIfEmpty(context.editFollowupMessage(messageId, Emoji.MAGNIFYING_GLASS +
-                                                                " (**%s**) This user doesn't play Counter-Strike: Global Offensive.",
-                                                        context.getAuthorName()));
-                                    });
-                        })
-                        .switchIfEmpty(context.editFollowupMessage(messageId, Emoji.MAGNIFYING_GLASS +
-                                        " (**%s**) Steam player not found.",
-                                context.getAuthorName())));
+                                return Mono.fromCallable(() -> NetUtil.MAPPER.readValue(body, UserStatsForGameResponse.class))
+                                        .map(userStats -> userStats.getPlayerStats()
+                                                .flatMap(PlayerStats::getStats))
+                                        .flatMap(Mono::justOrEmpty)
+                                        .flatMap(stats -> context.editReply(
+                                                CounterStrikeCmd.formatEmbed(context, player, stats)))
+                                        .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
+                                                context.localize("cs.not.playing")));
+                            });
+                })
+                .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
+                        context.localize("cs.player.not.found")));
     }
 
     private static String getIdentificator(String arg) {
@@ -127,8 +121,7 @@ public class CounterStrikeCmd extends BaseCmd {
                 .next();
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(final String avatarUrl, final PlayerSummary player,
-                                                         final List<Stats> stats) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, PlayerSummary player, List<Stats> stats) {
         final Map<String, Integer> statsMap = stats.stream()
                 .collect(Collectors.toMap(Stats::getName, Stats::getValue));
 
@@ -152,16 +145,16 @@ public class CounterStrikeCmd extends BaseCmd {
 
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor("Counter-Strike: Global Offensive Stats",
-                        "http://steamcommunity.com/profiles/%s".formatted(player.getSteamId()), avatarUrl)
+                        "http://steamcommunity.com/profiles/%s".formatted(player.getSteamId()), context.getAuthorAvatar())
                         .setThumbnail(player.getAvatarFull())
-                        .setDescription("Stats for **%s**".formatted(player.getPersonaName()))
-                        .addField("Kills", FormatUtil.number(kills), true)
-                        .addField("Time played", "%.1fh".formatted(timePlayed), true)
-                        .addField("MVPs", FormatUtil.number(mvps), true)
-                        .addField("Win", "%.1f%%".formatted(win), true)
-                        .addField("Accuracy", "%.1f%%".formatted(accuracy), true)
-                        .addField("Headshot", "%.1f%%".formatted(headshot), true)
-                        .addField("K/D Ratio", "%.2f".formatted(ratio), true));
+                        .setDescription(context.localize("cs.description").formatted(player.getPersonaName()))
+                        .addField(context.localize("cs.kills"), context.localize(kills), true)
+                        .addField(context.localize("cs.playtime"), context.localize(timePlayed), true)
+                        .addField(context.localize("cs.mvp"), context.localize(mvps), true)
+                        .addField(context.localize("cs.win"), context.localize(win), true)
+                        .addField(context.localize("cs.accuracy"), context.localize(accuracy), true)
+                        .addField(context.localize("cs.headshot"), context.localize(headshot), true)
+                        .addField(context.localize("cs.ratio"), context.localize(ratio), true));
     }
 
 }
