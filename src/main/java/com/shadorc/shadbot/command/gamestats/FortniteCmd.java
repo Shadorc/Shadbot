@@ -26,6 +26,8 @@ public class FortniteCmd extends BaseCmd {
         PC, XBL, PSN
     }
 
+    private static final String PLAYER_NOT_FOUND = "Player Not Found";
+
     private final String apiKey;
 
     public FortniteCmd() {
@@ -45,64 +47,63 @@ public class FortniteCmd extends BaseCmd {
         final String encodedUsername = NetUtil.encode(username.replace(" ", "%20"));
         final String url = FortniteCmd.buildApiUrl(platform, encodedUsername);
 
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Fortnite stats...", context.getAuthorName())
-                .flatMap(messageId -> RequestHelper.fromUrl(url)
+        return context.reply(Emoji.HOURGLASS, context.localize("fortnite.loading"))
+                .then(RequestHelper.fromUrl(url)
                         .addHeaders("TRN-Api-Key", this.apiKey)
-                        .to(FortniteResponse.class)
-                        .flatMap(fortnite -> {
-                            if ("Player Not Found".equals(fortnite.getError().orElse(""))) {
-                                throw Exceptions.propagate(new IOException("HTTP Error 400. The request URL is invalid."));
-                            }
+                        .to(FortniteResponse.class))
+                .flatMap(fortnite -> {
+                    if (PLAYER_NOT_FOUND.equals(fortnite.getError().orElse(""))) {
+                        throw Exceptions.propagate(new IOException(PLAYER_NOT_FOUND));
+                    }
 
-                            final String profileUrl = FortniteCmd.buildProfileUrl(platform, encodedUsername);
-                            final String desc = FortniteCmd.formatDescription(fortnite.getStats(), username);
-                            return context.editFollowupMessage(messageId,
-                                    FortniteCmd.formatEmbed(context.getAuthorAvatar(), profileUrl, desc));
-                        })
-                        .onErrorResume(FortniteCmd::isNotFound,
-                                err -> context.editFollowupMessage(messageId,
-                                        String.format(Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Fortnite " +
-                                                        "on this platform or doesn't exist. Please make sure your spelling is" +
-                                                        " correct, or follow this guide if you play on Console: " +
-                                                        "<https://fortnitetracker.com/profile/search>",
-                                                context.getAuthorName()))));
+                    final String profileUrl = FortniteCmd.buildProfileUrl(platform, encodedUsername);
+                    final String description = FortniteCmd.formatDescription(context, fortnite.getStats(), username);
+                    return context.editReply(FortniteCmd.formatEmbed(context, profileUrl, description));
+                })
+                .onErrorResume(FortniteCmd::isNotFound,
+                        err -> context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("fortnite.user.not.found")));
     }
 
-    private static boolean isNotFound(final Throwable err) {
-        return err.getMessage().contains("HTTP Error 400. The request URL is invalid.")
-                || err.getMessage().contains("wrong header");
+    private static boolean isNotFound(Throwable err) {
+        return err.getMessage().equals(PLAYER_NOT_FOUND) || err.getMessage().contains("wrong header");
     }
 
-    private static String buildApiUrl(final Platform platform, final String encodedUsername) {
+    private static String buildApiUrl(Platform platform, final String encodedUsername) {
         return "https://api.fortnitetracker.com/v1/profile/%s/%s"
                 .formatted(platform.name().toLowerCase(), encodedUsername);
     }
 
-    private static String buildProfileUrl(final Platform platform, final String encodedUsername) {
+    private static String buildProfileUrl(Platform platform, String encodedUsername) {
         return "https://fortnitetracker.com/profile/%s/%s"
                 .formatted(platform.name().toLowerCase(), encodedUsername);
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(final String avatarUrl, final String profileUrl, final String desc) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, String profileUrl, String description) {
         return ShadbotUtil.getDefaultEmbed(embed ->
-                embed.setAuthor("Fortnite Stats", profileUrl, avatarUrl)
+                embed.setAuthor(context.localize("fortnite.title"), profileUrl, context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/8NrvS8e.png")
-                        .setDescription(desc));
+                        .setDescription(description));
     }
 
-    private static String formatDescription(final Stats stats, final String username) {
+    private static String formatDescription(Context context, Stats stats, String username) {
         final int length = 8;
         final String format = "%n%-" + (length + 5) + "s %-" + length + "s %-" + length + "s %-" + (length + 3) + "s";
-        return "Stats for user **%s**%n".formatted(username) +
+        return context.localize("fortnite.description").formatted(username) +
                 "```prolog" +
-                format.formatted(" ", "Solo", "Duo", "Squad") +
-                format.formatted("Top 1",
-                        stats.getSoloStats().getTop1(), stats.getDuoStats().getTop1(), stats.getSquadStats().getTop1()) +
-                format.formatted("K/D season",
-                        stats.getSeasonSoloStats().getRatio(), stats.getSeasonDuoStats().getRatio(),
+                format.formatted(" ", context.localize("fortnite.solo"),
+                        context.localize("fortnite.duo"), context.localize("fortnite.squad")) +
+                format.formatted(context.localize("fortnite.top"),
+                        stats.getSoloStats().getTop1(),
+                        stats.getDuoStats().getTop1(),
+                        stats.getSquadStats().getTop1()) +
+                format.formatted(context.localize("fortnite.ratio.season"),
+                        stats.getSeasonSoloStats().getRatio(),
+                        stats.getSeasonDuoStats().getRatio(),
                         stats.getSeasonSquadStats().getRatio()) +
-                format.formatted("K/D lifetime",
-                        stats.getSoloStats().getRatio(), stats.getDuoStats().getRatio(), stats.getSquadStats().getRatio()) +
+                format.formatted(context.localize("fortnite.ratio.lifetime"),
+                        stats.getSoloStats().getRatio(),
+                        stats.getDuoStats().getRatio(),
+                        stats.getSquadStats().getRatio()) +
                 "```";
     }
 

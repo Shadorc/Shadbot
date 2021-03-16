@@ -77,8 +77,7 @@ public class CounterStrikeCmd extends BaseCmd {
                                                 context.localize("cs.not.playing")));
                             });
                 })
-                .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
-                        context.localize("cs.player.not.found")));
+                .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("cs.player.not.found")));
     }
 
     private static String getIdentificator(String arg) {
@@ -144,7 +143,7 @@ public class CounterStrikeCmd extends BaseCmd {
         final float headshot = (float) killsHeadshot / kills * 100;
 
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor("Counter-Strike: Global Offensive Stats",
+                embed -> embed.setAuthor(context.localize("cs.title"),
                         "http://steamcommunity.com/profiles/%s".formatted(player.getSteamId()), context.getAuthorAvatar())
                         .setThumbnail(player.getAvatarFull())
                         .setDescription(context.localize("cs.description").formatted(player.getPersonaName()))
