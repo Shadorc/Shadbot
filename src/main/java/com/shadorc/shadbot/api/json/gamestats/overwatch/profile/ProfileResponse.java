@@ -50,16 +50,12 @@ public class ProfileResponse {
         return this.games;
     }
 
-    public String formatCompetitive() {
-        final StringBuilder strBuilder = new StringBuilder();
-        this.competitive.getDamage().getRank().ifPresent(rank -> strBuilder.append(String.format("%nDamage: %d", rank)));
-        this.competitive.getTank().getRank().ifPresent(rank -> strBuilder.append(String.format("%nTank: %d", rank)));
-        this.competitive.getSupport().getRank().ifPresent(rank -> strBuilder.append(String.format("%nSupport: %d", rank)));
-        return strBuilder.isEmpty() ? "Not ranked" : strBuilder.toString();
-    }
-
     public String getQuickplayPlaytime() {
         return this.playtime.get("quickplay");
+    }
+
+    public Competitive getCompetitive() {
+        return this.competitive;
     }
 
     @Override

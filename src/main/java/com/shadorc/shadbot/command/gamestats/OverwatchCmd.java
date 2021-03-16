@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.overwatch.OverwatchProfile;
+import com.shadorc.shadbot.api.json.gamestats.overwatch.profile.Competitive;
 import com.shadorc.shadbot.api.json.gamestats.overwatch.profile.ProfileResponse;
 import com.shadorc.shadbot.api.json.gamestats.overwatch.stats.StatsResponse;
 import com.shadorc.shadbot.command.CommandException;
@@ -81,11 +82,25 @@ public class OverwatchCmd extends BaseCmd {
                         .addField(context.localize("overwatch.games.won"),
                                 context.localize(profile.getProfile().getGames().getQuickplayWon()), true)
                         .addField(context.localize("overwatch.ranks"),
-                                profile.getProfile().formatCompetitive(), true)
+                                OverwatchCmd.formatCompetitive(context, profile.getProfile().getCompetitive()), true)
                         .addField(context.localize("overwatch.heroes.played"),
                                 profile.getQuickplay().getPlayed(), true)
                         .addField(context.localize("overwatch.heroes.ratio"),
                                 profile.getQuickplay().getEliminationsPerLife(), true));
+    }
+
+    private static String formatCompetitive(Context context, Competitive competitive) {
+        final StringBuilder strBuilder = new StringBuilder();
+        competitive.getDamage().getRank()
+                .ifPresent(rank -> strBuilder.append(context.localize("overwatch.competitive.damage")
+                        .formatted(context.localize(rank))));
+        competitive.getTank().getRank()
+                .ifPresent(rank -> strBuilder.append(context.localize("overwatch.competitive.tank")
+                        .formatted(context.localize(rank))));
+        competitive.getSupport().getRank()
+                .ifPresent(rank -> strBuilder.append(context.localize("overwatch.competitive.support")
+                        .formatted(context.localize(rank))));
+        return strBuilder.isEmpty() ? context.localize("overwatch.not.ranked") : strBuilder.toString();
     }
 
     private Mono<OverwatchProfile> getOverwatchProfile(Context context, String battletag, Platform platform) {
