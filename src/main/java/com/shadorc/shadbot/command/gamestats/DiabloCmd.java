@@ -62,73 +62,65 @@ public class DiabloCmd extends BaseCmd {
         final Region region = context.getOptionAsEnum(Region.class, "region").orElseThrow();
         final String battletag = context.getOptionAsString("battletag").orElseThrow().replace("#", "-");
 
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Diablo 3 statistics...", context.getAuthorName())
-                .flatMap(messageId -> this.requestAccessToken()
-                        .then(Mono.fromCallable(() -> this.buildProfileApiUrl(region, battletag)))
-                        .flatMap(url -> RequestHelper.fromUrl(url)
-                                .to(ProfileResponse.class))
-                        .flatMap(profile -> {
-                            if ("NOTFOUND".equals(profile.getCode().orElse(""))) {
-                                return context.editFollowupMessage(messageId,
-                                        Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't play Diablo 3 or doesn't exist.",
-                                        context.getAuthorName());
-                            }
+        return context.reply(Emoji.HOURGLASS, context.localize("diablo3.loading"))
+                .then(this.requestAccessToken())
+                .then(Mono.fromCallable(() -> this.buildProfileApiUrl(region, battletag)))
+                .flatMap(url -> RequestHelper.fromUrl(url)
+                        .to(ProfileResponse.class))
+                .flatMap(profile -> {
+                    if ("NOTFOUND".equals(profile.getCode().orElse(""))) {
+                        return context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("diablo3.user.not.found"));
+                    }
 
-                            return Flux.fromIterable(profile.getHeroIds())
-                                    .map(heroId -> this.buildHeroApiUrl(region, battletag, heroId))
-                                    .flatMap(heroUrl -> RequestHelper.fromUrl(heroUrl)
-                                            .to(HeroResponse.class)
-                                            .onErrorResume(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR),
-                                                    err -> Mono.empty()))
-                                    .filter(hero -> hero.getCode().isEmpty())
-                                    // Sort heroes by ascending damage
-                                    .sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()))
-                                    .collectList()
-                                    .flatMap(heroResponses -> {
-                                        if (heroResponses.isEmpty()) {
-                                            return context.editFollowupMessage(messageId,
-                                                    Emoji.MAGNIFYING_GLASS + " (**%s**) This user doesn't have " +
-                                                            "any heroes or they are not found.",
-                                                    context.getAuthorName());
-                                        }
-                                        Collections.reverse(heroResponses);
-                                        return context.editFollowupMessage(messageId,
-                                                DiabloCmd.formatEmbed(context.getAuthorAvatar(), profile, heroResponses));
-                                    });
-                        }));
+                    return Flux.fromIterable(profile.getHeroIds())
+                            .map(heroId -> this.buildHeroApiUrl(region, battletag, heroId))
+                            .flatMap(heroUrl -> RequestHelper.fromUrl(heroUrl)
+                                    .to(HeroResponse.class)
+                                    .onErrorResume(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR),
+                                            err -> Mono.empty()))
+                            .filter(hero -> hero.getCode().isEmpty())
+                            // Sort heroes by ascending damage
+                            .sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()))
+                            .collectList()
+                            .flatMap(heroResponses -> {
+                                if (heroResponses.isEmpty()) {
+                                    return context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("diablo3.no.heroes"));
+                                }
+                                Collections.reverse(heroResponses);
+                                return context.editReply(DiabloCmd.formatEmbed(context, profile, heroResponses));
+                            });
+                });
     }
 
-    private String buildProfileApiUrl(final Region region, final String battletag) {
+    private String buildProfileApiUrl(Region region, String battletag) {
         return "https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s"
                 .formatted(region, NetUtil.encode(battletag), this.token.get().getAccessToken());
     }
 
-    private String buildHeroApiUrl(final Region region, final String battletag, final HeroId heroId) {
+    private String buildHeroApiUrl(Region region, String battletag, HeroId heroId) {
         return "https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s"
                 .formatted(region, NetUtil.encode(battletag), heroId.getId(), this.token.get().getAccessToken());
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(final String avatarUrl, final ProfileResponse profile,
-                                                         final List<HeroResponse> heroResponses) {
-        final String description = String.format("Stats for **%s** (Guild: **%s**)"
-                        + "%n%nParangon level: **%s** (*Normal*) / **%s** (*Hardcore*)"
-                        + "%nSeason Parangon level: **%s** (*Normal*) / **%s** (*Hardcore*)",
-                profile.getBattleTag(), profile.getGuildName(),
-                profile.getParagonLevel(), profile.getParagonLevelHardcore(),
-                profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore());
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, ProfileResponse profile,
+                                                         List<HeroResponse> heroResponses) {
+        final String description = context.localize("diablo3.description")
+                .formatted(profile.getBattleTag(), profile.getGuildName(),
+                        profile.getParagonLevel(), profile.getParagonLevelHardcore(),
+                        profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore());
 
         final String heroes = FormatUtil.format(heroResponses,
                 hero -> "**%s** (*%s*)".formatted(hero.getName(), hero.getClassName()), "\n");
 
         final String damages = FormatUtil.format(heroResponses,
-                hero -> "%s DPS".formatted(FormatUtil.number(hero.getStats().getDamage())), "\n");
+                hero -> context.localize("diablo3.hero.dps").formatted(context.localize(hero.getStats().getDamage())), "\n");
 
         return ShadbotUtil.getDefaultEmbed(embed ->
-                embed.setAuthor("Diablo 3 Stats", null, avatarUrl)
+                embed.setAuthor(context.localize("diablo3.title"), null, context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/QUS9QkX.png")
                         .setDescription(description)
-                        .addField("Heroes", heroes, true)
-                        .addField("Damage", damages, true));
+                        .addField(context.localize("diablo3.heroes"), heroes, true)
+                        .addField(context.localize("diablo3.damages"), damages, true));
     }
 
     private boolean isTokenExpired() {
