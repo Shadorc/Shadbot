@@ -31,7 +31,7 @@ public class FeedbackCmd extends BaseCmd {
                         String.format(Emoji.SPEECH + " Feedback from **%s** (User ID: %d, Guild ID: %d):%n%s",
                                 context.getAuthorName(), context.getAuthorId().asLong(),
                                 context.getGuildId().asLong(), message), channel))
-                .then(context.createFollowupMessage(Emoji.INFO + " (**%s**) Feedback sent, thank you!", context.getAuthorName()));
+                .then(context.reply(Emoji.INFO, context.localize("feedback.message")));
     }
 
 }

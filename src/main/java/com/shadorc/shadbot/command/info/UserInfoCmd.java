@@ -34,11 +34,11 @@ class UserInfoCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final Mono<Member> getMemberOrAuthor = context.getOptionAsMember("user")
+        final Mono<Member> getUser = context.getOptionAsMember("user")
                 .defaultIfEmpty(context.getAuthor())
                 .cache();
 
-        return Mono.zip(getMemberOrAuthor, getMemberOrAuthor.flatMapMany(Member::getRoles).collectList())
+        return Mono.zip(getUser, getUser.flatMapMany(Member::getRoles).collectList())
                 .map(TupleUtils.function((user, roles) -> this.formatEmbed(user, roles, context.getAuthorAvatar())))
                 .flatMap(context::reply);
     }

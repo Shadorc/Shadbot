@@ -18,19 +18,13 @@ public class LinksCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         return context.reply(ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor("Links", Config.INVITE_URL, context.getAuthorAvatar())
-                        .setDescription(
-                                """
-                                        Here are some useful links for you.
-                                        If you have any questions or issues, **do not hesitate to join the Support Server and ask!**
-                                        If you like Shadbot, you can vote for it on **top.gg**, you will unlock the **%s** achievement and the `bass_boost` command! 
-                                        If you want to support Shadbot, you can also follow the **Donation** link to get more information. 
-                                        Even small donations are really helpful. %s"""
-                                        .formatted(Achievement.VOTER.getTitle(), Emoji.HEARTS))
-                        .addField("Invite", Config.INVITE_URL, false)
-                        .addField("Support Server", Config.SUPPORT_SERVER_URL, false)
-                        .addField("Donation", Config.PATREON_URL, false)
-                        .addField("Vote", Config.TOP_GG_URL, false)));
+                embed -> embed.setAuthor(context.localize("links.title"), Config.INVITE_URL, context.getAuthorAvatar())
+                        .setDescription(context.localize("links.description")
+                                .formatted(Achievement.VOTER.getTitle(), Emoji.HEARTS))
+                        .addField(context.localize("links.invite"), Config.INVITE_URL, false)
+                        .addField(context.localize("links.support.server"), Config.SUPPORT_SERVER_URL, false)
+                        .addField(context.localize("links.donation"), Config.PATREON_URL, false)
+                        .addField(context.localize("links.vote"), Config.TOP_GG_URL, false)));
     }
 
 }
