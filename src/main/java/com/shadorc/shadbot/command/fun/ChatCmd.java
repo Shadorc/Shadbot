@@ -49,7 +49,7 @@ public class ChatCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final String message = context.getOptionAsString("message").orElseThrow();
         if (message.length() > MAX_CHARACTERS) {
-            return Mono.error(new CommandException("The message must not exceed **%d characters**."
+            return Mono.error(new CommandException(context.localize("chat.max.characters")
                     .formatted(MAX_CHARACTERS)));
         }
 
