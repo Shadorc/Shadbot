@@ -3,7 +3,6 @@ package com.shadorc.shadbot.command.info;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
@@ -17,6 +16,7 @@ import reactor.function.TupleUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -29,7 +29,7 @@ class UserInfoCmd extends BaseCmd {
         this.addOption("user", "If not specified, it will show your info", false,
                 ApplicationCommandOptionType.USER);
 
-        this.dateFormatter = DateTimeFormatter.ofPattern("d MMMM uuuu - HH'h'mm", Config.DEFAULT_LOCALE);
+        this.dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.MEDIUM);
     }
 
     @Override
@@ -39,45 +39,58 @@ class UserInfoCmd extends BaseCmd {
                 .cache();
 
         return Mono.zip(getUser, getUser.flatMapMany(Member::getRoles).collectList())
-                .map(TupleUtils.function((user, roles) -> this.formatEmbed(user, roles, context.getAuthorAvatar())))
+                .map(TupleUtils.function((user, roles) -> this.formatEmbed(context, user, roles)))
                 .flatMap(context::reply);
     }
 
-    private Consumer<EmbedCreateSpec> formatEmbed(Member member, List<Role> roles, String avatarUrl) {
-        final LocalDateTime createTime = TimeUtil.toLocalDateTime(member.getId().getTimestamp());
-        final String creationDate = String.format("%s%n(%s)",
-                createTime.format(this.dateFormatter), FormatUtil.formatLongDuration(createTime));
-
-        final LocalDateTime joinTime = TimeUtil.toLocalDateTime(member.getJoinTime());
-        final String joinDate = String.format("%s%n(%s)",
-                joinTime.format(this.dateFormatter), FormatUtil.formatLongDuration(joinTime));
-
-        final String badges = FormatUtil.format(member.getPublicFlags(), FormatUtil::capitalizeEnum, "\n");
-        final String rolesMention = FormatUtil.format(roles, Role::getMention, "\n");
+    private Consumer<EmbedCreateSpec> formatEmbed(Context context, Member member, List<Role> roles) {
+        final DateTimeFormatter dateFormatter = this.dateFormatter.withLocale(context.getDbGuild().getLocale());
 
         final StringBuilder usernameBuilder = new StringBuilder(member.getTag());
         if (member.isBot()) {
-            usernameBuilder.append(" (Bot)");
+            usernameBuilder
+                    .append(" ")
+                    .append(context.localize("userinfo.bot"));
         }
         if (member.getPremiumTime().isPresent()) {
-            usernameBuilder.append(" (Booster)");
+            usernameBuilder
+                    .append(" ")
+                    .append(context.localize("userinfo.booster"));
         }
+
+        final String idTitle = Emoji.ID + " " + context.localize("userinfo.id");
+        final String nameTitle = Emoji.BUST_IN_SILHOUETTE + " " + context.localize("userinfo.name");
+
+        final String creationTitle = Emoji.BIRTHDAY + " " + context.localize("userinfo.creation");
+        final LocalDateTime createTime = TimeUtil.toLocalDateTime(member.getId().getTimestamp());
+        final String creationField = "%s%n(%s)"
+                .formatted(createTime.format(dateFormatter), FormatUtil.formatLongDuration(createTime));
+
+        final String joinTitle = Emoji.DATE + " " + context.localize("userinfo.join");
+        final LocalDateTime joinTime = TimeUtil.toLocalDateTime(member.getJoinTime());
+        final String joinField = "%s%n(%s)"
+                .formatted(joinTime.format(dateFormatter), FormatUtil.formatLongDuration(joinTime));
+
+        final String badgesField = FormatUtil.format(member.getPublicFlags(), FormatUtil::capitalizeEnum, "\n");
+        final String rolesField = FormatUtil.format(roles, Role::getMention, "\n");
 
         return ShadbotUtil.getDefaultEmbed(
                 embed -> {
-                    embed.setAuthor(String.format("User Info: %s", usernameBuilder), null, avatarUrl)
+                    embed.setAuthor(context.localize("userinfo.title").formatted(usernameBuilder), null, context.getAuthorAvatar())
                             .setThumbnail(member.getAvatarUrl())
-                            .addField(Emoji.ID + " User ID", member.getId().asString(), true)
-                            .addField(Emoji.BUST_IN_SILHOUETTE + " Display name", member.getDisplayName(), true)
-                            .addField(Emoji.BIRTHDAY + " Creation date", creationDate, true)
-                            .addField(Emoji.DATE + " Join date", joinDate, true);
+                            .addField(idTitle, member.getId().asString(), true)
+                            .addField(nameTitle, member.getDisplayName(), true)
+                            .addField(creationTitle, creationField, true)
+                            .addField(joinTitle, joinField, true);
 
-                    if (!badges.isEmpty()) {
-                        embed.addField(Emoji.MILITARY_MEDAL + " Badges", badges, true);
+                    if (!badgesField.isEmpty()) {
+                        final String badgesTitle = Emoji.MILITARY_MEDAL + " " + context.localize("userinfo.badges");
+                        embed.addField(badgesTitle, badgesField, true);
                     }
 
-                    if (!rolesMention.isEmpty()) {
-                        embed.addField(Emoji.LOCK + " Roles", rolesMention, true);
+                    if (!rolesField.isEmpty()) {
+                        final String rolesTitle = Emoji.LOCK + " " + context.localize("userinfo.roles");
+                        embed.addField(rolesTitle, rolesField, true);
                     }
                 });
     }
