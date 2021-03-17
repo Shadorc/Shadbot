@@ -16,6 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
@@ -24,12 +25,15 @@ public class ChatCmd extends BaseCmd {
 
     private static final Logger LOGGER = LogUtil.getLogger(ChatCmd.class, LogUtil.Category.COMMAND);
     private static final String HOME_URl = "https://www.pandorabots.com/pandora/talk-xml";
-    private static final Map<String, String> BOTS = Map.of(
-            "Marvin", "efc39100ce34d038",
-            "Chomsky", "b0dafd24ee35a477",
-            "R.I.V.K.A", "ea373c261e3458c6",
-            "Lisa", "b0a6a41a5e345c23");
     private static final int MAX_CHARACTERS = 250;
+    private static final Map<String, String> BOTS = new LinkedHashMap<>(4);
+
+    static {
+        BOTS.put("Marvin", "efc39100ce34d038");
+        BOTS.put("Chomsky", "b0dafd24ee35a477");
+        BOTS.put("R.I.V.K.A", "ea373c261e3458c6");
+        BOTS.put("Lisa", "b0a6a41a5e345c23");
+    }
 
     private final Map<Snowflake, String> channelsCustid;
 
@@ -55,8 +59,8 @@ public class ChatCmd extends BaseCmd {
 
     private Mono<String> getResponse(Snowflake channelId, String message) {
         return Flux.fromIterable(BOTS.entrySet())
-                .flatMap(bot -> Mono.defer(() -> this.talk(channelId, bot.getValue(), message)
-                        .map(response -> "**%s**: %s".formatted(bot.getKey(), response))))
+                .flatMapSequential(bot -> this.talk(channelId, bot.getValue(), message)
+                        .map(response -> "**%s**: %s".formatted(bot.getKey(), response)))
                 .takeUntil(Predicate.not(String::isBlank))
                 .next();
     }
