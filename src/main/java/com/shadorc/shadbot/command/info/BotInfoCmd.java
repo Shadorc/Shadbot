@@ -83,9 +83,9 @@ class BotInfoCmd extends BaseCmd {
         return ShadbotUtil.getDefaultEmbed(embed -> embed
                 .setAuthor(context.localize("botinfo.title"), null, context.getAuthorAvatar())
                 .addField(shadbotTitle, shadbotField, true)
-                .addField(networkTitle, networkField, true)
                 .addField(versionsTitle, versionsField, true)
-                .addField(performanceTitle, performanceField, true));
+                .addField(performanceTitle, performanceField, true)
+                .addField(networkTitle, networkField, true));
     }
 
 }

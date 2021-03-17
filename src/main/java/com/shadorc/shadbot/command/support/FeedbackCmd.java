@@ -18,12 +18,12 @@ public class FeedbackCmd extends BaseCmd {
     public FeedbackCmd() {
         super(CommandCategory.INFO, "feedback", "Send a feedback");
         this.setRateLimiter(new RateLimiter(1, Duration.ofMinutes(10)));
-        this.addOption("text", "Your feedback", true, ApplicationCommandOptionType.STRING);
+        this.addOption("message", "Your feedback", true, ApplicationCommandOptionType.STRING);
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final String message = context.getOptionAsString("text").orElseThrow();
+        final String message = context.getOptionAsString("message").orElseThrow();
         return context.getClient()
                 .getUserById(Shadbot.getOwnerId())
                 .flatMap(User::getPrivateChannel)
