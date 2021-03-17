@@ -3,6 +3,7 @@ package com.shadorc.shadbot.api.html.thisday;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -25,9 +26,9 @@ public class ThisDay {
 
     public String getEvents() {
         return this.document.getElementsByClass("event-list event-list--with-advert")
-                .first()
-                .getElementsByClass("event")
                 .stream()
+                .map(element -> element.getElementsByClass("event"))
+                .flatMap(Elements::stream)
                 .map(Element::html)
                 .map(html -> TAG_PATTERN.matcher(html).replaceFirst("**"))
                 .map(html -> html.replaceFirst(Pattern.quote("</a>"), "**"))

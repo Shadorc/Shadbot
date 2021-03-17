@@ -38,6 +38,7 @@ public class ThisDayCmd extends BaseCmd {
                         .setDescription(StringUtil.abbreviate(thisDay.getEvents(), Embed.MAX_DESCRIPTION_LENGTH)));
     }
 
+    // TODO: Cache the value and clean the cache once a day
     private static Mono<ThisDay> getThisDay() {
         return RequestHelper.request(HOME_URL)
                 .map(Jsoup::parse)
