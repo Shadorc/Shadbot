@@ -5,9 +5,9 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 
 import java.util.List;
 
-public class GameStatsCmd extends BaseCmdGroup {
+public class GameStatsGroup extends BaseCmdGroup {
 
-    public GameStatsCmd() {
+    public GameStatsGroup() {
         super(CommandCategory.GAMESTATS, "gamestats", "Search game stats for different games",
                 List.of(new OverwatchCmd(), new FortniteCmd(), new DiabloCmd(), new CounterStrikeCmd()));
     }

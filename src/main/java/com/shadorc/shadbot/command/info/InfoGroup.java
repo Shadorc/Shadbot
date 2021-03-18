@@ -5,9 +5,9 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 
 import java.util.List;
 
-public class InfoCmd extends BaseCmdGroup {
+public class InfoGroup extends BaseCmdGroup {
 
-    public InfoCmd() {
+    public InfoGroup() {
         super(CommandCategory.INFO, "info", "Show specific information",
                 List.of(new BotInfoCmd(), new ServerInfoCmd(), new UserInfoCmd()));
     }

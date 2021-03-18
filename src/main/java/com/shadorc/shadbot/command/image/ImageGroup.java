@@ -5,9 +5,9 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 
 import java.util.List;
 
-public class ImageCmd extends BaseCmdGroup {
+public class ImageGroup extends BaseCmdGroup {
 
-    public ImageCmd() {
+    public ImageGroup() {
         super(CommandCategory.IMAGE, "image", "Search random image from different sources",
                 List.of(new DeviantartCmd(), new Rule34Cmd(), new SuicideGirlsCmd(), new WallhavenCmd(), new XkcdCmd()));
     }

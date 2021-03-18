@@ -1,14 +1,14 @@
 package com.shadorc.shadbot.core.command;
 
-import com.shadorc.shadbot.command.fun.FunCmd;
-import com.shadorc.shadbot.command.gamestats.GameStatsCmd;
-import com.shadorc.shadbot.command.image.ImageCmd;
-import com.shadorc.shadbot.command.info.InfoCmd;
-import com.shadorc.shadbot.command.moderation.ModerationCmd;
-import com.shadorc.shadbot.command.owner.OwnerCmd;
-import com.shadorc.shadbot.command.support.SupportCmd;
+import com.shadorc.shadbot.command.fun.FunGroup;
+import com.shadorc.shadbot.command.gamestats.GameStatsGroup;
+import com.shadorc.shadbot.command.image.ImageGroup;
+import com.shadorc.shadbot.command.info.InfoGroup;
+import com.shadorc.shadbot.command.moderation.ModerationGroup;
+import com.shadorc.shadbot.command.owner.OwnerGroup;
+import com.shadorc.shadbot.command.support.SupportGroup;
 import com.shadorc.shadbot.command.todo.PingCmd;
-import com.shadorc.shadbot.command.utils.UtilsCmd;
+import com.shadorc.shadbot.command.util.UtilGroup;
 import discord4j.rest.service.ApplicationService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,8 +31,8 @@ public class CommandManager {
 
     private CommandManager() {
         this.commandsMap = CommandManager.initialize(
-                new InfoCmd(), new SupportCmd(), new ImageCmd(), new ModerationCmd(), new OwnerCmd(), new UtilsCmd(),
-                new FunCmd(), new GameStatsCmd(), new PingCmd());
+                new InfoGroup(), new SupportGroup(), new ImageGroup(), new ModerationGroup(), new OwnerGroup(), new UtilGroup(),
+                new FunGroup(), new GameStatsGroup(), new PingCmd());
     }
 
     private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {

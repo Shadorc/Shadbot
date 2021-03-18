@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.utils.translate;
+package com.shadorc.shadbot.command.util.translate;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;

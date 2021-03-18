@@ -5,9 +5,9 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 
 import java.util.List;
 
-public class SupportCmd extends BaseCmdGroup {
+public class SupportGroup extends BaseCmdGroup {
 
-    public SupportCmd() {
+    public SupportGroup() {
         super(CommandCategory.INFO, "support", "Show support information",
                 List.of(new FeedbackCmd(), new LinksCmd()));
     }

@@ -1,8 +1,8 @@
-package com.shadorc.shadbot.command.utils;
+package com.shadorc.shadbot.command.util;
 
 import com.shadorc.shadbot.command.CmdTest;
-import com.shadorc.shadbot.command.utils.translate.TranslateCmd;
-import com.shadorc.shadbot.command.utils.translate.TranslateData;
+import com.shadorc.shadbot.command.util.translate.TranslateCmd;
+import com.shadorc.shadbot.command.util.translate.TranslateData;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

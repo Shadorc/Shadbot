@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.utils;
+package com.shadorc.shadbot.command.util;
 
 import com.shadorc.shadbot.api.json.wikipedia.WikipediaPage;
 import com.shadorc.shadbot.command.CmdTest;

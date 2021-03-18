@@ -6,9 +6,9 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 
 import java.util.List;
 
-public class OwnerCmd extends BaseCmdGroup {
+public class OwnerGroup extends BaseCmdGroup {
 
-    public OwnerCmd() {
+    public OwnerGroup() {
         super(CommandCategory.OWNER, "owner", "Owner commands",
                 List.of(new ShutdownCmd(), new EnableCommandCmd(), new LeaveGuildCmd(), new LoggerCmd(),
                         new ManageAchievementsCmd(), new GenerateRelicCmd(), new SendMessageCmd()));

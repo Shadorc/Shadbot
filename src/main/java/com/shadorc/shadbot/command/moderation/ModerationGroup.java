@@ -5,9 +5,9 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 
 import java.util.List;
 
-public class ModerationCmd extends BaseCmdGroup {
+public class ModerationGroup extends BaseCmdGroup {
 
-    public ModerationCmd() {
+    public ModerationGroup() {
         super(CommandCategory.MODERATION, "moderation", "Manages your server",
                 List.of(new RolelistCmd(), new PruneCmd()));
     }

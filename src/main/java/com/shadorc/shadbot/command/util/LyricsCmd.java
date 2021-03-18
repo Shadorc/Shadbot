@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.utils;
+package com.shadorc.shadbot.command.util;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;

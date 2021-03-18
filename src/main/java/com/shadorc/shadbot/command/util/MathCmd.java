@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.utils;
+package com.shadorc.shadbot.command.util;
 
 import com.fathzer.soft.javaluator.DoubleEvaluator;
 import com.shadorc.shadbot.command.CommandException;

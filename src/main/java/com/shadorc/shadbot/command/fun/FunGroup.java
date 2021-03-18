@@ -5,9 +5,9 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 
 import java.util.List;
 
-public class FunCmd extends BaseCmdGroup {
+public class FunGroup extends BaseCmdGroup {
 
-    public FunCmd() {
+    public FunGroup() {
         super(CommandCategory.FUN, "fun", "Fun commands",
                 List.of(new ChatCmd(), new JokeCmd(), new ThisDayCmd()));
     }

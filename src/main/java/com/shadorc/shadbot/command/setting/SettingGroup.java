@@ -6,9 +6,9 @@ import com.shadorc.shadbot.core.command.CommandPermission;
 
 import java.util.List;
 
-public class SettingCmd extends BaseCmdGroup {
+public class SettingGroup extends BaseCmdGroup {
 
-    public SettingCmd() {
+    public SettingGroup() {
         super(CommandCategory.ADMIN, CommandPermission.ADMIN, "setting", "Configure Shadbot",
                 List.of());
     }
