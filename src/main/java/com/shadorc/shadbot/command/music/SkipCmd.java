@@ -21,25 +21,23 @@ public class SkipCmd extends BaseCmd {
         super(CommandCategory.MUSIC, "skip", "Skip current music and play the next one. " +
                 "You can also directly skip to a music in the playlist");
         this.setRateLimiter(new RateLimiter(1, Duration.ofSeconds(1)));
-        this.addOption("index",
-                "The index of the music in the playlist to play",
-                false,
-                ApplicationCommandOptionType.INTEGER);
+        this.addOption("index", "The index of the music in the playlist to play",
+                false, ApplicationCommandOptionType.INTEGER);
     }
 
     @Override
     public Mono<?> execute(Context context) {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
-        final Mono<Snowflake> sendMessage =
-                context.createFollowupMessage(Emoji.TRACK_NEXT + " Music skipped by **%s**.", context.getAuthorName());
+        final Mono<Snowflake> sendMessage = context.reply(Emoji.TRACK_NEXT, context.localize("skip.message"));
 
         final Optional<String> option = context.getOptionAsString("index");
         if (option.isPresent()) {
             final int playlistSize = guildMusic.getTrackScheduler().getPlaylist().size();
             final Integer index = NumberUtil.toIntBetweenOrNull(option.orElseThrow(), 1, playlistSize);
             if (index == null) {
-                return Mono.error(new CommandException(String.format("Number must be between 1 and %d.", playlistSize)));
+                return Mono.error(new CommandException(context.localize("skip.out.of.index")
+                        .formatted(playlistSize)));
             }
 
             return sendMessage

@@ -19,10 +19,8 @@ public class BackwardCmd extends BaseCmd {
 
     public BackwardCmd() {
         super(CommandCategory.MUSIC, "backward", "Fast backward current music a specified amount of time");
-        this.addOption("time",
-                "Can be number of seconds or formatted time (e.g. 72 or 1m12s)",
-                true,
-                ApplicationCommandOptionType.STRING);
+        this.addOption("time", "Can be number of seconds or formatted time (e.g. 72 or 1m12s)",
+                true, ApplicationCommandOptionType.STRING);
     }
 
     @Override
@@ -40,14 +38,15 @@ public class BackwardCmd extends BaseCmd {
                             // ... else, try to parse it
                             time = TimeUtil.parseTime(option);
                         } catch (final IllegalArgumentException err) {
-                            return Mono.error(new CommandException(String.format("`%s` is not a valid number / time.", option)));
+                            return Mono.error(new CommandException(context.localize("backward.invalid")
+                                    .formatted(option)));
                         }
                     }
 
                     final long newPosition = guildMusic.getTrackScheduler()
                             .changePosition(-TimeUnit.SECONDS.toMillis(time));
-                    return context.createFollowupMessage(Emoji.CHECK_MARK + " (**%s**) New position set to **%s**.",
-                            FormatUtil.formatDuration(newPosition), context.getAuthorName());
+                    return context.reply(Emoji.CHECK_MARK, context.localize("backward.message")
+                            .formatted(FormatUtil.formatDuration(newPosition)));
                 });
     }
 

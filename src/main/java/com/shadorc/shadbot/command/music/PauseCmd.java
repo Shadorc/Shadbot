@@ -19,15 +19,14 @@ public class PauseCmd extends BaseCmd {
         final AudioPlayer audioPlayer = context.requireGuildMusic().getTrackScheduler().getAudioPlayer();
 
         return DiscordUtil.requireVoiceChannel(context)
-                .map(__ -> {
+                .flatMap(__ -> {
                     audioPlayer.setPaused(!audioPlayer.isPaused());
                     if (audioPlayer.isPaused()) {
-                        return String.format(Emoji.PAUSE + " Music paused by **%s**.", context.getAuthorName());
+                        return context.reply(Emoji.PAUSE, context.localize("pause.paused"));
                     } else {
-                        return String.format(Emoji.PLAY + " Music resumed by **%s**.", context.getAuthorName());
+                        return context.reply(Emoji.PLAY, context.localize("pause.resumed"));
                     }
-                })
-                .flatMap(context::createFollowupMessage);
+                });
     }
 
 }

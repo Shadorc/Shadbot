@@ -35,7 +35,7 @@ public class VolumeSetting extends BaseCmd {
 
         final Integer volume = NumberUtil.toIntBetweenOrNull(volumeStr, MIN_VOLUME, MAX_VOLUME);
         if (volume == null) {
-            return Mono.error(new CommandException(context.localize("volume.invalid")
+            return Mono.error(new CommandException(context.localize("setting.volume.invalid")
                     .formatted(volumeStr, MIN_VOLUME, MAX_VOLUME)));
         }
 
@@ -44,6 +44,6 @@ public class VolumeSetting extends BaseCmd {
                 .flatMap(dbGuild -> dbGuild.updateSetting(this.setting, volume))
                 .then(context.getChannel())
                 .flatMap(channel -> context.reply(Emoji.CHECK_MARK,
-                        context.localize("volume.message").formatted(volume)));
+                        context.localize("setting.volume.message").formatted(volume)));
     }
 }

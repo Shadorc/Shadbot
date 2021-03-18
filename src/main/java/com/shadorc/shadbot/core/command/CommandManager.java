@@ -5,6 +5,7 @@ import com.shadorc.shadbot.command.gamestats.GameStatsGroup;
 import com.shadorc.shadbot.command.image.ImageGroup;
 import com.shadorc.shadbot.command.info.InfoGroup;
 import com.shadorc.shadbot.command.moderation.ModerationGroup;
+import com.shadorc.shadbot.command.music.MusicGroup;
 import com.shadorc.shadbot.command.owner.OwnerGroup;
 import com.shadorc.shadbot.command.setting.SettingGroup;
 import com.shadorc.shadbot.command.support.SupportGroup;
@@ -33,7 +34,7 @@ public class CommandManager {
     private CommandManager() {
         this.commandsMap = CommandManager.initialize(
                 new InfoGroup(), new SupportGroup(), new ImageGroup(), new ModerationGroup(), new OwnerGroup(), new UtilGroup(),
-                new FunGroup(), new GameStatsGroup(), new PingCmd(), new SettingGroup());
+                new FunGroup(), new GameStatsGroup(), new PingCmd(), new SettingGroup(), new MusicGroup());
     }
 
     private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {

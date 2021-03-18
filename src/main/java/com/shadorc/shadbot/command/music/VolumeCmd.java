@@ -19,10 +19,8 @@ public class VolumeCmd extends BaseCmd {
 
     public VolumeCmd() {
         super(CommandCategory.MUSIC, "volume", "Show or change current volume level");
-        this.addOption("volume",
-                String.format("Volume to set, must be between 1%% and %d%%", Config.VOLUME_MAX),
-                false,
-                ApplicationCommandOptionType.INTEGER);
+        this.addOption("volume", "Volume to set, must be between 1%% and %d%%".formatted(Config.VOLUME_MAX),
+                false, ApplicationCommandOptionType.INTEGER);
     }
 
     @Override
@@ -34,23 +32,24 @@ public class VolumeCmd extends BaseCmd {
                     final Optional<String> option = context.getOptionAsString("volume");
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
                     if (option.isEmpty()) {
-                        return context.createFollowupMessage(Emoji.SOUND + " (**%s**) Current volume level: **%d%%**",
-                                context.getAuthorName(), scheduler.getAudioPlayer().getVolume());
+                        return context.reply(Emoji.SOUND, context.localize("volume.current")
+                                .formatted(scheduler.getAudioPlayer().getVolume()));
                     }
 
                     final Integer volume = NumberUtil.toPositiveIntOrNull(option.orElseThrow());
                     if (volume == null) {
-                        return Mono.error(new CommandException(String.format("`%s` is not a valid volume.", volume)));
+                        return Mono.error(new CommandException(context.localize("volume.invalid")
+                                .formatted(volume)));
                     }
 
                     if (volume > Config.VOLUME_MAX) {
-                        return Mono.error(new CommandException(
-                                String.format("You cannot set the volume higher than %d%%.", Config.VOLUME_MAX)));
+                        return Mono.error(new CommandException(context.localize("volume.max.reached")
+                                .formatted(Config.VOLUME_MAX)));
                     }
 
                     scheduler.setVolume(volume);
-                    return context.createFollowupMessage(String.format(Emoji.SOUND + " Volume level set to **%s%%** by **%s**.",
-                            scheduler.getAudioPlayer().getVolume(), context.getAuthorName()));
+                    return context.reply(Emoji.SOUND, context.localize("volume.message")
+                            .formatted(scheduler.getAudioPlayer().getVolume()));
                 });
     }
 

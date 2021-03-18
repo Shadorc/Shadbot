@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 public class NameCmd extends BaseCmd {
 
     public NameCmd() {
-        super(CommandCategory.MUSIC, "name", "Show current music name");
+        super(CommandCategory.MUSIC, "name", "Current music name");
     }
 
     @Override
@@ -22,7 +22,7 @@ public class NameCmd extends BaseCmd {
                 .getPlayingTrack()
                 .getInfo();
 
-        return context.createFollowupMessage(Emoji.MUSICAL_NOTE + " (**%s**) Currently playing: **%s**",
-                context.getAuthorName(), FormatUtil.trackName(trackInfo));
+        return context.reply(Emoji.MUSICAL_NOTE, context.localize("name.message")
+                .formatted(FormatUtil.trackName(trackInfo)));
     }
 }

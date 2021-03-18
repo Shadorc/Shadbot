@@ -20,10 +20,8 @@ public class BassBoostCmd extends BaseCmd {
 
     public BassBoostCmd() {
         super(CommandCategory.MUSIC, "bass_boost", "Drop the bass");
-        this.addOption("percentage",
-                String.format("Bass boost in percent, must be between **%d%%** and **%d%%**.", VALUE_MIN, VALUE_MAX),
-                true,
-                ApplicationCommandOptionType.INTEGER);
+        this.addOption("percentage", "Bass boost in percent, must be between **%d%%** and **%d%%**."
+                .formatted(VALUE_MIN, VALUE_MAX), true, ApplicationCommandOptionType.INTEGER);
     }
 
     @Override
@@ -31,17 +29,15 @@ public class BassBoostCmd extends BaseCmd {
         return DatabaseManager.getUsers().getDBUser(context.getAuthorId())
                 .map(DBUser::getAchievements)
                 .filter(achievements -> achievements.contains(Achievement.VOTER))
-                .switchIfEmpty(Mono.error(new CommandException(
-                        String.format("You can use this command by contributing to Shadbot <%s> or by unlocking the " +
-                                        "**%s** achievement (more information using `/achievements`).",
-                                Config.PATREON_URL, Achievement.VOTER.getTitle()))))
-                .map(__ -> {
+                .switchIfEmpty(Mono.error(new CommandException(context.localize("bassboost.unlock")
+                        .formatted(Config.PATREON_URL, Achievement.VOTER.getTitle()))))
+                .flatMap(__ -> {
                     final String arg = context.getOptionAsString("percentage").orElseThrow();
 
                     final Integer percentage = NumberUtil.toIntBetweenOrNull(arg, VALUE_MIN, VALUE_MAX);
                     if (percentage == null) {
-                        throw new CommandException(
-                                String.format("Incorrect value. Must be between **%d** and **%d**.", VALUE_MIN, VALUE_MAX));
+                        return Mono.error(new CommandException(context.localize("bassboost.invalid")
+                                .formatted(VALUE_MIN, VALUE_MAX)));
                     }
 
                     context.requireGuildMusic()
@@ -49,13 +45,11 @@ public class BassBoostCmd extends BaseCmd {
                             .bassBoost(percentage);
 
                     if (percentage == 0) {
-                        return String.format(Emoji.CHECK_MARK + " Bass boost disabled by **%s**.", context.getAuthorName());
+                        return context.reply(Emoji.CHECK_MARK, context.localize("bassboost.disabled"));
                     }
 
-                    return String.format(Emoji.CHECK_MARK + " Bass boost set to **%d%%** by **%s**.", percentage,
-                            context.getAuthorName());
-                })
-                .flatMap(context::createFollowupMessage);
+                    return context.reply(Emoji.CHECK_MARK, context.localize("bassboost.message").formatted(percentage));
+                });
     }
 
 }

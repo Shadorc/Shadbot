@@ -40,14 +40,15 @@ public class ForwardCmd extends BaseCmd {
                             // ... else, try to parse it
                             time = TimeUtil.parseTime(option);
                         } catch (final IllegalArgumentException err) {
-                            return Mono.error(new CommandException(String.format("`%s` is not a valid number / time.", option)));
+                            return Mono.error(new CommandException(context.localize("forward.invalid.time")
+                                    .formatted(option)));
                         }
                     }
 
                     final long newPosition = guildMusic.getTrackScheduler()
                             .changePosition(TimeUnit.SECONDS.toMillis(time));
-                    return context.createFollowupMessage(Emoji.CHECK_MARK + " (**%s**) New position set to **%s**.",
-                            FormatUtil.formatDuration(newPosition), context.getAuthorName());
+                    return context.reply(Emoji.CHECK_MARK, context.localize("forward.message")
+                            .formatted(FormatUtil.formatDuration(newPosition)));
                 });
     }
 

@@ -182,15 +182,11 @@ public class Context {
     }
 
     public Mono<Snowflake> reply(Emoji emoji, String message) {
-        return this.createFollowupMessage("%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message))
-                .doOnNext(this.replyId::set);
-    }
-
-    // TODO: Remove?
-    public Mono<Snowflake> createFollowupMessage(String format, Object... args) {
-        return this.event.getInteractionResponse().createFollowupMessage(format.formatted(args))
+        return this.event.getInteractionResponse()
+                .createFollowupMessage("%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message))
                 .map(MessageData::id)
-                .map(Snowflake::of);
+                .map(Snowflake::of)
+                .doOnNext(this.replyId::set);
     }
 
     public Mono<Snowflake> reply(Consumer<EmbedCreateSpec> embed) {
@@ -207,8 +203,10 @@ public class Context {
     public Mono<MessageData> editReply(Emoji emoji, String message) {
         return Mono.defer(() -> Mono.justOrEmpty(this.replyId.get()))
                 .switchIfEmpty(Mono.error(new RuntimeException("Context#reply must be called before Context#editReply")))
-                .flatMap(messageId -> this.editFollowupMessage(messageId,
-                        "%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message)));
+                .flatMap(messageId -> this.event.getInteractionResponse()
+                        .editFollowupMessage(messageId.asLong(), ImmutableWebhookMessageEditRequest.builder()
+                                .content("%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message))
+                                .build(), true));
     }
 
     public Mono<MessageData> editReply(Consumer<EmbedCreateSpec> embed) {
@@ -223,30 +221,6 @@ public class Context {
                                     .embeds(List.of(mutatedSpec.asRequest()))
                                     .build(), true);
                 });
-    }
-
-    // TODO: Remove?
-    public Mono<MessageData> editFollowupMessage(Snowflake messageId, String format, Object... args) {
-        return this.editFollowupMessage(messageId, format.formatted(args));
-    }
-
-    // TODO: Remove?
-    public Mono<MessageData> editFollowupMessage(Snowflake messageId, String content) {
-        return this.event.getInteractionResponse()
-                .editFollowupMessage(messageId.asLong(), ImmutableWebhookMessageEditRequest.builder()
-                        .content(content)
-                        .build(), true);
-    }
-
-    // TODO: Remove?
-    public Mono<MessageData> editFollowupMessage(Snowflake messageId, Consumer<EmbedCreateSpec> embed) {
-        final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
-        embed.accept(mutatedSpec);
-        return this.event.getInteractionResponse()
-                .editFollowupMessage(messageId.asLong(), ImmutableWebhookMessageEditRequest.builder()
-                        .content("")
-                        .embeds(List.of(mutatedSpec.asRequest()))
-                        .build(), true);
     }
 
     public GuildMusic requireGuildMusic() {

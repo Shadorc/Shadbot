@@ -20,7 +20,7 @@ public class StopCmd extends BaseCmd {
                 .getVoiceConnectionRegistry()
                 .getVoiceConnection(context.getGuildId())
                 .flatMap(VoiceConnection::disconnect)
-                .then(context.createFollowupMessage(Emoji.STOP_BUTTON + " Music stopped by **%s**.", context.getAuthorName()));
+                .then(context.reply(Emoji.STOP_BUTTON, context.localize("stop.music")));
     }
 
 }
