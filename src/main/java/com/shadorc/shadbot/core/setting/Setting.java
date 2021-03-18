@@ -21,7 +21,7 @@ public enum Setting {
 
     @Override
     public String toString() {
-        return super.toString().toLowerCase();
+        return super.name().toLowerCase();
     }
 
 }
