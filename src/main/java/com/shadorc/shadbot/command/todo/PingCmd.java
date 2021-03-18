@@ -16,11 +16,9 @@ public class PingCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         final long start = System.currentTimeMillis();
-        final String message = "%s (**%s**) %s"
-                .formatted(Emoji.GEAR, context.getAuthorName(), context.localize("testing.ping"));
-        return context.createFollowupMessage(message)
-                .flatMap(messageId -> context.editFollowupMessage(messageId,
-                        "%s Ping: %sms", Emoji.GEAR, context.localize(TimeUtil.elapsed(start))));
+        return context.reply(Emoji.GEAR, context.localize("testing.ping"))
+                .flatMap(messageId -> context.editReply(Emoji.GEAR, context.localize("ping.message")
+                        .formatted(context.localize(TimeUtil.elapsed(start)))));
     }
 
 }

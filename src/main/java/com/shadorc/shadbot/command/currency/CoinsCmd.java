@@ -6,7 +6,6 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -25,17 +24,15 @@ public class CoinsCmd extends BaseCmd {
                 .flatMap(user -> DatabaseManager.getGuilds()
                         .getDBMember(context.getGuildId(), user.getId())
                         .map(DBMember::getCoins)
-                        .map(FormatUtil::coins)
-                        .map(coins -> {
+                        .flatMap(coins -> {
                             if (user.getId().equals(context.getAuthorId())) {
-                                return Emoji.PURSE + " (**%s**) You have **%s**."
-                                        .formatted(user.getUsername(), coins);
+                                return context.reply(Emoji.PURSE, context.localize("coins.yours")
+                                        .formatted(context.localize(coins)));
                             } else {
-                                return Emoji.PURSE + " (**%s**) **%s** has **%s**."
-                                        .formatted(context.getAuthorName(), user.getUsername(), coins);
+                                return context.reply(Emoji.PURSE, context.localize("coins.user")
+                                        .formatted(context.localize(coins)));
                             }
-                        }))
-                .flatMap(context::createFollowupMessage);
+                        }));
     }
 
 }

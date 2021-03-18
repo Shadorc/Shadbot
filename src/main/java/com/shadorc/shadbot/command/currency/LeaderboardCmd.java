@@ -36,17 +36,17 @@ public class LeaderboardCmd extends BaseCmd {
                 .collectList()
                 .map(list -> {
                     if (list.isEmpty()) {
-                        return "\nEveryone is poor here.";
+                        return context.localize("leaderboard.empty");
                     }
                     return FormatUtil.numberedList(USER_COUNT, list.size(),
                             count -> {
                                 final Tuple2<String, Long> tuple = list.get(count - 1);
-                                return String.format("%d. **%s** - %s",
-                                        count, tuple.getT1(), FormatUtil.coins(tuple.getT2()));
+                                return context.localize("leaderboard.line")
+                                        .formatted(count, tuple.getT1(), context.localize(tuple.getT2()));
                             });
                 })
                 .map(description -> ShadbotUtil.getDefaultEmbed(
-                        embed -> embed.setAuthor("Leaderboard", null, context.getAuthorAvatar())
+                        embed -> embed.setAuthor(context.localize("leaderboard.title"), null, context.getAuthorAvatar())
                                 .setDescription(description)))
                 .flatMap(context::reply);
     }

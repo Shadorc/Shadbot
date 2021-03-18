@@ -25,8 +25,8 @@ public class GenerateRelicCmd extends BaseCmd {
         final RelicType type = context.getOptionAsEnum(RelicType.class, "type").orElseThrow();
 
         return PremiumCollection.generateRelic(type)
-                .flatMap(relic -> context.createFollowupMessage(Emoji.CHECK_MARK + " %s relic generated: **%s**",
-                        StringUtil.capitalize(type.name()), relic.getId()));
+                .flatMap(relic -> context.reply(Emoji.CHECK_MARK, " %s relic generated: **%s**"
+                        .formatted(StringUtil.capitalize(type.name()), relic.getId())));
     }
 
 }

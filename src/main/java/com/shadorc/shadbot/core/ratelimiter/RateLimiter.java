@@ -4,7 +4,6 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.common.util.Snowflake;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
@@ -61,11 +60,10 @@ public class RateLimiter {
 
     private Mono<Snowflake> sendWarningMessage(Context context) {
         final String message = ShadbotUtil.SPAMS.getRandomLine();
-        final String maxNum = StringUtil.pluralOf(this.bandwidth.getCapacity(), "time");
         final String duration = FormatUtil.formatDurationWords(
                 Duration.ofNanos(this.bandwidth.getRefillPeriodNanos()));
-        return context.createFollowupMessage(Emoji.STOPWATCH + " (**%s**) %s You can use this command %s every *%s*.",
-                context.getAuthorName(), message, maxNum, duration);
+        return context.reply(Emoji.STOPWATCH, context.localize("ratelimit.message")
+                .formatted(message, this.bandwidth.getCapacity(), duration));
     }
 
 }

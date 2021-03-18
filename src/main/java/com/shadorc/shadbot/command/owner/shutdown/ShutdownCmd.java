@@ -18,7 +18,7 @@ public class ShutdownCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return context.createFollowupMessage(Emoji.QUESTION + " (**%s**) Do you really want to shutdown? y/n", context.getAuthorName())
+        return context.reply(Emoji.QUESTION, "Do you really want to shutdown me? y/n")
                 .doOnNext(__ -> ConfirmInputs
                         .create(context.getClient(), Duration.ofSeconds(15), context.getChannelId(), Shadbot.quit())
                         .listen());

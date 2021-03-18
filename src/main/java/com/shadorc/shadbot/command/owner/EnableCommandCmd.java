@@ -12,8 +12,10 @@ public class EnableCommandCmd extends BaseCmd {
 
     public EnableCommandCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "enable_command", "Enable/disable a command");
-        this.addOption("command", "The command to enable/disable", true, ApplicationCommandOptionType.STRING);
-        this.addOption("enabled", "True to enable, false to disable", true, ApplicationCommandOptionType.BOOLEAN);
+        this.addOption("command", "The command to enable/disable", true,
+                ApplicationCommandOptionType.STRING);
+        this.addOption("enabled", "True to enable, false to disable", true,
+                ApplicationCommandOptionType.BOOLEAN);
     }
 
     @Override
@@ -30,7 +32,7 @@ public class EnableCommandCmd extends BaseCmd {
         final String enabledStr = enabled ? "enabled" : "disabled";
         DEFAULT_LOGGER.info("Command {} {}", cmd.getName(), enabledStr);
 
-        return context.createFollowupMessage(Emoji.CHECK_MARK + " Command `%s` %s", commandName, enabledStr);
+        return context.reply(Emoji.CHECK_MARK, "Command `%s` %s".formatted(commandName, enabledStr));
     }
 
 }

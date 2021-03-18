@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 public class RelicStatusCmd extends BaseCmd {
 
     public RelicStatusCmd() {
-        super(CommandCategory.DONATOR, "relic_status", "Show your donator status");
+        super(CommandCategory.DONATOR, "relic_status", "Your donator status");
     }
 
     @Override
@@ -35,30 +35,38 @@ public class RelicStatusCmd extends BaseCmd {
                 .getUserRelics(context.getAuthorId())
                 .flatMap(relic -> RelicStatusCmd.getRelicAndGuild(context, relic))
                 .map(TupleUtils.function((relic, optGuild) -> {
-                    final StringBuilder descBuilder = new StringBuilder(String.format("**ID:** %s", relic.getId()));
+                    final StringBuilder descBuilder = new StringBuilder(context.localize("relicstatus.id")
+                            .formatted(relic.getId()));
 
                     optGuild.ifPresent(guild ->
-                            descBuilder.append(String.format("%n**Guild:** %s (ID: %d)",
-                                    guild.getName(), guild.getId().asLong())));
+                            descBuilder.append(context.localize("relicstatus.guild")
+                                    .formatted(guild.getName(), guild.getId().asLong())));
 
-                    descBuilder.append(String.format("%n**Duration:** %s",
-                            FormatUtil.formatDurationWords(relic.getDuration())));
+                    descBuilder.append(context.localize("relicstatus.duration")
+                            .formatted(FormatUtil.formatDurationWords(relic.getDuration())));
 
                     if (!relic.isExpired()) {
                         relic.getActivation()
                                 .ifPresent(activation -> {
                                     final Duration durationLeft = relic.getDuration()
                                             .minusMillis(TimeUtil.elapsed(activation.toEpochMilli()));
-                                    descBuilder.append(String.format("%n**Expires in:** %s",
-                                            FormatUtil.formatDurationWords(durationLeft)));
+                                    descBuilder.append(context.localize("relicstatus.expiration")
+                                            .formatted(FormatUtil.formatDurationWords(durationLeft)));
                                 });
                     }
 
                     final StringBuilder titleBuilder = new StringBuilder();
                     if (relic.getType() == RelicType.GUILD) {
-                        titleBuilder.append("Legendary ");
+                        titleBuilder.append(context.localize("relicstatus.legendary.relic"));
+                    } else {
+                        titleBuilder.append(context.localize("relicstatus.relic"));
                     }
-                    titleBuilder.append(String.format("Relic (%s)", relic.isExpired() ? "Expired" : "Activated"));
+                    titleBuilder.append(' ');
+                    if (relic.isExpired()) {
+                        titleBuilder.append(context.localize("relicstatus.expired"));
+                    } else {
+                        titleBuilder.append(context.localize("relicstatus.activated"));
+                    }
 
                     return ImmutableEmbedFieldData.of(titleBuilder.toString(), descBuilder.toString(), Possible.of(false));
                 }))
@@ -66,17 +74,14 @@ public class RelicStatusCmd extends BaseCmd {
                 .filter(Predicate.not(List::isEmpty))
                 .map(fields -> ShadbotUtil.getDefaultEmbed(
                         embed -> {
-                            embed.setAuthor("Donator Status", null, context.getAuthorAvatar())
+                            embed.setAuthor(context.localize("relicstatus.title"), null, context.getAuthorAvatar())
                                     .setThumbnail("https://i.imgur.com/R0N6kW3.png");
 
                             fields.forEach(field -> embed.addField(field.name(), field.value(), field.inline().get()));
                         }))
                 .flatMap(context::reply)
-                .switchIfEmpty(context.createFollowupMessage(
-                        Emoji.INFO + " (**%s**) You are not a donator. If you like Shadbot, "
-                                + "you can help me keep it alive by making a donation on my [Patreon](%s)."
-                                + "%nAll donations are important and really help me %s",
-                        context.getAuthorName(), Config.PATREON_URL, Emoji.HEARTS));
+                .switchIfEmpty(context.reply(Emoji.INFO, context.localize("relicstatus.not.donator")
+                        .formatted(Config.PATREON_URL, Emoji.HEARTS)));
     }
 
     private static Mono<Tuple2<Relic, Optional<Guild>>> getRelicAndGuild(Context context, Relic relic) {

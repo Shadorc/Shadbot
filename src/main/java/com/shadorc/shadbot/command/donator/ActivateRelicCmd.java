@@ -18,30 +18,27 @@ public class ActivateRelicCmd extends BaseCmd {
 
     public ActivateRelicCmd() {
         super(CommandCategory.DONATOR, "activate_relic", "Activate a relic");
-        this.addOption("key", "The key to activate", true, ApplicationCommandOptionType.STRING);
+        this.addOption("relic", "The relic to activate", true, ApplicationCommandOptionType.STRING);
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final String arg = context.getOptionAsString("key").orElseThrow();
+        final String arg = context.getOptionAsString("relic").orElseThrow();
 
         return DatabaseManager.getPremium().getRelicById(arg)
-                .switchIfEmpty(context.createFollowupMessage(
-                        Emoji.GREY_EXCLAMATION + " (**%s**) This Relic doesn't exist.", context.getAuthorName())
+                .switchIfEmpty(context.reply(Emoji.GREY_EXCLAMATION, context.localize("activaterelic.not.found"))
                         .then(Mono.empty()))
                 .flatMap(relic -> {
                     if (relic.getActivation().isPresent()) {
-                        return context.createFollowupMessage(
-                                Emoji.GREY_EXCLAMATION + " (**%s**) This Relic is already activated.", context.getAuthorName());
+                        return context.reply(Emoji.GREY_EXCLAMATION, context.localize("activaterelic.already.activated"));
                     }
 
-                    DEFAULT_LOGGER.info("{User ID: {}} Relic activated. ID: {}", context.getAuthorId().asString(), arg);
+                    DEFAULT_LOGGER.info("{User ID: {}} Relic (ID: {}) activated.", context.getAuthorId().asString(), arg);
 
                     final Optional<Snowflake> guildId = Optional.of(context.getGuildId())
                             .filter(__ -> relic.getType() == RelicType.GUILD);
                     return relic.activate(context.getAuthorId(), guildId.orElse(null))
-                            .then(context.createFollowupMessage(
-                                    Emoji.CHECK_MARK + " (**%s**) Relic successfully activated, enjoy!", context.getAuthorName()));
+                            .then(context.reply(Emoji.CHECK_MARK, context.localize("activaterelic.message")));
                 });
     }
 

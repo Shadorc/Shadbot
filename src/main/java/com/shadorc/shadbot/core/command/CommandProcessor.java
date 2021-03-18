@@ -35,10 +35,8 @@ public class CommandProcessor {
 
         // The command has been disabled
         if (!command.isEnabled()) {
-            return context.createFollowupMessage(
-                    Emoji.ACCESS_DENIED + " (**%s**) Sorry, this command is temporary disabled. " +
-                            "Do not hesitate to join the [support server](%s) if you have any questions.",
-                    context.getAuthorName(), Config.SUPPORT_SERVER_URL);
+            return context.reply(Emoji.ACCESS_DENIED, context.localize("command.disabled")
+                    .formatted(Config.SUPPORT_SERVER_URL));
         }
 
         // This category is not allowed in this channel
@@ -55,8 +53,7 @@ public class CommandProcessor {
                 .collectList()
                 // The author has the permission to execute this command
                 .filter(userPerms -> userPerms.contains(command.getPermission()))
-                .switchIfEmpty(context.createFollowupMessage(Emoji.ACCESS_DENIED
-                        + " (**%s**) You do not have the permission to execute this command.", context.getAuthorName())
+                .switchIfEmpty(context.reply(Emoji.ACCESS_DENIED, context.localize("command.missing.permission"))
                         .then(Mono.empty()))
                 // The command is allowed in the guild
                 .filter(__ -> context.getDbGuild().getSettings().isCommandAllowed(command))
