@@ -14,10 +14,18 @@ public abstract class BaseCmdGroup extends BaseCmd {
 
     private final Map<String, BaseCmd> cmds;
 
+    public BaseCmdGroup(CommandCategory category, CommandPermission permission, String name, String description, List<BaseCmd> cmds) {
+        super(category, permission, name, description);
+        this.cmds = BaseCmdGroup.buildCmdsMap(cmds);
+    }
+
     public BaseCmdGroup(CommandCategory category, String name, String description, List<BaseCmd> cmds) {
         super(category, name, description);
-        this.cmds = cmds.stream()
-                .collect(Collectors.toUnmodifiableMap(BaseCmd::getName, Function.identity()));
+        this.cmds = BaseCmdGroup.buildCmdsMap(cmds);
+    }
+
+    private static Map<String, BaseCmd> buildCmdsMap(List<BaseCmd> cmds) {
+        return cmds.stream().collect(Collectors.toUnmodifiableMap(BaseCmd::getName, Function.identity()));
     }
 
     @Override
