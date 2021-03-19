@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.util;
 
 import com.shadorc.shadbot.api.json.urbandictionary.UrbanDefinition;
@@ -27,3 +28,4 @@ public class UrbanCmdTest extends CmdTest<UrbanCmd> {
     }
 
 }
+*/

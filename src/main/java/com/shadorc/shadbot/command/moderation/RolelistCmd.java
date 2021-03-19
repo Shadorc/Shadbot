@@ -53,11 +53,15 @@ public class RolelistCmd extends BaseCmd {
                 .map(TupleUtils.function((mentionedRoles, usernames) -> ShadbotUtil.getDefaultEmbed(
                         embed -> {
                             final String rolesFormatted = FormatUtil.format(mentionedRoles, Role::getName, ", ");
-                            embed.setAuthor(String.format("Rolelist: %s", rolesFormatted), null, context.getAuthorAvatar());
+                            embed.setAuthor(context.localize("rolelist.title").formatted(rolesFormatted), null,
+                                    context.getAuthorAvatar());
 
                             if (usernames.isEmpty()) {
-                                embed.setDescription("There is nobody with %s."
-                                        .formatted(mentionedRoles.size() == 1 ? "this role" : "these roles"));
+                                if (mentionedRoles.size() == 1) {
+                                    embed.setDescription(context.localize("rolelist.nobody.singular"));
+                                } else {
+                                    embed.setDescription(context.localize("rolelist.nobody.plural"));
+                                }
                                 return;
                             }
 

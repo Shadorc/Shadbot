@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.util.translate;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -107,3 +108,4 @@ public class TranslateCmd extends BaseCmd {
     }
 
 }
+*/

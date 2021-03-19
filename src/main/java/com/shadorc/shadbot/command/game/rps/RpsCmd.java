@@ -1,14 +1,12 @@
 package com.shadorc.shadbot.command.game.rps;
 
-import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.EnumUtil;
-import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.rest.util.ApplicationCommandOptionType;
@@ -28,26 +26,20 @@ public class RpsCmd extends BaseCmd {
         super(CommandCategory.GAME, "rps", "Play a Rock–paper–scissors game, win-streak increases gains");
         this.setGameRateLimiter();
 
-        this.addOption("handsign",
-                FormatUtil.format(Handsign.values(), Handsign::getHandsign, ", "),
-                true,
-                ApplicationCommandOptionType.STRING);
+        this.addOption("handsign", "Your next move", true, ApplicationCommandOptionType.STRING,
+                DiscordUtil.toOptions(Handsign.class));
 
         this.players = new ConcurrentHashMap<>();
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final String handsign = context.getOptionAsString("handsign").orElseThrow();
-
-        final Handsign userHandsign = EnumUtil.parseEnum(Handsign.class, handsign,
-                new CommandException(String.format("`%s` is not a valid handsign. %s.",
-                        handsign, FormatUtil.options(Handsign.class))));
+        final Handsign userHandsign = context.getOptionAsEnum(Handsign.class, "handsign").orElseThrow();
         final Handsign botHandsign = RandUtil.randValue(Handsign.values());
 
-        final StringBuilder strBuilder = new StringBuilder(String.format("**%s**: %s %s **VS** %s %s :**Shadbot**%n",
-                context.getAuthorName(), userHandsign.getHandsign(), userHandsign.getEmoji(),
-                botHandsign.getEmoji(), botHandsign.getHandsign()));
+        final StringBuilder strBuilder = new StringBuilder(context.localize("rps.result")
+                .formatted(context.getAuthorName(), userHandsign.getHandsign(context.getI18nContext()), userHandsign.getEmoji(),
+                        botHandsign.getEmoji(), botHandsign.getHandsign(context.getI18nContext())));
 
         final RpsPlayer player = this.getPlayer(context.getGuildId(), context.getAuthorId());
         if (userHandsign.isSuperior(botHandsign)) {
@@ -56,20 +48,20 @@ public class RpsCmd extends BaseCmd {
             Telemetry.RPS_SUMMARY.labels("win").observe(gains);
             return player.win(gains)
                     .then(Mono.defer(() -> {
-                        strBuilder.append(
-                                String.format(Emoji.BANK + " (**%s**) Well done, you win **%s** (Win Streak x%d)!",
-                                        context.getAuthorName(), FormatUtil.coins(gains), player.getWinStreak().get()));
-                        return context.createFollowupMessage(strBuilder.toString());
+                        strBuilder.append(Emoji.BANK + context.localize("rps.win")
+                                .formatted(context.getAuthorName(), context.localize(gains),
+                                        context.localize(player.getWinStreak().get())));
+                        return context.reply(strBuilder.toString());
                     }));
         } else if (userHandsign == botHandsign) {
             player.getWinStreak().set(0);
-            strBuilder.append("It's a draw.");
+            strBuilder.append(context.localize("rps.draw"));
         } else {
             player.getWinStreak().set(0);
-            strBuilder.append("I win !");
+            strBuilder.append(context.localize("rps.lose"));
         }
 
-        return context.createFollowupMessage(strBuilder.toString());
+        return context.reply(strBuilder.toString());
     }
 
     private RpsPlayer getPlayer(Snowflake guildId, Snowflake userId) {

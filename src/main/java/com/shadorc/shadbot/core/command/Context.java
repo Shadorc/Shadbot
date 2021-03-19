@@ -1,8 +1,7 @@
 package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.Shadbot;
-import com.shadorc.shadbot.core.i18n.I18nManager;
-import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
@@ -10,7 +9,6 @@ import com.shadorc.shadbot.music.NoMusicException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.EnumUtil;
-import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.InteractionCreateEvent;
@@ -34,7 +32,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -43,11 +40,13 @@ public class Context {
 
     private final InteractionCreateEvent event;
     private final DBGuild dbGuild;
+    private final I18nContext i18nContext;
     private final AtomicReference<Snowflake> replyId;
 
     public Context(InteractionCreateEvent event, DBGuild dbGuild) {
         this.event = event;
         this.dbGuild = dbGuild;
+        this.i18nContext = new I18nContext(dbGuild.getLocale());
         this.replyId = new AtomicReference<>();
     }
 
@@ -59,16 +58,16 @@ public class Context {
         return this.dbGuild;
     }
 
+    public I18nContext getI18nContext() {
+        return this.i18nContext;
+    }
+
     public String localize(String key) {
-        try {
-            return I18nManager.getInstance().getBundle(this.getDbGuild().getLocale()).getString(key);
-        } catch (final MissingResourceException err) {
-            return I18nManager.getInstance().getBundle(Config.DEFAULT_LOCALE).getString(key);
-        }
+        return this.i18nContext.localize(key);
     }
 
     public String localize(double number) {
-        return FormatUtil.number(number, this.getDbGuild().getLocale());
+        return this.i18nContext.localize(number);
     }
 
     public GatewayDiscordClient getClient() {
@@ -181,12 +180,16 @@ public class Context {
         return Flux.merge(ownerPerm, adminPerm, Mono.just(CommandPermission.USER));
     }
 
-    public Mono<Snowflake> reply(Emoji emoji, String message) {
+    public Mono<Snowflake> reply(String message) {
         return this.event.getInteractionResponse()
-                .createFollowupMessage("%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message))
+                .createFollowupMessage(message)
                 .map(MessageData::id)
                 .map(Snowflake::of)
                 .doOnNext(this.replyId::set);
+    }
+
+    public Mono<Snowflake> reply(Emoji emoji, String message) {
+        return this.reply("%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message));
     }
 
     public Mono<Snowflake> reply(Consumer<EmbedCreateSpec> embed) {

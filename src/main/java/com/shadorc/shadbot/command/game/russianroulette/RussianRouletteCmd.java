@@ -36,37 +36,37 @@ public class RussianRouletteCmd extends BaseCmd {
         final RussianRoulettePlayer player = this.getPlayer(context.getGuildId(), context.getAuthorId());
         return ShadbotUtil.requireValidBet(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
                 .filter(__ -> player.isAlive())
-                .switchIfEmpty(context.createFollowupMessage(
-                        Emoji.BROKEN_HEART + " (**%s**) Dead people can't play the Russian Roulette... " +
-                                "You will be able to play again in %s!",
-                        context.getAuthorName(), FormatUtil.formatDurationWords(player.getResetDuration()))
+                .switchIfEmpty(context.reply(Emoji.BROKEN_HEART, context.localize("russianroulette.already.dead")
+                        .formatted(FormatUtil.formatDurationWords(player.getResetDuration())))
                         .then(Mono.empty()))
                 .flatMap(__ -> player.bet())
                 .flatMap(__ -> {
                     player.fire();
 
-                    final StringBuilder descBuilder = new StringBuilder("You break a sweat, you pull the trigger...");
+                    final StringBuilder descBuilder = new StringBuilder(context.localize("russianroulette.pull"));
                     if (player.isAlive()) {
                         final long coins = (long) ThreadLocalRandom.current()
                                 .nextInt(Constants.MIN_GAINS, Constants.MAX_GAINS + 1) * player.getRemaining();
 
-                        descBuilder.append(String.format("\n**\\*click\\*** ... Phew, you are still alive!%nYou get **%s**.",
-                                FormatUtil.coins(coins)));
+                        descBuilder.append(context.localize("russianroulette.win")
+                                .formatted(context.localize(coins)));
 
                         Telemetry.RUSSIAN_ROULETTE_SUMMARY.labels("win").observe(coins);
                         return player.cancelBet()
                                 .then(player.win(coins))
                                 .thenReturn(descBuilder);
                     } else {
-                        descBuilder.append("\n**\\*PAN\\*** ... Sorry, you died...");
+                        descBuilder.append(context.localize("russianroulette.lose"));
                         Telemetry.RUSSIAN_ROULETTE_SUMMARY.labels("loss").observe(player.getBet());
                         return Mono.just(descBuilder);
                     }
                 })
                 .map(StringBuilder::toString)
                 .map(description -> ShadbotUtil.getDefaultEmbed(
-                        embed -> embed.setAuthor("Russian Roulette", null, context.getAuthorAvatar())
-                                .addField("Tries", String.format("%d/6", player.getRemaining()), false)
+                        embed -> embed.setAuthor(context.localize("russianroulette.title"),
+                                null, context.getAuthorAvatar())
+                                .addField(context.localize("russianroulette.tries"),
+                                        "%d/6".formatted(player.getRemaining()), false)
                                 .setDescription(description)))
                 .flatMap(context::reply);
     }

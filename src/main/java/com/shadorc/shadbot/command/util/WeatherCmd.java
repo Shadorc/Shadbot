@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.util;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -145,3 +146,4 @@ public class WeatherCmd extends BaseCmd {
     }
 
 }
+*/
