@@ -5,6 +5,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
+import discord4j.discordjson.json.MessageData;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
 import reactor.core.publisher.Mono;
@@ -58,7 +59,7 @@ public class RateLimiter {
         return Mono.just(false);
     }
 
-    private Mono<Snowflake> sendWarningMessage(Context context) {
+    private Mono<MessageData> sendWarningMessage(Context context) {
         final String message = ShadbotUtil.SPAMS.getRandomLine();
         final String duration = FormatUtil.formatDurationWords(
                 Duration.ofNanos(this.bandwidth.getRefillPeriodNanos()));

@@ -42,6 +42,7 @@ public class WeatherWrapper {
     }
 
     public String getCloudsDescription() {
+        // TODO: I18n
         return this.weather.getDescription();
     }
 

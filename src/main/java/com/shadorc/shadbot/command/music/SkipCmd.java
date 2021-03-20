@@ -8,7 +8,7 @@ import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.NumberUtil;
-import discord4j.common.util.Snowflake;
+import discord4j.discordjson.json.MessageData;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -29,7 +29,7 @@ public class SkipCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
-        final Mono<Snowflake> sendMessage = context.reply(Emoji.TRACK_NEXT, context.localize("skip.message"));
+        final Mono<MessageData> sendMessage = context.reply(Emoji.TRACK_NEXT, context.localize("skip.message"));
 
         final Optional<String> option = context.getOptionAsString("index");
         if (option.isPresent()) {

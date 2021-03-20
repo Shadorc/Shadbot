@@ -94,15 +94,11 @@ public class WeatherCmd extends BaseCmd {
         final String lastUpdated = formatter.format(weather.getDateTime());
 
         final String clouds = StringUtil.capitalize(weather.getCloudsDescription());
-
-        final String windDesc = weather.getWindDescription(context.getI18nContext());
         final String wind = context.localize("weather.wind.speed")
-                .formatted(windDesc, context.localize(weather.getWindSpeed()));
-
+                .formatted(weather.getWindDescription(context), context.localize(weather.getWindSpeed()));
         final String rain = weather.getPrecipVol3h()
                 .map(data -> context.localize("weather.precip.volume").formatted(context.localize(data)))
                 .orElse(context.localize("weather.none"));
-
         final String humidity = "%s%%".formatted(context.localize(weather.getHumidity()));
         final String temperature = "%s°C".formatted(context.localize(weather.getTemp()));
 

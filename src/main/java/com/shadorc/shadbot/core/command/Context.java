@@ -2,6 +2,8 @@ package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.core.i18n.I18nContext;
+import com.shadorc.shadbot.core.i18n.I18nManager;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
@@ -9,6 +11,7 @@ import com.shadorc.shadbot.music.NoMusicException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.EnumUtil;
+import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.InteractionCreateEvent;
@@ -30,24 +33,20 @@ import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
-public class Context {
+public class Context implements InteractionContext, I18nContext {
 
     private final InteractionCreateEvent event;
     private final DBGuild dbGuild;
-    private final I18nContext i18nContext;
-    private final AtomicReference<Snowflake> replyId;
+    private final AtomicLong replyId;
 
     public Context(InteractionCreateEvent event, DBGuild dbGuild) {
         this.event = event;
         this.dbGuild = dbGuild;
-        this.i18nContext = new I18nContext(dbGuild.getLocale());
-        this.replyId = new AtomicReference<>();
+        this.replyId = new AtomicLong();
     }
 
     public InteractionCreateEvent getEvent() {
@@ -56,18 +55,6 @@ public class Context {
 
     public DBGuild getDbGuild() {
         return this.dbGuild;
-    }
-
-    public I18nContext getI18nContext() {
-        return this.i18nContext;
-    }
-
-    public String localize(String key) {
-        return this.i18nContext.localize(key);
-    }
-
-    public String localize(double number) {
-        return this.i18nContext.localize(number);
     }
 
     public GatewayDiscordClient getClient() {
@@ -180,38 +167,75 @@ public class Context {
         return Flux.merge(ownerPerm, adminPerm, Mono.just(CommandPermission.USER));
     }
 
-    public Mono<Snowflake> reply(String message) {
-        return this.event.getInteractionResponse()
-                .createFollowupMessage(message)
-                .map(MessageData::id)
-                .map(Snowflake::of)
-                .doOnNext(this.replyId::set);
+    public GuildMusic requireGuildMusic() {
+        return MusicManager.getInstance()
+                .getGuildMusic(this.getGuildId())
+                .filter(guildMusic -> !guildMusic.getTrackScheduler().isStopped())
+                .orElseThrow(NoMusicException::new);
     }
 
-    public Mono<Snowflake> reply(Emoji emoji, String message) {
+    /////////////////////////////////////////////
+    ///////////// InteractionContext
+
+    /////////////////////////////////////////////
+
+    @Override
+    public Locale getLocale() {
+        return this.getDbGuild().getLocale();
+    }
+
+    @Override
+    public String localize(String key) {
+        try {
+            return I18nManager.getInstance().getBundle(this.getLocale()).getString(key);
+        } catch (final MissingResourceException err) {
+            return I18nManager.getInstance().getBundle(Config.DEFAULT_LOCALE).getString(key);
+        }
+    }
+
+    @Override
+    public String localize(double number) {
+        return FormatUtil.number(number, this.getLocale());
+    }
+
+    /////////////////////////////////////////////
+    ///////////// InteractionContext
+    /////////////////////////////////////////////
+
+    @Override
+    public Mono<MessageData> reply(String message) {
+        return this.event.getInteractionResponse()
+                .createFollowupMessage(message)
+                .doOnNext(messageData -> this.replyId.set(Long.parseLong(messageData.id())));
+    }
+
+    @Override
+    public Mono<MessageData> reply(Emoji emoji, String message) {
         return this.reply("%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message));
     }
 
-    public Mono<Snowflake> reply(Consumer<EmbedCreateSpec> embed) {
+    @Override
+    public Mono<MessageData> reply(Consumer<EmbedCreateSpec> embed) {
         final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
         embed.accept(mutatedSpec);
         return this.event.getInteractionResponse().createFollowupMessage(new WebhookMultipartRequest(
                 WebhookExecuteRequest.builder()
                         .addEmbed(mutatedSpec.asRequest())
                         .build()), true)
-                .map(MessageData::id)
-                .map(Snowflake::of);
+                .doOnNext(messageData -> this.replyId.set(Snowflake.asLong(messageData.id())));
     }
 
+    @Override
     public Mono<MessageData> editReply(Emoji emoji, String message) {
         return Mono.defer(() -> Mono.justOrEmpty(this.replyId.get()))
                 .switchIfEmpty(Mono.error(new RuntimeException("Context#reply must be called before Context#editReply")))
                 .flatMap(messageId -> this.event.getInteractionResponse()
-                        .editFollowupMessage(messageId.asLong(), ImmutableWebhookMessageEditRequest.builder()
+                        .editFollowupMessage(messageId, ImmutableWebhookMessageEditRequest.builder()
                                 .content("%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message))
                                 .build(), true));
     }
 
+    @Override
     public Mono<MessageData> editReply(Consumer<EmbedCreateSpec> embed) {
         return Mono.defer(() -> Mono.justOrEmpty(this.replyId.get()))
                 .switchIfEmpty(Mono.error(new RuntimeException("Context#reply must be called before Context#editReply")))
@@ -219,18 +243,11 @@ public class Context {
                     final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
                     embed.accept(mutatedSpec);
                     return this.event.getInteractionResponse()
-                            .editFollowupMessage(messageId.asLong(), ImmutableWebhookMessageEditRequest.builder()
+                            .editFollowupMessage(messageId, ImmutableWebhookMessageEditRequest.builder()
                                     .content("")
                                     .embeds(List.of(mutatedSpec.asRequest()))
                                     .build(), true);
                 });
-    }
-
-    public GuildMusic requireGuildMusic() {
-        return MusicManager.getInstance()
-                .getGuildMusic(this.getGuildId())
-                .filter(guildMusic -> !guildMusic.getTrackScheduler().isStopped())
-                .orElseThrow(NoMusicException::new);
     }
 
 }

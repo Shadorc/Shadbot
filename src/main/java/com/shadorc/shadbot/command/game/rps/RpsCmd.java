@@ -38,8 +38,8 @@ public class RpsCmd extends BaseCmd {
         final Handsign botHandsign = RandUtil.randValue(Handsign.values());
 
         final StringBuilder strBuilder = new StringBuilder(context.localize("rps.result")
-                .formatted(context.getAuthorName(), userHandsign.getHandsign(context.getI18nContext()), userHandsign.getEmoji(),
-                        botHandsign.getEmoji(), botHandsign.getHandsign(context.getI18nContext())));
+                .formatted(context.getAuthorName(), userHandsign.getHandsign(context), userHandsign.getEmoji(),
+                        botHandsign.getEmoji(), botHandsign.getHandsign(context)));
 
         final RpsPlayer player = this.getPlayer(context.getGuildId(), context.getAuthorId());
         if (userHandsign.isSuperior(botHandsign)) {
