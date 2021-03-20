@@ -14,6 +14,7 @@ import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
+import discord4j.core.object.entity.Message;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -116,8 +117,7 @@ public class TrackEventListener extends AudioEventAdapter {
      *
      * @return A {@link Mono} that completes when a new track has been started or when the guild music ended.
      */
-
-    private Mono<Void> nextOrEnd() {
+    private Mono<Message> nextOrEnd() {
         return Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
                 // If the next track could not be started
                 .filter(guildMusic -> !guildMusic.getTrackScheduler().nextTrack())

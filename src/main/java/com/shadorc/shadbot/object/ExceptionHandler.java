@@ -64,17 +64,23 @@ public class ExceptionHandler {
     private static Mono<?> onServerAccessError(Throwable err, BaseCmd cmd, Context context) {
         final Throwable cause = err.getCause() != null ? err.getCause() : err;
         DEFAULT_LOGGER.warn("{Guild ID: {}} [{}] Server access error on input '{}'. {}: {}",
-                context.getGuildId().asString(), cmd.getClass().getSimpleName(), context.getEvent().getCommandName(),
-                cause.getClass().getName(), cause.getMessage());
+                context.getGuildId().asString(),
+                cmd.getClass().getSimpleName(),
+                context.getEvent().getCommandName(),
+                cause.getClass().getName(),
+                cause.getMessage());
 
         return context.reply(Emoji.RED_FLAG, context.localize("exception.server.access")
                 .formatted(context.getCommandName()));
     }
 
     private static Mono<?> onUnknown(Throwable err, BaseCmd cmd, Context context) {
-        DEFAULT_LOGGER.error(String.format("{Guild ID: %d} [%s] An unknown error occurred (input: %s): %s",
-                context.getGuildId().asLong(), cmd.getClass().getSimpleName(), context.getCommandName(),
-                Objects.requireNonNullElse(err.getMessage(), "")), err);
+        DEFAULT_LOGGER.error("{Guild ID: %s} [%s] An unknown error occurred (input: %s): %s"
+                        .formatted(context.getGuildId().asString(),
+                                cmd.getClass().getSimpleName(),
+                                context.getCommandName(),
+                                Objects.requireNonNullElse(err.getMessage(), "")),
+                err);
 
         return context.reply(Emoji.RED_FLAG, context.localize("exception.unknown")
                 .formatted(context.getCommandName()));

@@ -101,7 +101,7 @@ public class MusicManager {
                             .map(trackScheduler -> new GuildMusic(gateway, guildId, trackScheduler))
                             .doOnNext(guildMusic -> {
                                 this.guildMusics.put(guildId, guildMusic);
-                                LOGGER.debug("{Guild ID: {}} Guild music created", guildId.asLong());
+                                LOGGER.debug("{Guild ID: {}} Guild music created", guildId.asString());
                             });
                 }));
     }
@@ -127,7 +127,7 @@ public class MusicManager {
                 .cast(VoiceChannel.class)
                 // Do not join the voice channel if the current voice connection is in not disconnected
                 .filterWhen(__ -> isDisconnected)
-                .doOnNext(__ -> LOGGER.info("{Guild ID: {}} Joining voice channel...", guildId.asLong()))
+                .doOnNext(__ -> LOGGER.info("{Guild ID: {}} Joining voice channel...", guildId.asString()))
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
                 .doOnTerminate(() -> this.guildJoining.remove(guildId));
     }
@@ -136,7 +136,7 @@ public class MusicManager {
         final GuildMusic guildMusic = this.guildMusics.remove(guildId);
         if (guildMusic != null) {
             guildMusic.destroy();
-            LOGGER.debug("{Guild ID: {}} Guild music destroyed", guildId.asLong());
+            LOGGER.debug("{Guild ID: {}} Guild music destroyed", guildId.asString());
         }
 
         return Mono.justOrEmpty(guildMusic)
@@ -149,7 +149,7 @@ public class MusicManager {
     public Optional<GuildMusic> getGuildMusic(Snowflake guildId) {
         final GuildMusic guildMusic = this.guildMusics.get(guildId);
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("{Guild ID: {}} Guild music request: {}", guildId.asLong(), guildMusic);
+            LOGGER.trace("{Guild ID: {}} Guild music request: {}", guildId.asString(), guildMusic);
         }
         return Optional.ofNullable(guildMusic);
     }

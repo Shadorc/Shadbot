@@ -1,6 +1,7 @@
 package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
+import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.core.retriever.SpyRestEntityRetriever;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
@@ -119,7 +120,7 @@ public class Shadbot {
                 .withGateway(gateway -> {
                     Shadbot.gateway = gateway;
 
-                    gateway.getRestClient()
+                    /*gateway.getRestClient()
                             .getApplicationService()
                             .getGuildApplicationCommands(applicationId, Config.OWNER_GUILD_ID)
                             .doOnNext(command -> DEFAULT_LOGGER.info("Deleting {}", command.name()))
@@ -128,7 +129,7 @@ public class Shadbot {
                                     .deleteGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, Long.parseLong(commandData.id()))
                                     .doOnTerminate(() -> DEFAULT_LOGGER.info("Deleted: {}", commandData.name())))
                             .doOnTerminate(() -> DEFAULT_LOGGER.info("Done!"))
-                            .subscribe();
+                            .subscribe();*/
 
                     Shadbot.taskManager = new TaskManager();
 //                    Shadbot.taskManager.scheduleLottery(gateway);
