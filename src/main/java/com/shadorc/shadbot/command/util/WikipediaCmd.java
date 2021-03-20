@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.util;
 
 import com.shadorc.shadbot.api.json.wikipedia.WikipediaPage;
@@ -7,6 +6,7 @@ import com.shadorc.shadbot.api.json.wikipedia.WikipediaResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.NetUtil;
@@ -31,35 +31,34 @@ public class WikipediaCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final String word = context.getOptionAsString("word").orElseThrow();
 
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading Wikipedia article...", context.getAuthorName())
-                .flatMap(messageId -> WikipediaCmd.getWikipediaPage(word)
-                        .flatMap(page -> {
-                            if (page.getExtract().endsWith("may refer to:")) {
-                                return context.editFollowupMessage(messageId,
-                                        Emoji.MAGNIFYING_GLASS + " (**%s**) This term refers to several results, "
-                                                + "try to refine your search.", context.getAuthorName());
-                            }
+        return context.reply(Emoji.HOURGLASS, context.localize("wikipedia.loading"))
+                .then(WikipediaCmd.getWikipediaPage(context, word))
+                .flatMap(page -> {
+                    if (page.getExtract().endsWith("may refer to:")) {
+                        return context.editReply(Emoji.MAGNIFYING_GLASS,
+                                context.localize("wikipedia.several.results"));
+                    }
 
-                            return context.editFollowupMessage(messageId,
-                                    WikipediaCmd.formatEmbed(page, context.getAuthorAvatar()));
-                        })
-                        .switchIfEmpty(context.editFollowupMessage(messageId,
-                                Emoji.MAGNIFYING_GLASS + " (**%s**) No Wikipedia article matching word `%s`",
-                                context.getAuthorName(), word)));
+                    return context.editReply(WikipediaCmd.formatEmbed(context, page));
+                })
+                .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("wikipedia.not.found")
+                        .formatted(word)));
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(final WikipediaPage page, final String avatarUrl) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, WikipediaPage page) {
         final String extract = StringUtil.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor("Wikipedia: %s".formatted(page.getTitle()),
-                        "https://en.wikipedia.org/wiki/%s".formatted(page.getEncodedTitle()), avatarUrl)
+                embed -> embed.setAuthor(context.localize("wikipedia.title").formatted(page.getTitle()),
+                        "https://%s.wikipedia.org/wiki/%s"
+                                .formatted(context.getDbGuild().getLocale().getLanguage(),
+                                        page.getEncodedTitle()), context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/7X7Cvhf.png")
                         .setDescription(extract));
     }
 
-    private static Mono<WikipediaPage> getWikipediaPage(String search) {
+    private static Mono<WikipediaPage> getWikipediaPage(I18nContext context, String search) {
         // Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
-        final String url = String.format("https://en.wikipedia.org/w/api.php?"
+        final String url = String.format("https://%s.wikipedia.org/w/api.php?"
                         + "format=json"
                         + "&action=query"
                         + "&titles=%s"
@@ -68,7 +67,7 @@ public class WikipediaCmd extends BaseCmd {
                         + "&explaintext=true"
                         + "&exintro=true"
                         + "&exsentences=5",
-                NetUtil.encode(search));
+                context.getLocale().getLanguage(), NetUtil.encode(search));
 
         return RequestHelper.fromUrl(url)
                 .to(WikipediaResponse.class)
@@ -81,4 +80,3 @@ public class WikipediaCmd extends BaseCmd {
     }
 
 }
-*/
