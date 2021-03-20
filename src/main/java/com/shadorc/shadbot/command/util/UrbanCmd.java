@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.util;
 
 import com.shadorc.shadbot.api.ServerAccessException;
@@ -7,6 +6,7 @@ import com.shadorc.shadbot.api.json.urbandictionary.UrbanDictionaryResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.NetUtil;
@@ -39,37 +39,36 @@ public class UrbanCmd extends BaseCmd {
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return context.createFollowupMessage(ShadbotUtil.mustBeNsfw());
+                        return context.reply(Emoji.GREY_EXCLAMATION,
+                                context.localize("must.be.nsfw").formatted(Setting.NSFW));
                     }
 
-                    return context.createFollowupMessage(
-                            Emoji.HOURGLASS + " (**%s**) Loading Urban Dictionary definition...", context.getAuthorName())
-                            .flatMap(messageId -> UrbanCmd.getUrbanDefinition(query)
-                                    .flatMap(urbanDef -> context.editFollowupMessage(messageId,
-                                            UrbanCmd.formatEmbed(urbanDef, context.getAuthorAvatar())))
-                                    .switchIfEmpty(context.editFollowupMessage(messageId,
-                                            Emoji.MAGNIFYING_GLASS + " (**%s**) No definition matching word `%s`",
-                                            context.getAuthorName(), query)));
+                    return context.reply(Emoji.HOURGLASS, context.localize("urban.loading"))
+                            .then(UrbanCmd.getUrbanDefinition(query))
+                            .flatMap(urbanDef -> context.editReply(UrbanCmd.formatEmbed(context, urbanDef)))
+                            .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
+                                    context.localize("urban.not.found").formatted(query)));
                 });
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(final UrbanDefinition urbanDef, final String avatarUrl) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, UrbanDefinition urbanDef) {
         final String definition = StringUtil.abbreviate(urbanDef.getDefinition(), Embed.MAX_DESCRIPTION_LENGTH);
         final String example = StringUtil.abbreviate(urbanDef.getExample(), Field.MAX_VALUE_LENGTH);
         return ShadbotUtil.getDefaultEmbed(
                 embed -> {
-                    embed.setAuthor("Urban Dictionary: %s".formatted(urbanDef.getWord()), urbanDef.getPermalink(), avatarUrl)
+                    embed.setAuthor(context.localize("urban.title").formatted(urbanDef.getWord()),
+                            urbanDef.getPermalink(), context.getAuthorAvatar())
                             .setThumbnail("https://i.imgur.com/7KJtwWp.png")
                             .setDescription(definition);
 
                     if (!example.isBlank()) {
-                        embed.addField("Example", example, false);
+                        embed.addField(context.localize("urban.example"), example, false);
                     }
                 });
     }
 
     private static Mono<UrbanDefinition> getUrbanDefinition(String query) {
-        final String url = String.format("%s?term=%s", HOME_URL, NetUtil.encode(query));
+        final String url = "%s?term=%s".formatted(HOME_URL, NetUtil.encode(query));
         return RequestHelper.fromUrl(url)
                 .to(UrbanDictionaryResponse.class)
                 .flatMapIterable(UrbanDictionaryResponse::getDefinitions)
@@ -79,4 +78,3 @@ public class UrbanCmd extends BaseCmd {
     }
 
 }
-*/
