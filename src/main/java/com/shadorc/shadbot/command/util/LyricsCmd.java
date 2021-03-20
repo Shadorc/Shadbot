@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.util;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -24,7 +23,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.select.Elements;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 import reactor.util.function.Tuples;
@@ -34,7 +32,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 public class LyricsCmd extends BaseCmd {
@@ -47,8 +44,6 @@ public class LyricsCmd extends BaseCmd {
     // Make html() preserve linebreak and spacing
     private static final OutputSettings PRESERVE_FORMAT = new OutputSettings().prettyPrint(false);
     private static final Pattern PATTERN = Pattern.compile("(?i)official|officiel|clip|video|music|\\[|]|\\(|\\)");
-    private static final Supplier<CommandException> NO_TRACK_EXCEPTION = () -> new CommandException(
-            "You are currently not listening to music, please provide a music name to search.");
 
     public LyricsCmd() {
         super(CommandCategory.UTILS, "lyrics", "Search for music lyrics");
@@ -59,24 +54,22 @@ public class LyricsCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         final String search = LyricsCmd.getSearch(context);
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading lyrics...", context.getAuthorName())
-                .flatMap(messageId -> LyricsCmd.getMusixmatch(search)
-                        .flatMap(musixmatch -> context.editFollowupMessage(messageId,
-                                LyricsCmd.formatEmbed(musixmatch, context.getAuthorAvatar())))
-                        .switchIfEmpty(context.editFollowupMessage(messageId,
-                                Emoji.MAGNIFYING_GLASS + " (**%s**) No lyrics found matching `%s`",
-                                context.getAuthorName(), search)));
+        return context.reply(Emoji.HOURGLASS, context.localize("lyrics.loading"))
+                .then(LyricsCmd.getMusixmatch(search))
+                .flatMap(musixmatch -> context.editReply(LyricsCmd.formatEmbed(context, musixmatch)))
+                .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
+                        context.localize("lyrics.not.found").formatted(search)));
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(final Musixmatch musixmatch, final String avatarUrl) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, Musixmatch musixmatch) {
         final String artist = StringUtil.abbreviate(musixmatch.getArtist(), MAX_TITLE_LENGTH);
-        final String title = StringUtil.abbreviate(musixmatch.getTitle(), MAX_TITLE_LENGTH);
+        final String musicTitle = StringUtil.abbreviate(musixmatch.getTitle(), MAX_TITLE_LENGTH);
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor("Lyrics: %s - %s".formatted(artist, title), musixmatch.getUrl(), avatarUrl)
+                embed -> embed.setAuthor(context.localize("lyrics.title").formatted(artist, musicTitle),
+                        musixmatch.getUrl(), context.getAuthorAvatar())
                         .setThumbnail(musixmatch.getImageUrl())
                         .setDescription(StringUtil.abbreviate(musixmatch.getLyrics(), MAX_LYRICS_LENGTH))
-                        .setFooter("Click on the title to see the full version",
-                                "https://i.imgur.com/G7q6Hmq.png"));
+                        .setFooter(context.localize("lyrics.footer"), "https://i.imgur.com/G7q6Hmq.png"));
     }
 
     private static Mono<Musixmatch> getMusixmatch(String search) {
@@ -87,21 +80,19 @@ public class LyricsCmd extends BaseCmd {
                 .filter(musixmatch -> !musixmatch.getLyrics().isBlank());
     }
 
-    */
-/**
+    /*
      * @return The search term, either the current playing music title or the context argument.
-     *//*
-
+     */
     private static String getSearch(Context context) {
         return context.getOptionAsString("music")
                 .orElseGet(() -> {
                     final GuildMusic guildMusic = MusicManager.getInstance()
                             .getGuildMusic(context.getGuildId())
-                            .orElseThrow(NO_TRACK_EXCEPTION);
+                            .orElseThrow(() -> new CommandException(context.localize("lyrics.not.listening")));
 
                     final AudioTrack track = guildMusic.getTrackScheduler().getAudioPlayer().getPlayingTrack();
                     if (track == null) {
-                        throw NO_TRACK_EXCEPTION.get();
+                        throw new CommandException(context.localize("lyrics.not.listening"));
                     }
                     final AudioTrackInfo info = track.getInfo();
                     // Remove from title (case insensitive): official, video, music, [, ], (, )
@@ -124,13 +115,13 @@ public class LyricsCmd extends BaseCmd {
                     return Mono.error(new ServerAccessException(res, body));
                 }))
                 .retryWhen(Retry.max(MAX_RETRY)
-                        .filter(ServerAccessException.class::isInstance))
-                .onErrorMap(Exceptions::isRetryExhausted,
-                        err -> new IOException("Musixmatch does not redirect to the correct page: %s".formatted(url)));
+                        .filter(ServerAccessException.class::isInstance)
+                        .onRetryExhaustedThrow((spec, signal) ->
+                                new IOException("Musixmatch does not redirect to the correct page: %s".formatted(url))));
     }
 
     private static Mono<String> getCorrectedUrl(String query) {
-        final String url = String.format("%s/search/%s/tracks", HOME_URL, NetUtil.encode(query));
+        final String url = "%s/search/%s/tracks".formatted(HOME_URL, NetUtil.encode(query));
         // Make a search request on the site
         return RequestHelper.request(url)
                 .map(Jsoup::parse)
@@ -142,4 +133,3 @@ public class LyricsCmd extends BaseCmd {
     }
 
 }
-*/
