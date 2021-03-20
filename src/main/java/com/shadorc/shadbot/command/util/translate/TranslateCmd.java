@@ -1,13 +1,12 @@
-/*
 package com.shadorc.shadbot.command.util.translate;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -15,7 +14,6 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import org.json.JSONArray;
 import org.json.JSONException;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
 
 import java.util.function.Consumer;
 
@@ -46,31 +44,31 @@ public class TranslateCmd extends BaseCmd {
                     .formatted(err.getMessage(), this.getName())));
         }
 
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading translation...", context.getAuthorName())
-                .zipWith(TranslateCmd.getTranslation(data))
-                .flatMap(TupleUtils.function((messageId, translatedText) ->
-                        context.editFollowupMessage(messageId,
-                                TranslateCmd.formatEmbed(data, context.getAuthorAvatar(), translatedText))))
+        return context.reply(Emoji.HOURGLASS, context.localize("translate.loading"))
+                .then(TranslateCmd.getTranslation(context, data))
+                .flatMap(translatedText -> context.editReply(
+                        TranslateCmd.formatEmbed(context, data, translatedText)))
                 .onErrorMap(IllegalArgumentException.class,
+                        // TODO: How can we get supported language ?
                         err -> new CommandException("%s. Use `/help %s` to see a complete list of supported languages."
                                 .formatted(err.getMessage(), this.getName())));
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(TranslateData data, String avatarUrl, String translatedText) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, TranslateData data, String translatedText) {
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor("Translation", null, avatarUrl)
+                embed -> embed.setAuthor(context.localize("translate.title"), null, context.getAuthorAvatar())
                         .setDescription("**%s**%n%s%n%n**%s**%n%s".formatted(
                                 StringUtil.capitalize(TranslateData.isoToLang(data.getSourceLang())), data.getSourceText(),
                                 StringUtil.capitalize(TranslateData.isoToLang(data.getDestLang())), translatedText)));
     }
 
-    private static Mono<String> getTranslation(TranslateData data) {
+    private static Mono<String> getTranslation(I18nContext context, TranslateData data) {
         return RequestHelper.request(data.getUrl())
                 .map(body -> {
                     // The body is an error 400 if one of the specified language
                     // exists but is not supported by Google translator
                     if (!TranslateCmd.isValidBody(body)) {
-                        throw new IllegalArgumentException("One of the specified language isn't supported");
+                        throw new IllegalArgumentException(context.localize("translate.unsupported.language"));
                     }
 
                     final JSONArray translations = new JSONArray(body).getJSONArray(0);
@@ -80,17 +78,14 @@ public class TranslateCmd extends BaseCmd {
                     }
 
                     if (translatedText.toString().equalsIgnoreCase(data.getSourceText())) {
-                        throw new IllegalArgumentException("The text could not been translated."
-                                + "%nCheck that the specified languages are supported, that the text is in "
-                                + "the specified language and that the destination language is different from the "
-                                + "source one");
+                        throw new IllegalArgumentException(context.localize("translate.exception"));
                     }
 
                     return translatedText.toString();
                 });
     }
 
-    private static boolean isValidBody(final String body) {
+    private static boolean isValidBody(String body) {
         try {
             return new JSONArray(body).get(0) instanceof JSONArray;
         } catch (final JSONException err) {
@@ -98,14 +93,4 @@ public class TranslateCmd extends BaseCmd {
         }
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setExample("`/%s en fr \"How are you ?\"`".formatted(this.getName()))
-                .addField("Documentation", "List of supported languages: " +
-                        "https://cloud.google.com/translate/docs/languages", false)
-                .build();
-    }
-
 }
-*/

@@ -44,7 +44,7 @@ class UserInfoCmd extends BaseCmd {
     }
 
     private Consumer<EmbedCreateSpec> formatEmbed(Context context, Member member, List<Role> roles) {
-        final DateTimeFormatter dateFormatter = this.dateFormatter.withLocale(context.getDbGuild().getLocale());
+        final DateTimeFormatter dateFormatter = this.dateFormatter.withLocale(context.getLocale());
 
         final StringBuilder usernameBuilder = new StringBuilder(member.getTag());
         if (member.isBot()) {

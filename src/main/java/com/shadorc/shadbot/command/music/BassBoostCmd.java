@@ -30,7 +30,7 @@ public class BassBoostCmd extends BaseCmd {
                 .map(DBUser::getAchievements)
                 .filter(achievements -> achievements.contains(Achievement.VOTER))
                 .switchIfEmpty(Mono.error(new CommandException(context.localize("bassboost.unlock")
-                        .formatted(Config.PATREON_URL, Achievement.VOTER.getTitle()))))
+                        .formatted(Config.PATREON_URL, Achievement.VOTER.getTitle(context)))))
                 .flatMap(__ -> {
                     final String arg = context.getOptionAsString("percentage").orElseThrow();
 

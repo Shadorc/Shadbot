@@ -49,6 +49,8 @@ public class RepeatCmd extends BaseCmd {
                         strBuilder.append(context.localize("repeat.song.disabled"));
                     }
 
+                    strBuilder.append(' ');
+
                     if (newMode == TrackScheduler.RepeatMode.PLAYLIST) {
                         strBuilder.append(context.localize("repeat.playlist.enabled"));
                     } else if (newMode == TrackScheduler.RepeatMode.SONG) {

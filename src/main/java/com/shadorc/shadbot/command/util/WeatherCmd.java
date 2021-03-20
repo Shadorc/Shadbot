@@ -73,10 +73,10 @@ public class WeatherCmd extends BaseCmd {
                 .onErrorResume(WeatherCmd.isNotFound(), err -> {
                     if (countryOpt.isPresent()) {
                         return context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("weather.exception.country")
-                                        .formatted(city, countryOpt.orElseThrow()));
+                                .formatted(city, countryOpt.orElseThrow()));
                     }
                     return context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("weather.exception.city")
-                                    .formatted(city));
+                            .formatted(city));
                 })
                 .onErrorMap(APIException.class, IOException::new);
     }
@@ -86,7 +86,7 @@ public class WeatherCmd extends BaseCmd {
     }
 
     private Consumer<EmbedCreateSpec> formatEmbed(Context context, WeatherWrapper weather) {
-        final DateTimeFormatter formatter = this.dateFormatter.withLocale(context.getDbGuild().getLocale());
+        final DateTimeFormatter formatter = this.dateFormatter.withLocale(context.getLocale());
 
         final String title = context.localize("weather.title")
                 .formatted(weather.getCityName(), weather.getCountryCode());

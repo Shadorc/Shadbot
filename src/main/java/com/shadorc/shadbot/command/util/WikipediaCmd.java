@@ -50,7 +50,7 @@ public class WikipediaCmd extends BaseCmd {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(context.localize("wikipedia.title").formatted(page.getTitle()),
                         "https://%s.wikipedia.org/wiki/%s"
-                                .formatted(context.getDbGuild().getLocale().getLanguage(),
+                                .formatted(context.getLocale().getLanguage(),
                                         page.getEncodedTitle()), context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/7X7Cvhf.png")
                         .setDescription(extract));

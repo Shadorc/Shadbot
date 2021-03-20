@@ -51,7 +51,7 @@ class ServerInfoCmd extends BaseCmd {
         final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
         final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
 
-        final DateTimeFormatter dateFormatter = this.dateFormatter.withLocale(context.getDbGuild().getLocale());
+        final DateTimeFormatter dateFormatter = this.dateFormatter.withLocale(context.getLocale());
 
         final String idTitle = Emoji.ID + " " + context.localize("serverinfo.id");
         final String ownerTitle = Emoji.CROWN + " " + context.localize("serverinfo.owner");
