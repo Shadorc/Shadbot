@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.util;
 
 import com.fathzer.soft.javaluator.DoubleEvaluator;
@@ -11,11 +10,11 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 
 public class MathCmd extends BaseCmd {
 
     private final DoubleEvaluator evaluator;
-    private final DecimalFormat formatter;
 
     public MathCmd() {
         super(CommandCategory.UTILS, "math", "Evaluate an expression");
@@ -23,7 +22,6 @@ public class MathCmd extends BaseCmd {
                 ApplicationCommandOptionType.STRING);
 
         this.evaluator = new DoubleEvaluator();
-        this.formatter = new DecimalFormat("#.##");
     }
 
     @Override
@@ -35,9 +33,11 @@ public class MathCmd extends BaseCmd {
         } catch (final IllegalArgumentException err) {
             return Mono.error(new CommandException(err.getMessage()));
         }
-        return context.createFollowupMessage(Emoji.TRIANGULAR_RULER + " (**%s**) %s = %s",
-                context.getAuthorName(), arg.replace("*", "\\*"), this.formatter.format(result));
+
+        final DecimalFormat formatter = new DecimalFormat("#.##",
+                new DecimalFormatSymbols(context.getDbGuild().getLocale()));
+        return context.reply(Emoji.TRIANGULAR_RULER, "%s = %s"
+                .formatted(arg.replace("*", "\\*"), formatter.format(result)));
     }
 
 }
-*/
