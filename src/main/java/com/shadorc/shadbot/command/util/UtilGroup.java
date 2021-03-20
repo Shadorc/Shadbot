@@ -9,8 +9,8 @@ public class UtilGroup extends BaseCmdGroup {
 
     public UtilGroup() {
         super(CommandCategory.UTILS, "util", "Utility commands",
-                List.of(/*new MathCmd(), new LyricsCmd(), new UrbanCmd(), new WeatherCmd(),
-                        new WikipediaCmd(), new TranslateCmd()*/));
+                List.of(new MathCmd(), new LyricsCmd(), new UrbanCmd(), new WeatherCmd()
+                        /*new WikipediaCmd(), new TranslateCmd()*/));
     }
 
 }

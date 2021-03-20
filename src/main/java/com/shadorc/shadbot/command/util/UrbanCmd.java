@@ -73,6 +73,7 @@ public class UrbanCmd extends BaseCmd {
                 .to(UrbanDictionaryResponse.class)
                 .flatMapIterable(UrbanDictionaryResponse::getDefinitions)
                 .next()
+                // TODO: What happen on retry exhausted?
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
                         .filter(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR)));
     }

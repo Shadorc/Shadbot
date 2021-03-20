@@ -71,12 +71,12 @@ public class WeatherCmd extends BaseCmd {
                 .map(weather -> this.formatEmbed(context, weather))
                 .flatMap(context::editReply)
                 .onErrorResume(WeatherCmd.isNotFound(), err -> {
-                    final StringBuilder strBuilder = new StringBuilder(context.localize("weather.exception.city")
-                            .formatted(city));
-                    countryOpt.ifPresent(country -> strBuilder.append(context.localize("weather.exception.country")
-                            .formatted(country)));
-                    strBuilder.append(context.localize("weather.exception.not.found"));
-                    return context.editReply(Emoji.MAGNIFYING_GLASS, strBuilder.toString());
+                    if (countryOpt.isPresent()) {
+                        return context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("weather.exception.country")
+                                        .formatted(city, countryOpt.orElseThrow()));
+                    }
+                    return context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("weather.exception.city")
+                                    .formatted(city));
                 })
                 .onErrorMap(APIException.class, IOException::new);
     }
