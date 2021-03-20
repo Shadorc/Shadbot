@@ -1,15 +1,14 @@
-/*
 package com.shadorc.shadbot.command.util;
 
+import com.shadorc.shadbot.api.wrapper.WeatherWrapper;
+import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.EnumUtil;
-import com.shadorc.shadbot.utils.NumberUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -18,20 +17,19 @@ import net.aksingh.owmjapis.api.APIException;
 import net.aksingh.owmjapis.core.OWM;
 import net.aksingh.owmjapis.core.OWM.Country;
 import net.aksingh.owmjapis.core.OWM.Unit;
-import net.aksingh.owmjapis.model.CurrentWeather;
-import net.aksingh.owmjapis.model.param.Main;
-import net.aksingh.owmjapis.model.param.Weather;
 import org.apache.http.HttpStatus;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class WeatherCmd extends BaseCmd {
 
-    private final SimpleDateFormat dateFormatter;
+    private final DateTimeFormatter dateFormatter;
     private final OWM owm;
 
     public WeatherCmd() {
@@ -39,7 +37,7 @@ public class WeatherCmd extends BaseCmd {
         this.addOption("city", "The city", true, ApplicationCommandOptionType.STRING);
         this.addOption("country", "The country", false, ApplicationCommandOptionType.STRING);
 
-        this.dateFormatter = new SimpleDateFormat("MMMMM d, yyyy 'at' hh:mm aa", Config.DEFAULT_LOCALE);
+        this.dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.MEDIUM);
         final String apiKey = CredentialManager.getInstance().get(Credential.OPENWEATHERMAP_API_KEY);
         if (apiKey != null) {
             this.owm = new OWM(apiKey);
@@ -54,96 +52,69 @@ public class WeatherCmd extends BaseCmd {
         final String city = context.getOptionAsString("city").orElseThrow();
         final Optional<String> countryOpt = context.getOptionAsString("country");
 
-        return context.createFollowupMessage(Emoji.HOURGLASS + " (**%s**) Loading weather report...", context.getAuthorName())
-                .flatMap(messageId -> Mono
-                        .fromCallable(() -> {
-                            if (countryOpt.isPresent()) {
-                                final String countryStr = countryOpt.get();
-                                final Country country = EnumUtil.parseEnum(Country.class,
-                                        countryStr.replace(" ", "_"));
-                                if (country == null) {
-                                    throw new IllegalArgumentException("Country `%s` not found".formatted(countryStr));
-                                }
-                                return this.owm.currentWeatherByCityName(city, country);
-                            } else {
-                                return this.owm.currentWeatherByCityName(city);
-                            }
-                        })
-                        .map(currentWeather -> this.formatEmbed(context.getAuthorAvatar(), currentWeather))
-                        .onErrorMap(APIException.class, err -> {
-                            if (err.getCode() == HttpStatus.SC_NOT_FOUND) {
-                                final StringBuilder strBuilder = new StringBuilder(
-                                        Emoji.MAGNIFYING_GLASS + " (**%s**) City `%s`".formatted(context.getAuthorName(), city));
-                                countryOpt.ifPresent(country -> strBuilder.append(" in country `%s`".formatted(country)));
-                                strBuilder.append(" not found.");
-                                return new IllegalArgumentException(strBuilder.toString());
-                            }
-                            return new IOException(err);
-                        })
-                        .onErrorResume(IllegalArgumentException.class, err -> context.editFollowupMessage(messageId,
-                                Emoji.MAGNIFYING_GLASS + " (**%s**) %s.", context.getAuthorName(), err.getMessage())
-                                .then(Mono.empty()))
-                        .flatMap(embed -> context.editFollowupMessage(messageId, embed)));
+        return context.reply(Emoji.HOURGLASS, context.localize("weather.loading"))
+                .then(Mono.fromCallable(() -> {
+                    if (countryOpt.isPresent()) {
+                        final String countryStr = countryOpt.get();
+                        final Country country = EnumUtil.parseEnum(Country.class,
+                                countryStr.replace(" ", "_"));
+                        if (country == null) {
+                            throw new CommandException(
+                                    context.localize("weather.country.not.found").formatted(countryStr));
+                        }
+                        return this.owm.currentWeatherByCityName(city, country);
+                    } else {
+                        return this.owm.currentWeatherByCityName(city);
+                    }
+                }))
+                .map(WeatherWrapper::new)
+                .map(weather -> this.formatEmbed(context, weather))
+                .flatMap(context::editReply)
+                .onErrorResume(WeatherCmd.isNotFound(), err -> {
+                    final StringBuilder strBuilder = new StringBuilder(context.localize("weather.exception.city")
+                            .formatted(city));
+                    countryOpt.ifPresent(country -> strBuilder.append(context.localize("weather.exception.country")
+                            .formatted(country)));
+                    strBuilder.append(context.localize("weather.exception.not.found"));
+                    return context.editReply(Emoji.MAGNIFYING_GLASS, strBuilder.toString());
+                })
+                .onErrorMap(APIException.class, IOException::new);
     }
 
-    @SuppressWarnings("ConstantConditions") // Removes NullPointerException warnings
-    private Consumer<EmbedCreateSpec> formatEmbed(String avatarUrl, CurrentWeather currentWeather) {
-        final Weather weather = currentWeather.getWeatherList().get(0);
-        final Main main = currentWeather.getMainData();
+    private static Predicate<Throwable> isNotFound() {
+        return err -> err instanceof APIException && ((APIException) err).getCode() == HttpStatus.SC_NOT_FOUND;
+    }
 
-        final String countryCode = currentWeather.getSystemData().getCountryCode();
-        final String title = "Weather: %s (%s)".formatted(currentWeather.getCityName(), countryCode);
-        final String url = "https://openweathermap.org/city/%d".formatted(currentWeather.getCityId());
-        final String lastUpdated = this.dateFormatter.format(currentWeather.getDateTime());
-        final String clouds = StringUtil.capitalize(weather.getDescription());
-        final double windSpeed = currentWeather.getWindData().getSpeed() * 3.6;
-        final String windDesc = WeatherCmd.getWindDesc(windSpeed);
-        final String wind = "%s%n%.1f km/h".formatted(windDesc, windSpeed);
-        final String rain = currentWeather.hasRainData() && currentWeather.getRainData().hasPrecipVol3h() ?
-                "%.1f mm/h".formatted(currentWeather.getRainData().getPrecipVol3h()) : "None";
-        final String humidity = "%.1f%%".formatted(main.getHumidity());
-        final String temperature = "%.1f°C".formatted(main.getTemp());
+    private Consumer<EmbedCreateSpec> formatEmbed(Context context, WeatherWrapper weather) {
+        final DateTimeFormatter formatter = this.dateFormatter.withLocale(context.getDbGuild().getLocale());
+
+        final String title = context.localize("weather.title")
+                .formatted(weather.getCityName(), weather.getCountryCode());
+        final String url = "https://openweathermap.org/city/%d".formatted(weather.getCityId());
+        final String lastUpdated = formatter.format(weather.getDateTime());
+
+        final String clouds = StringUtil.capitalize(weather.getCloudsDescription());
+
+        final String windDesc = weather.getWindDescription(context.getI18nContext());
+        final String wind = context.localize("weather.wind.speed")
+                .formatted(windDesc, context.localize(weather.getWindSpeed()));
+
+        final String rain = weather.getPrecipVol3h()
+                .map(data -> context.localize("weather.precip.volume").formatted(context.localize(data)))
+                .orElse(context.localize("weather.none"));
+
+        final String humidity = "%s%%".formatted(context.localize(weather.getHumidity()));
+        final String temperature = "%s°C".formatted(context.localize(weather.getTemp()));
 
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor(title, url, avatarUrl)
+                embed -> embed.setAuthor(title, url, context.getAuthorAvatar())
                         .setThumbnail(weather.getIconLink())
-                        .setDescription(String.format("Last updated %s", lastUpdated))
-                        .addField(Emoji.CLOUD + " Clouds", clouds, true)
-                        .addField(Emoji.WIND + " Wind", wind, true)
-                        .addField(Emoji.RAIN + " Rain", rain, true)
-                        .addField(Emoji.DROPLET + " Humidity", humidity, true)
-                        .addField(Emoji.THERMOMETER + " Temperature", temperature, true));
-    }
-
-    private static String getWindDesc(double windSpeed) {
-        if (windSpeed < 1) {
-            return "Calm";
-        } else if (NumberUtil.isBetween(windSpeed, 1, 6)) {
-            return "Light air";
-        } else if (NumberUtil.isBetween(windSpeed, 6, 12)) {
-            return "Light breeze";
-        } else if (NumberUtil.isBetween(windSpeed, 12, 20)) {
-            return "Gentle breeze";
-        } else if (NumberUtil.isBetween(windSpeed, 20, 29)) {
-            return "Moderate breeze";
-        } else if (NumberUtil.isBetween(windSpeed, 29, 39)) {
-            return "Fresh breeze";
-        } else if (NumberUtil.isBetween(windSpeed, 39, 50)) {
-            return "Strong breeze";
-        } else if (NumberUtil.isBetween(windSpeed, 50, 62)) {
-            return "Near gale";
-        } else if (NumberUtil.isBetween(windSpeed, 62, 75)) {
-            return "Gale";
-        } else if (NumberUtil.isBetween(windSpeed, 75, 89)) {
-            return "Strong gale";
-        } else if (NumberUtil.isBetween(windSpeed, 89, 103)) {
-            return "Storm";
-        } else if (NumberUtil.isBetween(windSpeed, 103, 118)) {
-            return "Violent storm";
-        } else {
-            return "Hurricane";
-        }
+                        .setDescription(context.localize("weather.last.updated").formatted(lastUpdated))
+                        .addField(Emoji.CLOUD + " " + context.localize("weather.clouds"), clouds, true)
+                        .addField(Emoji.WIND + " " + context.localize("weather.wind"), wind, true)
+                        .addField(Emoji.RAIN + " " + context.localize("weather.rain"), rain, true)
+                        .addField(Emoji.DROPLET + " " + context.localize("weather.humidity"), humidity, true)
+                        .addField(Emoji.THERMOMETER + " " + context.localize("weather.temperature"), temperature, true));
     }
 
 }
-*/
