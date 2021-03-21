@@ -1,6 +1,9 @@
 package com.shadorc.shadbot.listener;
 
+import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.data.Telemetry;
+import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
@@ -11,6 +14,7 @@ import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 import reactor.util.Logger;
 
 public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateEvent> {
@@ -29,16 +33,18 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
 
         // If the voice state update comes from the bot...
         if (userId.equals(event.getClient().getSelfId())) {
-            LOGGER.trace("{Guild ID: {}} Voice state update event: {}", guildId.asLong(), event);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("{Guild ID: {}} Voice state update event: {}", guildId.asString(), event);
+            }
             if (event.isLeaveEvent()) {
-                LOGGER.info("{Guild ID: {}} Voice channel left", guildId.asLong());
+                LOGGER.info("{Guild ID: {}} Voice channel left", guildId.asString());
                 Telemetry.VOICE_COUNT_GAUGE.dec();
                 return MusicManager.getInstance().destroyConnection(guildId);
             } else if (event.isJoinEvent()) {
-                LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asLong());
+                LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asString());
                 Telemetry.VOICE_COUNT_GAUGE.inc();
             } else if (event.isMoveEvent()) {
-                LOGGER.info("{Guild ID: {}} Voice channel moved", guildId.asLong());
+                LOGGER.info("{Guild ID: {}} Voice channel moved", guildId.asString());
             }
         }
         // If the voice state update does not come from the bot...
@@ -46,6 +52,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
             return VoiceStateUpdateListener.onUserEvent(event);
         }
 
+        LOGGER.error("{Guild ID: {}} Unknown event: {}", guildId.asString(), event);
         return Mono.empty();
     }
 
@@ -62,29 +69,33 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
                         .count()
                         // Everyone left or somebody joined
                         .filter(memberCount -> (memberCount == 0) != guildMusic.isLeavingScheduled())
-                        .map(memberCount -> {
+                        .zipWith(DatabaseManager.getGuilds().getDBGuild(guildId).map(DBGuild::getLocale))
+                        .map(TupleUtils.function((memberCount, locale) -> {
                             LOGGER.debug("{Guild ID: {}} On user event, memberCount: {}, leavingScheduled: {}",
-                                    guildId.asLong(), memberCount, guildMusic.isLeavingScheduled());
-                            final StringBuilder strBuilder = new StringBuilder(Emoji.INFO.toString());
+                                    guildId.asString(), memberCount, guildMusic.isLeavingScheduled());
                             // The bot is now alone: pause, schedule leave and warn users
                             if (memberCount == 0 && !guildMusic.isLeavingScheduled()) {
+                                LOGGER.debug("{Guild ID: {}} Nobody is listening, music paused, leaving scheduled",
+                                        guildId.asString());
                                 guildMusic.getTrackScheduler().getAudioPlayer().setPaused(true);
                                 guildMusic.scheduleLeave();
-                                strBuilder.append(" Nobody is listening anymore, music paused. I will leave the " +
-                                        "voice channel in 1 minute.");
-                                LOGGER.debug("{Guild ID: {}} Nobody is listening anymore, music paused, leave scheduled", guildId.asLong());
+                                return I18nManager.getInstance().localize(locale, "voicestateupdate.nobody.listening");
                             }
                             // The bot is no more alone: unpause, cancel leave and warn users
                             else if (memberCount != 0 && guildMusic.isLeavingScheduled()) {
+                                LOGGER.debug("{Guild ID: {}} Somebody joined, music resumed, leaving cancelled",
+                                        guildId.asString());
                                 guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
                                 guildMusic.cancelLeave();
-                                strBuilder.append(" Somebody joined me, music resumed.");
-                                LOGGER.debug("{Guild ID: {}} Somebody joined, music resumed", guildId.asLong());
+                                return I18nManager.getInstance().localize(locale, "voicestateupdate.somebody.joined");
+                            } else {
+                                LOGGER.error("{Guild ID: {}} Illegal state detected! Member count: {}, leaving scheduled: {}",
+                                        guildId.asString(), memberCount, guildMusic.isLeavingScheduled());
+                                return "";
                             }
-                            return strBuilder.toString();
-                        })
+                        }))
                         .flatMap(content -> guildMusic.getMessageChannel()
-                                .flatMap(channel -> DiscordUtil.sendMessage(content, channel))));
+                                .flatMap(channel -> DiscordUtil.sendMessage(Emoji.INFO + " " + content, channel))));
     }
 
 }

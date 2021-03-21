@@ -3,7 +3,6 @@ package com.shadorc.shadbot.core.command;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.core.i18n.I18nManager;
-import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
@@ -11,7 +10,6 @@ import com.shadorc.shadbot.music.NoMusicException;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.EnumUtil;
-import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.InteractionCreateEvent;
@@ -33,7 +31,10 @@ import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -186,16 +187,12 @@ public class Context implements InteractionContext, I18nContext {
 
     @Override
     public String localize(String key) {
-        try {
-            return I18nManager.getInstance().getBundle(this.getLocale()).getString(key);
-        } catch (final MissingResourceException err) {
-            return I18nManager.getInstance().getBundle(Config.DEFAULT_LOCALE).getString(key);
-        }
+        return I18nManager.getInstance().localize(this.getLocale(), key);
     }
 
     @Override
     public String localize(double number) {
-        return FormatUtil.number(number, this.getLocale());
+        return I18nManager.getInstance().localize(this.getLocale(), number);
     }
 
     /////////////////////////////////////////////

@@ -71,14 +71,13 @@ class DeviantartCmd extends BaseCmd {
 
     private Mono<Image> getPopularImage(final String query) {
         return this.requestAccessToken()
-                .map(token -> String.format("%s?"
-                                + "q=%s"
-                                + "&timerange=alltime"
-                                + "&limit=25" // The pagination limit (min: 1 max: 50)
-                                + "&offset=%d" // The pagination offset (min: 0 max: 50000)
-                                + "&access_token=%s",
-                        BROWSE_POPULAR_URL, NetUtil.encode(query), ThreadLocalRandom.current().nextInt(150),
-                        token.getAccessToken()))
+                .map(token -> "%s?".formatted(BROWSE_POPULAR_URL)
+                        + "q=%s".formatted(NetUtil.encode(query))
+                        + "&timerange=alltime"
+                        + "&limit=25" // The pagination limit (min: 1 max: 50)
+                        // The pagination offset (min: 0 max: 50000)
+                        + "&offset=%d".formatted(ThreadLocalRandom.current().nextInt(150))
+                        + "&access_token=%s".formatted(token.getAccessToken()))
                 .flatMap(url -> RequestHelper.fromUrl(url)
                         .to(DeviantArtResponse.class))
                 .flatMapIterable(DeviantArtResponse::getResults)
@@ -90,8 +89,10 @@ class DeviantartCmd extends BaseCmd {
 
     private Mono<TokenResponse> requestAccessToken() {
         if (this.isTokenExpired()) {
-            final String url = "%s?client_id=%s&client_secret=%s&grant_type=client_credentials"
-                    .formatted(OAUTH_URL, this.clientId, this.apiSecret);
+            final String url = "%s?".formatted(OAUTH_URL)
+                    + "client_id=%s".formatted(this.clientId)
+                    + "&client_secret=%s".formatted(this.apiSecret)
+                    + "&grant_type=client_credentials";
             return RequestHelper.fromUrl(url)
                     .to(TokenResponse.class)
                     .doOnNext(token -> {

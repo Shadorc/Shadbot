@@ -104,8 +104,8 @@ public class RequestHelper {
                         })
                         .onErrorMap(err -> err instanceof JSONException || err instanceof JsonProcessingException,
                                 err -> new IOException(err.getMessage(),
-                                        new IOException(String.format("Invalid JSON received (response: %s): %s", resp, body)))))
+                                        new IOException("Invalid JSON received (response: %s): %s".formatted(resp, body)))))
                 .retryWhen(ExceptionHandler.RETRY_ON_INTERNET_FAILURES
-                        .apply(String.format("Retries exhausted while accessing %s", resp.fullPath())));
+                        .apply("Retries exhausted while accessing %s".formatted(resp.fullPath())));
     }
 }

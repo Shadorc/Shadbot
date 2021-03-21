@@ -3,6 +3,7 @@ package com.shadorc.shadbot.listener;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.MusicManager;
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import reactor.core.publisher.Mono;
 
@@ -21,13 +22,14 @@ public class GuildDeleteListener implements EventListener<GuildDeleteEvent> {
             return Mono.empty();
         }
 
-        DEFAULT_LOGGER.info("{Guild ID: {}} Disconnected", event.getGuildId().asLong());
+        final Snowflake guildId = event.getGuildId();
+        DEFAULT_LOGGER.info("{Guild ID: {}} Disconnected", guildId.asString());
 
         final Mono<Void> destroyVoiceConnection = MusicManager.getInstance()
-                .destroyConnection(event.getGuildId());
+                .destroyConnection(guildId);
 
         final Mono<Void> deleteGuild = DatabaseManager.getGuilds()
-                .getDBGuild(event.getGuildId())
+                .getDBGuild(guildId)
                 .flatMap(DBGuild::delete);
 
         return destroyVoiceConnection

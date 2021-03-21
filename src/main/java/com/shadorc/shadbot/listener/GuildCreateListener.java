@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.listener;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
 import reactor.core.publisher.Mono;
 
@@ -14,9 +15,11 @@ public class GuildCreateListener implements EventListener<GuildCreateEvent> {
 
     @Override
     public Mono<?> execute(GuildCreateEvent event) {
-        final long guildId = event.getGuild().getId().asLong();
-        final int memberCount = event.getGuild().getMemberCount();
-        DEFAULT_LOGGER.debug("{Guild ID: {}} Connected ({} users)", guildId, memberCount);
+        if (DEFAULT_LOGGER.isDebugEnabled()) {
+            final Snowflake guildId = event.getGuild().getId();
+            final int memberCount = event.getGuild().getMemberCount();
+            DEFAULT_LOGGER.debug("{Guild ID: {}} Connected ({} users)", guildId.asString(), memberCount);
+        }
         return Mono.empty();
     }
 

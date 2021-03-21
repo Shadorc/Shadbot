@@ -58,16 +58,15 @@ class WikipediaCmd extends BaseCmd {
 
     private static Mono<WikipediaPage> getWikipediaPage(I18nContext context, String search) {
         // Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
-        final String url = String.format("https://%s.wikipedia.org/w/api.php?"
-                        + "format=json"
-                        + "&action=query"
-                        + "&titles=%s"
-                        + "&redirects=true"
-                        + "&prop=extracts"
-                        + "&explaintext=true"
-                        + "&exintro=true"
-                        + "&exsentences=5",
-                context.getLocale().getLanguage(), NetUtil.encode(search));
+        final String url = "https://%s.wikipedia.org/w/api.php?".formatted(context.getLocale().getLanguage())
+                + "format=json"
+                + "&action=query"
+                + "&titles=%s".formatted(NetUtil.encode(search))
+                + "&redirects=true"
+                + "&prop=extracts"
+                + "&explaintext=true"
+                + "&exintro=true"
+                + "&exsentences=5";
 
         return RequestHelper.fromUrl(url)
                 .to(WikipediaResponse.class)

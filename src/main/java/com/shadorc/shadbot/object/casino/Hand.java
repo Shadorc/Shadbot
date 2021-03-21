@@ -57,11 +57,12 @@ public class Hand {
     }
 
     public String format() {
-        return String.format("%s%nValue: %d",
-                FormatUtil.format(this.getCards(),
-                        card -> String.format("`%s` %s", card.getValue().getIdent(), card.getSuit().getEmoji()),
-                        " | "),
-                this.getValue());
+        return "%s%nValue: %d"
+                .formatted(
+                        FormatUtil.format(this.getCards(),
+                                card -> "`%s` %s".formatted(card.getValue().getIdent(), card.getSuit().getEmoji()),
+                                " | "),
+                        this.getValue());
     }
 
 }

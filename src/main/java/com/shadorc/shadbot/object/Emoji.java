@@ -74,6 +74,6 @@ public enum Emoji {
 
     @Override
     public String toString() {
-        return String.format(":%s:", this.discordNotation);
+        return ":%s:".formatted(this.discordNotation);
     }
 }

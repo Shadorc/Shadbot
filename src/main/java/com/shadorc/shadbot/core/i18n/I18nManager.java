@@ -1,6 +1,9 @@
 package com.shadorc.shadbot.core.i18n;
 
 
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.utils.FormatUtil;
+
 import java.util.*;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
@@ -30,6 +33,18 @@ public class I18nManager {
 
     public ResourceBundle getBundle(final Locale locale) {
         return this.bundlesMap.get(locale);
+    }
+
+    public String localize(Locale locale, String key) {
+        try {
+            return this.getBundle(locale).getString(key);
+        } catch (final MissingResourceException err) {
+            return this.getBundle(Config.DEFAULT_LOCALE).getString(key);
+        }
+    }
+
+    public String localize(Locale locale, double number) {
+        return FormatUtil.number(number, locale);
     }
 
     public static I18nManager getInstance() {

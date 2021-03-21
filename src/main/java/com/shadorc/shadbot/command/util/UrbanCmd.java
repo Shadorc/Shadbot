@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.function.Consumer;
 
@@ -73,9 +74,10 @@ class UrbanCmd extends BaseCmd {
                 .to(UrbanDictionaryResponse.class)
                 .flatMapIterable(UrbanDictionaryResponse::getDefinitions)
                 .next()
-                // TODO: What happen on retry exhausted?
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
-                        .filter(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR)));
+                        .filter(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR))
+                        .onRetryExhaustedThrow((spec, signal) -> new IOException("Retries exhausted on error %d"
+                                .formatted(HttpResponseStatus.INTERNAL_SERVER_ERROR.code()))));
     }
 
 }

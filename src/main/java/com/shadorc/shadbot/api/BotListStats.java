@@ -105,7 +105,7 @@ public class BotListStats {
     private Mono<String> postOnBotlistDotSpace(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
-        final String url = String.format("https://api.botlist.space/v1/bots/%d", this.gateway.getSelfId().asLong());
+        final String url = "https://api.botlist.space/v1/bots/%d".formatted(this.gateway.getSelfId().asLong());
         return BotListStats.post(url, CredentialManager.getInstance().get(Credential.BOTLIST_DOT_SPACE_TOKEN), content)
                 .onErrorResume(BotListStats.handleError(BOTLIST_DOT_SPACE));
     }
@@ -116,7 +116,7 @@ public class BotListStats {
     private Mono<String> postOnBotsOndiscordDotXyz(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("guildCount", guildCount);
-        final String url = String.format("https://bots.ondiscord.xyz/bot-api/bots/%d/guilds", this.gateway.getSelfId().asLong());
+        final String url = "https://bots.ondiscord.xyz/bot-api/bots/%d/guilds".formatted(this.gateway.getSelfId().asLong());
         return BotListStats.post(url, CredentialManager.getInstance().get(Credential.BOTS_ONDISCORD_DOT_XYZ_TOKEN), content)
                 .onErrorResume(BotListStats.handleError(BOTS_ONDISCORD_DOT_XYZ));
     }
@@ -128,7 +128,7 @@ public class BotListStats {
         final JSONObject content = new JSONObject()
                 .put("serveurs", guildCount)
                 .put("shards", shardCount);
-        final String url = String.format("https://api.wonderbotlist.com/v1/bot/%d", this.gateway.getSelfId().asLong());
+        final String url = "https://api.wonderbotlist.com/v1/bot/%d".formatted(this.gateway.getSelfId().asLong());
         return BotListStats.post(url, CredentialManager.getInstance().get(Credential.WONDERBOTLIST_DOT_COM_TOKEN), content)
                 .onErrorResume(BotListStats.handleError(WONDERBOTLIST_DOT_COM));
     }

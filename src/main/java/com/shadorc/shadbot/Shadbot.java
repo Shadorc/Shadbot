@@ -165,8 +165,8 @@ public class Shadbot {
                 .on(eventListener.getEventType())
                 .doOnNext(event -> Telemetry.EVENT_COUNTER.labels(event.getClass().getSimpleName()).inc())
                 .flatMap(event -> eventListener.execute(event)
-                        .timeout(EVENT_TIMEOUT, Mono.error(new RuntimeException(
-                                String.format("Event timed out after %s: %s", FormatUtil.formatDurationWords(EVENT_TIMEOUT), event))))
+                        .timeout(EVENT_TIMEOUT, Mono.error(new RuntimeException("Event timed out after %s: %s"
+                                .formatted(FormatUtil.formatDurationWords(EVENT_TIMEOUT), event))))
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }

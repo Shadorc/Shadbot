@@ -56,7 +56,7 @@ public abstract class HelpBuilder {
     }
 
     public HelpBuilder setDescription(String description) {
-        this.description = String.format("**%s**", description);
+        this.description = "**%s**".formatted(description);
         return this;
     }
 
@@ -126,22 +126,22 @@ public abstract class HelpBuilder {
 
     private String getUsage() {
         if (this.usage != null && !this.usage.isBlank()) {
-            return String.format("`%s`", this.usage);
+            return "`%s`".formatted(this.usage);
         }
 
         if (this.options.isEmpty()) {
-            return String.format("`/%s`", this.getCommandName());
+            return "`/%s`".formatted(this.getCommandName());
         }
 
-        return String.format("`/%s %s`", this.getCommandName(),
+        return "`/%s %s`".formatted(this.getCommandName(),
                 FormatUtil.format(this.options,
                         option -> String.format(option.isRequired() ? "<%s>" : "[<%s>]", option.getName()), " "));
     }
 
     private String getArguments() {
         return this.options.stream()
-                .map(option -> String.format("%n**%s** %s - %s",
-                        option.getName(), option.isRequired() ? "" : "[optional] ", option.getDescription()))
+                .map(option -> "%n**%s** %s - %s"
+                        .formatted(option.getName(), option.isRequired() ? "" : "[optional] ", option.getDescription()))
                 .collect(Collectors.joining());
     }
 }
