@@ -103,8 +103,9 @@ class CounterStrikeCmd extends BaseCmd {
         }
         // The user provided a pseudo
         else {
-            final String url = "%s?key=%s&vanityurl=%s"
-                    .formatted(RESOLVE_VANITY_URL, this.apiKey, NetUtil.encode(identificator));
+            final String url = "%s?".formatted(RESOLVE_VANITY_URL)
+                    + "key=%s".formatted(this.apiKey)
+                    + "&vanityurl=%s".formatted(NetUtil.encode(identificator));
             return RequestHelper.fromUrl(url)
                     .to(ResolveVanityUrlResponse.class)
                     .map(ResolveVanityUrlResponse::getResponse)
@@ -114,7 +115,9 @@ class CounterStrikeCmd extends BaseCmd {
     }
 
     private Mono<PlayerSummary> getPlayerSummary(String steamId) {
-        final String url = "%s?key=%s&steamids=%s".formatted(PLAYER_SUMMARIES_URL, this.apiKey, steamId);
+        final String url = "%s?".formatted(PLAYER_SUMMARIES_URL)
+                + "key=%s".formatted(this.apiKey)
+                + "&steamids=%s".formatted(steamId);
         return RequestHelper.fromUrl(url)
                 .to(PlayerSummariesResponse.class)
                 .map(PlayerSummariesResponse::getResponse)

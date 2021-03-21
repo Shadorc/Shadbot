@@ -69,7 +69,8 @@ class UrbanCmd extends BaseCmd {
     }
 
     private static Mono<UrbanDefinition> getUrbanDefinition(String query) {
-        final String url = "%s?term=%s".formatted(HOME_URL, NetUtil.encode(query));
+        final String url = "%s?".formatted(HOME_URL)
+                + "term=%s".formatted(NetUtil.encode(query));
         return RequestHelper.fromUrl(url)
                 .to(UrbanDictionaryResponse.class)
                 .flatMapIterable(UrbanDictionaryResponse::getDefinitions)

@@ -139,7 +139,7 @@ public class BotListStats {
     private Mono<String> postOnDiscordDotBoats(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
-        final String url = String.format("https://discord.boats/api/bot/%d", this.gateway.getSelfId().asLong());
+        final String url = "https://discord.boats/api/bot/%d".formatted(this.gateway.getSelfId().asLong());
         return BotListStats.post(url, CredentialManager.getInstance().get(Credential.DISCORD_DOT_BOATS), content)
                 .onErrorResume(BotListStats.handleError(DISCORD_DOT_BOATS));
     }
@@ -150,7 +150,7 @@ public class BotListStats {
     private Mono<String> postOnDiscordextremelistDotXyz(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("guildCount", guildCount);
-        final String url = String.format("https://api.discordextremelist.xyz/v2/bot/%d/stats", this.gateway.getSelfId().asLong());
+        final String url = "https://api.discordextremelist.xyz/v2/bot/%d/stats".formatted(this.gateway.getSelfId().asLong());
         return BotListStats.post(url, CredentialManager.getInstance().get(Credential.DISCORDEXTREMELIST_DOT_XYZ), content)
                 .onErrorResume(BotListStats.handleError(DISCORDEXTREMELIST_DOT_XYZ));
     }
@@ -161,7 +161,7 @@ public class BotListStats {
     private Mono<String> postOnBotsfordiscordDotCom(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
-        final String url = String.format("https://botsfordiscord.com/api/bot/%d", this.gateway.getSelfId().asLong());
+        final String url = "https://botsfordiscord.com/api/bot/%d".formatted(this.gateway.getSelfId().asLong());
         return BotListStats.post(url, CredentialManager.getInstance().get(Credential.BOTSFORDISCORD_DOT_COM), content)
                 .onErrorResume(BotListStats.handleError(BOTSFORDISCORD_DOT_COM));
     }
@@ -175,10 +175,10 @@ public class BotListStats {
                     final JSONObject content = new JSONObject()
                             .put("shard_id", shardId)
                             .put("guilds ", guildCount / shardCount);
-                    final String url = String.format("https://discordbotlist.com/api/bots/%d/stats",
-                            this.gateway.getSelfId().asLong());
-                    return BotListStats.post(url, String.format("Bot %s",
-                            CredentialManager.getInstance().get(Credential.DISCORDBOTLIST_DOT_COM_TOKEN)), content);
+                    final String url = "https://discordbotlist.com/api/bots/%d/stats"
+                            .formatted(this.gateway.getSelfId().asLong());
+                    return BotListStats.post(url, "Bot %s"
+                            .formatted(CredentialManager.getInstance().get(Credential.DISCORDBOTLIST_DOT_COM_TOKEN)), content);
                 })
                 .onErrorResume(BotListStats.handleError(DISCORDBOTLIST_DOT_COM));
     }
@@ -193,7 +193,7 @@ public class BotListStats {
                             .put("shardId", shardId)
                             .put("shardCount", shardCount)
                             .put("guildCount", guildCount / shardCount);
-                    final String url = String.format("https://discord.bots.gg/api/v1/bots/%d/stats", this.gateway.getSelfId().asLong());
+                    final String url = "https://discord.bots.gg/api/v1/bots/%d/stats".formatted(this.gateway.getSelfId().asLong());
                     return BotListStats.post(url, CredentialManager.getInstance().get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
                 })
                 .onErrorResume(BotListStats.handleError(DISCORD_BOTS_DOT_GG));
@@ -209,7 +209,7 @@ public class BotListStats {
                             .put("shard_id", shardId)
                             .put("shard_count", shardCount)
                             .put("server_count", guildCount / shardCount);
-                    final String url = String.format("https://top.gg/api/bots/%d/stats", this.gateway.getSelfId().asLong());
+                    final String url = "https://top.gg/api/bots/%d/stats".formatted(this.gateway.getSelfId().asLong());
                     return BotListStats.post(url, CredentialManager.getInstance().get(Credential.TOP_DOT_GG_TOKEN), content);
                 })
                 .onErrorResume(BotListStats.handleError(TOP_DOT_GG));

@@ -66,9 +66,10 @@ class ChatCmd extends BaseCmd {
     }
 
     private Mono<String> talk(Snowflake channelId, String botId, String message) {
-        final String url = "%s?botid=%s&input=%s&custid=%s"
-                .formatted(HOME_URl, botId, NetUtil.encode(message),
-                        this.channelsCustid.getOrDefault(channelId, ""));
+        final String url = "%s?".formatted(HOME_URl)
+                + "botid=%s".formatted(botId)
+                + "&input=%s".formatted(NetUtil.encode(message))
+                + "&custid=%s".formatted(this.channelsCustid.getOrDefault(channelId, ""));
 
         return RequestHelper.fromUrl(url)
                 .to(ChatBotResponse.class)
