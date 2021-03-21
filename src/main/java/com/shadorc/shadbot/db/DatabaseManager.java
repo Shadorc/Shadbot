@@ -24,66 +24,55 @@ public class DatabaseManager {
             MongoClientSettings.getDefaultCodecRegistry(),
             CodecRegistries.fromCodecs(new SnowflakeCodec(), new LongCodec(), new IamCodec()));
 
-    private static DatabaseManager instance;
+    private static final MongoClient CLIENT;
+    private static final PremiumCollection PREMIUM_COLLECTION;
+    private static final GuildsCollection GUILDS_COLLECTION;
+    private static final LotteryCollection LOTTERY_COLLECTION;
+    private static final UsersCollection USERS_COLLECTION;
 
     static {
-        DatabaseManager.instance = new DatabaseManager();
-    }
-
-    private final MongoClient client;
-
-    private final PremiumCollection premiumCollection;
-    private final GuildsCollection guildsCollection;
-    private final LotteryCollection lotteryCollection;
-    private final UsersCollection usersCollection;
-
-    private DatabaseManager() {
         final MongoClientSettings.Builder settingsBuilder = MongoClientSettings.builder()
                 .codecRegistry(CODEC_REGISTRY)
                 .applicationName("Shadbot V%s".formatted(Config.VERSION));
 
         if (!Config.IS_SNAPSHOT) {
-            final String username = CredentialManager.getInstance().get(Credential.DATABASE_USERNAME);
-            final String pwd = CredentialManager.getInstance().get(Credential.DATABASE_PWD);
-            final String host = CredentialManager.getInstance().get(Credential.DATABASE_HOST);
-            final String port = CredentialManager.getInstance().get(Credential.DATABASE_PORT);
+            final String username = CredentialManager.get(Credential.DATABASE_USERNAME);
+            final String pwd = CredentialManager.get(Credential.DATABASE_PWD);
+            final String host = CredentialManager.get(Credential.DATABASE_HOST);
+            final String port = CredentialManager.get(Credential.DATABASE_PORT);
             if (username != null && pwd != null && host != null && port != null) {
                 settingsBuilder.applyConnectionString(new ConnectionString(
-                        String.format("mongodb://%s:%s@%s:%s/%s", username, pwd, host, port, Config.DATABASE_NAME)));
+                        "mongodb://%s:%s@%s:%s/%s".formatted(username, pwd, host, port, Config.DATABASE_NAME)));
             }
         }
 
-        this.client = MongoClients.create(settingsBuilder.build());
+        CLIENT = MongoClients.create(settingsBuilder.build());
 
-        final MongoDatabase database = this.client.getDatabase(Config.DATABASE_NAME);
-        this.premiumCollection = new PremiumCollection(database);
-        this.guildsCollection = new GuildsCollection(database);
-        this.lotteryCollection = new LotteryCollection(database);
-        this.usersCollection = new UsersCollection(database);
+        final MongoDatabase database = CLIENT.getDatabase(Config.DATABASE_NAME);
+        PREMIUM_COLLECTION = new PremiumCollection(database);
+        GUILDS_COLLECTION = new GuildsCollection(database);
+        LOTTERY_COLLECTION = new LotteryCollection(database);
+        USERS_COLLECTION = new UsersCollection(database);
     }
 
     public static PremiumCollection getPremium() {
-        return DatabaseManager.instance.premiumCollection;
+        return PREMIUM_COLLECTION;
     }
 
     public static GuildsCollection getGuilds() {
-        return DatabaseManager.instance.guildsCollection;
+        return GUILDS_COLLECTION;
     }
 
     public static LotteryCollection getLottery() {
-        return DatabaseManager.instance.lotteryCollection;
+        return LOTTERY_COLLECTION;
     }
 
     public static UsersCollection getUsers() {
-        return DatabaseManager.instance.usersCollection;
+        return USERS_COLLECTION;
     }
 
-    public void close() {
-        this.client.close();
-    }
-
-    public static DatabaseManager getInstance() {
-        return DatabaseManager.instance;
+    public static void close() {
+        CLIENT.close();
     }
 
 }

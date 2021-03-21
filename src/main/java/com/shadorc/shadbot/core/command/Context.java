@@ -169,8 +169,7 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     public GuildMusic requireGuildMusic() {
-        return MusicManager.getInstance()
-                .getGuildMusic(this.getGuildId())
+        return MusicManager.getGuildMusic(this.getGuildId())
                 .filter(guildMusic -> !guildMusic.getTrackScheduler().isStopped())
                 .orElseThrow(NoMusicException::new);
     }
@@ -187,12 +186,12 @@ public class Context implements InteractionContext, I18nContext {
 
     @Override
     public String localize(String key) {
-        return I18nManager.getInstance().localize(this.getLocale(), key);
+        return I18nManager.localize(this.getLocale(), key);
     }
 
     @Override
     public String localize(double number) {
-        return I18nManager.getInstance().localize(this.getLocale(), number);
+        return I18nManager.localize(this.getLocale(), number);
     }
 
     /////////////////////////////////////////////

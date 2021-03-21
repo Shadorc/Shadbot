@@ -51,8 +51,8 @@ class DiabloCmd extends BaseCmd {
                 DiscordUtil.toOptions(Region.class));
         this.addOption("battletag", "User's battletag", true, ApplicationCommandOptionType.STRING);
 
-        this.clientId = CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_ID);
-        this.clientSecret = CredentialManager.getInstance().get(Credential.BLIZZARD_CLIENT_SECRET);
+        this.clientId = CredentialManager.get(Credential.BLIZZARD_CLIENT_ID);
+        this.clientSecret = CredentialManager.get(Credential.BLIZZARD_CLIENT_SECRET);
         this.lastTokenGeneration = new AtomicLong();
         this.token = new AtomicReference<>();
     }

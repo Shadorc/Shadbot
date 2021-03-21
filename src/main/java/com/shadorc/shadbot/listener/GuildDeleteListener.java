@@ -25,8 +25,7 @@ public class GuildDeleteListener implements EventListener<GuildDeleteEvent> {
         final Snowflake guildId = event.getGuildId();
         DEFAULT_LOGGER.info("{Guild ID: {}} Disconnected", guildId.asString());
 
-        final Mono<Void> destroyVoiceConnection = MusicManager.getInstance()
-                .destroyConnection(guildId);
+        final Mono<Void> destroyVoiceConnection = MusicManager.destroyConnection(guildId);
 
         final Mono<Void> deleteGuild = DatabaseManager.getGuilds()
                 .getDBGuild(guildId)

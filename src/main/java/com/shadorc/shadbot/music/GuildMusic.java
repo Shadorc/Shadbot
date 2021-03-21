@@ -71,7 +71,7 @@ public class GuildMusic {
 
     public void addAudioLoadResultListener(AudioLoadResultListener listener, String identifier) {
         LOGGER.debug("{Guild ID: {}} Adding audio load result listener: {}", this.guildId, listener.hashCode());
-        this.listeners.put(listener, MusicManager.getInstance().loadItemOrdered(this.guildId, identifier, listener));
+        this.listeners.put(listener, MusicManager.loadItemOrdered(this.guildId, identifier, listener));
     }
 
     public Mono<Void> removeAudioLoadResultListener(AudioLoadResultListener listener) {

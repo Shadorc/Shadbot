@@ -45,7 +45,7 @@ class PlayCmd extends BaseCmd {
 
         return DiscordUtils.requireVoiceChannel(context)
                 .flatMap(voiceChannel -> context.getChannel()
-                        .flatMap(channel -> MusicManager.getInstance()
+                        .flatMap(channel -> MusicManager
                                 .getOrCreate(context.getClient(), context.getGuildId(), voiceChannel.getId())
                                 .flatMap(guildMusic -> PlayCmd.play(context, channel, guildMusic, PlayCmd.getIdentifier(arg)))))
                 .onErrorMap(err -> {

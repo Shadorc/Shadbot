@@ -43,7 +43,7 @@ class CounterStrikeCmd extends BaseCmd {
         this.addOption("steamid", "Steam ID, custom ID or profile URL", true,
                 ApplicationCommandOptionType.STRING);
 
-        this.apiKey = CredentialManager.getInstance().get(Credential.STEAM_API_KEY);
+        this.apiKey = CredentialManager.get(Credential.STEAM_API_KEY);
     }
 
     @Override

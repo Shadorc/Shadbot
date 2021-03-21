@@ -54,7 +54,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     @Override
     public void trackLoaded(AudioTrack audioTrack) {
         LOGGER.debug("{Guild ID: {}} Track loaded: {}", this.guildId.asLong(), audioTrack.hashCode());
-        Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
                 .filter(guildMusic -> !guildMusic.getTrackScheduler().startOrQueue(audioTrack, this.insertFirst))
                 .flatMap(GuildMusic::getMessageChannel)
                 .flatMap(channel -> DiscordUtil.sendMessage(String.format(
@@ -90,7 +90,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
     private void onSearchResult(AudioPlaylist playlist) {
-        Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
                 .flatMapMany(guildMusic -> {
                     this.resultTracks = playlist.getTracks()
                             .subList(0, Math.min(Config.MUSIC_SEARCHES, playlist.getTracks().size()));
@@ -116,7 +116,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
     private void onPlaylistLoaded(AudioPlaylist playlist) {
-        Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
                 .zipWith(DatabaseManager.getPremium().isPremium(this.guildId, this.djId))
                 .flatMap(TupleUtils.function((guildMusic, isPremium) -> {
                     final TrackScheduler trackScheduler = guildMusic.getTrackScheduler();
@@ -164,7 +164,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     @Override
     public void loadFailed(FriendlyException err) {
         LOGGER.debug("{Guild ID: {}} Load failed: {}", this.guildId.asLong(), err);
-        Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
                 .flatMap(guildMusic -> {
                     final String errMessage = ShadbotUtil.cleanLavaplayerErr(err);
                     LOGGER.info("{Guild ID: {}} Load failed: {}", this.guildId.asLong(), errMessage);
@@ -185,7 +185,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
     private void onNoMatches() {
-        Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
                 .flatMap(GuildMusic::getMessageChannel)
                 .flatMap(channel -> DiscordUtil.sendMessage(String.format(Emoji.MAGNIFYING_GLASS + " No results for `%s`.",
                         StringUtil.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel))
@@ -195,7 +195,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
     private Mono<Void> terminate() {
-        return Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
+        return Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
                 .flatMap(guildMusic -> guildMusic.removeAudioLoadResultListener(this));
     }
 

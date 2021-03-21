@@ -39,7 +39,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
             if (event.isLeaveEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel left", guildId.asString());
                 Telemetry.VOICE_COUNT_GAUGE.dec();
-                return MusicManager.getInstance().destroyConnection(guildId);
+                return MusicManager.destroyConnection(guildId);
             } else if (event.isJoinEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asString());
                 Telemetry.VOICE_COUNT_GAUGE.inc();
@@ -58,7 +58,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
 
     private static Mono<?> onUserEvent(VoiceStateUpdateEvent event) {
         final Snowflake guildId = event.getCurrent().getGuildId();
-        return Mono.defer(() -> Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(guildId)))
+        return Mono.defer(() -> Mono.justOrEmpty(MusicManager.getGuildMusic(guildId)))
                 .flatMap(guildMusic -> event.getClient()
                         .getMemberById(guildId, event.getClient().getSelfId())
                         .flatMap(Member::getVoiceState)
@@ -79,7 +79,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
                                         guildId.asString());
                                 guildMusic.getTrackScheduler().getAudioPlayer().setPaused(true);
                                 guildMusic.scheduleLeave();
-                                return I18nManager.getInstance().localize(locale, "voicestateupdate.nobody.listening");
+                                return I18nManager.localize(locale, "voicestateupdate.nobody.listening");
                             }
                             // The bot is no more alone: unpause, cancel leave and warn users
                             else if (memberCount != 0 && guildMusic.isLeavingScheduled()) {
@@ -87,7 +87,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
                                         guildId.asString());
                                 guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
                                 guildMusic.cancelLeave();
-                                return I18nManager.getInstance().localize(locale, "voicestateupdate.somebody.joined");
+                                return I18nManager.localize(locale, "voicestateupdate.somebody.joined");
                             } else {
                                 LOGGER.error("{Guild ID: {}} Illegal state detected! Member count: {}, leaving scheduled: {}",
                                         guildId.asString(), memberCount, guildMusic.isLeavingScheduled());

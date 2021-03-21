@@ -40,33 +40,28 @@ public class MusicManager {
 
     public static final Logger LOGGER = LogUtil.getLogger(LogUtil.Category.MUSIC);
 
-    private static MusicManager instance;
+    private static final AudioPlayerManager AUDIO_PLAYER_MANAGER;
+    private static final Map<Snowflake, GuildMusic> GUILD_MUSIC_MAP;
+    private static final Map<Snowflake, AtomicBoolean> GUILD_JOINING;
 
     static {
-        MusicManager.instance = new MusicManager();
-    }
+        AUDIO_PLAYER_MANAGER = new DefaultAudioPlayerManager();
+        AUDIO_PLAYER_MANAGER.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
+        AUDIO_PLAYER_MANAGER.getConfiguration().setFilterHotSwapEnabled(true);
+        AudioSourceManagers.registerRemoteSources(AUDIO_PLAYER_MANAGER);
 
-    private final AudioPlayerManager audioPlayerManager;
-    private final Map<Snowflake, GuildMusic> guildMusics;
-    private final Map<Snowflake, AtomicBoolean> guildJoining;
-
-    private MusicManager() {
-        this.audioPlayerManager = new DefaultAudioPlayerManager();
-        this.audioPlayerManager.getConfiguration().setFrameBufferFactory(NonAllocatingAudioFrameBuffer::new);
-        this.audioPlayerManager.getConfiguration().setFilterHotSwapEnabled(true);
-        AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
-        this.guildMusics = new ConcurrentHashMap<>();
-        this.guildJoining = new ConcurrentHashMap<>();
+        GUILD_MUSIC_MAP = new ConcurrentHashMap<>();
+        GUILD_JOINING = new ConcurrentHashMap<>();
 
         //IPv6 rotation config
-        final String ipv6Block = CredentialManager.getInstance().get(Credential.IPV6_BLOCK);
+        final String ipv6Block = CredentialManager.get(Credential.IPV6_BLOCK);
         if (ipv6Block != null && !Config.IS_SNAPSHOT) {
             LOGGER.info("Configuring YouTube IP rotator");
             @SuppressWarnings("rawtypes") final List<IpBlock> blocks = Collections.singletonList(new Ipv6Block(ipv6Block));
             final AbstractRoutePlanner planner = new RotatingNanoIpRoutePlanner(blocks);
 
             new YoutubeIpRotatorSetup(planner)
-                    .forSource(this.audioPlayerManager.source(YoutubeAudioSourceManager.class))
+                    .forSource(AUDIO_PLAYER_MANAGER.source(YoutubeAudioSourceManager.class))
                     .setup();
         }
     }
@@ -77,8 +72,8 @@ public class MusicManager {
      *
      * @return A future for this operation.
      */
-    protected Future<Void> loadItemOrdered(long guildId, String identifier, AudioLoadResultHandler listener) {
-        return this.audioPlayerManager.loadItemOrdered(guildId, identifier, listener);
+    protected static Future<Void> loadItemOrdered(long guildId, String identifier, AudioLoadResultHandler listener) {
+        return AUDIO_PLAYER_MANAGER.loadItemOrdered(guildId, identifier, listener);
     }
 
     /**
@@ -86,21 +81,21 @@ public class MusicManager {
      * a new one is created and a request to join the {@link VoiceChannel} corresponding to the provided
      * {@code voiceChannelId} is sent.
      */
-    public Mono<GuildMusic> getOrCreate(GatewayDiscordClient gateway, Snowflake guildId, Snowflake voiceChannelId) {
-        return Mono.justOrEmpty(this.getGuildMusic(guildId))
+    public static Mono<GuildMusic> getOrCreate(GatewayDiscordClient gateway, Snowflake guildId, Snowflake voiceChannelId) {
+        return Mono.justOrEmpty(MusicManager.getGuildMusic(guildId))
                 .switchIfEmpty(Mono.defer(() -> {
-                    final AudioPlayer audioPlayer = this.audioPlayerManager.createPlayer();
+                    final AudioPlayer audioPlayer = AUDIO_PLAYER_MANAGER.createPlayer();
                     audioPlayer.addListener(new TrackEventListener(guildId));
                     final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
 
-                    return this.joinVoiceChannel(gateway, guildId, voiceChannelId, audioProvider)
+                    return MusicManager.joinVoiceChannel(gateway, guildId, voiceChannelId, audioProvider)
                             .flatMap(__ -> DatabaseManager.getGuilds().getDBGuild(guildId))
                             .map(DBGuild::getSettings)
                             .map(Settings::getDefaultVol)
                             .map(volume -> new TrackScheduler(audioPlayer, volume))
                             .map(trackScheduler -> new GuildMusic(gateway, guildId, trackScheduler))
                             .doOnNext(guildMusic -> {
-                                this.guildMusics.put(guildId, guildMusic);
+                                GUILD_MUSIC_MAP.put(guildId, guildMusic);
                                 LOGGER.debug("{Guild ID: {}} Guild music created", guildId.asString());
                             });
                 }));
@@ -109,10 +104,10 @@ public class MusicManager {
     /**
      * Requests to join a voice channel.
      */
-    private Mono<VoiceConnection> joinVoiceChannel(GatewayDiscordClient gateway, Snowflake guildId, Snowflake voiceChannelId,
-                                                   AudioProvider audioProvider) {
+    private static Mono<VoiceConnection> joinVoiceChannel(GatewayDiscordClient gateway, Snowflake guildId, Snowflake voiceChannelId,
+                                                          AudioProvider audioProvider) {
         // Do not join the voice channel if the bot is already joining one
-        if (this.guildJoining.computeIfAbsent(guildId, id -> new AtomicBoolean()).getAndSet(true)) {
+        if (GUILD_JOINING.computeIfAbsent(guildId, id -> new AtomicBoolean()).getAndSet(true)) {
             return Mono.empty();
         }
 
@@ -129,11 +124,11 @@ public class MusicManager {
                 .filterWhen(__ -> isDisconnected)
                 .doOnNext(__ -> LOGGER.info("{Guild ID: {}} Joining voice channel...", guildId.asString()))
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
-                .doOnTerminate(() -> this.guildJoining.remove(guildId));
+                .doOnTerminate(() -> GUILD_JOINING.remove(guildId));
     }
 
-    public Mono<Void> destroyConnection(Snowflake guildId) {
-        final GuildMusic guildMusic = this.guildMusics.remove(guildId);
+    public static Mono<Void> destroyConnection(Snowflake guildId) {
+        final GuildMusic guildMusic = GUILD_MUSIC_MAP.remove(guildId);
         if (guildMusic != null) {
             guildMusic.destroy();
             LOGGER.debug("{Guild ID: {}} Guild music destroyed", guildId.asString());
@@ -146,15 +141,12 @@ public class MusicManager {
                 .flatMap(VoiceConnection::disconnect);
     }
 
-    public Optional<GuildMusic> getGuildMusic(Snowflake guildId) {
-        final GuildMusic guildMusic = this.guildMusics.get(guildId);
+    public static Optional<GuildMusic> getGuildMusic(Snowflake guildId) {
+        final GuildMusic guildMusic = GUILD_MUSIC_MAP.get(guildId);
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("{Guild ID: {}} Guild music request: {}", guildId.asString(), guildMusic);
         }
         return Optional.ofNullable(guildMusic);
     }
 
-    public static MusicManager getInstance() {
-        return MusicManager.instance;
-    }
 }

@@ -23,7 +23,6 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import reactor.function.TupleUtils;
 
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.shadorc.shadbot.music.MusicManager.LOGGER;
@@ -44,10 +43,10 @@ public class TrackEventListener extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
                 .zipWith(DatabaseManager.getGuilds().getDBGuild(this.guildId).map(DBGuild::getLocale))
                 .flatMap(TupleUtils.function((guildMusic, locale) -> {
-                    final String message = Emoji.MUSICAL_NOTE + " " + I18nManager.getInstance().localize(locale, "trackevent.playing")
+                    final String message = Emoji.MUSICAL_NOTE + " " + I18nManager.localize(locale, "trackevent.playing")
                             .formatted(FormatUtil.trackName(track.getInfo()));
                     return guildMusic.getMessageChannel()
                             .flatMap(channel -> DiscordUtil.sendMessage(message, channel));
@@ -58,7 +57,7 @@ public class TrackEventListener extends AudioEventAdapter {
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
                 .filter(__ -> endReason == AudioTrackEndReason.FINISHED)
                 // Everything seems fine, reset error counter.
                 .doOnNext(__ -> this.errorCount.set(0))
@@ -70,7 +69,7 @@ public class TrackEventListener extends AudioEventAdapter {
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
         Telemetry.MUSIC_ERROR_COUNTER.labels(exception.getClass().getSimpleName()).inc();
-        Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
                 .flatMap(guildMusic -> {
                     this.errorCount.incrementAndGet();
                     if (this.errorCount.get() > MAX_ERROR_COUNT) {
@@ -111,7 +110,7 @@ public class TrackEventListener extends AudioEventAdapter {
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
         LOGGER.info("{Guild ID: {}} Music stuck, skipping it", this.guildId.asLong());
         Telemetry.MUSIC_ERROR_COUNTER.labels("StuckException").inc();
-        Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
+        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
                 .flatMap(GuildMusic::getMessageChannel)
                 .flatMap(channel -> DiscordUtil.sendMessage(Emoji.RED_EXCLAMATION + " Music seems stuck, I'll "
                         + "try to play the next available song.", channel))
@@ -126,7 +125,7 @@ public class TrackEventListener extends AudioEventAdapter {
      * @return A {@link Mono} that completes when a new track has been started or when the guild music ended.
      */
     private Mono<Message> nextOrEnd() {
-        return Mono.justOrEmpty(MusicManager.getInstance().getGuildMusic(this.guildId))
+        return Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
                 // If the next track could not be started
                 .filter(guildMusic -> !guildMusic.getTrackScheduler().nextTrack())
                 .flatMap(GuildMusic::end);

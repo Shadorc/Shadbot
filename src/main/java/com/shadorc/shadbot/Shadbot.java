@@ -54,7 +54,7 @@ public class Shadbot {
     public static void main(String[] args) {
         Locale.setDefault(Config.DEFAULT_LOCALE);
 
-        final String sentryDsn = CredentialManager.getInstance().get(Credential.SENTRY_DSN);
+        final String sentryDsn = CredentialManager.get(Credential.SENTRY_DSN);
         if (sentryDsn != null && !Config.IS_SNAPSHOT) {
             DEFAULT_LOGGER.info("Initializing Sentry");
             Sentry.init(options -> {
@@ -68,7 +68,7 @@ public class Shadbot {
 
         DEFAULT_LOGGER.info("Starting Shadbot V{}", Config.VERSION);
 
-        final String prometheusPort = CredentialManager.getInstance().get(Credential.PROMETHEUS_PORT);
+        final String prometheusPort = CredentialManager.get(Credential.PROMETHEUS_PORT);
         if (prometheusPort != null && !Config.IS_SNAPSHOT) {
             DEFAULT_LOGGER.info("Initializing Prometheus on port {}", prometheusPort);
             try {
@@ -83,7 +83,7 @@ public class Shadbot {
             Hooks.onOperatorDebug();
         }
 
-        final String discordToken = CredentialManager.getInstance().get(Credential.DISCORD_TOKEN);
+        final String discordToken = CredentialManager.get(Credential.DISCORD_TOKEN);
         Objects.requireNonNull(discordToken, "Missing Discord bot token");
         final DiscordClient client = DiscordClient.builder(discordToken)
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
@@ -190,7 +190,7 @@ public class Shadbot {
         }
 
         return Shadbot.gateway.logout()
-                .then(Mono.fromRunnable(() -> DatabaseManager.getInstance().close()));
+                .then(Mono.fromRunnable(DatabaseManager::close));
     }
 
 }

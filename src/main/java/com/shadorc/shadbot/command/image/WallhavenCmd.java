@@ -35,7 +35,7 @@ class WallhavenCmd extends BaseCmd {
         super(CommandCategory.IMAGE, "wallhaven", "Search random wallpaper from Wallhaven");
         this.addOption("query", "Search for a wallpaper", false, ApplicationCommandOptionType.STRING);
 
-        this.apiKey = CredentialManager.getInstance().get(Credential.WALLHAVEN_API_KEY);
+        this.apiKey = CredentialManager.get(Credential.WALLHAVEN_API_KEY);
     }
 
     @Override

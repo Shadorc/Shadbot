@@ -38,7 +38,7 @@ class WeatherCmd extends BaseCmd {
         this.addOption("country", "The country", false, ApplicationCommandOptionType.STRING);
 
         this.dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.MEDIUM);
-        final String apiKey = CredentialManager.getInstance().get(Credential.OPENWEATHERMAP_API_KEY);
+        final String apiKey = CredentialManager.get(Credential.OPENWEATHERMAP_API_KEY);
         if (apiKey != null) {
             this.owm = new OWM(apiKey);
             this.owm.setUnit(Unit.METRIC);

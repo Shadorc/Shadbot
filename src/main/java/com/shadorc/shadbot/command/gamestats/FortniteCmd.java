@@ -36,7 +36,7 @@ class FortniteCmd extends BaseCmd {
                 DiscordUtil.toOptions(Platform.class));
         this.addOption("username", "Epic nickname", true, ApplicationCommandOptionType.STRING);
 
-        this.apiKey = CredentialManager.getInstance().get(Credential.FORTNITE_API_KEY);
+        this.apiKey = CredentialManager.get(Credential.FORTNITE_API_KEY);
     }
 
     @Override
