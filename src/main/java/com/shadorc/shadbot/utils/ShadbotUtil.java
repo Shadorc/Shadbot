@@ -24,11 +24,6 @@ public class ShadbotUtil {
     public static final String NOT_ENOUGH_COINS =
             "You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";
 
-    public static final String PLAYLIST_LIMIT_REACHED =
-            String.format(Emoji.LOCK + " You've reached the maximum number of tracks (%d) in a playlist. "
-                    + "You can **remove this limit and gain other advantage** by contributing to Shadbot. "
-                    + "More info here: <%s>", Config.PLAYLIST_SIZE, Config.PATREON_URL);
-
     public static final TextFile SPAMS = new TextFile("texts/spam.txt");
     public static final TextFile TIPS = new TextFile("texts/tips.txt");
 

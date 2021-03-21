@@ -52,8 +52,8 @@ public class AudioLoadResultInputs extends Inputs {
                         guildMusic.setWaitingForChoice(false);
                         return guildMusic.getMessageChannel()
                                 .flatMap(channel -> DiscordUtil.sendMessage(
-                                        String.format(Emoji.CHECK_MARK + " **%s** cancelled his choice.",
-                                                event.getMember().orElseThrow().getUsername()), channel))
+                                        Emoji.CHECK_MARK, "**%s** cancelled his choice."
+                                                .formatted(event.getMember().orElseThrow().getUsername()), channel))
                                 .then(Mono.empty());
                     }
 

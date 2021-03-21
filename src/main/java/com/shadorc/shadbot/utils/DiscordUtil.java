@@ -46,6 +46,10 @@ public class DiscordUtil {
         return DiscordUtil.sendMessage(spec -> spec.setContent(content), channel, false);
     }
 
+    public static Mono<Message> sendMessage(Emoji emoji, String message, MessageChannel channel) {
+        return DiscordUtil.sendMessage(emoji + " " + message, channel);
+    }
+
     /**
      * @param embed   The {@link EmbedCreateSpec} consumer used to attach rich content when creating a message.
      * @param channel The {@link MessageChannel} in which to send the message.
