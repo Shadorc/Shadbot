@@ -13,7 +13,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-public class TransferCoinsCmd extends BaseCmd {
+class TransferCoinsCmd extends BaseCmd {
 
     public TransferCoinsCmd() {
         super(CommandCategory.CURRENCY, "transfer", "Transfer coins to a user");

@@ -15,7 +15,7 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 
-public class ManageAchievementsCmd extends BaseCmd {
+class ManageAchievementsCmd extends BaseCmd {
 
     private enum Action {
         ADD, REMOVE
@@ -45,7 +45,8 @@ public class ManageAchievementsCmd extends BaseCmd {
                             case REMOVE -> dbUser.lockAchievement(achievement);
                         })
                         .then(context.reply(Emoji.CHECK_MARK, "%s **%s** to **%s** done."
-                                .formatted(FormatUtil.capitalizeEnum(action), achievement.getTitle(), user.getTag()))));
+                                .formatted(FormatUtil.capitalizeEnum(action), achievement.getTitle(context),
+                                        user.getTag()))));
     }
 
 }

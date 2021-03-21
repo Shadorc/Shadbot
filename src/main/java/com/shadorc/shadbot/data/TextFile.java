@@ -22,7 +22,7 @@ public class TextFile {
                 final String content = Files.readString(file.toPath()).replace("\r\n", "\n");
                 this.lines.addAll(Arrays.asList(content.split("\n")));
             } catch (final IOException err) {
-                DEFAULT_LOGGER.error(String.format("An error occurred while reading text file: %s", file.getPath()), err);
+                DEFAULT_LOGGER.error("An error occurred while reading text file: %s".formatted(file.getPath()), err);
             }
         } else {
             DEFAULT_LOGGER.error("Text file {} not found", file.getPath());

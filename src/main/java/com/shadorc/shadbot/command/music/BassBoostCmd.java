@@ -13,7 +13,7 @@ import com.shadorc.shadbot.utils.NumberUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-public class BassBoostCmd extends BaseCmd {
+class BassBoostCmd extends BaseCmd {
 
     private static final int VALUE_MIN = 0;
     private static final int VALUE_MAX = 200;

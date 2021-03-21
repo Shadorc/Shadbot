@@ -25,7 +25,7 @@ public class Config {
     public static final String TOP_GG_URL = PROPERTIES.getProperty("top.gg.url");
     public static final String INVITE_URL = PROPERTIES.getProperty("invite.url");
 
-    public static final String USER_AGENT = String.format("Shadbot/%s/D4J-DiscordBot (%s)", VERSION, GITHUB_URL);
+    public static final String USER_AGENT = "Shadbot/%s/D4J-DiscordBot (%s)".formatted(VERSION, GITHUB_URL);
     public static final Duration TIMEOUT = Duration.ofMillis(Long.parseLong(PROPERTIES.getProperty("timeout")));
 
     public static final Locale DEFAULT_LOCALE = Locale.forLanguageTag(PROPERTIES.getProperty("default.locale"));

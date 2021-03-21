@@ -1,7 +1,5 @@
 package com.shadorc.shadbot.command.setting;
 
-import com.shadorc.shadbot.command.admin.setting.NSFWSetting;
-import com.shadorc.shadbot.command.admin.setting.VolumeSetting;
 import com.shadorc.shadbot.core.command.BaseCmdGroup;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;

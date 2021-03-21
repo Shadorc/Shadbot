@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
 
-public class ThisDayCmd extends BaseCmd {
+class ThisDayCmd extends BaseCmd {
 
     private static final String HOME_URL = "https://www.onthisday.com/";
 

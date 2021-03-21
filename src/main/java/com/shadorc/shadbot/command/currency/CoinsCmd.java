@@ -9,7 +9,7 @@ import com.shadorc.shadbot.object.Emoji;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-public class CoinsCmd extends BaseCmd {
+class CoinsCmd extends BaseCmd {
 
     public CoinsCmd() {
         super(CommandCategory.CURRENCY, "coins", "Show how many coins a user has");

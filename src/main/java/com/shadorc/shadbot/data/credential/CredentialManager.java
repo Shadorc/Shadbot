@@ -26,14 +26,14 @@ public class CredentialManager {
     private CredentialManager() {
         final File file = new File("credentials.properties");
         if (!file.exists()) {
-            throw new RuntimeException(String.format("%s file is missing.", file.getName()));
+            throw new RuntimeException("%s file is missing.".formatted(file.getName()));
         }
 
         this.properties = new Properties();
         try (final BufferedReader reader = Files.newBufferedReader(file.toPath())) {
             this.properties.load(reader);
         } catch (final IOException err) {
-            throw new RuntimeException(String.format("An error occurred while loading %s file.", file.getName()));
+            throw new RuntimeException("An error occurred while loading %s file.".formatted(file.getName()));
         }
 
         // Check if all API keys are present

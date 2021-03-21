@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class RelicStatusCmd extends BaseCmd {
+class RelicStatusCmd extends BaseCmd {
 
     public RelicStatusCmd() {
         super(CommandCategory.DONATOR, "relic_status", "Your donator status");

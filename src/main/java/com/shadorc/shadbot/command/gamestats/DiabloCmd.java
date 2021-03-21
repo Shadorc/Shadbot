@@ -32,7 +32,7 @@ import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
-public class DiabloCmd extends BaseCmd {
+class DiabloCmd extends BaseCmd {
 
     private static final String ACCESS_TOKEN_URL = "https://us.battle.net/oauth/token?grant_type=client_credentials";
 

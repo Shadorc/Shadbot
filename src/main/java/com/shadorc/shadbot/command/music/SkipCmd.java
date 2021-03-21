@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.Optional;
 
-public class SkipCmd extends BaseCmd {
+class SkipCmd extends BaseCmd {
 
     public SkipCmd() {
         super(CommandCategory.MUSIC, "skip", "Skip current music and play the next one. " +

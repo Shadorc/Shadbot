@@ -7,7 +7,7 @@ import com.shadorc.shadbot.object.Emoji;
 import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
 
-public class StopCmd extends BaseCmd {
+class StopCmd extends BaseCmd {
 
     public StopCmd() {
         super(CommandCategory.MUSIC, "stop", "Stop current music");

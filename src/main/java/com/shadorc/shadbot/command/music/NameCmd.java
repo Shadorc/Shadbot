@@ -8,7 +8,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import reactor.core.publisher.Mono;
 
-public class NameCmd extends BaseCmd {
+class NameCmd extends BaseCmd {
 
     public NameCmd() {
         super(CommandCategory.MUSIC, "name", "Current music name");

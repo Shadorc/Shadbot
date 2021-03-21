@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
-public class VolumeCmd extends BaseCmd {
+class VolumeCmd extends BaseCmd {
 
     public VolumeCmd() {
         super(CommandCategory.MUSIC, "volume", "Show or change current volume level");

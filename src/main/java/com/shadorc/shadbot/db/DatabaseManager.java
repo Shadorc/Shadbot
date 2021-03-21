@@ -40,7 +40,7 @@ public class DatabaseManager {
     private DatabaseManager() {
         final MongoClientSettings.Builder settingsBuilder = MongoClientSettings.builder()
                 .codecRegistry(CODEC_REGISTRY)
-                .applicationName(String.format("Shadbot V%s", Config.VERSION));
+                .applicationName("Shadbot V%s".formatted(Config.VERSION));
 
         if (!Config.IS_SNAPSHOT) {
             final String username = CredentialManager.getInstance().get(Credential.DATABASE_USERNAME);

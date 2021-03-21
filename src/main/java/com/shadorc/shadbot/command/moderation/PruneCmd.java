@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class PruneCmd extends BaseCmd {
+class PruneCmd extends BaseCmd {
 
     private static final int MAX_MESSAGES = 100;
     private static final int MESSAGES_OFFSET = 2;

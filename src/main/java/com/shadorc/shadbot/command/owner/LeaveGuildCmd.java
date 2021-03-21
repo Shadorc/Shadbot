@@ -14,7 +14,7 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 
-public class LeaveGuildCmd extends BaseCmd {
+class LeaveGuildCmd extends BaseCmd {
 
     public LeaveGuildCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "leave_guild", "Leave a guild");

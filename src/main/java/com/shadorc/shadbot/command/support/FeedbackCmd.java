@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
-public class FeedbackCmd extends BaseCmd {
+class FeedbackCmd extends BaseCmd {
 
     public FeedbackCmd() {
         super(CommandCategory.INFO, "feedback", "Send a feedback");

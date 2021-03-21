@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
-public class LoggerCmd extends BaseCmd {
+class LoggerCmd extends BaseCmd {
 
     private enum LogLevel {
         OFF,

@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class Rule34Cmd extends BaseCmd {
+class Rule34Cmd extends BaseCmd {
 
     private static final String HOME_URL = "https://rule34.xxx/index.php";
     private static final int MAX_TAGS_CHAR = 250;

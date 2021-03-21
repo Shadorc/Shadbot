@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RolelistCmd extends BaseCmd {
+class RolelistCmd extends BaseCmd {
 
     // TODO: Uses varargs when available
     public RolelistCmd() {

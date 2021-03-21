@@ -21,7 +21,7 @@ import reactor.function.TupleUtils;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-public class OverwatchCmd extends BaseCmd {
+class OverwatchCmd extends BaseCmd {
 
     private static final String HOME_URL = "https://owapi.io";
     private static final String PROFILE_API_URL = "%s/profile".formatted(HOME_URL);

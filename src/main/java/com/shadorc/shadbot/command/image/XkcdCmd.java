@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public class XkcdCmd extends BaseCmd {
+class XkcdCmd extends BaseCmd {
 
     private enum Sort {
         LATEST, RANDOM

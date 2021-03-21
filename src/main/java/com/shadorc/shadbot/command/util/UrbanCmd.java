@@ -23,7 +23,7 @@ import reactor.util.retry.Retry;
 import java.time.Duration;
 import java.util.function.Consumer;
 
-public class UrbanCmd extends BaseCmd {
+class UrbanCmd extends BaseCmd {
 
     private static final String HOME_URL = "http://api.urbandictionary.com/v0/define";
 

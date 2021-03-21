@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
 
-public class JokeCmd extends BaseCmd {
+class JokeCmd extends BaseCmd {
 
     private static final String HOME_URL = "https://icanhazdadjoke.com/";
 

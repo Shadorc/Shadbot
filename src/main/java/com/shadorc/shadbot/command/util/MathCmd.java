@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
-public class MathCmd extends BaseCmd {
+class MathCmd extends BaseCmd {
 
     private final DoubleEvaluator evaluator;
 

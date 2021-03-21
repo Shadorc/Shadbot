@@ -1,5 +1,7 @@
 package com.shadorc.shadbot.core.command;
 
+import com.shadorc.shadbot.command.currency.CurrencyGroup;
+import com.shadorc.shadbot.command.donator.DonatorGroup;
 import com.shadorc.shadbot.command.fun.FunGroup;
 import com.shadorc.shadbot.command.gamestats.GameStatsGroup;
 import com.shadorc.shadbot.command.image.ImageGroup;
@@ -9,7 +11,6 @@ import com.shadorc.shadbot.command.music.MusicGroup;
 import com.shadorc.shadbot.command.owner.OwnerGroup;
 import com.shadorc.shadbot.command.setting.SettingGroup;
 import com.shadorc.shadbot.command.support.SupportGroup;
-import com.shadorc.shadbot.command.todo.PingCmd;
 import com.shadorc.shadbot.command.util.UtilGroup;
 import discord4j.rest.service.ApplicationService;
 import reactor.core.publisher.Flux;
@@ -33,8 +34,9 @@ public class CommandManager {
 
     private CommandManager() {
         this.commandsMap = CommandManager.initialize(
-                new InfoGroup(), new SupportGroup(), new ImageGroup(), new ModerationGroup(), new OwnerGroup(), new UtilGroup(),
-                new FunGroup(), new GameStatsGroup(), new PingCmd(), new SettingGroup(), new MusicGroup());
+                new InfoGroup(), new SupportGroup(), new ImageGroup(), new ModerationGroup(), new OwnerGroup(),
+                new UtilGroup(), new FunGroup(), new GameStatsGroup(), new CurrencyGroup(), new SettingGroup(),
+                new MusicGroup(), new DonatorGroup());
     }
 
     private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {

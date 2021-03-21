@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class HelpCmd extends BaseCmd {
+class HelpCmd extends BaseCmd {
 
     public HelpCmd() {
         super(CommandCategory.INFO, "help", "Show the list of available commands");

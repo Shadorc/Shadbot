@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 
-public class PlayCmd extends BaseCmd {
+class PlayCmd extends BaseCmd {
 
     private static final String SC_QUERY = "soundcloud ";
 
