@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.command.fun;
 
 import com.shadorc.shadbot.api.html.thisday.ThisDay;
+import com.shadorc.shadbot.core.cache.SingleValueCache;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -22,21 +23,23 @@ class ThisDayCmd extends BaseCmd {
 
     private static final String HOME_URL = "https://www.onthisday.com/";
 
-    private static final Mono<ThisDay> GET_THIS_DAY = RequestHelper.request(HOME_URL)
-            .map(Jsoup::parse)
-            .map(ThisDay::new)
-            .cache(__ -> ThisDayCmd.getNextUpdate(), // Cache value until the next day
-                    __ -> Duration.ZERO, // Do not cache value on error
-                    () -> Duration.ZERO); // Do not cache value on empty
+    private final SingleValueCache<ThisDay> getThisDay;
 
     public ThisDayCmd() {
         super(CommandCategory.FUN, "this_day", "Significant events of the day");
+        this.getThisDay = SingleValueCache.Builder
+                .create(RequestHelper.request(HOME_URL)
+                        .map(Jsoup::parse)
+                        .map(ThisDay::new))
+                .withTtlForValue(__ -> ThisDayCmd.getNextUpdate())
+                .build();
+
     }
 
     @Override
     public Mono<?> execute(Context context) {
         return context.reply(Emoji.HOURGLASS, context.localize("thisday.loading"))
-                .then(GET_THIS_DAY)
+                .then(this.getThisDay)
                 .flatMap(thisDay -> context.editReply(ThisDayCmd.formatEmbed(context, thisDay)));
     }
 
