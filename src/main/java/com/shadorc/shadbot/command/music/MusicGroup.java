@@ -11,7 +11,7 @@ public class MusicGroup extends BaseCmdGroup {
         super(CommandCategory.MUSIC, "music", "Music commands",
                 List.of(new BackwardCmd(), new BassBoostCmd(), new ClearCmd(), new ForwardCmd(), new NameCmd(),
                         new PauseCmd(), new PlaylistCmd(), new RepeatCmd(), new ShuffleCmd(), new SkipCmd(),
-                        new StopCmd(), new VolumeCmd()));
+                        new StopCmd(), new VolumeCmd(), new PlayCmd()));
     }
 
 }

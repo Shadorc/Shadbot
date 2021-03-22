@@ -64,7 +64,7 @@ public class CommandProcessor {
                     Telemetry.COMMAND_USAGE_COUNTER.labels(command.getName()).inc();
                     Telemetry.INTERACTING_USERS.add(context.getAuthorId().asLong());
                 })
-                .onErrorResume(err -> ExceptionHandler.handleCommandError(err, command, context)
+                .onErrorResume(err -> ExceptionHandler.handleCommandError(err, context)
                         .then(Mono.empty()));
     }
 

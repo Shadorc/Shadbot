@@ -29,7 +29,7 @@ public class ExceptionHandler {
                             || err instanceof TimeoutException)
                     .onRetryExhaustedThrow((spec, signal) -> new IOException(message));
 
-    public static Mono<?> handleCommandError(Throwable err, BaseCmd cmd, Context context) {
+    public static Mono<?> handleCommandError(Throwable err, Context context) {
         if (err instanceof CommandException) {
             return ExceptionHandler.onCommandException((CommandException) err, context);
         }
@@ -40,9 +40,9 @@ public class ExceptionHandler {
             return ExceptionHandler.onNoMusicException(context);
         }
         if (err instanceof TimeoutException || err instanceof IOException) {
-            return ExceptionHandler.onServerAccessError(err, cmd, context);
+            return ExceptionHandler.onServerAccessError(err, context);
         }
-        return ExceptionHandler.onUnknown(err, cmd, context);
+        return ExceptionHandler.onUnknown(err, context);
     }
 
     private static Mono<?> onCommandException(CommandException err, Context context) {
@@ -61,29 +61,29 @@ public class ExceptionHandler {
         return context.reply(Emoji.MUTE, context.localize("exception.no.music"));
     }
 
-    private static Mono<?> onServerAccessError(Throwable err, BaseCmd cmd, Context context) {
+    private static Mono<?> onServerAccessError(Throwable err, Context context) {
         final Throwable cause = err.getCause() != null ? err.getCause() : err;
-        DEFAULT_LOGGER.warn("{Guild ID: {}} [{}] Server access error on input '{}'. {}: {}",
+        DEFAULT_LOGGER.warn("{Guild ID: {}} [{}] Server access error. {}: {}\n{}",
                 context.getGuildId().asString(),
-                cmd.getClass().getSimpleName(),
-                context.getEvent().getCommandName(),
+                context.getFullCommandName(),
                 cause.getClass().getName(),
-                cause.getMessage());
+                cause.getMessage(),
+                context.getEvent().getInteraction().getData().data());
 
         return context.reply(Emoji.RED_FLAG, context.localize("exception.server.access")
-                .formatted(context.getCommandName()));
+                .formatted(context.getFullCommandName()));
     }
 
-    private static Mono<?> onUnknown(Throwable err, BaseCmd cmd, Context context) {
-        DEFAULT_LOGGER.error("{Guild ID: %s} [%s] An unknown error occurred (input: %s): %s"
+    private static Mono<?> onUnknown(Throwable err, Context context) {
+        DEFAULT_LOGGER.error("{Guild ID: %s} [%s] An unknown error occurred: %s\n%s"
                         .formatted(context.getGuildId().asString(),
-                                cmd.getClass().getSimpleName(),
-                                context.getCommandName(),
-                                Objects.requireNonNullElse(err.getMessage(), "")),
+                                context.getFullCommandName(),
+                                Objects.requireNonNullElse(err.getMessage(), ""),
+                                context.getEvent().getInteraction().getData().data()),
                 err);
 
         return context.reply(Emoji.RED_FLAG, context.localize("exception.unknown")
-                .formatted(context.getCommandName()));
+                .formatted(context.getFullCommandName()));
     }
 
     public static void handleUnknownError(Throwable err) {
