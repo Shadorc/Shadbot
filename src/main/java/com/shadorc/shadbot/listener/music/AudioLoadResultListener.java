@@ -21,6 +21,7 @@ import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
@@ -59,15 +60,15 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     @Override
     public void trackLoaded(AudioTrack audioTrack) {
         LOGGER.debug("{Guild ID: {}} Track loaded: {}", this.guildId.asString(), audioTrack.hashCode());
-        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
-                .filter(guildMusic -> !guildMusic.getTrackScheduler().startOrQueue(audioTrack, this.insertFirst))
-                .flatMap(GuildMusic::getMessageChannel)
-                .zipWith(DatabaseManager.getGuilds().getDBGuild(this.guildId)
+        Mono.zip(
+                Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
+                        .filter(guildMusic -> !guildMusic.getTrackScheduler().startOrQueue(audioTrack, this.insertFirst))
+                        .flatMap(GuildMusic::getMessageChannel),
+                DatabaseManager.getGuilds().getDBGuild(this.guildId)
                         .map(DBGuild::getLocale))
                 .flatMap(TupleUtils.function((channel, locale) -> DiscordUtil.sendMessage(Emoji.MUSICAL_NOTE,
                         I18nManager.localize(locale, "audioresult.track.loaded")
-                                .formatted(FormatUtil.trackName(audioTrack.getInfo())),
-                        channel)))
+                                .formatted(FormatUtil.trackName(audioTrack.getInfo())), channel)))
                 .then(this.terminate())
                 .subscribeOn(DEFAULT_SCHEDULER)
                 .subscribe(null, ExceptionHandler::handleUnknownError);
@@ -107,8 +108,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                     guildMusic.setDjId(this.djId);
                     guildMusic.setWaitingForChoice(true);
 
-                    return guildMusic.getGateway()
-                            .getUserById(guildMusic.getDjId())
+                    return guildMusic.getDj()
                             .map(User::getAvatarUrl)
                             .zipWith(DatabaseManager.getGuilds().getDBGuild(this.guildId).map(DBGuild::getLocale))
                             .map(TupleUtils.function((avatarUrl, locale) ->
@@ -183,15 +183,17 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     @Override
     public void loadFailed(FriendlyException err) {
         LOGGER.debug("{Guild ID: {}} Load failed: {}", this.guildId.asString(), err);
-        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
-                .zipWith(DatabaseManager.getGuilds().getDBGuild(this.guildId).map(DBGuild::getLocale))
-                .flatMap(TupleUtils.function((guildMusic, locale) -> {
-                    final String errMessage = ShadbotUtil.cleanLavaplayerErr(err);
+        Mono.zip(
+                Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
+                        .flatMap(GuildMusic::getMessageChannel),
+                DatabaseManager.getGuilds().getDBGuild(this.guildId)
+                        .map(DBGuild::getLocale))
+                .flatMap(TupleUtils.function((channel, locale) -> {
+                    final String errMessage = ShadbotUtil.cleanLavaplayerErr(err).toLowerCase();
                     LOGGER.info("{Guild ID: {}} Load failed: {}", this.guildId.asString(), errMessage);
-                    return guildMusic.getMessageChannel()
-                            .flatMap(channel -> DiscordUtil.sendMessage(Emoji.RED_CROSS,
-                                    I18nManager.localize(locale, "audioresult.load.failed")
-                                            .formatted(errMessage.toLowerCase()), channel));
+                    return DiscordUtil.sendMessage(Emoji.RED_CROSS,
+                            I18nManager.localize(locale, "audioresult.load.failed")
+                                    .formatted(errMessage), channel);
                 }))
                 .then(this.terminate())
                 .subscribeOn(DEFAULT_SCHEDULER)
@@ -205,9 +207,11 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
     private void onNoMatches() {
-        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
-                .flatMap(GuildMusic::getMessageChannel)
-                .zipWith(DatabaseManager.getGuilds().getDBGuild(this.guildId).map(DBGuild::getLocale))
+        Mono.zip(
+                Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
+                        .flatMap(GuildMusic::getMessageChannel),
+                DatabaseManager.getGuilds().getDBGuild(this.guildId)
+                        .map(DBGuild::getLocale))
                 .flatMap(TupleUtils.function((channel, locale) -> DiscordUtil.sendMessage(Emoji.MAGNIFYING_GLASS,
                         I18nManager.localize(locale, "audioresult.no.matches")
                                 .formatted(StringUtil.remove(this.identifier, YT_SEARCH, SC_SEARCH)), channel)))
@@ -218,11 +222,24 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
     private Mono<Void> terminate() {
         return Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
-                .flatMap(guildMusic -> guildMusic.removeAudioLoadResultListener(this));
+                .flatMap(guildMusic -> {
+                    guildMusic.removeAudioLoadResultListener(this);
+                    // If there is no music playing and nothing is loading, leave the voice channel
+                    if (guildMusic.getTrackScheduler().isStopped() && !guildMusic.isWaitingForListeners()) {
+                        return guildMusic.getGateway().getVoiceConnectionRegistry()
+                                .getVoiceConnection(this.getGuildId())
+                                .flatMap(VoiceConnection::disconnect);
+                    }
+                    return Mono.empty();
+                });
     }
 
     public Snowflake getGuildId() {
         return this.guildId;
+    }
+
+    public String getIdentifier() {
+        return this.identifier;
     }
 
     public List<AudioTrack> getResultTracks() {

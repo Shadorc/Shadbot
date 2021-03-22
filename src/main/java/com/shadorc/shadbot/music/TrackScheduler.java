@@ -42,11 +42,11 @@ public class TrackScheduler {
     /**
      * @return {@code true} if the track was started, {@code false} if it was added to the queue.
      */
-    public boolean startOrQueue(AudioTrack track, boolean first) {
+    public boolean startOrQueue(AudioTrack track, boolean insertFirst) {
         if (this.audioPlayer.startTrack(TrackScheduler.makeClone(track), true)) {
             this.currentTrack = track;
             return true;
-        } else if (first) {
+        } else if (insertFirst) {
             this.queue.offerFirst(track);
             return false;
         } else {

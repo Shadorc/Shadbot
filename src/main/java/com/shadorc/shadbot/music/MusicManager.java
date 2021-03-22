@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.music;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -16,8 +15,8 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.db.guilds.entity.Settings;
+import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
 import com.shadorc.shadbot.utils.LogUtil;
 import discord4j.common.util.Snowflake;
@@ -53,7 +52,7 @@ public class MusicManager {
         GUILD_MUSIC_MAP = new ConcurrentHashMap<>();
         GUILD_JOINING = new ConcurrentHashMap<>();
 
-        //IPv6 rotation config
+        //IPv6 rotation configuration
         final String ipv6Block = CredentialManager.get(Credential.IPV6_BLOCK);
         if (ipv6Block != null && !Config.IS_SNAPSHOT) {
             LOGGER.info("Configuring YouTube IP rotator");
@@ -72,8 +71,8 @@ public class MusicManager {
      *
      * @return A future for this operation.
      */
-    protected static Future<Void> loadItemOrdered(long guildId, String identifier, AudioLoadResultHandler listener) {
-        return AUDIO_PLAYER_MANAGER.loadItemOrdered(guildId, identifier, listener);
+    protected static Future<Void> loadItemOrdered(long guildId, AudioLoadResultListener listener) {
+        return AUDIO_PLAYER_MANAGER.loadItemOrdered(guildId, listener.getIdentifier(), listener);
     }
 
     /**
@@ -89,14 +88,13 @@ public class MusicManager {
                     final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
 
                     return MusicManager.joinVoiceChannel(gateway, guildId, voiceChannelId, audioProvider)
-                            .flatMap(__ -> DatabaseManager.getGuilds().getDBGuild(guildId))
-                            .map(DBGuild::getSettings)
+                            .flatMap(voiceConnection -> DatabaseManager.getGuilds().getSettings(voiceConnection.getGuildId()))
                             .map(Settings::getDefaultVol)
                             .map(volume -> new TrackScheduler(audioPlayer, volume))
                             .map(trackScheduler -> new GuildMusic(gateway, guildId, trackScheduler))
                             .doOnNext(guildMusic -> {
-                                GUILD_MUSIC_MAP.put(guildId, guildMusic);
                                 LOGGER.debug("{Guild ID: {}} Guild music created", guildId.asString());
+                                GUILD_MUSIC_MAP.put(guildId, guildMusic);
                             });
                 }));
     }
@@ -120,7 +118,7 @@ public class MusicManager {
 
         return gateway.getChannelById(voiceChannelId)
                 .cast(VoiceChannel.class)
-                // Do not join the voice channel if the current voice connection is in not disconnected
+                // Do not join the voice channel if the current voice connection is not disconnected
                 .filterWhen(__ -> isDisconnected)
                 .doOnNext(__ -> LOGGER.info("{Guild ID: {}} Joining voice channel...", guildId.asString()))
                 .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))

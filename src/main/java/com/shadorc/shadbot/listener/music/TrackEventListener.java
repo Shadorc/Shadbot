@@ -42,13 +42,14 @@ public class TrackEventListener extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
-                .zipWith(DatabaseManager.getGuilds().getDBGuild(this.guildId)
-                        .map(DBGuild::getLocale)
-                        .map(locale -> Emoji.MUSICAL_NOTE + " " + I18nManager.localize(locale, "trackevent.playing")
-                                .formatted(FormatUtil.trackName(track.getInfo()))))
-                .flatMap(TupleUtils.function((guildMusic, message) -> guildMusic.getMessageChannel()
-                        .flatMap(channel -> DiscordUtil.sendMessage(message, channel))))
+        Mono.zip(
+                Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
+                        .flatMap(GuildMusic::getMessageChannel),
+                DatabaseManager.getGuilds().getDBGuild(this.guildId)
+                        .map(DBGuild::getLocale))
+                .flatMap(TupleUtils.function((channel, locale) -> DiscordUtil.sendMessage(Emoji.MUSICAL_NOTE,
+                        I18nManager.localize(locale, "trackevent.playing")
+                                .formatted(FormatUtil.trackName(track.getInfo())), channel)))
                 .subscribeOn(DEFAULT_SCHEDULER)
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
@@ -74,16 +75,16 @@ public class TrackEventListener extends AudioEventAdapter {
         Telemetry.MUSIC_ERROR_COUNTER.labels(exception.getClass().getSimpleName()).inc();
         final int errorCount = this.errorCount.incrementAndGet();
 
-        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
-                .zipWith(DatabaseManager.getGuilds().getDBGuild(this.guildId)
+        Mono.zip(
+                Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId)),
+                DatabaseManager.getGuilds().getDBGuild(this.guildId)
                         .map(DBGuild::getLocale))
                 .flatMap(TupleUtils.function((guildMusic, locale) -> {
                     if (errorCount > MAX_ERROR_COUNT) {
                         LOGGER.error("{Guild ID: {}} Stopping playlist due to too many errors.", this.guildId.asString());
-                        final String message = Emoji.RED_FLAG + " "
-                                + I18nManager.localize(locale, "trackevent.stop.retrying");
                         return guildMusic.getMessageChannel()
-                                .flatMap(channel -> DiscordUtil.sendMessage(message, channel))
+                                .flatMap(channel -> DiscordUtil.sendMessage(Emoji.RED_FLAG,
+                                        I18nManager.localize(locale, "trackevent.stop.retrying"), channel))
                                 .then(guildMusic.end());
                     }
 
@@ -92,19 +93,17 @@ public class TrackEventListener extends AudioEventAdapter {
                             this.guildId.asString(), errorCount, IGNORED_ERROR_THRESHOLD, errMessage);
 
                     if (errorCount < IGNORED_ERROR_THRESHOLD) {
-                        final String message = Emoji.RED_CROSS + " " + I18nManager.localize(locale, "trackevent.exception")
-                                .formatted(errMessage.toLowerCase());
                         return guildMusic.getMessageChannel()
-                                .flatMap(channel -> DiscordUtil.sendMessage(message, channel))
+                                .flatMap(channel -> DiscordUtil.sendMessage(Emoji.RED_CROSS,
+                                        I18nManager.localize(locale, "trackevent.exception"), channel))
                                 .then(this.nextOrEnd(guildMusic));
                     } else if (errorCount == IGNORED_ERROR_THRESHOLD) {
                         LOGGER.info("{Guild ID: {}} Too many errors in a row. They will be ignored until a music can be played.",
                                 this.guildId.asString());
 
-                        final String message = Emoji.RED_FLAG + " "
-                                + I18nManager.localize(locale, "trackevent.too.many.exceptions");
                         return guildMusic.getMessageChannel()
-                                .flatMap(channel -> DiscordUtil.sendMessage(message, channel))
+                                .flatMap(channel -> DiscordUtil.sendMessage(Emoji.RED_FLAG,
+                                        I18nManager.localize(locale, "trackevent.too.many.exceptions"), channel))
                                 .then(this.nextOrEnd(guildMusic));
                     }
 
@@ -119,12 +118,13 @@ public class TrackEventListener extends AudioEventAdapter {
         LOGGER.info("{Guild ID: {}} Music stuck, skipping it", this.guildId.asLong());
         Telemetry.MUSIC_ERROR_COUNTER.labels("StuckException").inc();
 
-        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
-                .zipWith(DatabaseManager.getGuilds().getDBGuild(this.guildId)
+        Mono.zip(
+                Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId)),
+                DatabaseManager.getGuilds().getDBGuild(this.guildId)
                         .map(DBGuild::getLocale))
                 .flatMap(TupleUtils.function((guildMusic, locale) -> guildMusic.getMessageChannel()
-                        .flatMap(channel -> DiscordUtil.sendMessage(Emoji.RED_EXCLAMATION + " "
-                                + I18nManager.localize(locale, "trackevent.stuck"), channel))
+                        .flatMap(channel -> DiscordUtil.sendMessage(Emoji.RED_EXCLAMATION,
+                                I18nManager.localize(locale, "trackevent.stuck"), channel))
                         .then(this.nextOrEnd(guildMusic))))
                 .subscribeOn(DEFAULT_SCHEDULER)
                 .subscribe(null, ExceptionHandler::handleUnknownError);

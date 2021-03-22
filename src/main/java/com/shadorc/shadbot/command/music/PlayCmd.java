@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -13,90 +12,90 @@ import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.NetUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import com.shadorc.shadbot.utils.StringUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.NetUtil;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.object.entity.channel.TextChannel;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.voice.retry.VoiceGatewayException;
 import reactor.core.publisher.Mono;
+import reactor.function.TupleUtils;
 
-import java.util.List;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 
 class PlayCmd extends BaseCmd {
 
-    private static final String SC_QUERY = "soundcloud ";
-
     public PlayCmd() {
-        super(CommandCategory.MUSIC, List.of("play", "add", "queue", "playfirst", "addfirst", "queuefirst"));
-        this.setDefaultRateLimiter();
+        super(CommandCategory.MUSIC, "play", "Play the music(s) from the url, search terms or playlist");
+
+        this.addOption("music", "The url, search terms or playlist", true,
+                ApplicationCommandOptionType.STRING);
+        this.addOption("first", "Add the song first in the playlist", false,
+                ApplicationCommandOptionType.BOOLEAN);
+        this.addOption("soundcloud", "Search on SoundCloud", false,
+                ApplicationCommandOptionType.BOOLEAN);
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final String arg = context.requireArg();
+    public Mono<?> execute(Context context) {
+        final String query = context.getOptionAsString("music").orElseThrow();
+        final boolean playFirst = context.getOptionAsBool("first").orElse(false);
+        final boolean isSoundcloud = context.getOptionAsBool("soundcloud").orElse(false);
 
-        return DiscordUtils.requireVoiceChannel(context)
-                .flatMap(voiceChannel -> context.getChannel()
-                        .flatMap(channel -> MusicManager
-                                .getOrCreate(context.getClient(), context.getGuildId(), voiceChannel.getId())
-                                .flatMap(guildMusic -> PlayCmd.play(context, channel, guildMusic, PlayCmd.getIdentifier(arg)))))
+        return DiscordUtil.requireVoiceChannel(context)
+                .zipWith(context.getChannel())
+                .flatMap(TupleUtils.function((voiceChannel, textChannel) -> {
+                    final String identifier = PlayCmd.getIdentifier(query, isSoundcloud);
+                    return MusicManager.getOrCreate(context.getClient(), context.getGuildId(), voiceChannel.getId())
+                            .flatMap(guildMusic -> PlayCmd.play(context, textChannel, guildMusic, identifier, playFirst));
+                }))
                 .onErrorMap(err -> {
                     LOGGER.info("{Guild ID: {}} An error occurred while joining a voice channel: {}",
-                            context.getGuildId().asLong(), err.getMessage());
+                            context.getGuildId().asString(), err.getMessage());
 
                     if (!(err instanceof CommandException) && !(err instanceof MissingPermissionException)) {
                         Telemetry.VOICE_CHANNEL_ERROR_COUNTER.labels(err.getClass().getSimpleName()).inc();
                     }
 
                     if (err instanceof VoiceGatewayException) {
-                        return new CommandException("An unknown error occurred while joining the voice channel, please try again later.");
+                        return new CommandException(context.localize("play.exception.voice.gateway"));
                     }
                     if (err instanceof TimeoutException) {
-                        return new CommandException("I can't establish a connection with this voice channel, please try again later.");
+                        return new CommandException(context.localize("play.exception.timeout"));
                     }
                     return err;
                 });
     }
 
-    private static String getIdentifier(String arg) {
+    private static String getIdentifier(String query, boolean isSoundcloude) {
         // If this is a SoundCloud search...
-        if (arg.startsWith(SC_QUERY)) {
-            return AudioLoadResultListener.SC_SEARCH + StringUtils.remove(arg, SC_QUERY);
+        if (isSoundcloude) {
+            return AudioLoadResultListener.SC_SEARCH + query;
         }
         // ... else if the argument is a valid URL...
-        else if (NetUtils.isUrl(arg)) {
-            return arg;
+        else if (NetUtil.isUrl(query)) {
+            return query;
         }
         // ...else, search on YouTube
         else {
-            return AudioLoadResultListener.YT_SEARCH + arg;
+            return AudioLoadResultListener.YT_SEARCH + query;
         }
     }
 
-    private static Mono<Void> play(Context context, MessageChannel channel, GuildMusic guildMusic, String identifier) {
+    private static Mono<?> play(Context context, TextChannel channel, GuildMusic guildMusic, String identifier, boolean playFirst) {
         // Someone is already selecting a music...
         if (guildMusic.isWaitingForChoice()) {
             if (guildMusic.getDjId().equals(context.getAuthorId())) {
-                return Mono.error(new CommandException(String.format("You're already selecting a music. "
-                        + "Enter a number or use `%scancel` to cancel the selection.", context.getPrefix())));
+                return Mono.error(new CommandException(context.localize("play.self.selecting")));
             }
 
-            if (identifier.startsWith(AudioLoadResultListener.SC_SEARCH) || identifier.startsWith(AudioLoadResultListener.YT_SEARCH)) {
-                return context.getClient()
-                        .getUserById(guildMusic.getDjId())
+            if (identifier.startsWith(AudioLoadResultListener.YT_SEARCH) || identifier.startsWith(AudioLoadResultListener.SC_SEARCH)) {
+                return guildMusic.getDj()
                         .map(User::getUsername)
-                        .flatMap(djName -> DiscordUtils.sendMessage(String.format(Emoji.HOURGLASS + " (**%s**) **%s** is "
-                                        + "already selecting a music, please wait for him to finish.",
-                                context.getUsername(), djName), channel))
-                        .then();
+                        .flatMap(username -> DiscordUtil.sendMessage(Emoji.HOURGLASS,
+                                context.localize("play.other.selecting").formatted(username), channel));
             }
         }
 
@@ -104,28 +103,15 @@ class PlayCmd extends BaseCmd {
                 .isPremium(context.getGuildId(), context.getAuthorId())
                 .filter(isPremium -> guildMusic.getTrackScheduler().getPlaylist().size() < Config.PLAYLIST_SIZE - 1 || isPremium)
                 .doOnNext(__ -> {
-                    final boolean insertFirst = context.getCommandName().endsWith("first");
-                    final AudioLoadResultListener resultListener = new AudioLoadResultListener(
-                            context.getGuildId(), context.getAuthorId(), identifier, insertFirst);
-
                     guildMusic.setMessageChannelId(context.getChannelId());
-                    guildMusic.addAudioLoadResultListener(resultListener, identifier);
+
+                    final AudioLoadResultListener resultListener = new AudioLoadResultListener(
+                            context.getGuildId(), context.getAuthorId(), identifier, playFirst);
+                    guildMusic.addAudioLoadResultListener(resultListener);
                 })
-                .switchIfEmpty(DiscordUtils.sendMessage(ShadbotUtils.PLAYLIST_LIMIT_REACHED, channel)
-                        .then(Mono.empty()))
-                .then();
+                .switchIfEmpty(DiscordUtil.sendMessage(Emoji.LOCK, context.localize("playlist.limit.reached")
+                        .formatted(Config.PLAYLIST_SIZE, Config.PATREON_URL), channel)
+                        .then(Mono.empty()));
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Play the music(s) from the url, search terms or playlist.")
-                .setFullUsage(String.format("%s%s[first] [soundcloud] <url>", context.getPrefix(), this.getName()))
-                .addArg("first", "add the song at the top of the playlist", true)
-                .addArg("soundcloud", "search on SoundCloud instead of YouTube", true)
-                .setExample(String.format("`%splayfirst soundcloud At Doom's gate`"
-                        + "%n`%splay E1M8`", context.getPrefix(), context.getPrefix()))
-                .build();
-    }
 }
-*/
