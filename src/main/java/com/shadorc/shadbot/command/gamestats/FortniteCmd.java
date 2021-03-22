@@ -2,6 +2,7 @@ package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.fortnite.FortniteResponse;
 import com.shadorc.shadbot.api.json.gamestats.fortnite.Stats;
+import com.shadorc.shadbot.core.cache.MultiValueCache;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -18,6 +19,7 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.function.Consumer;
 
 class FortniteCmd extends BaseCmd {
@@ -28,6 +30,7 @@ class FortniteCmd extends BaseCmd {
 
     private static final String PLAYER_NOT_FOUND = "Player Not Found";
 
+    private final MultiValueCache<String, FortniteResponse> cachedValues;
     private final String apiKey;
 
     public FortniteCmd() {
@@ -36,6 +39,9 @@ class FortniteCmd extends BaseCmd {
                 DiscordUtil.toOptions(Platform.class));
         this.addOption("username", "Epic nickname", true, ApplicationCommandOptionType.STRING);
 
+        this.cachedValues = MultiValueCache.Builder.<String, FortniteResponse>create()
+                .withTtl(Duration.ofMinutes(5))
+                .build();
         this.apiKey = CredentialManager.get(Credential.FORTNITE_API_KEY);
     }
 
@@ -48,9 +54,9 @@ class FortniteCmd extends BaseCmd {
         final String url = FortniteCmd.buildApiUrl(platform, encodedUsername);
 
         return context.reply(Emoji.HOURGLASS, context.localize("fortnite.loading"))
-                .then(RequestHelper.fromUrl(url)
+                .then(this.cachedValues.getOrCache(url, RequestHelper.fromUrl(url)
                         .addHeaders("TRN-Api-Key", this.apiKey)
-                        .to(FortniteResponse.class))
+                        .to(FortniteResponse.class)))
                 .flatMap(fortnite -> {
                     if (PLAYER_NOT_FOUND.equals(fortnite.getError().orElse(""))) {
                         throw Exceptions.propagate(new IOException(PLAYER_NOT_FOUND));
