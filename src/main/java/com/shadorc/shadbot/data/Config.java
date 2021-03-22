@@ -27,6 +27,7 @@ public class Config {
 
     public static final String USER_AGENT = "Shadbot/%s/D4J-DiscordBot (%s)".formatted(VERSION, GITHUB_URL);
     public static final Duration TIMEOUT = Duration.ofMillis(Long.parseLong(PROPERTIES.getProperty("timeout")));
+    public static final Duration CACHE_TTL = Duration.ofMinutes(Long.parseLong(PROPERTIES.getProperty("cache.ttl")));
 
     public static final Locale DEFAULT_LOCALE = Locale.forLanguageTag(PROPERTIES.getProperty("default.locale"));
     public static final int DEFAULT_VOLUME = Integer.parseInt(PROPERTIES.getProperty("default.volume"));

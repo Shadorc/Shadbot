@@ -5,9 +5,11 @@ import com.shadorc.shadbot.api.json.gamestats.overwatch.profile.Competitive;
 import com.shadorc.shadbot.api.json.gamestats.overwatch.profile.ProfileResponse;
 import com.shadorc.shadbot.api.json.gamestats.overwatch.stats.StatsResponse;
 import com.shadorc.shadbot.command.CommandException;
+import com.shadorc.shadbot.core.cache.MultiValueCache;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.DiscordUtil;
@@ -44,12 +46,18 @@ public class OverwatchCmd extends BaseCmd {
         }
     }
 
+    private final MultiValueCache<String, OverwatchProfile> cachedValues;
+
     public OverwatchCmd() {
         super(CommandCategory.GAMESTATS, "overwatch", "Search for Overwatch statistics");
         this.addOption("platform", "User's platform", true, ApplicationCommandOptionType.STRING,
                 DiscordUtil.toOptions(Platform.class));
         this.addOption("battletag", "User's battletag, case sensitive", true,
                 ApplicationCommandOptionType.STRING);
+
+        this.cachedValues = MultiValueCache.Builder.<String, OverwatchProfile>create()
+                .withTtl(Config.CACHE_TTL)
+                .build();
     }
 
     @Override
@@ -71,7 +79,8 @@ public class OverwatchCmd extends BaseCmd {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(context.localize("overwatch.title"),
                         "https://playoverwatch.com/en-gb/career/%s/%s"
-                                .formatted(platform.getName(), profile.getProfile().getUsername()), context.getAuthorAvatar())
+                                .formatted(platform.getName(), profile.getProfile().getUsername()),
+                        context.getAuthorAvatar())
                         .setThumbnail(profile.getProfile().getPortrait())
                         .setDescription(context.localize("overwatch.description")
                                 .formatted(profile.getProfile().getUsername()))
@@ -116,8 +125,9 @@ public class OverwatchCmd extends BaseCmd {
         final Mono<StatsResponse> getStats = RequestHelper.fromUrl(statsUrl)
                 .to(StatsResponse.class);
 
-        return Mono.zip(Mono.just(platform), getProfile, getStats)
-                .map(TupleUtils.function(OverwatchProfile::new))
+        return this.cachedValues
+                .getOrCache(profileUrl, Mono.zip(Mono.just(platform), getProfile, getStats)
+                        .map(TupleUtils.function(OverwatchProfile::new)))
                 .filter(overwatchProfile -> overwatchProfile.getProfile().getPortrait() != null)
                 .switchIfEmpty(Mono.error(new IOException("Overwatch API returned malformed JSON")));
     }

@@ -6,6 +6,7 @@ import com.shadorc.shadbot.core.cache.MultiValueCache;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -40,7 +41,7 @@ class FortniteCmd extends BaseCmd {
         this.addOption("username", "Epic nickname", true, ApplicationCommandOptionType.STRING);
 
         this.cachedValues = MultiValueCache.Builder.<String, FortniteResponse>create()
-                .withTtl(Duration.ofMinutes(5))
+                .withTtl(Config.CACHE_TTL)
                 .build();
         this.apiKey = CredentialManager.get(Credential.FORTNITE_API_KEY);
     }
