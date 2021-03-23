@@ -45,7 +45,7 @@ public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> imp
                         new ReplaceOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[LotteryHistoric] Insertion result: {}", result))
                 .then()
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getLottery().getName()).inc());
     }
 
     @Override
@@ -57,7 +57,7 @@ public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> imp
                 .deleteOne(Filters.eq("_id", "historic")))
                 .doOnNext(result -> LOGGER.trace("[LotteryHistoric] Deletion result: {}", result))
                 .then()
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getLottery().getName()).inc());
     }
 
     @Override

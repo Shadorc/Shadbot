@@ -24,10 +24,9 @@ import java.util.UUID;
 public class PremiumCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = LogUtil.getLogger(PremiumCollection.class, LogUtil.Category.DATABASE);
-    public static final String NAME = "premium";
 
     public PremiumCollection(MongoDatabase database) {
-        super(database.getCollection(PremiumCollection.NAME));
+        super(database, "premium");
     }
 
     /**
@@ -45,7 +44,7 @@ public class PremiumCollection extends DatabaseCollection {
                 .map(document -> document.toJson(JSON_WRITER_SETTINGS))
                 .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, RelicBean.class)))
                 .map(Relic::new)
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(PremiumCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
     }
 
     /**
@@ -62,7 +61,7 @@ public class PremiumCollection extends DatabaseCollection {
                 .map(document -> document.toJson(JSON_WRITER_SETTINGS))
                 .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, RelicBean.class)))
                 .map(Relic::new)
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(PremiumCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
     }
 
     /**
@@ -93,7 +92,7 @@ public class PremiumCollection extends DatabaseCollection {
 
         return Flux.from(request)
                 .hasElements()
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(PremiumCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
     }
 
 }

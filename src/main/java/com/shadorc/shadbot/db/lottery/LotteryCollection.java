@@ -24,10 +24,9 @@ import reactor.util.Logger;
 public class LotteryCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = LogUtil.getLogger(LotteryCollection.class, LogUtil.Category.DATABASE);
-    public static final String NAME = "lottery";
 
     public LotteryCollection(MongoDatabase database) {
-        super(database.getCollection(LotteryCollection.NAME));
+        super(database, "lottery");
     }
 
     public Flux<LotteryGambler> getGamblers() {
@@ -42,7 +41,7 @@ public class LotteryCollection extends DatabaseCollection {
                 .map(Document::toJson)
                 .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, LotteryGamblerBean.class)))
                 .map(LotteryGambler::new)
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
     }
 
     public Mono<LotteryHistoric> getHistoric() {
@@ -56,7 +55,7 @@ public class LotteryCollection extends DatabaseCollection {
                 .map(Document::toJson)
                 .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, LotteryHistoricBean.class)))
                 .map(LotteryHistoric::new)
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
     }
 
     public Mono<Long> getJackpot() {
@@ -69,7 +68,7 @@ public class LotteryCollection extends DatabaseCollection {
         return Mono.from(request)
                 .map(document -> document.getLong("jackpot"))
                 .defaultIfEmpty(0L)
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
     }
 
     public Mono<Boolean> isGambler(Snowflake userId) {
@@ -82,7 +81,7 @@ public class LotteryCollection extends DatabaseCollection {
 
         return Mono.from(request)
                 .hasElement()
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
     }
 
     public Mono<DeleteResult> resetGamblers() {
@@ -91,7 +90,7 @@ public class LotteryCollection extends DatabaseCollection {
         return Mono.from(this.getCollection()
                 .deleteOne(Filters.eq("_id", "gamblers")))
                 .doOnNext(result -> LOGGER.trace("[Lottery] Gamblers deletion result: {}", result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
     }
 
     public Mono<UpdateResult> addToJackpot(long coins) {
@@ -104,7 +103,7 @@ public class LotteryCollection extends DatabaseCollection {
                         Updates.inc("jackpot", value),
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[Lottery] Jackpot update result: {}", result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
     }
 
     public Mono<DeleteResult> resetJackpot() {
@@ -113,7 +112,7 @@ public class LotteryCollection extends DatabaseCollection {
         return Mono.from(this.getCollection()
                 .deleteOne(Filters.eq("_id", "jackpot")))
                 .doOnNext(result -> LOGGER.trace("[Lottery] Jackpot deletion result: {}", result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
     }
 
 }

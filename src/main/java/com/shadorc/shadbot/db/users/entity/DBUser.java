@@ -65,7 +65,7 @@ public class DBUser extends SerializableEntity<DBUserBean> implements DatabaseEn
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[DBUser {}] Achievements update result: {}",
                         this.getId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(UsersCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getUsers().getName()).inc());
     }
 
     @Override

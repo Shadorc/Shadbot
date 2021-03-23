@@ -17,10 +17,9 @@ import reactor.util.Logger;
 public class UsersCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = LogUtil.getLogger(UsersCollection.class, LogUtil.Category.DATABASE);
-    public static final String NAME = "users";
 
     public UsersCollection(MongoDatabase database) {
-        super(database.getCollection(UsersCollection.NAME));
+        super(database, "users");
     }
 
     public Mono<DBUser> getDBUser(Snowflake id) {
@@ -39,7 +38,7 @@ public class UsersCollection extends DatabaseCollection {
                     }
                 })
                 .defaultIfEmpty(new DBUser(id))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(UsersCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
     }
 
 }

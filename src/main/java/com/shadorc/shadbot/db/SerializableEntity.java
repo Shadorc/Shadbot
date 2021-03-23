@@ -7,6 +7,8 @@ import org.bson.codecs.DocumentCodec;
 
 public abstract class SerializableEntity<T extends Bean> {
 
+    private static final DocumentCodec DECODER = new DocumentCodec(DatabaseManager.CODEC_REGISTRY);
+
     private final T bean;
 
     public SerializableEntity(T bean) {
@@ -19,8 +21,7 @@ public abstract class SerializableEntity<T extends Bean> {
 
     public Document toDocument() {
         try {
-            return Document.parse(NetUtil.MAPPER.writeValueAsString(this.getBean()),
-                    new DocumentCodec(DatabaseManager.CODEC_REGISTRY));
+            return Document.parse(NetUtil.MAPPER.writeValueAsString(this.getBean()), DECODER);
         } catch (final JsonProcessingException err) {
             throw new RuntimeException(err);
         }

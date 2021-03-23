@@ -70,7 +70,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Setting update result: {}",
                         this.getId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc());
     }
 
     public Mono<UpdateResult> removeSetting(Setting setting) {
@@ -83,7 +83,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                         Updates.unset(String.format("settings.%s", setting))))
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Setting deletion result: {}",
                         this.getId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc());
     }
 
     @Override
@@ -95,7 +95,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                 .insertOne(this.toDocument()))
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Insertion result: {}",
                         this.getId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc())
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
                 .then();
     }
 
@@ -107,7 +107,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                 .getCollection()
                 .deleteOne(Filters.eq("_id", this.getId().asString())))
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Deletion result: {}", this.getId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc())
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
                 .then();
     }
 

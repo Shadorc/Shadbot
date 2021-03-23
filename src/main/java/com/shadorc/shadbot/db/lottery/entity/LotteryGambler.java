@@ -50,7 +50,7 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
                 .doOnNext(result -> LOGGER.trace("[LotteryGambler {} / {}] Insertion result: {}",
                         this.getUserId().asLong(), this.getGuildId().asLong(), result))
                 .then()
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getLottery().getName()).inc());
     }
 
     @Override
@@ -66,7 +66,7 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
                 .doOnNext(result -> LOGGER.trace("[LotteryGambler {} / {}] Deletion result: {}",
                         this.getUserId().asLong(), this.getGuildId().asLong(), result))
                 .then()
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(LotteryCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getLottery().getName()).inc());
     }
 
     @Override

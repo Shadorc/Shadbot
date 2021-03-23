@@ -20,7 +20,7 @@ import org.bson.codecs.configuration.CodecRegistry;
 
 public class DatabaseManager {
 
-    public static final CodecRegistry CODEC_REGISTRY = CodecRegistries.fromRegistries(
+    protected static final CodecRegistry CODEC_REGISTRY = CodecRegistries.fromRegistries(
             MongoClientSettings.getDefaultCodecRegistry(),
             CodecRegistries.fromCodecs(new SnowflakeCodec(), new LongCodec(), new IamCodec()));
 

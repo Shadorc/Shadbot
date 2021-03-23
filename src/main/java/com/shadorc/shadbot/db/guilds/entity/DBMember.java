@@ -101,7 +101,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                     }
                     return Mono.empty();
                 })
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc());
     }
 
     // Note: If one day, a member contains more data than just coins, this method will need to be updated
@@ -121,7 +121,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Insertion result: {}",
                         this.getId().asLong(), this.getGuildId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc())
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
                 .then();
     }
 
@@ -135,7 +135,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                         Updates.pull("members", Filters.eq("_id", this.getId().asString()))))
                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Deletion result: {}",
                         this.getId().asLong(), this.getGuildId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc())
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
                 .then();
     }
 

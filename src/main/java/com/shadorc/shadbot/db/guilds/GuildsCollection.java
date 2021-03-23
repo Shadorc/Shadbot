@@ -24,10 +24,9 @@ import java.util.Set;
 public class GuildsCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = LogUtil.getLogger(GuildsCollection.class, LogUtil.Category.DATABASE);
-    public static final String NAME = "guilds";
 
     public GuildsCollection(MongoDatabase database) {
-        super(database.getCollection(GuildsCollection.NAME));
+        super(database, "guilds");
     }
 
     public Mono<DBGuild> getDBGuild(Snowflake guildId) {
@@ -46,7 +45,7 @@ public class GuildsCollection extends DatabaseCollection {
                     }
                 })
                 .defaultIfEmpty(new DBGuild(guildId))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
     }
 
     public Mono<Settings> getSettings(Snowflake guildId) {
@@ -73,7 +72,7 @@ public class GuildsCollection extends DatabaseCollection {
                     }
                     return members;
                 })
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(GuildsCollection.NAME).inc());
+                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
     }
 
 }
