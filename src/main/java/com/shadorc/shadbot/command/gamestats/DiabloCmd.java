@@ -5,10 +5,12 @@ import com.shadorc.shadbot.api.json.TokenResponse;
 import com.shadorc.shadbot.api.json.gamestats.diablo.hero.HeroResponse;
 import com.shadorc.shadbot.api.json.gamestats.diablo.profile.HeroId;
 import com.shadorc.shadbot.api.json.gamestats.diablo.profile.ProfileResponse;
+import com.shadorc.shadbot.core.cache.MultiValueCache;
 import com.shadorc.shadbot.core.cache.SingleValueCache;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -44,6 +46,8 @@ class DiabloCmd extends BaseCmd {
     private final String clientId;
     private final String clientSecret;
     private final SingleValueCache<TokenResponse> token;
+    private final MultiValueCache<String, ProfileResponse> profileCache;
+    private final MultiValueCache<String, HeroResponse> heroCache;
 
     public DiabloCmd() {
         super(CommandCategory.GAMESTATS, "diablo", "Search for Diablo 3 statistics");
@@ -56,6 +60,8 @@ class DiabloCmd extends BaseCmd {
         this.token = SingleValueCache.Builder.create(this.requestAccessToken())
                 .withTtlForValue(TokenResponse::getExpiresIn)
                 .build();
+        this.profileCache = MultiValueCache.Builder.<String, ProfileResponse>create().withTtl(Config.CACHE_TTL).build();
+        this.heroCache = MultiValueCache.Builder.<String, HeroResponse>create().withTtl(Config.CACHE_TTL).build();
     }
 
     @Override
@@ -66,33 +72,36 @@ class DiabloCmd extends BaseCmd {
         return context.reply(Emoji.HOURGLASS, context.localize("diablo3.loading"))
                 .then(this.token)
                 .map(TokenResponse::getAccessToken)
-                .flatMap(token -> RequestHelper.fromUrl(DiabloCmd.buildProfileApiUrl(token, region, battletag))
-                        .to(ProfileResponse.class)
-                        .flatMap(profile -> {
-                            if ("NOTFOUND".equals(profile.getCode().orElse(""))) {
-                                return context.editReply(Emoji.MAGNIFYING_GLASS,
-                                        context.localize("diablo3.user.not.found"));
-                            }
+                .flatMap(token -> {
+                    final String profileUrl = DiabloCmd.buildProfileApiUrl(token, region, battletag);
+                    return this.profileCache.getOrCache(profileUrl, RequestHelper.fromUrl(profileUrl)
+                            .to(ProfileResponse.class))
+                            .flatMap(profile -> {
+                                if ("NOTFOUND".equals(profile.getCode().orElse(""))) {
+                                    return context.editReply(Emoji.MAGNIFYING_GLASS,
+                                            context.localize("diablo3.user.not.found"));
+                                }
 
-                            return Flux.fromIterable(profile.getHeroIds())
-                                    .map(heroId -> DiabloCmd.buildHeroApiUrl(token, region, battletag, heroId))
-                                    .flatMap(heroUrl -> RequestHelper.fromUrl(heroUrl)
-                                            .to(HeroResponse.class)
-                                            .onErrorResume(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR),
-                                                    err -> Mono.empty()))
-                                    .filter(hero -> hero.getCode().isEmpty())
-                                    // Sort heroes by ascending damage
-                                    .sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()))
-                                    .collectList()
-                                    .flatMap(heroResponses -> {
-                                        if (heroResponses.isEmpty()) {
-                                            return context.editReply(Emoji.MAGNIFYING_GLASS,
-                                                    context.localize("diablo3.no.heroes"));
-                                        }
-                                        Collections.reverse(heroResponses);
-                                        return context.editReply(DiabloCmd.formatEmbed(context, profile, heroResponses));
-                                    });
-                        }));
+                                return Flux.fromIterable(profile.getHeroIds())
+                                        .map(heroId -> DiabloCmd.buildHeroApiUrl(token, region, battletag, heroId))
+                                        .flatMap(heroUrl -> this.heroCache.getOrCache(heroUrl, RequestHelper.fromUrl(heroUrl)
+                                                .to(HeroResponse.class)
+                                                .onErrorResume(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR),
+                                                        err -> Mono.empty())))
+                                        .filter(hero -> hero.getCode().isEmpty())
+                                        // Sort heroes by ascending damage
+                                        .sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()))
+                                        .collectList()
+                                        .flatMap(heroResponses -> {
+                                            if (heroResponses.isEmpty()) {
+                                                return context.editReply(Emoji.MAGNIFYING_GLASS,
+                                                        context.localize("diablo3.no.heroes"));
+                                            }
+                                            Collections.reverse(heroResponses);
+                                            return context.editReply(DiabloCmd.formatEmbed(context, profile, heroResponses));
+                                        });
+                            });
+                });
     }
 
     private static String buildProfileApiUrl(String accessToken, Region region, String battletag) {
