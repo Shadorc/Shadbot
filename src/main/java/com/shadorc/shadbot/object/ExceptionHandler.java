@@ -46,7 +46,7 @@ public class ExceptionHandler {
     }
 
     private static Mono<?> onCommandException(CommandException err, Context context) {
-        return context.reply(Emoji.GREY_EXCLAMATION, err.getMessage());
+        return context.editReply(Emoji.GREY_EXCLAMATION, err.getMessage());
     }
 
     private static Mono<?> onMissingPermissionException(MissingPermissionException err, Context context) {
