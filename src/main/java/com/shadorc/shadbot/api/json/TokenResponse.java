@@ -2,6 +2,8 @@ package com.shadorc.shadbot.api.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.time.Duration;
+
 public class TokenResponse {
 
     @JsonProperty("access_token")
@@ -13,8 +15,8 @@ public class TokenResponse {
         return this.accessToken;
     }
 
-    public int getExpiresIn() {
-        return this.expiresIn;
+    public Duration getExpiresIn() {
+        return Duration.ofSeconds(this.expiresIn);
     }
 
 }

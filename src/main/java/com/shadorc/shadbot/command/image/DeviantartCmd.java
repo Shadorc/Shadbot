@@ -4,6 +4,7 @@ import com.shadorc.shadbot.api.json.TokenResponse;
 import com.shadorc.shadbot.api.json.image.deviantart.Content;
 import com.shadorc.shadbot.api.json.image.deviantart.DeviantArtResponse;
 import com.shadorc.shadbot.api.json.image.deviantart.Image;
+import com.shadorc.shadbot.core.cache.SingleValueCache;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -14,16 +15,12 @@ import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
@@ -35,8 +32,7 @@ class DeviantartCmd extends BaseCmd {
 
     private final String clientId;
     private final String apiSecret;
-    private final AtomicLong lastTokenGeneration;
-    private final AtomicReference<TokenResponse> token;
+    private final SingleValueCache<TokenResponse> token;
 
     public DeviantartCmd() {
         super(CommandCategory.IMAGE, "deviantart", "Search random image from DeviantArt");
@@ -44,8 +40,9 @@ class DeviantartCmd extends BaseCmd {
 
         this.clientId = CredentialManager.get(Credential.DEVIANTART_CLIENT_ID);
         this.apiSecret = CredentialManager.get(Credential.DEVIANTART_API_SECRET);
-        this.lastTokenGeneration = new AtomicLong();
-        this.token = new AtomicReference<>();
+        this.token = SingleValueCache.Builder.create(this.requestAccessToken())
+                .withTtlForValue(TokenResponse::getExpiresIn)
+                .build();
     }
 
     @Override
@@ -53,10 +50,30 @@ class DeviantartCmd extends BaseCmd {
         final String query = context.getOptionAsString("query").orElseThrow();
 
         return context.reply(Emoji.HOURGLASS, context.localize("deviantart.loading"))
-                .then(this.getPopularImage(query))
+                .then(this.token)
+                .map(TokenResponse::getAccessToken)
+                .flatMap(accessToken -> this.getPopularImage(accessToken, query))
                 .flatMap(image -> context.editReply(DeviantartCmd.formatEmbed(context, query, image)))
                 .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
                         context.localize("deviantart.not.found").formatted(query)));
+    }
+
+    private Mono<Image> getPopularImage(String accessToken, String query) {
+        return Mono.fromCallable(() ->
+                "%s?".formatted(BROWSE_POPULAR_URL)
+                        + "q=%s".formatted(NetUtil.encode(query))
+                        + "&timerange=alltime"
+                        + "&limit=25" // The pagination limit (min: 1 max: 50)
+                        // The pagination offset (min: 0 max: 50000)
+                        + "&offset=%d".formatted(ThreadLocalRandom.current().nextInt(150))
+                        + "&access_token=%s".formatted(accessToken))
+                .flatMap(url -> RequestHelper.fromUrl(url)
+                        .to(DeviantArtResponse.class))
+                .flatMapIterable(DeviantArtResponse::getResults)
+                .filter(image -> image.getContent().isPresent())
+                .collectList()
+                .map(list -> Optional.ofNullable(RandUtil.randValue(list)))
+                .flatMap(Mono::justOrEmpty);
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, String query, Image image) {
@@ -69,48 +86,16 @@ class DeviantartCmd extends BaseCmd {
                         .setImage(image.getContent().map(Content::getSource).orElseThrow()));
     }
 
-    private Mono<Image> getPopularImage(final String query) {
-        return this.requestAccessToken()
-                .map(token -> "%s?".formatted(BROWSE_POPULAR_URL)
-                        + "q=%s".formatted(NetUtil.encode(query))
-                        + "&timerange=alltime"
-                        + "&limit=25" // The pagination limit (min: 1 max: 50)
-                        // The pagination offset (min: 0 max: 50000)
-                        + "&offset=%d".formatted(ThreadLocalRandom.current().nextInt(150))
-                        + "&access_token=%s".formatted(token.getAccessToken()))
-                .flatMap(url -> RequestHelper.fromUrl(url)
-                        .to(DeviantArtResponse.class))
-                .flatMapIterable(DeviantArtResponse::getResults)
-                .filter(image -> image.getContent().isPresent())
-                .collectList()
-                .map(list -> Optional.ofNullable(RandUtil.randValue(list)))
-                .flatMap(Mono::justOrEmpty);
-    }
-
     private Mono<TokenResponse> requestAccessToken() {
-        if (this.isTokenExpired()) {
-            final String url = "%s?".formatted(OAUTH_URL)
-                    + "client_id=%s".formatted(this.clientId)
-                    + "&client_secret=%s".formatted(this.apiSecret)
-                    + "&grant_type=client_credentials";
-            return RequestHelper.fromUrl(url)
-                    .to(TokenResponse.class)
-                    .doOnNext(token -> {
-                        this.token.set(token);
-                        this.lastTokenGeneration.set(System.currentTimeMillis());
-                        DEFAULT_LOGGER.info("DeviantArt token generated: {}", token.getAccessToken());
-                    });
-        }
-        return Mono.just(this.token.get());
-    }
-
-    private boolean isTokenExpired() {
-        if (this.token.get() == null) {
-            return true;
-        }
-        final long elapsedMs = TimeUtil.elapsed(this.lastTokenGeneration.get());
-        final long expiresIn = TimeUnit.SECONDS.toMillis(this.token.get().getExpiresIn());
-        return elapsedMs >= expiresIn;
+        return Mono.fromCallable(() ->
+                "%s?".formatted(OAUTH_URL)
+                        + "client_id=%s".formatted(this.clientId)
+                        + "&client_secret=%s".formatted(this.apiSecret)
+                        + "&grant_type=client_credentials")
+                .flatMap(url -> RequestHelper.fromUrl(url)
+                        .to(TokenResponse.class))
+                .doOnNext(token -> DEFAULT_LOGGER.info("DeviantArt token generated {}, expires in %ds",
+                        token.getAccessToken(), token.getExpiresIn().toSeconds()));
     }
 
 }

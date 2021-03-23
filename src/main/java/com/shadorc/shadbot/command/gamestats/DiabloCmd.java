@@ -5,6 +5,7 @@ import com.shadorc.shadbot.api.json.TokenResponse;
 import com.shadorc.shadbot.api.json.gamestats.diablo.hero.HeroResponse;
 import com.shadorc.shadbot.api.json.gamestats.diablo.profile.HeroId;
 import com.shadorc.shadbot.api.json.gamestats.diablo.profile.ProfileResponse;
+import com.shadorc.shadbot.core.cache.SingleValueCache;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
@@ -12,7 +13,10 @@ import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.NetUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -25,9 +29,6 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
@@ -42,8 +43,7 @@ class DiabloCmd extends BaseCmd {
 
     private final String clientId;
     private final String clientSecret;
-    private final AtomicLong lastTokenGeneration;
-    private final AtomicReference<TokenResponse> token;
+    private final SingleValueCache<TokenResponse> token;
 
     public DiabloCmd() {
         super(CommandCategory.GAMESTATS, "diablo", "Search for Diablo 3 statistics");
@@ -53,8 +53,9 @@ class DiabloCmd extends BaseCmd {
 
         this.clientId = CredentialManager.get(Credential.BLIZZARD_CLIENT_ID);
         this.clientSecret = CredentialManager.get(Credential.BLIZZARD_CLIENT_SECRET);
-        this.lastTokenGeneration = new AtomicLong();
-        this.token = new AtomicReference<>();
+        this.token = SingleValueCache.Builder.create(this.requestAccessToken())
+                .withTtlForValue(TokenResponse::getExpiresIn)
+                .build();
     }
 
     @Override
@@ -63,43 +64,45 @@ class DiabloCmd extends BaseCmd {
         final String battletag = context.getOptionAsString("battletag").orElseThrow().replace("#", "-");
 
         return context.reply(Emoji.HOURGLASS, context.localize("diablo3.loading"))
-                .then(this.requestAccessToken())
-                .then(Mono.fromCallable(() -> this.buildProfileApiUrl(region, battletag)))
-                .flatMap(url -> RequestHelper.fromUrl(url)
-                        .to(ProfileResponse.class))
-                .flatMap(profile -> {
-                    if ("NOTFOUND".equals(profile.getCode().orElse(""))) {
-                        return context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("diablo3.user.not.found"));
-                    }
+                .then(this.token)
+                .map(TokenResponse::getAccessToken)
+                .flatMap(token -> RequestHelper.fromUrl(DiabloCmd.buildProfileApiUrl(token, region, battletag))
+                        .to(ProfileResponse.class)
+                        .flatMap(profile -> {
+                            if ("NOTFOUND".equals(profile.getCode().orElse(""))) {
+                                return context.editReply(Emoji.MAGNIFYING_GLASS,
+                                        context.localize("diablo3.user.not.found"));
+                            }
 
-                    return Flux.fromIterable(profile.getHeroIds())
-                            .map(heroId -> this.buildHeroApiUrl(region, battletag, heroId))
-                            .flatMap(heroUrl -> RequestHelper.fromUrl(heroUrl)
-                                    .to(HeroResponse.class)
-                                    .onErrorResume(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR),
-                                            err -> Mono.empty()))
-                            .filter(hero -> hero.getCode().isEmpty())
-                            // Sort heroes by ascending damage
-                            .sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()))
-                            .collectList()
-                            .flatMap(heroResponses -> {
-                                if (heroResponses.isEmpty()) {
-                                    return context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("diablo3.no.heroes"));
-                                }
-                                Collections.reverse(heroResponses);
-                                return context.editReply(DiabloCmd.formatEmbed(context, profile, heroResponses));
-                            });
-                });
+                            return Flux.fromIterable(profile.getHeroIds())
+                                    .map(heroId -> DiabloCmd.buildHeroApiUrl(token, region, battletag, heroId))
+                                    .flatMap(heroUrl -> RequestHelper.fromUrl(heroUrl)
+                                            .to(HeroResponse.class)
+                                            .onErrorResume(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR),
+                                                    err -> Mono.empty()))
+                                    .filter(hero -> hero.getCode().isEmpty())
+                                    // Sort heroes by ascending damage
+                                    .sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()))
+                                    .collectList()
+                                    .flatMap(heroResponses -> {
+                                        if (heroResponses.isEmpty()) {
+                                            return context.editReply(Emoji.MAGNIFYING_GLASS,
+                                                    context.localize("diablo3.no.heroes"));
+                                        }
+                                        Collections.reverse(heroResponses);
+                                        return context.editReply(DiabloCmd.formatEmbed(context, profile, heroResponses));
+                                    });
+                        }));
     }
 
-    private String buildProfileApiUrl(Region region, String battletag) {
+    private static String buildProfileApiUrl(String accessToken, Region region, String battletag) {
         return "https://%s.api.blizzard.com/d3/profile/%s/?access_token=%s"
-                .formatted(region, NetUtil.encode(battletag), this.token.get().getAccessToken());
+                .formatted(region, NetUtil.encode(battletag), accessToken);
     }
 
-    private String buildHeroApiUrl(Region region, String battletag, HeroId heroId) {
+    private static String buildHeroApiUrl(String accessToken, Region region, String battletag, HeroId heroId) {
         return "https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s"
-                .formatted(region, NetUtil.encode(battletag), heroId.getId(), this.token.get().getAccessToken());
+                .formatted(region, NetUtil.encode(battletag), heroId.getId(), accessToken);
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, ProfileResponse profile,
@@ -123,27 +126,13 @@ class DiabloCmd extends BaseCmd {
                         .addField(context.localize("diablo3.damages"), damages, true));
     }
 
-    private boolean isTokenExpired() {
-        final TokenResponse token = this.token.get();
-        if (token == null) {
-            return true;
-        }
-        return TimeUtil.elapsed(this.lastTokenGeneration.get()) >= TimeUnit.SECONDS.toMillis(token.getExpiresIn());
-    }
-
     private Mono<TokenResponse> requestAccessToken() {
-        if (this.isTokenExpired()) {
-            return RequestHelper.fromUrl(ACCESS_TOKEN_URL)
-                    .setMethod(HttpMethod.POST)
-                    .addHeaders(HttpHeaderNames.AUTHORIZATION, this.buildAuthorizationValue())
-                    .to(TokenResponse.class)
-                    .doOnNext(token -> {
-                        this.token.set(token);
-                        this.lastTokenGeneration.set(System.currentTimeMillis());
-                        DEFAULT_LOGGER.info("Blizzard token generated: {}", token.getAccessToken());
-                    });
-        }
-        return Mono.just(this.token.get());
+        return RequestHelper.fromUrl(ACCESS_TOKEN_URL)
+                .setMethod(HttpMethod.POST)
+                .addHeaders(HttpHeaderNames.AUTHORIZATION, this.buildAuthorizationValue())
+                .to(TokenResponse.class)
+                .doOnNext(token -> DEFAULT_LOGGER.info("Blizzard token generated {}, expires in %ds",
+                        token.getAccessToken(), token.getExpiresIn().toSeconds()));
     }
 
     private String buildAuthorizationValue() {
