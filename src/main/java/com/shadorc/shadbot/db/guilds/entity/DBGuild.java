@@ -61,6 +61,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
      */
     public <T> Mono<UpdateResult> updateSetting(Setting setting, T value) {
         LOGGER.debug("[DBGuild {}] Setting update: {}={}", this.getId().asLong(), setting, value);
+        DatabaseManager.getGuilds().invalidateCache(this.getId());
 
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
@@ -75,6 +76,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
 
     public Mono<UpdateResult> removeSetting(Setting setting) {
         LOGGER.debug("[DBGuild {}] Setting deletion: {}", this.getId().asLong(), setting);
+        DatabaseManager.getGuilds().invalidateCache(this.getId());
 
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
@@ -89,6 +91,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
     @Override
     public Mono<Void> insert() {
         LOGGER.debug("[DBGuild {}] Insertion", this.getId().asLong());
+        DatabaseManager.getGuilds().invalidateCache(this.getId());
 
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
@@ -102,6 +105,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
     @Override
     public Mono<Void> delete() {
         LOGGER.debug("[DBGuild {}] Deletion", this.getId().asLong());
+        DatabaseManager.getGuilds().invalidateCache(this.getId());
 
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()

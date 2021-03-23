@@ -40,6 +40,11 @@ public class MultiValueCache<K, V> extends ConcurrentHashMap<K, SingleValueCache
             return new Builder<>();
         }
 
+        public Builder<K, V> withInfiniteTtl() {
+            this.ttlForValue = __ -> Duration.ofMillis(Long.MAX_VALUE);
+            return this;
+        }
+
         public Builder<K, V> withTtl(Duration ttl) {
             this.ttlForValue = __ -> ttl;
             return this;

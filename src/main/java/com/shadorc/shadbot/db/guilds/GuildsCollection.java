@@ -2,6 +2,7 @@ package com.shadorc.shadbot.db.guilds;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoDatabase;
+import com.shadorc.shadbot.core.cache.MultiValueCache;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.guilds.bean.DBGuildBean;
@@ -25,32 +26,51 @@ public class GuildsCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = LogUtil.getLogger(GuildsCollection.class, LogUtil.Category.DATABASE);
 
+    private final MultiValueCache<Snowflake, DBGuild> guildCache;
+
     public GuildsCollection(MongoDatabase database) {
         super(database, "guilds");
+        this.guildCache = MultiValueCache.Builder.<Snowflake, DBGuild>create().withInfiniteTtl().build();
     }
 
     public Mono<DBGuild> getDBGuild(Snowflake guildId) {
-        LOGGER.debug("[DBGuild {}] Request", guildId.asLong());
+        LOGGER.debug("[DBGuild {}] Request", guildId.asString());
 
         final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", guildId.asString()))
                 .first();
 
-        return Mono.from(request)
-                .flatMap(document -> Mono.fromCallable(() ->
-                        new DBGuild(NetUtil.MAPPER.readValue(document.toJson(JSON_WRITER_SETTINGS), DBGuildBean.class))))
+        return this.guildCache.getOrCache(guildId, Mono.from(request)
+                .map(document -> document.toJson(JSON_WRITER_SETTINGS))
+                .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, DBGuildBean.class)))
+                .map(DBGuild::new)
                 .doOnSuccess(consumer -> {
                     if (consumer == null) {
-                        LOGGER.debug("[DBGuild {}] Not found", guildId.asLong());
+                        LOGGER.debug("[DBGuild {}] Not found", guildId.asString());
                     }
                 })
                 .defaultIfEmpty(new DBGuild(guildId))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
+                .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc()));
     }
 
     public Mono<Settings> getSettings(Snowflake guildId) {
         return this.getDBGuild(guildId)
                 .map(DBGuild::getSettings);
+    }
+
+    public Flux<DBMember> getDBMembers(Snowflake guildId, Snowflake... memberIds) {
+        return this.getDBGuild(guildId)
+                .flatMapIterable(DBGuild::getMembers)
+                .collectMap(DBMember::getId)
+                .flatMapIterable(dbMembers -> {
+                    // Completes the Flux with missing members from the provided array
+                    final Set<DBMember> members = new HashSet<>();
+                    for (final Snowflake memberId : memberIds) {
+                        final DBMember member = dbMembers.getOrDefault(memberId, new DBMember(guildId, memberId));
+                        members.add(member);
+                    }
+                    return members;
+                });
     }
 
     public Mono<DBMember> getDBMember(Snowflake guildId, Snowflake memberId) {
@@ -59,20 +79,8 @@ public class GuildsCollection extends DatabaseCollection {
                 .single();
     }
 
-    public Flux<DBMember> getDBMembers(Snowflake guildId, Snowflake... memberIds) {
-        LOGGER.debug("[DBMember {} / {}] Request", Arrays.toString(memberIds), guildId.asLong());
-
-        return this.getDBGuild(guildId)
-                .flatMapIterable(DBGuild::getMembers)
-                .collectMap(DBMember::getId)
-                .flatMapIterable(dbMembers -> {
-                    final Set<DBMember> members = new HashSet<>();
-                    for (final Snowflake memberId : memberIds) {
-                        members.add(dbMembers.getOrDefault(memberId, new DBMember(guildId, memberId)));
-                    }
-                    return members;
-                })
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
+    public void invalidateCache(Snowflake guildId) {
+        this.guildCache.remove(guildId);
     }
 
 }

@@ -54,11 +54,12 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
         // If the new coins amount is equal to the current one, no need to request an update
         if (coins == this.getCoins()) {
             LOGGER.debug("[DBMember {} / {}] Coins update useless, aborting: {} coins",
-                    this.getId().asLong(), this.getGuildId().asLong(), coins);
+                    this.getId().asString(), this.getGuildId().asString(), coins);
             return Mono.empty();
         }
 
-        LOGGER.debug("[DBMember {} / {}] Coins update: {} coins", this.getId().asLong(), this.getGuildId().asLong(), coins);
+        LOGGER.debug("[DBMember {} / {}] Coins update: {} coins",
+                this.getId().asString(), this.getGuildId().asString(), coins);
         return this.update(Updates.set("members.$.coins", coins), this.toDocument().append("coins", coins))
                 .then(Mono.defer(() -> {
                     if (coins >= 1_000_000_000) {
@@ -76,6 +77,8 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
     }
 
     private Mono<UpdateResult> update(Bson update, Document document) {
+        DatabaseManager.getGuilds().invalidateCache(this.getGuildId());
+
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
@@ -84,35 +87,37 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                                 Filters.eq("members._id", this.getId().asString())),
                         update))
                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Update result: {}",
-                        this.getId().asLong(), this.getGuildId().asLong(), result))
+                        this.getId().asString(), this.getGuildId().asString(), result))
                 .map(UpdateResult::getModifiedCount)
                 .flatMap(modifiedCount -> {
                     // Member was not found, insert it
                     if (modifiedCount == 0) {
                         LOGGER.debug("[DBMember {} / {}] Not updated. Upsert member",
-                                this.getId().asLong(), this.getGuildId().asLong());
+                                this.getId().asString(), this.getGuildId().asString());
                         return Mono.from(DatabaseManager.getGuilds()
                                 .getCollection()
                                 .updateOne(Filters.eq("_id", this.getGuildId().asString()),
                                         Updates.push("members", document),
                                         new UpdateOptions().upsert(true)))
                                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Upsert result: {}",
-                                        this.getId().asLong(), this.getGuildId().asLong(), result));
+                                        this.getId().asString(), this.getGuildId().asString(), result))
+                                .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc());
                     }
                     return Mono.empty();
                 })
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc());
+                .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc());
     }
 
     // Note: If one day, a member contains more data than just coins, this method will need to be updated
     public Mono<Void> resetCoins() {
-        LOGGER.debug("[DBMember {} / {}] Coins deletion", this.getId().asLong(), this.getGuildId().asLong());
+        LOGGER.debug("[DBMember {} / {}] Coins deletion", this.getId().asString(), this.getGuildId().asString());
         return this.delete();
     }
 
     @Override
     public Mono<Void> insert() {
-        LOGGER.debug("[DBMember {} / {}] Insertion", this.getId().asLong(), this.getGuildId().asLong());
+        LOGGER.debug("[DBMember {} / {}] Insertion", this.getId().asString(), this.getGuildId().asString());
+        DatabaseManager.getGuilds().invalidateCache(this.getGuildId());
 
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
@@ -120,22 +125,23 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                         Updates.push("members", this.toDocument()),
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Insertion result: {}",
-                        this.getId().asLong(), this.getGuildId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
+                        this.getId().asString(), this.getGuildId().asString(), result))
+                .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
                 .then();
     }
 
     @Override
     public Mono<Void> delete() {
-        LOGGER.debug("[DBMember {} / {}] Deletion", this.getId().asLong(), this.getGuildId().asLong());
+        LOGGER.debug("[DBMember {} / {}] Deletion", this.getId().asString(), this.getGuildId().asString());
+        DatabaseManager.getGuilds().invalidateCache(this.getGuildId());
 
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(Filters.eq("_id", this.getGuildId().asString()),
                         Updates.pull("members", Filters.eq("_id", this.getId().asString()))))
                 .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Deletion result: {}",
-                        this.getId().asLong(), this.getGuildId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
+                        this.getId().asString(), this.getGuildId().asString(), result))
+                .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
                 .then();
     }
 
