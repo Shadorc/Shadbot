@@ -70,13 +70,13 @@ public class PremiumCollection extends DatabaseCollection {
      */
     public static Mono<Relic> generateRelic(RelicType type) {
         final Relic relic = new Relic(UUID.randomUUID(), type, Duration.ofDays(Config.RELIC_DURATION));
-        LOGGER.info("Relic generated. Type: %s, ID: %s", relic.getType(), relic.getId());
+        LOGGER.info("Relic generated. Type: {}, ID: {}", relic.getType(), relic.getId());
         return relic.insert()
                 .thenReturn(relic);
     }
 
     /**
-     * Requests to determine if a {@link Guild} or a {@link User} are premium.
+     * Requests to determine if a {@link Guild} or a {@link User} is premium.
      *
      * @param guildId The {@link Snowflake} ID of the {@link Guild} to check.
      * @param userId  The {@link Snowflake} ID of the {@link User} to check.
