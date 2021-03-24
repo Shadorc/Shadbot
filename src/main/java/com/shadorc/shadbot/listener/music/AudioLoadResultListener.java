@@ -171,9 +171,11 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                     return "\t**%d.** [%s](%s)".formatted(count, FormatUtil.trackName(info), info.uri);
                 });
 
-        final String playlistName = StringUtil.abbreviate(playlist.getName(), MAX_PLAYLIST_NAME_LENGTH);
+        final String search = playlist.getName().split(":")[1].trim();
+        final String abbrSearch = StringUtil.abbreviate(search, MAX_PLAYLIST_NAME_LENGTH);
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor(playlistName, null, avatarUrl)
+                embed -> embed.setAuthor(I18nManager.localize(locale, "audioresult.playlist.name").formatted(abbrSearch),
+                        null, avatarUrl)
                         .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
                         .setDescription(I18nManager.localize(locale, "audioresult.embed.description").formatted(choices))
                         .setFooter(I18nManager.localize(locale, "audioresult.embed.footer")
