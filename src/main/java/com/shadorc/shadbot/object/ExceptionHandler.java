@@ -65,25 +65,25 @@ public class ExceptionHandler {
         final Throwable cause = err.getCause() != null ? err.getCause() : err;
         DEFAULT_LOGGER.warn("{Guild ID: {}} [{}] Server access error. {}: {}\n{}",
                 context.getGuildId().asString(),
-                context.getFullCommandName(),
+                context.getCommandName(),
                 cause.getClass().getName(),
                 cause.getMessage(),
                 context.getEvent().getInteraction().getData().data());
 
         return context.reply(Emoji.RED_FLAG, context.localize("exception.server.access")
-                .formatted(context.getFullCommandName()));
+                .formatted(context.getCommandName()));
     }
 
     private static Mono<?> onUnknown(Throwable err, Context context) {
         DEFAULT_LOGGER.error("{Guild ID: %s} [%s] An unknown error occurred: %s\n%s"
                         .formatted(context.getGuildId().asString(),
-                                context.getFullCommandName(),
+                                context.getCommandName(),
                                 Objects.requireNonNullElse(err.getMessage(), ""),
                                 context.getEvent().getInteraction().getData().data()),
                 err);
 
         return context.reply(Emoji.RED_FLAG, context.localize("exception.unknown")
-                .formatted(context.getFullCommandName()));
+                .formatted(context.getCommandName()));
     }
 
     public static void handleUnknownError(Throwable err) {

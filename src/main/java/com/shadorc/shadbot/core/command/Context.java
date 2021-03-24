@@ -64,18 +64,11 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     public String getCommandName() {
-        return this.event.getCommandName();
-    }
-
-    public Optional<String> getSubCommandName() {
         return Optional.of(this.event.getInteraction().getCommandInteraction().getOptions())
                 .filter(Predicate.not(List::isEmpty))
                 .map(list -> list.get(0))
-                .map(ApplicationCommandInteractionOption::getName);
-    }
-
-    public String getFullCommandName() {
-        return this.getCommandName() + this.getSubCommandName().map(name -> " " + name).orElse("");
+                .map(ApplicationCommandInteractionOption::getName)
+                .orElse(this.event.getCommandName());
     }
 
     public Mono<Guild> getGuild() {
