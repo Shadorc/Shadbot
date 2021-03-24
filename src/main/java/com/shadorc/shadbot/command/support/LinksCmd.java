@@ -9,7 +9,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import reactor.core.publisher.Mono;
 
-class LinksCmd extends BaseCmd {
+public class LinksCmd extends BaseCmd {
 
     public LinksCmd() {
         super(CommandCategory.INFO, "links", "Show useful links");

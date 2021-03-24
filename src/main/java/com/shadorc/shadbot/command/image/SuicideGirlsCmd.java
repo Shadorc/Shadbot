@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
 
-class SuicideGirlsCmd extends BaseCmd {
+public class SuicideGirlsCmd extends BaseCmd {
 
     private static final String HOME_URL = "https://www.suicidegirls.com/photos/sg/recent/all/";
 

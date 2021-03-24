@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
-class DeviantartCmd extends BaseCmd {
+public class DeviantartCmd extends BaseCmd {
 
     private static final String OAUTH_URL = "https://www.deviantart.com/oauth2/token";
     private static final String BROWSE_POPULAR_URL = "https://www.deviantart.com/api/v1/oauth2/browse/popular";

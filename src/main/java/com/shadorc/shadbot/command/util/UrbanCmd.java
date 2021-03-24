@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.function.Consumer;
 
-class UrbanCmd extends BaseCmd {
+public class UrbanCmd extends BaseCmd {
 
     private static final String HOME_URL = "http://api.urbandictionary.com/v0/define";
 

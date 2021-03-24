@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.concurrent.TimeUnit;
 
-class BackwardCmd extends BaseCmd {
+public class BackwardCmd extends BaseCmd {
 
     public BackwardCmd() {
         super(CommandCategory.MUSIC, "backward", "Fast backward current music a specified amount of time");

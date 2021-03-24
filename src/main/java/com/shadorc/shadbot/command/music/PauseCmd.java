@@ -8,7 +8,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import reactor.core.publisher.Mono;
 
-class PauseCmd extends BaseCmd {
+public class PauseCmd extends BaseCmd {
 
     public PauseCmd() {
         super(CommandCategory.MUSIC, "pause", "Toggle pause for current music");

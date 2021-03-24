@@ -15,7 +15,7 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 
-class ManageAchievementsCmd extends BaseCmd {
+public class ManageAchievementsCmd extends BaseCmd {
 
     private enum Action {
         ADD, REMOVE

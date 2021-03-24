@@ -13,7 +13,7 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 
-class SendMessageCmd extends BaseCmd {
+public class SendMessageCmd extends BaseCmd {
 
     public SendMessageCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "send_message", "Send a private message to a user");

@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-class LyricsCmd extends BaseCmd {
+public class LyricsCmd extends BaseCmd {
 
     private static final int MAX_LYRICS_LENGTH = Embed.MAX_DESCRIPTION_LENGTH / 3;
     private static final int MAX_TITLE_LENGTH = Embed.MAX_TITLE_LENGTH / 3;

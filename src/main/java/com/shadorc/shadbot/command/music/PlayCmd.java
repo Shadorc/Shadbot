@@ -25,7 +25,7 @@ import java.util.concurrent.TimeoutException;
 
 import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 
-class PlayCmd extends BaseCmd {
+public class PlayCmd extends BaseCmd {
 
     public PlayCmd() {
         super(CommandCategory.MUSIC, "play", "Play the music(s) from the url, search terms or playlist");

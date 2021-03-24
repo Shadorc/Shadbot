@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-class WallhavenCmd extends BaseCmd {
+public class WallhavenCmd extends BaseCmd {
 
     private static final String HOME_URL = "https://wallhaven.cc/api/v1/search";
     private static final Pattern COMPILE = Pattern.compile("[, ]");

@@ -24,7 +24,7 @@ import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.function.Consumer;
 
-class ServerInfoCmd extends BaseCmd {
+public class ServerInfoCmd extends BaseCmd {
 
     private final DateTimeFormatter dateFormatter;
 

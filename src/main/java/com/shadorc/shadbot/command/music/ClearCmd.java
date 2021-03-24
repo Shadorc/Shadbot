@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import reactor.core.publisher.Mono;
 
-class ClearCmd extends BaseCmd {
+public class ClearCmd extends BaseCmd {
 
     public ClearCmd() {
         super(CommandCategory.MUSIC, "clear", "Clear current playlist");

@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
-class EnableCommandCmd extends BaseCmd {
+public class EnableCommandCmd extends BaseCmd {
 
     public EnableCommandCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "enable_command", "Enable/disable a command");

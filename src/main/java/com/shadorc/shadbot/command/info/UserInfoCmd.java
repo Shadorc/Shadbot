@@ -20,7 +20,7 @@ import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.function.Consumer;
 
-class UserInfoCmd extends BaseCmd {
+public class UserInfoCmd extends BaseCmd {
 
     private final DateTimeFormatter dateFormatter;
 

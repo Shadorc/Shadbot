@@ -10,7 +10,7 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import reactor.core.publisher.Mono;
 
-class PlaylistCmd extends BaseCmd {
+public class PlaylistCmd extends BaseCmd {
 
     private static final int MAX_DESCRIPTION_LENGTH = 1800;
 

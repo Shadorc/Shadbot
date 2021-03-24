@@ -14,7 +14,7 @@ import java.util.Optional;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
-class ActivateRelicCmd extends BaseCmd {
+public class ActivateRelicCmd extends BaseCmd {
 
     public ActivateRelicCmd() {
         super(CommandCategory.DONATOR, "activate_relic", "Activate a relic");

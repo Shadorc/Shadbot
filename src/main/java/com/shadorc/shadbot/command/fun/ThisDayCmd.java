@@ -19,7 +19,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.function.Consumer;
 
-class ThisDayCmd extends BaseCmd {
+public class ThisDayCmd extends BaseCmd {
 
     private static final String HOME_URL = "https://www.onthisday.com/";
 

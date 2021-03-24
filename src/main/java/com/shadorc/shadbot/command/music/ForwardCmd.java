@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.concurrent.TimeUnit;
 
-class ForwardCmd extends BaseCmd {
+public class ForwardCmd extends BaseCmd {
 
     public ForwardCmd() {
         super(CommandCategory.MUSIC, "forward", "Fast forward the current music a specified amount of time");

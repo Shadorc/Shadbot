@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-class FortniteCmd extends BaseCmd {
+public class FortniteCmd extends BaseCmd {
 
     private enum Platform {
         PC, XBL, PSN

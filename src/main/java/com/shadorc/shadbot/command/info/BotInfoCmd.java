@@ -24,7 +24,7 @@ import java.time.Duration;
 import java.util.Properties;
 import java.util.function.Consumer;
 
-class BotInfoCmd extends BaseCmd {
+public class BotInfoCmd extends BaseCmd {
 
     private static final String JAVA_VERSION = System.getProperty("java.version");
     private static final Properties D4J_PROPERTIES = GitProperties.getProperties();

@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-class ChatCmd extends BaseCmd {
+public class ChatCmd extends BaseCmd {
 
     private static final Logger LOGGER = LogUtil.getLogger(ChatCmd.class, LogUtil.Category.COMMAND);
     private static final String HOME_URl = "https://www.pandorabots.com/pandora/talk-xml";

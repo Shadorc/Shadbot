@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import reactor.core.publisher.Mono;
 
-class BaguetteCmd extends BaseCmd {
+public class BaguetteCmd extends BaseCmd {
 
     public BaguetteCmd() {
         super(CommandCategory.HIDDEN, "baguette", "This command doesn't exist");

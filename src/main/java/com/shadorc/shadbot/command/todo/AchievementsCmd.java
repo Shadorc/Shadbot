@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 import java.util.EnumSet;
 import java.util.function.Consumer;
 
-class AchievementsCmd extends BaseCmd {
+public class AchievementsCmd extends BaseCmd {
 
     public AchievementsCmd() {
         super(CommandCategory.INFO, "achievements", "Show user's achievements");

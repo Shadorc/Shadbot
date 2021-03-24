@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-class WeatherCmd extends BaseCmd {
+public class WeatherCmd extends BaseCmd {
 
     private final DateTimeFormatter dateFormatter;
     private final OWM owm;

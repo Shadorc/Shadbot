@@ -10,7 +10,7 @@ import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-class RepeatCmd extends BaseCmd {
+public class RepeatCmd extends BaseCmd {
 
     public RepeatCmd() {
         super(CommandCategory.MUSIC, "repeat", "Toggle song/playlist repetition");

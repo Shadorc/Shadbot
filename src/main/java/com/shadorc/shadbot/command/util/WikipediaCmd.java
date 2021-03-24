@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 import java.util.function.Consumer;
 
-class WikipediaCmd extends BaseCmd {
+public class WikipediaCmd extends BaseCmd {
 
     public WikipediaCmd() {
         super(CommandCategory.UTILS, "wikipedia", "Search for Wikipedia article");

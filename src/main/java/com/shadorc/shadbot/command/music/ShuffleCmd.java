@@ -8,7 +8,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import reactor.core.publisher.Mono;
 
-class ShuffleCmd extends BaseCmd {
+public class ShuffleCmd extends BaseCmd {
 
     public ShuffleCmd() {
         super(CommandCategory.MUSIC, "shuffle", "Shuffle current playlist");

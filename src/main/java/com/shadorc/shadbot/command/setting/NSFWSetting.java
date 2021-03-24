@@ -12,7 +12,7 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
 
-class NSFWSetting extends BaseCmd {
+public class NSFWSetting extends BaseCmd {
 
     private enum Action {
         TOGGLE, ENABLE, DISABLE

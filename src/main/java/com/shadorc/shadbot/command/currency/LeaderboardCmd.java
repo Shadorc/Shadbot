@@ -14,7 +14,7 @@ import reactor.util.function.Tuple2;
 
 import java.util.Comparator;
 
-class LeaderboardCmd extends BaseCmd {
+public class LeaderboardCmd extends BaseCmd {
 
     private static final int USER_COUNT = 10;
 

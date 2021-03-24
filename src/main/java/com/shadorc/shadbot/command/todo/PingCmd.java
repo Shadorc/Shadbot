@@ -7,7 +7,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.TimeUtil;
 import reactor.core.publisher.Mono;
 
-class PingCmd extends BaseCmd {
+public class PingCmd extends BaseCmd {
 
     public PingCmd() {
         super(CommandCategory.INFO, "ping", "Test ping");

@@ -12,7 +12,7 @@ import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-class GenerateRelicCmd extends BaseCmd {
+public class GenerateRelicCmd extends BaseCmd {
 
     public GenerateRelicCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "generate_relic", "Generate a relic");

@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-class CounterStrikeCmd extends BaseCmd {
+public class CounterStrikeCmd extends BaseCmd {
 
     private static final String PRIVACY_HELP_URL = "https://support.steampowered.com/kb_article.php?ref=4113-YUDH-6401";
 

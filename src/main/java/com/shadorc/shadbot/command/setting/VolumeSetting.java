@@ -13,7 +13,7 @@ import com.shadorc.shadbot.utils.NumberUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-class VolumeSetting extends BaseCmd {
+public class VolumeSetting extends BaseCmd {
 
     private static final int MIN_VOLUME = 1;
     private static final int MAX_VOLUME = 75;
