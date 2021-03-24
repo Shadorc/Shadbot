@@ -79,7 +79,7 @@ public class Shadbot {
         }
 
         if (Config.IS_SNAPSHOT) {
-            DEFAULT_LOGGER.info("[SNAPSHOT] Initializing Reactor operator stack recorder");
+            DEFAULT_LOGGER.info("[SNAPSHOT] Enabling Reactor operator stack recorder");
             Hooks.onOperatorDebug();
         }
 
@@ -111,6 +111,7 @@ public class Shadbot {
                         Intent.DIRECT_MESSAGES))
                 .setStoreService(MappingStoreService.create()
                         // Stores messages during 30 minutes
+                        // TODO: Is it still useful?
                         .setMapping(new CaffeineStoreService(
                                 builder -> builder.expireAfterWrite(Duration.ofMinutes(30))), MessageData.class)
                         .setFallback(new JdkStoreService()))

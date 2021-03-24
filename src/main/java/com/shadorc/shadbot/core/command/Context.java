@@ -235,7 +235,8 @@ public class Context implements InteractionContext, I18nContext {
 
     @Override
     public Mono<MessageData> editReply(Emoji emoji, String message) {
-        return Mono.defer(() -> Mono.justOrEmpty(this.replyId.get()))
+        return Mono.fromCallable(this.replyId::get)
+                .filter(messageId -> messageId > 0)
                 .switchIfEmpty(Mono.error(new RuntimeException("Context#reply must be called before Context#editReply")))
                 .flatMap(messageId -> this.event.getInteractionResponse()
                         .editFollowupMessage(messageId, ImmutableWebhookMessageEditRequest.builder()
@@ -245,7 +246,8 @@ public class Context implements InteractionContext, I18nContext {
 
     @Override
     public Mono<MessageData> editReply(Consumer<EmbedCreateSpec> embed) {
-        return Mono.defer(() -> Mono.justOrEmpty(this.replyId.get()))
+        return Mono.fromCallable(this.replyId::get)
+                .filter(messageId -> messageId > 0)
                 .switchIfEmpty(Mono.error(new RuntimeException("Context#reply must be called before Context#editReply")))
                 .flatMap(messageId -> {
                     final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
