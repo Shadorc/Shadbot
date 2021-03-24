@@ -180,6 +180,8 @@ public class Shadbot {
     }
 
     public static Mono<Void> quit() {
+        DEFAULT_LOGGER.info("Shutdown request received");
+
         if (Shadbot.prometheusServer != null) {
             Shadbot.prometheusServer.stop();
         }

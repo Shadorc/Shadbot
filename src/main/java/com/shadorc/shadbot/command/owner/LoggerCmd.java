@@ -29,7 +29,7 @@ class LoggerCmd extends BaseCmd {
 
     public LoggerCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "logger", "Change the level of a logger");
-        this.addOption("name", "Can be `root` to change root logger", true,
+        this.addOption("name", "Can be 'root' to change root logger", true,
                 ApplicationCommandOptionType.STRING);
         this.addOption("level", "The new logger level", true, ApplicationCommandOptionType.STRING,
                 DiscordUtil.toOptions(LogLevel.class));
@@ -54,7 +54,7 @@ class LoggerCmd extends BaseCmd {
 
         logger.setLevel(level);
 
-        DEFAULT_LOGGER.info("Logger {} set to level {}", name, level);
+        DEFAULT_LOGGER.info("Logger '{}' set to level {}", name, level);
         return context.reply(Emoji.INFO, "Logger `%s` set to level `%s`.".formatted(name, level));
     }
 

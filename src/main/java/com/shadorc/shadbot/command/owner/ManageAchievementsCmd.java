@@ -44,7 +44,7 @@ class ManageAchievementsCmd extends BaseCmd {
                             case ADD -> dbUser.unlockAchievement(achievement);
                             case REMOVE -> dbUser.lockAchievement(achievement);
                         })
-                        .then(context.reply(Emoji.CHECK_MARK, "%s **%s** to **%s** done."
+                        .then(context.reply(Emoji.CHECK_MARK, "%s achievement **%s** to **%s** done."
                                 .formatted(FormatUtil.capitalizeEnum(action), achievement.getTitle(context),
                                         user.getTag()))));
     }
