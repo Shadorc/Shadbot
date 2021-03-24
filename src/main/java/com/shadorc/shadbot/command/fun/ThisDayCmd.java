@@ -28,12 +28,16 @@ public class ThisDayCmd extends BaseCmd {
     public ThisDayCmd() {
         super(CommandCategory.FUN, "this_day", "Significant events of the day");
         this.getThisDay = SingleValueCache.Builder
-                .create(RequestHelper.request(HOME_URL)
-                        .map(Jsoup::parse)
-                        .map(ThisDay::new))
+                .create(ThisDayCmd.getThisDay())
                 .withTtlForValue(__ -> ThisDayCmd.getNextUpdate())
                 .build();
 
+    }
+
+    private static Mono<ThisDay> getThisDay() {
+        return RequestHelper.request(HOME_URL)
+                .map(Jsoup::parse)
+                .map(ThisDay::new);
     }
 
     @Override

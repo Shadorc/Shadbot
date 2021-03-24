@@ -13,7 +13,6 @@ import com.shadorc.shadbot.core.cache.MultiValueCache;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
@@ -59,7 +58,12 @@ public class CounterStrikeCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         final String steamId = context.getOptionAsString("steamid").orElseThrow();
-        final String identificator = CounterStrikeCmd.getIdentificator(context, steamId);
+        final String identificator;
+        try {
+            identificator = CounterStrikeCmd.getIdentificator(steamId);
+        } catch (final IllegalArgumentException err) {
+            throw new CommandException(context.localize("counterstrike.invalid.id"));
+        }
 
         return context.reply(Emoji.HOURGLASS, context.localize("cs.loading"))
                 .then(this.steamIdCache.getOrCache(identificator, this.getSteamId(identificator)))
@@ -95,12 +99,12 @@ public class CounterStrikeCmd extends BaseCmd {
                 .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("cs.player.not.found")));
     }
 
-    private static String getIdentificator(I18nContext context, String arg) {
+    private static String getIdentificator(String arg) {
         // The user provided an URL that can contains a pseudo or an ID
         if (arg.contains("/")) {
             final List<String> splittedUrl = StringUtil.split(arg, "/");
             if (splittedUrl.isEmpty()) {
-                throw new CommandException(context.localize("counterstrike.invalid.id"));
+                throw new IllegalArgumentException();
             }
             return splittedUrl.get(splittedUrl.size() - 1);
         } else {

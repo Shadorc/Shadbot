@@ -19,7 +19,7 @@ public class CounterStrikeCmdTest extends CmdTest<CounterStrikeCmd> {
         assertEquals("shadorc", this.invoke(method, "/shadorc"));
         assertEquals("shadorc", this.invoke(method, "shadorc/"));
         assertEquals("*", this.invoke(method, "*"));
-        assertThrows(CommandException.class, () -> this.invoke(method, "/"));
+        assertThrows(IllegalArgumentException.class, () -> this.invoke(method, "/"));
     }
 
     @Test
