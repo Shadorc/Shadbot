@@ -117,7 +117,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                     .flatMap(channel -> DiscordUtil.sendMessage(embed, channel)))
                             .flatMapMany(__ ->
                                     // TODO: This seems bad
-                                    AudioLoadResultInputs.create(guildMusic.getGateway(), Duration.ofSeconds(30),
+                                    AudioLoadResultMessageInputs.create(guildMusic.getGateway(), Duration.ofSeconds(30),
                                             guildMusic.getMessageChannelId(), this)
                                             .waitForInputs()
                                             .then(Mono.fromRunnable(() -> guildMusic.setWaitingForChoice(false))));

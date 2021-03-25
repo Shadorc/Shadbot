@@ -4,7 +4,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.Inputs;
+import com.shadorc.shadbot.object.inputs.MessageInputs;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
 import com.shadorc.shadbot.utils.StringUtil;
@@ -18,19 +18,19 @@ import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AudioLoadResultInputs extends Inputs {
+public class AudioLoadResultMessageInputs extends MessageInputs {
 
     private final AudioLoadResultListener listener;
 
-    private AudioLoadResultInputs(GatewayDiscordClient gateway, Duration timeout,
-                                  Snowflake channelId, AudioLoadResultListener listener) {
+    private AudioLoadResultMessageInputs(GatewayDiscordClient gateway, Duration timeout,
+                                         Snowflake channelId, AudioLoadResultListener listener) {
         super(gateway, timeout, channelId);
         this.listener = listener;
     }
 
-    public static AudioLoadResultInputs create(GatewayDiscordClient gateway, Duration timeout,
-                                               Snowflake channelId, AudioLoadResultListener listener) {
-        return new AudioLoadResultInputs(gateway, timeout, channelId, listener);
+    public static AudioLoadResultMessageInputs create(GatewayDiscordClient gateway, Duration timeout,
+                                                      Snowflake channelId, AudioLoadResultListener listener) {
+        return new AudioLoadResultMessageInputs(gateway, timeout, channelId, listener);
     }
 
     @Override

@@ -1,5 +1,6 @@
-package com.shadorc.shadbot.object;
+package com.shadorc.shadbot.object.inputs;
 
+import com.shadorc.shadbot.object.ExceptionHandler;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -10,13 +11,13 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
-public abstract class Inputs {
+public abstract class MessageInputs {
 
     private final GatewayDiscordClient gateway;
     private final Duration timeout;
     private final Snowflake channelId;
 
-    protected Inputs(GatewayDiscordClient gateway, Duration timeout, Snowflake channelId) {
+    protected MessageInputs(GatewayDiscordClient gateway, Duration timeout, Snowflake channelId) {
         this.gateway = gateway;
         this.timeout = timeout;
         this.channelId = channelId;
@@ -49,7 +50,7 @@ public abstract class Inputs {
     public abstract Publisher<Boolean> isValidEvent(MessageCreateEvent event);
 
     /**
-     * {@code waitForInput} will relay events while this predicate returns {@code true} for
+     * {@link MessageInputs#waitForInputs()} will relay events while this predicate returns {@code true} for
      * the event (checked before each event is delivered). This only includes the matching data.
      *
      * @param event The event.

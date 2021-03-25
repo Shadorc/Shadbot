@@ -19,7 +19,7 @@ public class ShutdownCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         return context.reply(Emoji.QUESTION, "Do you really want to shutdown me? y/n")
-                .doOnNext(__ -> ConfirmInputs
+                .doOnNext(__ -> ConfirmMessageInputs
                         .create(context.getClient(), Duration.ofSeconds(15), context.getChannelId(), Shadbot.quit())
                         .listen());
     }
