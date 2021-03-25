@@ -83,12 +83,12 @@ public class Context implements InteractionContext, I18nContext {
         return this.getEvent().getInteraction().getChannel();
     }
 
-    public Mono<Boolean> isChannelNsfw() {
-        return this.getChannel().map(TextChannel::isNsfw);
-    }
-
     public Snowflake getChannelId() {
         return this.getEvent().getInteraction().getChannelId();
+    }
+
+    public Mono<Boolean> isChannelNsfw() {
+        return this.getChannel().map(TextChannel::isNsfw);
     }
 
     public Member getAuthor() {
@@ -212,7 +212,7 @@ public class Context implements InteractionContext, I18nContext {
 
     @Override
     public Mono<MessageData> reply(Emoji emoji, String message) {
-        return this.reply("%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message));
+        return this.reply("%s %s".formatted(emoji, message));
     }
 
     @Override
@@ -232,7 +232,7 @@ public class Context implements InteractionContext, I18nContext {
                 .filter(messageId -> messageId > 0)
                 .flatMap(messageId -> this.event.getInteractionResponse()
                         .editFollowupMessage(messageId, ImmutableWebhookMessageEditRequest.builder()
-                                .content("%s (**%s**) %s".formatted(emoji, this.getAuthorName(), message))
+                                .content("%s %s".formatted(emoji, message))
                                 .build(), true))
                 .switchIfEmpty(this.reply(emoji, message));
     }
