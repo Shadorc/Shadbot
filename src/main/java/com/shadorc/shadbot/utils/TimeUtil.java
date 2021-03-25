@@ -52,6 +52,12 @@ public class TimeUtil {
      * @return The amount of seconds corresponding to the {@code str} format.
      */
     public static long parseTime(@NonNull String str) {
+        // If the argument is a number of seconds...
+        final Long longValue = NumberUtil.toPositiveLongOrNull(str);
+        if (longValue != null) {
+            return longValue;
+        }
+
         final String normalizedText = str.replace(" ", "").toLowerCase();
 
         final Pattern pattern = Pattern.compile("[0-9]+[a-z]");

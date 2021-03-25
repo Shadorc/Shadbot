@@ -8,7 +8,6 @@ import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.FormatUtil;
-import com.shadorc.shadbot.utils.NumberUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
@@ -31,16 +30,12 @@ public class BackwardCmd extends BaseCmd {
                 .flatMap(__ -> {
                     final String option = context.getOptionAsString("time").orElseThrow();
 
-                    // If the argument is a number of seconds...
-                    Long time = NumberUtil.toPositiveLongOrNull(option);
-                    if (time == null) {
-                        try {
-                            // ... else, try to parse it
-                            time = TimeUtil.parseTime(option);
-                        } catch (final IllegalArgumentException err) {
-                            return Mono.error(new CommandException(context.localize("backward.invalid")
-                                    .formatted(option)));
-                        }
+                    final Long time;
+                    try {
+                        time = TimeUtil.parseTime(option);
+                    } catch (final IllegalArgumentException err) {
+                        return Mono.error(new CommandException(context.localize("backward.invalid.time")
+                                .formatted(option)));
                     }
 
                     final long newPosition = guildMusic.getTrackScheduler()
