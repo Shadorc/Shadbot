@@ -45,17 +45,17 @@ public class TimeUtil {
     }
 
     /**
-     * Convert a string, case insensitive, representing time (example: 1m03s) into seconds. <br>
+     * Convert a string, case insensitive, representing time (e.g. 1m03s) or seconds (e.g. 72) into duration.<br>
      * Supported units: s (second), m (minute), h (hour)
      *
      * @param str The text to parse.
-     * @return The amount of seconds corresponding to the {@code str} format.
+     * @return The duration corresponding to the {@code str} format.
      */
-    public static long parseTime(@NonNull String str) {
+    public static Duration parseTime(@NonNull String str) {
         // If the argument is a number of seconds...
-        final Long longValue = NumberUtil.toPositiveLongOrNull(str);
-        if (longValue != null) {
-            return longValue;
+        final Long secondsValue = NumberUtil.toPositiveLongOrNull(str);
+        if (secondsValue != null) {
+            return Duration.ofSeconds(secondsValue);
         }
 
         final String normalizedText = str.replace(" ", "").toLowerCase();

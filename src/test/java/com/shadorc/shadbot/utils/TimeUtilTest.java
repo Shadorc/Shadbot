@@ -2,10 +2,7 @@ package com.shadorc.shadbot.utils;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,9 +36,9 @@ public class TimeUtilTest {
 
     @Test
     public void testParseTime() {
-        assertEquals(60, TimeUtil.parseTime("1m"));
-        assertEquals(60, TimeUtil.parseTime("1m 00s"));
-        assertEquals(3600 + 10 * 60 + 6, TimeUtil.parseTime("01h10m6s"));
+        assertEquals(Duration.ofMinutes(1), TimeUtil.parseTime("1m"));
+        assertEquals(Duration.ofMinutes(1), TimeUtil.parseTime("1m 00s"));
+        assertEquals(Duration.ofSeconds(3600 + 10 * 60 + 6), TimeUtil.parseTime("01h10m6s"));
         assertThrows(IllegalArgumentException.class, () -> TimeUtil.parseTime("1m00"));
         assertThrows(IllegalArgumentException.class, () -> TimeUtil.parseTime("26d01h10m6s"));
         assertThrows(IllegalArgumentException.class, () -> TimeUtil.parseTime("-10s"));

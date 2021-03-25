@@ -12,6 +12,7 @@ import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 public class BackwardCmd extends BaseCmd {
@@ -28,18 +29,18 @@ public class BackwardCmd extends BaseCmd {
 
         return DiscordUtil.requireVoiceChannel(context)
                 .flatMap(__ -> {
-                    final String option = context.getOptionAsString("time").orElseThrow();
+                    final String time = context.getOptionAsString("time").orElseThrow();
 
-                    final Long time;
+                    final Duration duration;
                     try {
-                        time = TimeUtil.parseTime(option);
+                        duration = TimeUtil.parseTime(time);
                     } catch (final IllegalArgumentException err) {
                         return Mono.error(new CommandException(context.localize("backward.invalid.time")
-                                .formatted(option)));
+                                .formatted(time)));
                     }
 
                     final long newPosition = guildMusic.getTrackScheduler()
-                            .changePosition(-TimeUnit.SECONDS.toMillis(time));
+                            .changePosition(-duration.toMillis());
                     return context.reply(Emoji.CHECK_MARK, context.localize("backward.message")
                             .formatted(FormatUtil.formatDuration(newPosition)));
                 });
