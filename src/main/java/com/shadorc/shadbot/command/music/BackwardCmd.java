@@ -19,7 +19,7 @@ public class BackwardCmd extends BaseCmd {
 
     public BackwardCmd() {
         super(CommandCategory.MUSIC, "backward", "Fast backward current music a specified amount of time");
-        this.addOption("time", "Can be number of seconds or formatted time (e.g. 72 or 1m12s)",
+        this.addOption("time", "Number of seconds or formatted time (e.g. 72 or 1m12s)",
                 true, ApplicationCommandOptionType.STRING);
     }
 

@@ -20,7 +20,7 @@ public class ForwardCmd extends BaseCmd {
     public ForwardCmd() {
         super(CommandCategory.MUSIC, "forward", "Fast forward the current music a specified amount of time");
         this.addOption("time",
-                "Can be number of seconds or formatted time (e.g. 72 or 1m12s)",
+                "Number of seconds or formatted time (e.g. 72 or 1m12s)",
                 true,
                 ApplicationCommandOptionType.STRING);
     }
