@@ -2,7 +2,6 @@ package com.shadorc.shadbot.command.gamestats;
 
 import com.shadorc.shadbot.api.json.gamestats.steam.player.PlayerSummary;
 import com.shadorc.shadbot.command.CmdTest;
-import com.shadorc.shadbot.command.CommandException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -4,7 +4,6 @@ import com.shadorc.shadbot.api.json.TokenResponse;
 import com.shadorc.shadbot.api.json.image.deviantart.Content;
 import com.shadorc.shadbot.api.json.image.deviantart.Image;
 import com.shadorc.shadbot.command.CmdTest;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;

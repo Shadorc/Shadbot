@@ -8,7 +8,6 @@ import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
-import com.shadorc.shadbot.db.users.UsersCollection;
 import com.shadorc.shadbot.db.users.bean.DBUserBean;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import discord4j.common.util.Snowflake;

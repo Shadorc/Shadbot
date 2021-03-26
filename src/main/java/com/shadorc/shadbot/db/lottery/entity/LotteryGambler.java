@@ -7,7 +7,6 @@ import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
-import com.shadorc.shadbot.db.lottery.LotteryCollection;
 import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
 import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;

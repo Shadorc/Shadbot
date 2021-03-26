@@ -2,7 +2,6 @@ package com.shadorc.shadbot.object;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.command.MissingPermissionException;
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.music.NoMusicException;
 import com.shadorc.shadbot.utils.FormatUtil;
