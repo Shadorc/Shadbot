@@ -1,5 +1,4 @@
-/*
-package com.shadorc.shadbot.command.utils.poll;
+package com.shadorc.shadbot.command.util.poll;
 
 import discord4j.core.object.reaction.ReactionEmoji;
 
@@ -37,4 +36,3 @@ public class PollCreateSpec {
     }
 
 }
-*/

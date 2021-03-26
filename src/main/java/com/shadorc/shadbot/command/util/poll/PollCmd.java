@@ -1,30 +1,35 @@
-/*
-package com.shadorc.shadbot.command.utils.poll;
+package com.shadorc.shadbot.command.util.poll;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
-import com.shadorc.shadbot.utils.StringUtils;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.object.ExceptionHandler;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.NumberUtil;
+import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.common.util.Snowflake;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.ReactionEmoji;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.http.client.ClientException;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.Permission;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class PollCmd extends BaseCmd {
 
@@ -32,127 +37,104 @@ public class PollCmd extends BaseCmd {
             "\u0031\u20E3", "\u0032\u20E3", "\u0033\u20E3", "\u0034\u20E3", "\u0035\u20E3",
             "\u0036\u20E3", "\u0037\u20E3", "\u0038\u20E3", "\u0039\u20E3", "\uD83D\uDD1F");
 
-    private static final int MIN_CHOICES_NUM = 2;
     private static final int MAX_CHOICES_NUM = 10;
     private static final int MIN_DURATION = 10;
     private static final int MAX_DURATION = 3600;
 
     private final Map<Snowflake, PollManager> managers;
+    private final AtomicReference<Disposable> sendResultsTask;
 
     public PollCmd() {
-        super(CommandCategory.UTILS, List.of("poll"));
-        this.setDefaultRateLimiter();
-
+        super(CommandCategory.UTILS, "poll", "Create a poll");
         this.managers = new ConcurrentHashMap<>();
+        this.sendResultsTask = new AtomicReference<>();
+
+        this.addOption("duration", "Number of seconds or formatted time (e.g. 72 or 1m12s), 1h max",
+                true, ApplicationCommandOptionType.STRING);
+        this.addOption("question", "The question to ask", true, ApplicationCommandOptionType.STRING);
+        this.addOption("choice1", "The first choice", true, ApplicationCommandOptionType.STRING);
+        this.addOption("choice2", "The second choice", true, ApplicationCommandOptionType.STRING);
+        this.addOption("choice3", "The third choice", false, ApplicationCommandOptionType.STRING);
+        this.addOption("choice4", "The fourth choice", false, ApplicationCommandOptionType.STRING);
+        this.addOption("choice5", "The fifth choice", false, ApplicationCommandOptionType.STRING);
+        this.addOption("choice6", "The sixth choice", false, ApplicationCommandOptionType.STRING);
+        this.addOption("choice7", "The seventh choice", false, ApplicationCommandOptionType.STRING);
+        this.addOption("choice8", "The eighth choice", false, ApplicationCommandOptionType.STRING);
+        this.addOption("choice9", "The ninth choice", false, ApplicationCommandOptionType.STRING);
+        this.addOption("choice10", "The tenth choice", false, ApplicationCommandOptionType.STRING);
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        context.requireArg();
-
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.requirePermissions(channel, Permission.ADD_REACTIONS))
-                .thenMany(context.getPermissions())
-                .collectList()
-                .flatMap(permissions -> {
-                    final PollManager oldPollManager = this.managers.get(context.getChannelId());
-                    if (oldPollManager == null) {
-                        final PollManager newPollManager = this.createPoll(context);
-                        this.managers.put(context.getChannelId(), newPollManager);
-                        return newPollManager.start();
-                    } else if (PollCmd.isCancelMsg(context, permissions, oldPollManager)) {
-                        oldPollManager.stop();
-                        return context.getChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(
-                                        String.format(Emoji.CHECK_MARK + " Poll cancelled by **%s**.",
-                                                context.getUsername()), channel));
-                    }
-                    return Mono.empty();
-                })
-                .then();
-    }
-
-    private static boolean isCancelMsg(Context context, List<CommandPermission> permissions, PollManager pollManager) {
-        final boolean isAuthor = context.getAuthorId().equals(pollManager.getContext().getAuthorId());
-        final boolean isAdmin = permissions.contains(CommandPermission.ADMIN);
-        final boolean isCancelMsg = context.getArg()
-                .map("cancel"::equalsIgnoreCase)
-                .orElse(false);
-        return isCancelMsg && (isAuthor || isAdmin);
+    public Mono<?> execute(Context context) {
+        // TODO: Message if already started ? Start several polls ?
+        return Mono.justOrEmpty(this.managers.get(context.getChannelId()))
+                .switchIfEmpty(this.start(context)
+                        .then(Mono.empty()));
     }
 
     private PollManager createPoll(Context context) {
-        final List<String> args = context.requireArgs(2);
-
-        final int countMatches = StringUtils.countMatches(args.get(1), '"');
-        if (countMatches == 0 || countMatches % 2 != 0) {
-            throw new CommandException("Question and choices must be enclosed in quotation marks.");
+        final String durationStr = context.getOptionAsString("duration").orElseThrow();
+        final Duration duration;
+        try {
+            duration = TimeUtil.parseTime(durationStr);
+            if (!NumberUtil.isBetween(duration.toSeconds(), MIN_DURATION, MAX_DURATION)) {
+                throw new IllegalArgumentException();
+            }
+        } catch (final IllegalArgumentException err) {
+            throw new CommandException(context.localize("poll.invalid.time")
+                    .formatted(durationStr, context.localize(MIN_DURATION), context.localize(MAX_DURATION)));
         }
 
-        final Integer seconds;
-        if (NumberUtils.isPositiveLong(args.get(0))) {
-            seconds = NumberUtils.toIntBetweenOrNull(args.get(0), MIN_DURATION, MAX_DURATION);
-            if (seconds == null) {
-                throw new CommandException(String.format("`%s` is not a valid duration, it must be between %ds and %ds.",
-                        args.get(0), MIN_DURATION, MAX_DURATION));
-            }
-        } else {
-            try {
-                seconds = (int) TimeUtils.parseTime(args.get(0));
-            } catch (final IllegalArgumentException err) {
-                throw new CommandException(err.getMessage());
-            }
-            if (!NumberUtils.isBetween(seconds, MIN_DURATION, MAX_DURATION)) {
-                throw new CommandException(String.format("`%s` is not a valid duration, it must be between %ds and %ds.",
-                        args.get(0), MIN_DURATION, MAX_DURATION));
-            }
-        }
-
-        final List<String> substrings = StringUtils.substringsBetween(args.get(1), "\"", "\"");
-        if (substrings.size() != substrings.stream().filter(str -> !str.isBlank()).count()) {
-            throw new CommandException("Question or choice cannot be blank.");
-        }
-
-        // Remove duplicate choices
-        final List<String> choices = substrings.stream()
-                .skip(1)
+        final String question = context.getOptionAsString("question").orElseThrow();
+        final List<String> choices = IntStream.range(1, MAX_CHOICES_NUM + 1).boxed()
+                .map(index -> context.getOptionAsString("choice%d".formatted(index)).orElse(""))
+                .filter(Predicate.not(String::isBlank))
                 .distinct()
-                .collect(Collectors.toList());
-        if (!NumberUtils.isBetween(choices.size(), MIN_CHOICES_NUM, MAX_CHOICES_NUM)) {
-            throw new CommandException(
-                    String.format("You must specify between %d and %d different non-empty choices and one question.",
-                            MIN_CHOICES_NUM, MAX_CHOICES_NUM));
-        }
+                .collect(Collectors.toCollection(LinkedList::new));
 
         final Map<String, ReactionEmoji> choicesReactions = new LinkedHashMap<>();
         for (int i = 0; i < choices.size(); i++) {
             choicesReactions.put(choices.get(i), ReactionEmoji.unicode(NUMBER_UNICODE.get(i)));
         }
 
-        return new PollManager(this, context,
-                new PollCreateSpec(Duration.ofSeconds(seconds), substrings.get(0), choicesReactions));
+        return new PollManager(this, context, new PollCreateSpec(duration, question, choicesReactions));
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Create a poll.")
-                .addArg("duration", false)
-                .addArg("\"question\"", false)
-                .addArg("\"choice1\"", false)
-                .addArg("\"choice2\"", false)
-                .addArg("\"choiceX\"", true)
-                .setExample(String.format("`%s%s 2m30s \"Where do we eat at noon?\" \"White\" \"53\" \"A dog\"`",
-                        context.getPrefix(), this.getName()))
-                .addField("Restrictions", String.format("%n**duration** - must be between %ds and %ds (1 hour)"
-                                + "%n**question** - must be in quotation marks"
-                                + "%n**choices** - must be in quotation marks, min: %d, max: %d",
-                        MIN_DURATION, MAX_DURATION, MIN_CHOICES_NUM, MAX_CHOICES_NUM), false)
-                .build();
+    public Mono<?> start(Context context) {
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtil.requirePermissions(channel, Permission.ADD_REACTIONS))
+                .thenReturn(this.createPoll(context))
+                .doOnNext(pollManager -> this.managers.put(context.getChannelId(), pollManager))
+                .flatMapMany(pollManager -> pollManager.show()
+                        .flatMapMany(message -> {
+                            this.sendResultsTask.set(Mono.delay(pollManager.getSpec().getDuration(), Schedulers.boundedElastic())
+                                    .then(context.getClient()
+                                            .getMessageById(context.getChannelId(), message.getId()))
+                                    .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
+                                    .map(Message::getReactions)
+                                    .flatMap(pollManager::sendResults)
+                                    .subscribe(null, ExceptionHandler::handleUnknownError));
+
+                            final CancelReactionInputs inputs = CancelReactionInputs
+                                    .create(pollManager, message.getId(), ReactionEmoji.unicode("\u274c"));
+                            return inputs.addReaction()
+                                    .thenMany(inputs.waitForInputs());
+                        }))
+                .then();
+    }
+
+    public Mono<?> cancel(Context context) {
+        return Mono.justOrEmpty(this.managers.remove(context.getChannelId()))
+                .flatMap(pollManager -> {
+                    final Disposable sendResultsTask = this.sendResultsTask.get();
+                    if (sendResultsTask != null && !sendResultsTask.isDisposed()) {
+                        sendResultsTask.dispose();
+                    }
+                    return context.reply(Emoji.CHECK_MARK, context.localize("poll.cancelled"));
+                });
     }
 
     public Map<Snowflake, PollManager> getManagers() {
         return this.managers;
     }
 }
-*/

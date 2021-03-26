@@ -12,10 +12,10 @@ import java.time.Duration;
 
 public abstract class ReactionInputs {
 
-    private final GatewayDiscordClient gateway;
-    private final Snowflake messageId;
-    private final ReactionEmoji reactionEmoji;
-    private final Duration timeout;
+    protected final GatewayDiscordClient gateway;
+    protected final Snowflake messageId;
+    protected final ReactionEmoji reactionEmoji;
+    protected final Duration timeout;
 
     public ReactionInputs(GatewayDiscordClient gateway, Snowflake messageId, ReactionEmoji reactionEmoji, Duration timeout) {
         this.gateway = gateway;
