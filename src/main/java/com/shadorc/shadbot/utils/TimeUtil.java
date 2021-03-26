@@ -85,7 +85,7 @@ public class TimeUtil {
             }
         }
 
-        return seconds;
+        return Duration.ofSeconds(seconds);
     }
 
     /**
