@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 public class RussianRoulettePlayer extends GamblerPlayer {
 
+    private static final int MAX_BULLETS = 6;
+
     private Instant lastTimePlayed;
     private Instant deadInstant;
     private int bulletIndex;
@@ -24,7 +26,7 @@ public class RussianRoulettePlayer extends GamblerPlayer {
     private void init() {
         this.lastTimePlayed = null;
         this.deadInstant = null;
-        this.bulletIndex = ThreadLocalRandom.current().nextInt(1, 7);
+        this.bulletIndex = ThreadLocalRandom.current().nextInt(1, MAX_BULLETS + 1);
         this.index = 6;
     }
 
@@ -41,7 +43,7 @@ public class RussianRoulettePlayer extends GamblerPlayer {
     }
 
     public int getRemaining() {
-        return 6 - this.index;
+        return MAX_BULLETS - this.index;
     }
 
     public Duration getResetDuration() {
