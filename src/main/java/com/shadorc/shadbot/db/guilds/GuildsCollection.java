@@ -33,13 +33,11 @@ public class GuildsCollection extends DatabaseCollection {
     }
 
     public Mono<DBGuild> getDBGuild(Snowflake guildId) {
-        LOGGER.debug("[DBGuild {}] Request", guildId.asString());
-
         final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", guildId.asString()))
                 .first();
 
-        return this.guildCache.getOrCache(guildId, Mono.from(request)
+        final Mono<DBGuild> getDBGuild = Mono.from(request)
                 .map(document -> document.toJson(JSON_WRITER_SETTINGS))
                 .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, DBGuildBean.class)))
                 .map(DBGuild::new)
@@ -49,7 +47,12 @@ public class GuildsCollection extends DatabaseCollection {
                     }
                 })
                 .defaultIfEmpty(new DBGuild(guildId))
-                .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc()));
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[DBGuild {}] Request", guildId.asString());
+                    Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc();
+                });
+
+        return this.guildCache.getOrCache(guildId, getDBGuild);
     }
 
     public Mono<Settings> getSettings(Snowflake guildId) {
