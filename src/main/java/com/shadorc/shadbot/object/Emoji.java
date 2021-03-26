@@ -64,7 +64,11 @@ public enum Emoji {
     STAR("star2"),
     ROBOT("robot"),
     SATELLITE("satellite"),
-    SCREWDRIVER("screwdriver");
+    SCREWDRIVER("screwdriver"),
+    APPLE("apple"),
+    CHERRIES("cherries"),
+    BELL("bell"),
+    GIFT("gift");
 
     private final String discordNotation;
 

@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.game.slotmachine;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -7,18 +6,15 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
 public class SlotMachineCmd extends BaseCmd {
 
@@ -30,31 +26,36 @@ public class SlotMachineCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         final GamblerPlayer player = new GamblerPlayer(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST);
+
         return ShadbotUtil.requireValidBet(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
-                .flatMap(__ -> player.bet())
-                .flatMap(__ -> {
+                .then(player.bet())
+                .then(Mono.defer(() -> {
                     final List<SlotOptions> slots = SlotMachineCmd.randSlots();
 
-                    final StringBuilder strBuilder = new StringBuilder(String.format("%s%n%s (**%s**) ",
-                            FormatUtil.format(slots, SlotOptions::getEmoji, " "), Emoji.BANK, context.getAuthorName()));
+                    final StringBuilder strBuilder = new StringBuilder()
+                            .append(FormatUtil.format(slots, slot -> slot.getEmoji().toString(), " "))
+                            .append('\n')
+                            .append(Emoji.BANK)
+                            .append(' ');
 
                     if (slots.stream().distinct().count() == 1) {
                         final int slotGains = slots.get(0).getGains();
                         final long gains = ThreadLocalRandom.current().nextInt(
                                 (int) (slotGains * Constants.RAND_FACTOR),
                                 (int) (slotGains * (Constants.RAND_FACTOR + 1)));
-                        strBuilder.append(String.format("You win **%s** !", FormatUtil.coins(gains)));
+                        strBuilder.append(context.localize("slotmachine.win").formatted(context.localize(gains)));
                         Telemetry.SLOT_MACHINE_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
                                 .thenReturn(strBuilder);
                     } else {
-                        strBuilder.append(String.format("You lose **%s** !", FormatUtil.coins(Constants.PAID_COST)));
+                        strBuilder.append(context.localize("slotmachine.lose")
+                                .formatted(context.localize(Constants.PAID_COST)));
                         Telemetry.SLOT_MACHINE_SUMMARY.labels("loss").observe(Constants.PAID_COST);
                         return Mono.just(strBuilder);
                     }
-                })
+                }))
                 .map(StringBuilder::toString)
-                .flatMap(context::createFollowupMessage);
+                .flatMap(context::reply);
     }
 
     private static List<SlotOptions> randSlots() {
@@ -84,18 +85,4 @@ public class SlotMachineCmd extends BaseCmd {
         return Collections.unmodifiableList(list);
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .addField("Cost", String.format("A game costs **%s**.", FormatUtil.coins(Constants.PAID_COST)), false)
-                .addField("Gains", String.format("%s: **%s**, %s: **%s**, %s: **%s**, %s: **%s**." +
-                                "%nYou also gain a small random bonus.",
-                        FormatUtil.capitalizeEnum(SlotOptions.APPLE), FormatUtil.coins(SlotOptions.APPLE.getGains()),
-                        FormatUtil.capitalizeEnum(SlotOptions.CHERRIES), FormatUtil.coins(SlotOptions.CHERRIES.getGains()),
-                        FormatUtil.capitalizeEnum(SlotOptions.BELL), FormatUtil.coins(SlotOptions.BELL.getGains()),
-                        FormatUtil.capitalizeEnum(SlotOptions.GIFT), FormatUtil.coins(SlotOptions.GIFT.getGains())), false)
-                .build();
-    }
-
 }
-*/
