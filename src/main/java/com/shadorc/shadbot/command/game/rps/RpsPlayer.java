@@ -14,8 +14,16 @@ public class RpsPlayer extends Player {
         this.winStreak = new AtomicInteger();
     }
 
-    public AtomicInteger getWinStreak() {
-        return this.winStreak;
+    public int getWinStreak() {
+        return this.winStreak.get();
+    }
+
+    public void incrementWinStream() {
+        this.winStreak.incrementAndGet();
+    }
+
+    public void resetWinStreak() {
+        this.winStreak.set(0);
     }
 
 }

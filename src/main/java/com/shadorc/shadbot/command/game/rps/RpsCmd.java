@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class RpsCmd extends BaseCmd {
 
+    // Key is Guild ID, User ID
     private final Map<Tuple2<Snowflake, Snowflake>, RpsPlayer> players;
 
     public RpsCmd() {
@@ -43,21 +44,22 @@ public class RpsCmd extends BaseCmd {
 
         final RpsPlayer player = this.getPlayer(context.getGuildId(), context.getAuthorId());
         if (userHandsign.isSuperior(botHandsign)) {
-            final int winStreak = player.getWinStreak().incrementAndGet();
+            player.incrementWinStream();
+            final int winStreak = player.getWinStreak();
             final long gains = Math.min((long) Constants.GAINS * winStreak, Config.MAX_COINS);
             Telemetry.RPS_SUMMARY.labels("win").observe(gains);
             return player.win(gains)
                     .then(Mono.defer(() -> {
                         strBuilder.append(Emoji.BANK + context.localize("rps.win")
                                 .formatted(context.getAuthorName(), context.localize(gains),
-                                        context.localize(player.getWinStreak().get())));
+                                        context.localize(player.getWinStreak())));
                         return context.reply(strBuilder.toString());
                     }));
         } else if (userHandsign == botHandsign) {
-            player.getWinStreak().set(0);
+            player.resetWinStreak();
             strBuilder.append(context.localize("rps.draw"));
         } else {
-            player.getWinStreak().set(0);
+            player.resetWinStreak();
             strBuilder.append(context.localize("rps.lose"));
         }
 
