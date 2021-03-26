@@ -35,28 +35,32 @@ public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> imp
 
     @Override
     public Mono<Void> insert() {
-        LOGGER.debug("[LotteryHistoric] Insertion");
-
         return Mono.from(DatabaseManager.getLottery()
                 .getCollection()
                 .replaceOne(Filters.eq("_id", "historic"),
                         this.toDocument(),
                         new ReplaceOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[LotteryHistoric] Insertion result: {}", result))
-                .then()
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getLottery().getName()).inc());
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[LotteryHistoric] Insertion");
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getLottery().getName()).inc();
+                })
+                .doOnTerminate(DatabaseManager.getLottery()::invalidateHistoricCache)
+                .then();
     }
 
     @Override
     public Mono<Void> delete() {
-        LOGGER.debug("[LotteryHistoric] Deletion");
-
         return Mono.from(DatabaseManager.getLottery()
                 .getCollection()
                 .deleteOne(Filters.eq("_id", "historic")))
                 .doOnNext(result -> LOGGER.trace("[LotteryHistoric] Deletion result: {}", result))
-                .then()
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getLottery().getName()).inc());
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[LotteryHistoric] Deletion");
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getLottery().getName()).inc();
+                })
+                .doOnTerminate(DatabaseManager.getLottery()::invalidateHistoricCache)
+                .then();
     }
 
     @Override

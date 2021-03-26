@@ -6,6 +6,7 @@ import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoDatabase;
+import com.shadorc.shadbot.core.cache.SingleValueCache;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseCollection;
 import com.shadorc.shadbot.db.lottery.bean.LotteryGamblerBean;
@@ -21,17 +22,29 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 
+import java.util.List;
+
 public class LotteryCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = LogUtil.getLogger(LotteryCollection.class, LogUtil.Category.DATABASE);
 
+    private final SingleValueCache<List<LotteryGambler>> gamblersCache;
+    private final SingleValueCache<LotteryHistoric> historicCache;
+    private final SingleValueCache<Long> jackpotCache;
+
     public LotteryCollection(MongoDatabase database) {
         super(database, "lottery");
+        this.gamblersCache = SingleValueCache.Builder.create(this.requestGamblers()).withInfiniteTtl().build();
+        this.historicCache = SingleValueCache.Builder.create(this.requestHistoric()).withInfiniteTtl().build();
+        this.jackpotCache = SingleValueCache.Builder.create(this.requestJackpot()).withInfiniteTtl().build();
     }
 
     public Flux<LotteryGambler> getGamblers() {
-        LOGGER.debug("[Lottery] Request gamblers");
+        return this.gamblersCache.getOrCache(this.requestGamblers())
+                .flatMapMany(Flux::fromIterable);
+    }
 
+    private Mono<List<LotteryGambler>> requestGamblers() {
         final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", "gamblers"))
                 .first();
@@ -41,12 +54,18 @@ public class LotteryCollection extends DatabaseCollection {
                 .map(Document::toJson)
                 .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, LotteryGamblerBean.class)))
                 .map(LotteryGambler::new)
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[Lottery] Request gamblers");
+                    Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc();
+                })
+                .collectList();
     }
 
     public Mono<LotteryHistoric> getHistoric() {
-        LOGGER.debug("[Lottery] Request historic");
+        return this.historicCache.getOrCache(this.requestHistoric());
+    }
 
+    private Mono<LotteryHistoric> requestHistoric() {
         final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", "historic"))
                 .first();
@@ -55,12 +74,17 @@ public class LotteryCollection extends DatabaseCollection {
                 .map(Document::toJson)
                 .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, LotteryHistoricBean.class)))
                 .map(LotteryHistoric::new)
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[Lottery] Request historic");
+                    Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc();
+                });
     }
 
     public Mono<Long> getJackpot() {
-        LOGGER.debug("[Lottery] Request jackpot");
+        return this.jackpotCache.getOrCache(this.requestJackpot());
+    }
 
+    private Mono<Long> requestJackpot() {
         final Publisher<Document> request = this.getCollection()
                 .find(Filters.eq("_id", "jackpot"))
                 .first();
@@ -68,51 +92,62 @@ public class LotteryCollection extends DatabaseCollection {
         return Mono.from(request)
                 .map(document -> document.getLong("jackpot"))
                 .defaultIfEmpty(0L)
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[Lottery] Request jackpot");
+                    Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc();
+                });
     }
 
     public Mono<Boolean> isGambler(Snowflake userId) {
-        LOGGER.debug("[Gambler {}] Checking if user exist", userId.asLong());
-
-        final Publisher<Document> request = this.getCollection()
-                .find(Filters.and(Filters.eq("_id", "gamblers"),
-                        Filters.eq("gamblers.user_id", userId.asString())))
-                .first();
-
-        return Mono.from(request)
-                .hasElement()
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
+        return this.getGamblers()
+                .filter(lotteryGambler -> lotteryGambler.getUserId().equals(userId))
+                .hasElements();
     }
 
     public Mono<DeleteResult> resetGamblers() {
-        LOGGER.debug("[Lottery] Gamblers deletion");
-
         return Mono.from(this.getCollection()
                 .deleteOne(Filters.eq("_id", "gamblers")))
                 .doOnNext(result -> LOGGER.trace("[Lottery] Gamblers deletion result: {}", result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[Lottery] Gamblers deletion");
+                    Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc();
+                })
+                .doOnTerminate(this.gamblersCache::invalidate);
     }
 
     public Mono<UpdateResult> addToJackpot(long coins) {
         final long value = (long) Math.ceil(coins / 100.0f);
-
-        LOGGER.debug("[Lottery] Jackpot update: {} coins", value);
 
         return Mono.from(this.getCollection()
                 .updateOne(Filters.eq("_id", "jackpot"),
                         Updates.inc("jackpot", value),
                         new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[Lottery] Jackpot update result: {}", result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[Lottery] Jackpot update: {} coins", value);
+                    Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc();
+                })
+                .doOnTerminate(this.jackpotCache::invalidate);
     }
 
     public Mono<DeleteResult> resetJackpot() {
-        LOGGER.debug("[Lottery] Jackpot deletion");
-
         return Mono.from(this.getCollection()
                 .deleteOne(Filters.eq("_id", "jackpot")))
                 .doOnNext(result -> LOGGER.trace("[Lottery] Jackpot deletion result: {}", result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[Lottery] Jackpot deletion");
+                    Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc();
+                })
+                .doOnTerminate(this.jackpotCache::invalidate);
     }
+
+    public void invalidateGamblersCache() {
+        this.gamblersCache.invalidate();
+    }
+
+    public void invalidateHistoricCache() {
+        this.historicCache.invalidate();
+    }
+
 
 }

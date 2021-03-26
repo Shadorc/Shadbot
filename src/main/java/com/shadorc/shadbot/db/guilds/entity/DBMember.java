@@ -52,12 +52,12 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
 
         // If the new coins amount is equal to the current one, no need to request an update
         if (coins == this.getCoins()) {
-            LOGGER.debug("[DBMember {} / {}] Coins update useless, aborting: {} coins",
+            LOGGER.debug("[DBMember {}/{}] Coins update useless, aborting: {} coins",
                     this.getId().asString(), this.getGuildId().asString(), coins);
             return Mono.empty();
         }
 
-        LOGGER.debug("[DBMember {} / {}] Coins update: {} coins",
+        LOGGER.debug("[DBMember {}/{}] Coins update: {} coins",
                 this.getId().asString(), this.getGuildId().asString(), coins);
         return this.update(Updates.set("members.$.coins", coins), this.toDocument().append("coins", coins))
                 .then(Mono.defer(() -> {
@@ -85,20 +85,20 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                                 Filters.eq("_id", this.getGuildId().asString()),
                                 Filters.eq("members._id", this.getId().asString())),
                         update))
-                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Update result: {}",
+                .doOnNext(result -> LOGGER.trace("[DBMember {}/{}] Update result: {}",
                         this.getId().asString(), this.getGuildId().asString(), result))
                 .map(UpdateResult::getModifiedCount)
                 .flatMap(modifiedCount -> {
                     // Member was not found, insert it
                     if (modifiedCount == 0) {
-                        LOGGER.debug("[DBMember {} / {}] Not updated. Upsert member",
+                        LOGGER.debug("[DBMember {}/{}] Not updated. Upsert member",
                                 this.getId().asString(), this.getGuildId().asString());
                         return Mono.from(DatabaseManager.getGuilds()
                                 .getCollection()
                                 .updateOne(Filters.eq("_id", this.getGuildId().asString()),
                                         Updates.push("members", document),
                                         new UpdateOptions().upsert(true)))
-                                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Upsert result: {}",
+                                .doOnNext(result -> LOGGER.trace("[DBMember {}/{}] Upsert result: {}",
                                         this.getId().asString(), this.getGuildId().asString(), result))
                                 .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc());
                     }
@@ -109,13 +109,13 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
 
     // Note: If one day, a member contains more data than just coins, this method will need to be updated
     public Mono<Void> resetCoins() {
-        LOGGER.debug("[DBMember {} / {}] Coins deletion", this.getId().asString(), this.getGuildId().asString());
+        LOGGER.debug("[DBMember {}/{}] Coins deletion", this.getId().asString(), this.getGuildId().asString());
         return this.delete();
     }
 
     @Override
     public Mono<Void> insert() {
-        LOGGER.debug("[DBMember {} / {}] Insertion", this.getId().asString(), this.getGuildId().asString());
+        LOGGER.debug("[DBMember {}/{}] Insertion", this.getId().asString(), this.getGuildId().asString());
         DatabaseManager.getGuilds().invalidateCache(this.getGuildId());
 
         return Mono.from(DatabaseManager.getGuilds()
@@ -123,7 +123,7 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                 .updateOne(Filters.eq("_id", this.getGuildId().asString()),
                         Updates.push("members", this.toDocument()),
                         new UpdateOptions().upsert(true)))
-                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Insertion result: {}",
+                .doOnNext(result -> LOGGER.trace("[DBMember {}/{}] Insertion result: {}",
                         this.getId().asString(), this.getGuildId().asString(), result))
                 .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
                 .then();
@@ -131,14 +131,14 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
 
     @Override
     public Mono<Void> delete() {
-        LOGGER.debug("[DBMember {} / {}] Deletion", this.getId().asString(), this.getGuildId().asString());
+        LOGGER.debug("[DBMember {}/{}] Deletion", this.getId().asString(), this.getGuildId().asString());
         DatabaseManager.getGuilds().invalidateCache(this.getGuildId());
 
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(Filters.eq("_id", this.getGuildId().asString()),
                         Updates.pull("members", Filters.eq("_id", this.getId().asString()))))
-                .doOnNext(result -> LOGGER.trace("[DBMember {} / {}] Deletion result: {}",
+                .doOnNext(result -> LOGGER.trace("[DBMember {}/{}] Deletion result: {}",
                         this.getId().asString(), this.getGuildId().asString(), result))
                 .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
                 .then();

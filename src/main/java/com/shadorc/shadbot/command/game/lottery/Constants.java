@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.game.lottery;
 
 class Constants {
@@ -8,4 +7,3 @@ class Constants {
     protected static final int MAX_NUM = 100;
 
 }
-*/

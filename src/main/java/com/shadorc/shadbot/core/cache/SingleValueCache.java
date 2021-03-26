@@ -5,20 +5,46 @@ import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class SingleValueCache<T> extends Mono<T> {
 
-    private final Mono<T> cachedValue;
+    private final AtomicReference<Mono<T>> cachedValue;
+    private final Function<? super T, Duration> ttlForValue;
+    private final Function<Throwable, Duration> ttlForError;
+    private final Supplier<Duration> ttlForEmpty;
 
-    private SingleValueCache(Mono<T> cachedValue) {
-        this.cachedValue = cachedValue;
+    private SingleValueCache(Mono<T> value,
+                             Function<? super T, Duration> ttlForValue,
+                             Function<Throwable, Duration> ttlForError,
+                             Supplier<Duration> ttlForEmpty) {
+        this.cachedValue = new AtomicReference<>();
+        this.cache(value);
+        this.ttlForValue = ttlForValue;
+        this.ttlForError = ttlForError;
+        this.ttlForEmpty = ttlForEmpty;
+    }
+
+    public Mono<T> getOrCache(Mono<T> value) {
+        if (this.cachedValue.get() == null) {
+            this.cache(value);
+        }
+        return this.cachedValue.get();
+    }
+
+    public void cache(Mono<T> value) {
+        this.cachedValue.set(value.cache(this.ttlForValue, this.ttlForError, this.ttlForEmpty));
+    }
+
+    public void invalidate() {
+        this.cachedValue.set(null);
     }
 
     @Override
     public void subscribe(@NotNull CoreSubscriber<? super T> actual) {
-        this.cachedValue.subscribe(actual);
+        this.cachedValue.get().subscribe(actual);
     }
 
     public static class Builder<T> {
@@ -35,6 +61,11 @@ public class SingleValueCache<T> extends Mono<T> {
 
         public static <T> Builder<T> create(Mono<T> value) {
             return new Builder<>(value);
+        }
+
+        public Builder<T> withInfiniteTtl() {
+            this.ttlForValue = __ -> Duration.ofMillis(Long.MAX_VALUE);
+            return this;
         }
 
         public Builder<T> withTtl(Duration ttl) {
@@ -58,7 +89,7 @@ public class SingleValueCache<T> extends Mono<T> {
         }
 
         public SingleValueCache<T> build() {
-            return new SingleValueCache<>(this.value.cache(this.ttlForValue, this.ttlForError, this.ttlForEmpty));
+            return new SingleValueCache<>(this.value, this.ttlForValue, this.ttlForError, this.ttlForEmpty);
         }
 
     }

@@ -1,24 +1,27 @@
-/*
 package com.shadorc.shadbot.command.game.lottery;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
 import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
 import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.*;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.NumberUtil;
+import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.MessageData;
 import discord4j.rest.http.client.ClientException;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -29,55 +32,50 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class LotteryCmd extends BaseCmd {
 
     public LotteryCmd() {
-        super(CommandCategory.GAME, List.of("lottery", "lotto"));
-        this.setDefaultRateLimiter();
+        super(CommandCategory.GAME, "lottery",
+                "Buy a ticket for the lottery or display the current lottery status.");
+        this.addOption("number", "The number you bet on", false,
+                ApplicationCommandOptionType.INTEGER);
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        if (context.getArg().isEmpty()) {
-            return LotteryCmd.show(context).then();
+    public Mono<?> execute(Context context) {
+        final Optional<Long> numberOpt = context.getOptionAsLong("number");
+        if (numberOpt.isEmpty()) {
+            return LotteryCmd.show(context);
         }
-
-        final String arg = context.requireArg();
 
         return DatabaseManager.getGuilds()
                 .getDBMember(context.getGuildId(), context.getAuthorId())
-                .filterWhen(dbMember -> DatabaseManager.getLottery().isGambler(dbMember.getId())
-                        .map(isParticipating -> !isParticipating))
-                .switchIfEmpty(Mono.error(new CommandException("You're already participating.")))
+                .filterWhen(dbMember -> BooleanUtils.not(DatabaseManager.getLottery().isGambler(dbMember.getId())))
+                .switchIfEmpty(Mono.error(new CommandException(context.localize("lottery.already.participating"))))
                 .flatMap(dbMember -> {
                     if (dbMember.getCoins() < Constants.PAID_COST) {
-                        return Mono.error(new CommandException(ShadbotUtils.NOT_ENOUGH_COINS));
+                        return Mono.error(new CommandException(context.localize("not.enough.coins")));
                     }
 
-                    final Integer num = NumberUtils.toIntBetweenOrNull(arg, Constants.MIN_NUM, Constants.MAX_NUM);
-                    if (num == null) {
+                    final int number = numberOpt.orElseThrow().intValue();
+                    if (!NumberUtil.isBetween(number, Constants.MIN_NUM, Constants.MAX_NUM)) {
                         return Mono.error(new CommandException(
-                                String.format("`%s` is not a valid number, it must be between **%d** and **%d**.",
-                                        arg, Constants.MIN_NUM, Constants.MAX_NUM)));
+                                context.localize("lottery.invalid.number")
+                                        .formatted(number, Constants.MIN_NUM, Constants.MAX_NUM)));
                     }
 
                     return dbMember.addCoins(-Constants.PAID_COST)
-                            .thenReturn(new LotteryGambler(context.getGuildId(), context.getAuthorId(), num))
+                            .thenReturn(new LotteryGambler(context.getGuildId(), context.getAuthorId(), number))
                             .flatMap(LotteryGambler::insert)
-                            .then(context.getChannel())
-                            .flatMap(channel -> DiscordUtils.sendMessage(
-                                    String.format(Emoji.TICKET + " (**%s**) You bought a lottery ticket and bet " +
-                                                    "on number **%d**. Good luck ! The next draw will take place in **%s**.",
-                                            context.getUsername(), num, FormatUtils.formatDurationWords(LotteryCmd.getDelay())), channel));
-                })
-                .then();
+                            .then(context.reply(Emoji.TICKET, context.localize("lottery.message")
+                                    .formatted(number, FormatUtil.formatDurationWords(LotteryCmd.getDelay()))));
+                });
     }
 
-    private static Mono<Message> show(Context context) {
+    private static Mono<MessageData> show(Context context) {
         final Mono<List<LotteryGambler>> getGamblers = DatabaseManager.getLottery()
                 .getGamblers()
                 .collectList();
@@ -100,8 +98,7 @@ public class LotteryCmd extends BaseCmd {
                             .orElse(builder)
                             .build();
                 }))
-                .flatMap(embed -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)));
+                .flatMap(context::reply);
     }
 
     public static Duration getDelay() {
@@ -114,7 +111,7 @@ public class LotteryCmd extends BaseCmd {
             nextDate = nextDate.plusWeeks(1);
         }
 
-        return Duration.ofMillis(TimeUtils.getMillisUntil(nextDate.toInstant()));
+        return Duration.ofMillis(TimeUtil.elapsed(nextDate.toInstant()));
     }
 
     public static Mono<Void> draw(GatewayDiscordClient gateway) {
@@ -131,7 +128,7 @@ public class LotteryCmd extends BaseCmd {
                     DEFAULT_LOGGER.info("Lottery draw done (Winning number: {} | {} winner(s) | Prize pool: {})",
                             winningNum, winners.size(), jackpot);
 
-                    final Long coins = winners.isEmpty() ? null : Math.min(jackpot / winners.size(), Config.MAX_COINS);
+                    final long coins = winners.isEmpty() ? 0 : Math.min(jackpot / winners.size(), Config.MAX_COINS);
 
                     return Flux.fromIterable(winners)
                             .flatMap(member -> DatabaseManager.getGuilds()
@@ -142,10 +139,11 @@ public class LotteryCmd extends BaseCmd {
                                             .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.BINGO)))
                                     .then(member.getPrivateChannel()))
                             .cast(MessageChannel.class)
-                            .flatMap(privateChannel -> DiscordUtils.sendMessage(String.format("Congratulations, you " +
-                                            "have the winning lottery number! You earn **%s**.",
-                                    FormatUtils.coins(coins)), privateChannel))
-                            .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
+                            .flatMap(privateChannel -> DiscordUtil.sendMessage(
+                                    I18nManager.localize(Config.DEFAULT_LOCALE, "lottery.private.message")
+                                            .formatted(coins), privateChannel))
+                            .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
+                                    err -> Mono.empty())
                             .then(new LotteryHistoric(jackpot, winners.size(), winningNum).insert())
                             .then(DatabaseManager.getLottery().resetGamblers())
                             .then(Mono.defer(() -> {
@@ -158,18 +156,4 @@ public class LotteryCmd extends BaseCmd {
                 .then();
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Buy a ticket for the lottery or display the current lottery status.")
-                .addArg("num", String.format("must be between %d and %d", Constants.MIN_NUM, Constants.MAX_NUM), true)
-                .addField("Info", "One winner is randomly drawn every Sunday at noon (English time)."
-                        + "\nIf no one wins, the prize pool is put back into play, "
-                        + "if there are multiple winners, the prize pool is splitted between them.", false)
-                .addField("Cost", String.format("A ticket costs **%s.**", FormatUtils.coins(Constants.PAID_COST)), false)
-                .addField("Gains", "The prize pool contains all coins lost at games during the week plus " +
-                        "the purchase price of the lottery tickets.", false)
-                .build();
-    }
 }
-*/

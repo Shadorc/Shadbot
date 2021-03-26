@@ -132,7 +132,7 @@ public class Shadbot {
                             .subscribe();*/
 
                     Shadbot.taskManager = new TaskManager();
-//                    Shadbot.taskManager.scheduleLottery(gateway);
+                    Shadbot.taskManager.scheduleLottery(gateway);
                     Shadbot.taskManager.schedulePeriodicStats(gateway);
                     Shadbot.taskManager.schedulePresenceUpdates(gateway);
 

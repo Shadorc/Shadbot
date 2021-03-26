@@ -1,8 +1,10 @@
 package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
+import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.ExceptionHandler;
+import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.LogUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.SystemUtil;
@@ -10,6 +12,7 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.gateway.GatewayClientGroup;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.Logger;
@@ -38,14 +41,14 @@ public class TaskManager {
         this.tasks.add(task);
     }
 
-    /*public void scheduleLottery(GatewayDiscordClient gateway) {
+    public void scheduleLottery(GatewayDiscordClient gateway) {
         LOGGER.info("Starting lottery (next draw in {})", FormatUtil.formatDurationWords(LotteryCmd.getDelay()));
         final Disposable task = Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), DEFAULT_SCHEDULER)
                 .flatMap(__ -> LotteryCmd.draw(gateway)
-                        .onErrorResume(err -> Mono.fromCallable(() -> ExceptionHandler.handleUnknownError(err))))
+                        .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
         this.tasks.add(task);
-    }*/
+    }
 
     public void schedulePeriodicStats(GatewayDiscordClient gateway) {
         LOGGER.info("Scheduling periodic stats log");
