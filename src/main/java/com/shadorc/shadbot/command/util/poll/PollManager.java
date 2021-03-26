@@ -86,10 +86,11 @@ public class PollManager {
         }
 
         final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor(this.context.localize("poll.results.title")
-                                .formatted(this.context.getAuthorName()),
+                embed -> embed.setAuthor(this.context.localize("poll.results.title"),
                         null, this.context.getAuthorAvatar())
-                        .setDescription("__**%s**__%s".formatted(this.spec.getQuestion(), representation)));
+                        .setDescription("__**%s**__%s".formatted(this.spec.getQuestion(), representation))
+                        .setFooter(this.context.localize("poll.results.footer")
+                                .formatted(this.context.getAuthorName()), null));
 
         return this.context.reply(embedConsumer);
     }

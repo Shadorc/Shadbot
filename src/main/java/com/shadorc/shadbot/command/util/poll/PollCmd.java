@@ -66,8 +66,9 @@ public class PollCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        // TODO: Message if already started ? Start several polls ?
         return Mono.justOrEmpty(this.managers.get(context.getChannelId()))
+                // TODO: remove this limite
+                .flatMap(__ -> Mono.error(new CommandException(context.localize("poll.cannot.start"))))
                 .switchIfEmpty(this.start(context)
                         .then(Mono.empty()));
     }
