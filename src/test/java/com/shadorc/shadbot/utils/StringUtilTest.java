@@ -10,15 +10,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class StringUtilTest {
 
     @Test
-    public void testRemoveLastLetter() {
-        assertEquals("", StringUtil.removeLastLetter(""));
-        assertNull(StringUtil.removeLastLetter(null));
-        assertEquals("a", StringUtil.removeLastLetter("a"));
-        assertEquals("a", StringUtil.removeLastLetter("ab"));
-        assertEquals("ab", StringUtil.removeLastLetter("abc"));
-    }
-
-    @Test
     public void testCountMatches() {
         assertEquals(0, StringUtil.countMatches("foo", 'b'));
         assertEquals(1, StringUtil.countMatches("foo", 'f'));
@@ -74,19 +65,6 @@ public class StringUtilTest {
         assertEquals("he llo", StringUtil.normalizeSpace("   he   llo      "));
         assertEquals("", StringUtil.normalizeSpace(""));
         assertNull(StringUtil.normalizeSpace(null));
-    }
-
-    @Test
-    public void testPluralOf() {
-        assertEquals("-2 coins", StringUtil.pluralOf(-2, "coin"));
-        assertEquals("-1 coin", StringUtil.pluralOf(-1, "coin"));
-        assertEquals("0 coin", StringUtil.pluralOf(0, "coin"));
-        assertEquals("1 coin", StringUtil.pluralOf(1, "coin"));
-        assertEquals("2 coins", StringUtil.pluralOf(2, "coin"));
-        assertEquals("1,000 coins", StringUtil.pluralOf(1000, "coin"));
-        assertNull(StringUtil.pluralOf(1, "   "));
-        assertNull(StringUtil.pluralOf(2, "   "));
-        assertNull(StringUtil.pluralOf(2, null));
     }
 
     @Test

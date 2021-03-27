@@ -35,7 +35,7 @@ public class RussianRouletteCmd extends BaseCmd {
                 .then(Mono.defer(() -> {
                     if (!player.isAlive()) {
                         return context.reply(Emoji.BROKEN_HEART, context.localize("russianroulette.already.dead")
-                                .formatted(FormatUtil.formatDurationWords(player.getResetDuration())))
+                                .formatted(FormatUtil.formatDurationWords(context.getLocale(), player.getResetDuration())))
                                 .then(Mono.empty());
                     }
 

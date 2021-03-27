@@ -3,7 +3,7 @@ package com.shadorc.shadbot.utils;
 import org.junit.jupiter.api.Test;
 
 import java.time.*;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +21,7 @@ public class TimeUtilTest {
     @Test
     public void testElapsedInstant() {
         final int offset = 30;
-        final int millis = new Random().nextInt(10_000);
+        final int millis = ThreadLocalRandom.current().nextInt(10_000);
         final Duration elapsed = TimeUtil.elapsed(Instant.now().minusMillis(millis));
         assertTrue(elapsed.toMillis() >= millis - offset && elapsed.toMillis() <= millis + offset);
     }
@@ -29,7 +29,7 @@ public class TimeUtilTest {
     @Test
     public void testElapsedLong() {
         final int offset = 30;
-        final int millis = new Random().nextInt(10_000);
+        final int millis = ThreadLocalRandom.current().nextInt(10_000);
         final Duration elapsed = TimeUtil.elapsed(Instant.now().minusMillis(millis).toEpochMilli());
         assertTrue(elapsed.toMillis() >= millis - offset && elapsed.toMillis() <= millis + offset);
     }

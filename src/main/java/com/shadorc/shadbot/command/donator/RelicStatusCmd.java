@@ -43,7 +43,7 @@ public class RelicStatusCmd extends BaseCmd {
                                     .formatted(guild.getName(), guild.getId().asLong())));
 
                     descBuilder.append(context.localize("relicstatus.duration")
-                            .formatted(FormatUtil.formatDurationWords(relic.getDuration())));
+                            .formatted(FormatUtil.formatDurationWords(context.getLocale(), relic.getDuration())));
 
                     if (!relic.isExpired()) {
                         relic.getActivation()
@@ -51,7 +51,7 @@ public class RelicStatusCmd extends BaseCmd {
                                     final Duration durationLeft = relic.getDuration()
                                             .minus(TimeUtil.elapsed(activation.toEpochMilli()));
                                     descBuilder.append(context.localize("relicstatus.expiration")
-                                            .formatted(FormatUtil.formatDurationWords(durationLeft)));
+                                            .formatted(FormatUtil.formatDurationWords(context.getLocale(), durationLeft)));
                                 });
                     }
 

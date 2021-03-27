@@ -3,6 +3,7 @@ package com.shadorc.shadbot.utils;
 import com.sun.management.OperatingSystemMXBean;
 
 import java.lang.management.*;
+import java.time.Duration;
 import java.util.List;
 
 public class SystemUtil {
@@ -17,8 +18,8 @@ public class SystemUtil {
     /**
      * @return The uptime of the JVM in milliseconds.
      */
-    public static long getUptime() {
-        return RUNTIME_BEAN.getUptime();
+    public static Duration getUptime() {
+        return Duration.ofMillis(RUNTIME_BEAN.getUptime());
     }
 
     /**

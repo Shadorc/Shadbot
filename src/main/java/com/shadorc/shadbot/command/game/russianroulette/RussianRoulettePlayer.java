@@ -7,7 +7,6 @@ import discord4j.common.util.Snowflake;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 
 public class RussianRoulettePlayer extends GamblerPlayer {
 

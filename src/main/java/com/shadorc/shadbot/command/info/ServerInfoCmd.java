@@ -58,7 +58,8 @@ public class ServerInfoCmd extends BaseCmd {
         final String regionTitle = Emoji.MAP + " " + context.localize("serverinfo.region");
         final String creationTitle = Emoji.BIRTHDAY + " " + context.localize("serverinfo.creation");
         final String creationField = "%s\n(%s)"
-                .formatted(creationTime.format(dateFormatter), FormatUtil.formatLongDuration(creationTime));
+                .formatted(creationTime.format(dateFormatter),
+                        FormatUtil.formatLongDuration(context.getLocale(), creationTime));
         final String channelsTitle = Emoji.SPEECH_BALLOON + " " + context.localize("serverinfo.channels");
         final String channelsField = context.localize("serverinfo.channels.field")
                 .formatted(Emoji.MICROPHONE, voiceChannels, Emoji.KEYBOARD, textChannels);

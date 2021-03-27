@@ -17,17 +17,6 @@ public class StringUtil {
 
     /**
      * @param str The string to check.
-     * @return The string without its last letter.
-     */
-    public static String removeLastLetter(@Nullable String str) {
-        if (str == null || str.length() < 2) {
-            return str;
-        }
-        return str.substring(0, str.length() - 1);
-    }
-
-    /**
-     * @param str The string to check.
      * @param sub The char to count.
      * @return The number of occurrences.
      */
@@ -143,22 +132,6 @@ public class StringUtil {
             return str;
         }
         return SPACES_PATTERN.matcher(str.trim()).replaceAll(" ");
-    }
-
-    /**
-     * @param count The number of elements.
-     * @param str   The string to get plural from, may be {@code null}.
-     * @return {@code count str(s)} with {@code count} formatted using English locale.
-     */
-    @Nullable
-    public static String pluralOf(long count, @Nullable String str) {
-        if (str == null || str.isBlank()) {
-            return null;
-        }
-        if (Math.abs(count) > 1) {
-            return String.format("%s %ss", FormatUtil.number(count), str);
-        }
-        return String.format("%s %s", FormatUtil.number(count), str);
     }
 
     /**

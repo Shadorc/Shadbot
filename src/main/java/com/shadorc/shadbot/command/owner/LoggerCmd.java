@@ -9,7 +9,6 @@ import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
-import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -41,8 +40,7 @@ public class LoggerCmd extends BaseCmd {
         final LogLevel logLevel = context.getOptionAsEnum(LogLevel.class, "level").orElseThrow();
         final Level level = Level.toLevel(logLevel.name(), null);
         if (level == null) {
-            return Mono.error(new CommandException("`%s` in not a valid level. %s"
-                    .formatted(logLevel, FormatUtil.options(LogLevel.class))));
+            return Mono.error(new CommandException("`%s` in not a valid level.".formatted(logLevel)));
         }
 
         final Logger logger;

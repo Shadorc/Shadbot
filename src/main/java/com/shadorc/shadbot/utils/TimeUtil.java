@@ -33,8 +33,7 @@ public class TimeUtil {
      * @return The duration elapsed since {@code instant}.
      */
     public static Duration elapsed(@NonNull Instant instant) {
-        return Duration.ofSeconds(
-                Math.abs(ChronoUnit.MILLIS.between(LocalDateTime.now(), TimeUtil.toLocalDateTime(instant))));
+        return Duration.ofMillis(Math.abs(ChronoUnit.MILLIS.between(Instant.now(), instant)));
     }
 
     /**

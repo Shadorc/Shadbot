@@ -8,7 +8,6 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;

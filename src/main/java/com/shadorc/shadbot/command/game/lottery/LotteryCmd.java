@@ -71,7 +71,7 @@ public class LotteryCmd extends BaseCmd {
                             .thenReturn(new LotteryGambler(context.getGuildId(), context.getAuthorId(), number))
                             .flatMap(LotteryGambler::insert)
                             .then(context.reply(Emoji.TICKET, context.localize("lottery.message")
-                                    .formatted(number, FormatUtil.formatDurationWords(LotteryCmd.getDelay()))));
+                                    .formatted(number, FormatUtil.formatDurationWords(context.getLocale(), LotteryCmd.getDelay()))));
                 });
     }
 

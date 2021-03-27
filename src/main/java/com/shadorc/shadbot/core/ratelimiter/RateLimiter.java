@@ -62,6 +62,7 @@ public class RateLimiter {
     private Mono<MessageData> sendWarningMessage(Context context) {
         final String message = ShadbotUtil.SPAMS.getRandomLine();
         final String duration = FormatUtil.formatDurationWords(
+                context.getLocale(),
                 Duration.ofNanos(this.bandwidth.getRefillPeriodNanos()));
         return context.reply(Emoji.STOPWATCH, context.localize("ratelimit.message")
                 .formatted(message, this.bandwidth.getCapacity(), duration));

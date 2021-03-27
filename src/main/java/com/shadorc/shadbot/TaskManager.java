@@ -2,6 +2,7 @@ package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtil;
@@ -42,7 +43,8 @@ public class TaskManager {
     }
 
     public void scheduleLottery(GatewayDiscordClient gateway) {
-        LOGGER.info("Starting lottery (next draw in {})", FormatUtil.formatDurationWords(LotteryCmd.getDelay()));
+        LOGGER.info("Starting lottery (next draw in {})",
+                FormatUtil.formatDurationWords(Config.DEFAULT_LOCALE, LotteryCmd.getDelay()));
         final Disposable task = Flux.interval(LotteryCmd.getDelay(), Duration.ofDays(7), DEFAULT_SCHEDULER)
                 .flatMap(__ -> LotteryCmd.draw(gateway)
                         .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err))))
@@ -57,7 +59,7 @@ public class TaskManager {
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(15), DEFAULT_SCHEDULER)
                 .then(gateway.getGuilds().count())
                 .doOnNext(guildCount -> {
-                    Telemetry.UPTIME_GAUGE.set(SystemUtil.getUptime());
+                    Telemetry.UPTIME_GAUGE.set(SystemUtil.getUptime().toMillis());
                     Telemetry.PROCESS_CPU_USAGE_GAUGE.set(SystemUtil.getProcessCpuUsage());
                     Telemetry.SYSTEM_CPU_USAGE_GAUGE.set(SystemUtil.getSystemCpuUsage());
                     Telemetry.MAX_HEAP_MEMORY_GAUGE.set(SystemUtil.getMaxHeapMemory());

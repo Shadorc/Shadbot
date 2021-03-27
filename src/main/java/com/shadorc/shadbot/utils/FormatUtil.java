@@ -1,31 +1,20 @@
 package com.shadorc.shadbot.utils;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.core.i18n.I18nManager;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
 import reactor.util.annotation.Nullable;
 
 import java.text.NumberFormat;
 import java.time.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class FormatUtil {
-
-    /**
-     * @param coins The number of coins to format.
-     * @return {@code X coin(s)} where {@code X} is the number of coins formatted using English locale.
-     */
-    public static String coins(long coins) {
-        return String.format("%s coin%s", FormatUtil.number(coins), Math.abs(coins) > 1 ? "s" : "");
-    }
 
     /**
      * @param enumeration The enumeration to format, may be {@code null}.
@@ -51,9 +40,9 @@ public class FormatUtil {
 
     /**
      * @param duration The duration to format.
-     * @return The formatted duration as D day(s) H hour(s) S minute(s).
+     * @return The formatted duration as D day(s) H hour(s) M minute(s) or S second(s).
      */
-    public static String formatDurationWords(Duration duration) {
+    public static String formatDurationWords(Locale locale, Duration duration) {
         final long seconds = duration.toSecondsPart();
         final long minutes = duration.toMinutesPart();
         final long hours = duration.toHoursPart();
@@ -61,16 +50,27 @@ public class FormatUtil {
 
         final StringBuilder strBuilder = new StringBuilder();
         if (days > 0) {
-            strBuilder.append(String.format("%s ", StringUtil.pluralOf(days, "day")));
+            strBuilder.append(days == 1
+                    ? I18nManager.localize(locale, "one.day")
+                    : I18nManager.localize(locale, "several.days").formatted(I18nManager.localize(locale, days)))
+                    .append(' ');
         }
         if (hours > 0) {
-            strBuilder.append(String.format("%s ", StringUtil.pluralOf(hours, "hour")));
+            strBuilder.append(hours == 1
+                    ? I18nManager.localize(locale, "one.hour")
+                    : I18nManager.localize(locale, "several.hours").formatted(hours))
+                    .append(' ');
         }
         if (minutes > 0) {
-            strBuilder.append(String.format("%s ", StringUtil.pluralOf(minutes, "minute")));
+            strBuilder.append(minutes == 1
+                    ? I18nManager.localize(locale, "one.minute")
+                    : I18nManager.localize(locale, "several.minutes").formatted(minutes))
+                    .append(' ');
         }
         if (seconds > 0 || days == 0 && hours == 0 && minutes == 0) {
-            strBuilder.append(StringUtil.pluralOf(seconds, "second"));
+            strBuilder.append(seconds > 1
+                    ? I18nManager.localize(locale, "several.seconds").formatted(seconds)
+                    : I18nManager.localize(locale, "one.second").formatted(seconds)); // Can be 0 or 1 second
         }
 
         return strBuilder.toString().trim();
@@ -80,23 +80,39 @@ public class FormatUtil {
      * @param date The {@link LocalDateTime} to format.
      * @return The formatted instant (e.g Y year(s), M month(s), D day(s)).
      */
-    public static String formatLongDuration(LocalDateTime date) {
+    public static String formatLongDuration(Locale locale, LocalDateTime date) {
         final Duration diff = Duration.between(date, LocalDateTime.now(ZoneId.systemDefault()));
         if (diff.toHours() < Duration.ofDays(1).toHours()) {
             return FormatUtil.formatDuration(diff);
         }
 
         final Period period = Period.between(date.toLocalDate(), LocalDate.now(ZoneId.systemDefault()));
-        return period.getUnits().stream()
-                .filter(unit -> period.get(unit) != 0)
-                // TODO: i18n
-                .map(unit -> StringUtil.pluralOf(period.get(unit), StringUtil.removeLastLetter(unit.toString().toLowerCase())))
-                .collect(Collectors.joining(", "));
+        final int years = period.getYears();
+        final int months = period.getMonths();
+        final int days = period.getDays();
+
+        final List<String> units = new ArrayList<>();
+        if (years > 0) {
+            units.add(years == 1
+                    ? I18nManager.localize(locale, "one.year")
+                    : I18nManager.localize(locale, "several.years"));
+        }
+        if (months > 0) {
+            units.add(months == 1
+                    ? I18nManager.localize(locale, "one.month")
+                    : I18nManager.localize(locale, "several.months"));
+        }
+        if (days > 0) {
+            units.add(days == 1
+                    ? I18nManager.localize(locale, "one.day")
+                    : I18nManager.localize(locale, "several.days").formatted(days));
+        }
+        return String.join(", ", units);
     }
 
     /**
      * @param millis The duration to format (in milliseconds).
-     * @return The formatted duration as (H:)(mm:)ss.
+     * @return The formatted duration as (H:)mm:ss.
      */
     public static String formatDuration(long millis) {
         return FormatUtil.formatDuration(Duration.ofMillis(millis));
@@ -108,12 +124,12 @@ public class FormatUtil {
      */
     public static String formatDuration(Duration duration) {
         if (duration.isNegative()) {
-            throw new IllegalArgumentException("duration must be positive");
+            throw new IllegalArgumentException("Duration must be positive");
         }
         if (duration.toHours() > 0) {
-            return String.format("%d:%02d:%02d", duration.toHoursPart(), duration.toMinutesPart(), duration.toSecondsPart());
+            return "%d:%02d:%02d".formatted(duration.toHoursPart(), duration.toMinutesPart(), duration.toSecondsPart());
         }
-        return String.format("%d:%02d", duration.toMinutesPart(), duration.toSecondsPart());
+        return "%d:%02d".formatted(duration.toMinutesPart(), duration.toSecondsPart());
     }
 
     public static <T extends Enum<T>> String format(Class<T> enumClass, CharSequence delimiter) {
@@ -130,14 +146,6 @@ public class FormatUtil {
 
     public static <T> String format(Stream<T> stream, Function<T, String> mapper, CharSequence delimiter) {
         return stream.map(mapper).collect(Collectors.joining(delimiter));
-    }
-
-    /**
-     * @param number The double number to format.
-     * @return The formatted number as a string using English locale.
-     */
-    public static String number(double number) {
-        return NumberFormat.getNumberInstance(Config.DEFAULT_LOCALE).format(number);
     }
 
     /**
@@ -162,21 +170,6 @@ public class FormatUtil {
                 .limit(count)
                 .map(mapper)
                 .collect(Collectors.joining("\n"));
-    }
-
-    /**
-     * @param enumClass The Enum class to get constants from.
-     * @param <E>       An enumeration.
-     * @return {@code Options: `option_1`, `option_2`, ...}
-     * @throws java.lang.IllegalArgumentException If the enumeration contains less than 2 constants.
-     */
-    public static <E extends Enum<E>> String options(Class<E> enumClass) {
-        if (enumClass.getEnumConstants().length < 2) {
-            throw new IllegalArgumentException("There must be at least two enum constants.");
-        }
-        return String.format("Options: %s",
-                FormatUtil.format(enumClass.getEnumConstants(), value -> String.format("`%s`",
-                        value.name().toLowerCase()), ", "));
     }
 
     /**

@@ -64,12 +64,14 @@ public class UserInfoCmd extends BaseCmd {
         final String creationTitle = Emoji.BIRTHDAY + " " + context.localize("userinfo.creation");
         final LocalDateTime createTime = TimeUtil.toLocalDateTime(member.getId().getTimestamp());
         final String creationField = "%s%n(%s)"
-                .formatted(createTime.format(dateFormatter), FormatUtil.formatLongDuration(createTime));
+                .formatted(createTime.format(dateFormatter),
+                        FormatUtil.formatLongDuration(context.getLocale(), createTime));
 
         final String joinTitle = Emoji.DATE + " " + context.localize("userinfo.join");
         final LocalDateTime joinTime = TimeUtil.toLocalDateTime(member.getJoinTime());
         final String joinField = "%s%n(%s)"
-                .formatted(joinTime.format(dateFormatter), FormatUtil.formatLongDuration(joinTime));
+                .formatted(joinTime.format(dateFormatter),
+                        FormatUtil.formatLongDuration(context.getLocale(), joinTime));
 
         final String badgesField = FormatUtil.format(member.getPublicFlags(), FormatUtil::capitalizeEnum, "\n");
         final String rolesField = FormatUtil.format(roles, Role::getMention, "\n");

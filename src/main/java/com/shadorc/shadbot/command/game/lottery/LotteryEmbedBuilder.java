@@ -22,7 +22,7 @@ public class LotteryEmbedBuilder {
                         null, context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/peLGtkS.png")
                         .setDescription(context.localize("lottery.embed.description")
-                                .formatted(FormatUtil.formatDurationWords(LotteryCmd.getDelay()),
+                                .formatted(FormatUtil.formatDurationWords(context.getLocale(), LotteryCmd.getDelay()),
                                         context.getCommandName(), Constants.MIN_NUM, Constants.MAX_NUM)));
     }
 

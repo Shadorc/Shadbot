@@ -55,7 +55,7 @@ public class BotInfoCmd extends BaseCmd {
                 .map(GatewayClient::getResponseTime)
                 .map(Duration::toMillis)
                 .orElseThrow();
-        final String uptime = FormatUtil.formatDurationWords(Duration.ofMillis(SystemUtil.getUptime()));
+        final String uptime = FormatUtil.formatDurationWords(context.getLocale(), SystemUtil.getUptime());
         final ShardInfo shardInfo = context.getEvent().getShardInfo();
 
         final String shadbotTitle = Emoji.ROBOT + " Shadbot";
