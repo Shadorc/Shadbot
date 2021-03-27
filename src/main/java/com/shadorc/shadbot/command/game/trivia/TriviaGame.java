@@ -54,9 +54,9 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
                     .doOnNext(trivia -> {
                         this.trivia = trivia;
 
-                        if ("multiple".equals(this.trivia.getType())) {
-                            this.answers.addAll(this.trivia.getIncorrectAnswers());
-                            this.answers.add(this.trivia.getCorrectAnswer());
+                        if ("multiple".equals(trivia.getType())) {
+                            this.answers.addAll(trivia.getIncorrectAnswers());
+                            this.answers.add(trivia.getCorrectAnswer());
                             Collections.shuffle(this.answers);
                         } else {
                             this.answers.addAll(List.of("True", "False"));

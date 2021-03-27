@@ -4,6 +4,7 @@ import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
@@ -55,10 +56,12 @@ public class PollCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return Mono.justOrEmpty(this.managers.get(context.getChannelId()))
-                // TODO: Remove this limit
-                .flatMap(__ -> Mono.error(new CommandException(context.localize("poll.cannot.start"))))
-                .switchIfEmpty(this.start(context));
+        if (this.getManagers().containsKey(context.getChannelId())) {
+            // TODO: Remove this limit
+            return context.reply(Emoji.INFO, context.localize("poll.already.started"));
+        } else {
+            return this.start(context);
+        }
     }
 
     private PollManager createPoll(Context context) {
