@@ -67,7 +67,7 @@ public abstract class BaseCmd {
                 .addAllOptions(this.buildOptions())
                 .build();
 
-        // TODO
+        // TODO: Enable for release
         if (true/*this.getPermission().equals(CommandPermission.OWNER)*/) {
             return applicationService.createGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, request);
         } else {

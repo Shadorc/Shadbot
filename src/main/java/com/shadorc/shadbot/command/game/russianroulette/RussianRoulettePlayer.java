@@ -37,10 +37,6 @@ public class RussianRoulettePlayer extends GamblerPlayer {
         this.lastTimePlayed = Instant.now();
     }
 
-    public int getIndex() {
-        return this.index;
-    }
-
     public int getRemaining() {
         return MAX_BULLETS - this.index;
     }

@@ -21,10 +21,10 @@ public class SingleValueCache<T> extends Mono<T> {
                              Function<Throwable, Duration> ttlForError,
                              Supplier<Duration> ttlForEmpty) {
         this.cachedValue = new AtomicReference<>();
-        this.cache(value);
         this.ttlForValue = ttlForValue;
         this.ttlForError = ttlForError;
         this.ttlForEmpty = ttlForEmpty;
+        this.cache(value);
     }
 
     public Mono<T> getOrCache(Mono<T> value) {
