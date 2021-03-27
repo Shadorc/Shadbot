@@ -2,16 +2,21 @@ package com.shadorc.shadbot.command.util.poll;
 
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.MapUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
+import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.MessageData;
+import discord4j.rest.http.client.ClientException;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,10 +37,10 @@ public class PollManager {
         this.spec = spec;
     }
 
-    public Mono<Message> show() {
+    public Mono<?> show() {
         final StringBuilder representation = new StringBuilder();
         for (int i = 0; i < this.spec.getChoices().size(); i++) {
-            representation.append(String.format("%n\t**%d.** %s", i + 1, this.spec.getChoices().keySet().toArray()[i]));
+            representation.append("\n\t**%d.** %s".formatted(i + 1, this.spec.getChoices().keySet().toArray()[i]));
         }
 
         final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultEmbed(
@@ -49,14 +54,29 @@ public class PollManager {
                                 "https://i.imgur.com/jcrUDLY.png"));
 
         return this.context.reply(embedConsumer)
-                // TODO: Do not instantiate the message when the Discord4J API is finalized
                 .map(data -> new Message(this.context.getClient(), data))
                 .flatMap(message -> Flux.fromIterable(this.spec.getReactions())
                         .flatMap(message::addReaction)
-                        .then(Mono.just(message)));
+                        .then(Mono.fromRunnable(() -> this.scheduleEnd(message.getId()))));
     }
 
-    public Mono<MessageData> sendResults(Set<Reaction> reactionSet) {
+    private void scheduleEnd(Snowflake messageId) {
+        Mono.delay(this.spec.getDuration(), Schedulers.boundedElastic())
+                .then(this.end(messageId))
+                .subscribe(null, ExceptionHandler::handleUnknownError);
+    }
+
+    private Mono<MessageData> end(Snowflake messageId) {
+        return Mono.fromRunnable(() -> this.pollCmd.getManagers().remove(this.context.getChannelId()))
+                .then(this.context.getClient()
+                        .getMessageById(this.context.getChannelId(), messageId))
+                .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
+                        err -> Mono.empty())
+                .map(Message::getReactions)
+                .flatMap(this::sendResults);
+    }
+
+    private Mono<MessageData> sendResults(Set<Reaction> reactionSet) {
         final Map<ReactionEmoji, String> reactionsChoices = MapUtil.inverse(this.spec.getChoices());
 
         final Map<String, Integer> choiceVoteMap = new HashMap<>(reactionsChoices.size());
@@ -93,18 +113,6 @@ public class PollManager {
                                 .formatted(this.context.getAuthorName()), null));
 
         return this.context.reply(embedConsumer);
-    }
-
-    public PollCmd getPollCmd() {
-        return this.pollCmd;
-    }
-
-    public Context getContext() {
-        return this.context;
-    }
-
-    public PollCreateSpec getSpec() {
-        return this.spec;
     }
 
 }

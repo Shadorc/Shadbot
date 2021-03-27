@@ -4,28 +4,20 @@ import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.ReactionEmoji;
-import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.Permission;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -41,12 +33,10 @@ public class PollCmd extends BaseCmd {
     private static final int MAX_DURATION = 3600;
 
     private final Map<Snowflake, PollManager> managers;
-    private final AtomicReference<Disposable> sendResultsTask;
 
     public PollCmd() {
         super(CommandCategory.UTILS, "poll", "Create a poll");
         this.managers = new ConcurrentHashMap<>();
-        this.sendResultsTask = new AtomicReference<>();
 
         this.addOption("duration", "Number of seconds or formatted time (e.g. 72 or 1m12s), 1h max",
                 true, ApplicationCommandOptionType.STRING);
@@ -68,8 +58,7 @@ public class PollCmd extends BaseCmd {
         return Mono.justOrEmpty(this.managers.get(context.getChannelId()))
                 // TODO: Remove this limit
                 .flatMap(__ -> Mono.error(new CommandException(context.localize("poll.cannot.start"))))
-                .switchIfEmpty(this.start(context)
-                        .then(Mono.empty()));
+                .switchIfEmpty(this.start(context));
     }
 
     private PollManager createPoll(Context context) {
@@ -105,33 +94,7 @@ public class PollCmd extends BaseCmd {
                 .flatMap(channel -> DiscordUtil.requirePermissions(channel, Permission.ADD_REACTIONS))
                 .thenReturn(this.createPoll(context))
                 .doOnNext(pollManager -> this.managers.put(context.getChannelId(), pollManager))
-                .flatMapMany(pollManager -> pollManager.show()
-                        .flatMapMany(message -> {
-                            this.sendResultsTask.set(Mono.delay(pollManager.getSpec().getDuration(), Schedulers.boundedElastic())
-                                    .then(context.getClient()
-                                            .getMessageById(context.getChannelId(), message.getId()))
-                                    .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
-                                    .map(Message::getReactions)
-                                    .flatMap(pollManager::sendResults)
-                                    .subscribe(null, ExceptionHandler::handleUnknownError));
-
-                            final CancelReactionInputs inputs = CancelReactionInputs
-                                    .create(pollManager, message.getId(), ReactionEmoji.unicode("\u274c"));
-                            return inputs.addReaction()
-                                    .thenMany(inputs.waitForInputs());
-                        }))
-                .then();
-    }
-
-    public Mono<?> cancel(Context context) {
-        return Mono.justOrEmpty(this.managers.remove(context.getChannelId()))
-                .flatMap(pollManager -> {
-                    final Disposable sendResultsTask = this.sendResultsTask.get();
-                    if (sendResultsTask != null && !sendResultsTask.isDisposed()) {
-                        sendResultsTask.dispose();
-                    }
-                    return context.reply(Emoji.CHECK_MARK, context.localize("poll.cancelled"));
-                });
+                .flatMap(PollManager::show);
     }
 
     public Map<Snowflake, PollManager> getManagers() {
