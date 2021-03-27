@@ -22,7 +22,6 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -91,7 +90,7 @@ public class PollCmd extends BaseCmd {
                 .map(index -> context.getOptionAsString("choice%d".formatted(index)).orElse(""))
                 .filter(Predicate.not(String::isBlank))
                 .distinct()
-                .collect(Collectors.toCollection(LinkedList::new));
+                .collect(Collectors.toList());
 
         final Map<String, ReactionEmoji> choicesReactions = new LinkedHashMap<>();
         for (int i = 0; i < choices.size(); i++) {

@@ -10,25 +10,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class StringUtilTest {
 
     @Test
-    public void testCountMatches() {
-        assertEquals(0, StringUtil.countMatches("foo", 'b'));
-        assertEquals(1, StringUtil.countMatches("foo", 'f'));
-        assertEquals(2, StringUtil.countMatches("foo", 'o'));
-        assertEquals(2, StringUtil.countMatches(" hello world", ' '));
-        assertEquals(2, StringUtil.countMatches("hello \"hi\"", '"'));
-    }
-
-    @Test
-    public void testSubstringsBetween() {
-        assertEquals(List.of("o wo"), StringUtil.substringsBetween("hello world", "ll", "rl"));
-        assertEquals(Collections.emptyList(), StringUtil.substringsBetween(null, "ll", "rl"));
-        assertEquals(Collections.emptyList(), StringUtil.substringsBetween("", "ll", "rl"));
-        assertEquals(Collections.emptyList(), StringUtil.substringsBetween("null", "ll", "rl"));
-        assertEquals(Collections.emptyList(), StringUtil.substringsBetween("he\"llo", "\"", "\""));
-        assertEquals(List.of("hello"), StringUtil.substringsBetween("\"hello\"", "\"", "\""));
-    }
-
-    @Test
     public void testAbbreviate() {
         assertNull(StringUtil.abbreviate(null, 3));
         assertThrows(IllegalArgumentException.class, () -> StringUtil.abbreviate("hi", 1));
@@ -45,18 +26,6 @@ public class StringUtilTest {
         assertEquals("Foo", StringUtil.capitalize("Foo"));
         assertEquals("Foo", StringUtil.capitalize("foO"));
         assertNull(StringUtil.capitalize(null));
-    }
-
-    @Test
-    public void testGetQuotedElements() {
-        assertEquals(List.of("hello"), StringUtil.getQuotedElements("\"hello\""));
-        assertEquals(List.of("hello", "hi"), StringUtil.getQuotedElements("\"hello\" \"hi\""));
-        assertEquals(List.of("hello", "hi"), StringUtil.getQuotedElements("\"hello\" foo \"hi\""));
-        assertEquals(List.of("hello foo "), StringUtil.getQuotedElements("\"hello foo \"hi\""));
-        assertEquals(List.of("hello", "foo"), StringUtil.getQuotedElements("\"hello\" \"\" \"foo\""));
-        assertEquals(Collections.emptyList(), StringUtil.getQuotedElements("hello \"\"foo hi"));
-        assertEquals(Collections.emptyList(), StringUtil.getQuotedElements(null));
-        assertEquals(Collections.emptyList(), StringUtil.getQuotedElements("    "));
     }
 
     @Test

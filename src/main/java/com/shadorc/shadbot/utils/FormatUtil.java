@@ -176,20 +176,24 @@ public class FormatUtil {
      * @param info The {@link AudioTrackInfo} to format.
      * @return A string representing the provided info formatted.
      */
-    public static String trackName(AudioTrackInfo info) {
+    public static String trackName(Locale locale, AudioTrackInfo info) {
         final StringBuilder strBuilder = new StringBuilder();
         if (info.title == null) {
-            strBuilder.append("Unknown video name");
+            strBuilder.append(I18nManager.localize(locale, "unknown.video.name"));
         } else if ("Unknown artist".equals(info.author) || info.title.startsWith(info.author)) {
             strBuilder.append(info.title.trim());
         } else {
-            strBuilder.append(String.format("%s - %s", info.author.trim(), info.title.trim()));
+            strBuilder.append("%s - %s".formatted(info.author.trim(), info.title.trim()));
         }
 
         if (info.isStream) {
-            strBuilder.append(" (Stream)");
+            strBuilder.append(" (")
+                    .append(I18nManager.localize(locale, "stream"))
+                    .append(')');
         } else {
-            strBuilder.append(String.format(" (%s)", FormatUtil.formatDuration(info.length)));
+            strBuilder.append(" (")
+                    .append(FormatUtil.formatDuration(info.length))
+                    .append(')');
         }
 
         return strBuilder.toString();

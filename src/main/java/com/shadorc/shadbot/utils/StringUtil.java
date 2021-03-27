@@ -16,50 +16,6 @@ public class StringUtil {
     private static final Pattern SPACES_PATTERN = Pattern.compile(" +");
 
     /**
-     * @param str The string to check.
-     * @param sub The char to count.
-     * @return The number of occurrences.
-     */
-    public static int countMatches(String str, char sub) {
-        int count = 0;
-        for (final char c : str.toCharArray()) {
-            if (c == sub) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    /**
-     * @param str   The string containing the substrings.
-     * @param open  The string identifying the start of the substring.
-     * @param close The string identifying the end of the substring.
-     * @return A string list of substrings.
-     */
-    public static List<String> substringsBetween(@Nullable String str, String open, String close) {
-        final List<String> list = new ArrayList<>();
-        if (str == null || str.isEmpty()) {
-            return list;
-        }
-
-        int pos = 0;
-        while (pos < str.length() - close.length()) {
-            int start = str.indexOf(open, pos);
-            if (start < 0) {
-                break;
-            }
-            start += open.length();
-            final int end = str.indexOf(close, start);
-            if (end < 0) {
-                break;
-            }
-            list.add(str.substring(start, end));
-            pos = end + close.length();
-        }
-        return list;
-    }
-
-    /**
      * @param str      The string to check, may be {@code null}.
      * @param maxWidth Maximum length of result string, must be at least 4.
      * @return Abbreviated string, {@code null} if null string input.
@@ -85,7 +41,7 @@ public class StringUtil {
             return str;
         }
         if (str.length() - abbrevMarker.length() <= 0) {
-            throw new IllegalArgumentException(String.format("Minimum abbreviation width is %d", abbrevMarker.length() + 1));
+            throw new IllegalArgumentException("Minimum abbreviation width is %d".formatted(abbrevMarker.length() + 1));
         }
         return str.substring(0, maxWidth - abbrevMarker.length()) + abbrevMarker;
     }
@@ -100,23 +56,6 @@ public class StringUtil {
             return str;
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
-    }
-
-    /**
-     * @param text The string to get quoted elements from.
-     * @return A {@link List} containing the quoted elements from the provided text.
-     */
-    public static List<String> getQuotedElements(@Nullable String text) {
-        final List<String> matches = new ArrayList<>();
-        if (text == null || text.isBlank()) {
-            return matches;
-        }
-        final Matcher matcher = Pattern.compile("\"([^\"]*)\"").matcher(text);
-        while (matcher.find()) {
-            matches.add(matcher.group(1));
-        }
-        matches.removeAll(Collections.singleton(""));
-        return matches;
     }
 
     /**

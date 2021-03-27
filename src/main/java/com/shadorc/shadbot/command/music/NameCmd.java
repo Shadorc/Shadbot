@@ -23,6 +23,6 @@ public class NameCmd extends BaseCmd {
                 .getInfo();
 
         return context.reply(Emoji.MUSICAL_NOTE, context.localize("name.message")
-                .formatted(FormatUtil.trackName(trackInfo)));
+                .formatted(FormatUtil.trackName(context.getLocale(), trackInfo)));
     }
 }

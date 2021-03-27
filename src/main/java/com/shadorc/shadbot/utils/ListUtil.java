@@ -12,7 +12,7 @@ public class ListUtil {
 
         private Partition(List<T> list, int size) {
             if (size <= 0) {
-                throw new IllegalArgumentException("size must be positive");
+                throw new IllegalArgumentException("Size must be positive");
             }
             this.list = list;
             this.size = size;

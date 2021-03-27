@@ -7,8 +7,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.data.Telemetry;
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -20,8 +18,8 @@ import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
-import reactor.function.TupleUtils;
 
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.shadorc.shadbot.music.MusicManager.LOGGER;
@@ -32,24 +30,23 @@ public class TrackEventListener extends AudioEventAdapter {
     private static final int IGNORED_ERROR_THRESHOLD = 3;
     private static final int MAX_ERROR_COUNT = 10;
 
+    private final Locale locale;
     private final Snowflake guildId;
     private final AtomicInteger errorCount;
 
-    public TrackEventListener(Snowflake guildId) {
+    public TrackEventListener(Locale locale, Snowflake guildId) {
+        this.locale = locale;
         this.guildId = guildId;
         this.errorCount = new AtomicInteger();
     }
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        Mono.zip(
-                Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
-                        .flatMap(GuildMusic::getMessageChannel),
-                DatabaseManager.getGuilds().getDBGuild(this.guildId)
-                        .map(DBGuild::getLocale))
-                .flatMap(TupleUtils.function((channel, locale) -> DiscordUtil.sendMessage(Emoji.MUSICAL_NOTE,
-                        I18nManager.localize(locale, "trackevent.playing")
-                                .formatted(FormatUtil.trackName(track.getInfo())), channel)))
+        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
+                .flatMap(GuildMusic::getMessageChannel)
+                .flatMap(channel -> DiscordUtil.sendMessage(Emoji.MUSICAL_NOTE,
+                        I18nManager.localize(this.locale, "trackevent.playing")
+                                .formatted(FormatUtil.trackName(this.locale, track.getInfo())), channel))
                 .subscribeOn(DEFAULT_SCHEDULER)
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
@@ -75,16 +72,13 @@ public class TrackEventListener extends AudioEventAdapter {
         Telemetry.MUSIC_ERROR_COUNTER.labels(exception.getClass().getSimpleName()).inc();
         final int errorCount = this.errorCount.incrementAndGet();
 
-        Mono.zip(
-                Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId)),
-                DatabaseManager.getGuilds().getDBGuild(this.guildId)
-                        .map(DBGuild::getLocale))
-                .flatMap(TupleUtils.function((guildMusic, locale) -> {
+        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
+                .flatMap(guildMusic -> {
                     if (errorCount > MAX_ERROR_COUNT) {
                         LOGGER.error("{Guild ID: {}} Stopping playlist due to too many errors.", this.guildId.asString());
                         return guildMusic.getMessageChannel()
                                 .flatMap(channel -> DiscordUtil.sendMessage(Emoji.RED_FLAG,
-                                        I18nManager.localize(locale, "trackevent.stop.retrying"), channel))
+                                        I18nManager.localize(this.locale, "trackevent.stop.retrying"), channel))
                                 .then(guildMusic.end());
                     }
 
@@ -108,7 +102,7 @@ public class TrackEventListener extends AudioEventAdapter {
                     }
 
                     return Mono.empty();
-                }))
+                })
                 .subscribeOn(DEFAULT_SCHEDULER)
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
@@ -118,14 +112,11 @@ public class TrackEventListener extends AudioEventAdapter {
         LOGGER.info("{Guild ID: {}} Music stuck, skipping it", this.guildId.asLong());
         Telemetry.MUSIC_ERROR_COUNTER.labels("StuckException").inc();
 
-        Mono.zip(
-                Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId)),
-                DatabaseManager.getGuilds().getDBGuild(this.guildId)
-                        .map(DBGuild::getLocale))
-                .flatMap(TupleUtils.function((guildMusic, locale) -> guildMusic.getMessageChannel()
+        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
+                .flatMap(guildMusic -> guildMusic.getMessageChannel()
                         .flatMap(channel -> DiscordUtil.sendMessage(Emoji.RED_EXCLAMATION,
-                                I18nManager.localize(locale, "trackevent.stuck"), channel))
-                        .then(this.nextOrEnd(guildMusic))))
+                                I18nManager.localize(this.locale, "trackevent.stuck"), channel))
+                        .then(this.nextOrEnd(guildMusic)))
                 .subscribeOn(DEFAULT_SCHEDULER)
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }

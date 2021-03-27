@@ -93,33 +93,28 @@ public class FormatUtilsTest {
         assertEquals("", FormatUtil.numberedList(-1, 0, i -> Integer.toString(i)));
     }
 
-    private enum FakeEnum1 {VALUE_1, VALUE_2, VALUE_3}
-
-    private enum FakeEnum2 {VALUE_1}
-
-    private enum FakeEnum3 {}
-
     @Test
     public void testTrackName() {
-        assertEquals("author - title (1:00)", FormatUtil.trackName(
+        final Locale locale = Config.DEFAULT_LOCALE;
+        assertEquals("author - title (1:00)", FormatUtil.trackName(locale,
                 new AudioTrackInfo("title", "author", 60 * 1000,
                         "identifier", false, "uri")));
-        assertEquals("title (1:00)", FormatUtil.trackName(
+        assertEquals("title (1:00)", FormatUtil.trackName(locale,
                 new AudioTrackInfo("title", "Unknown artist", 60 * 1000,
                         "identifier", false, "uri")));
-        assertEquals("author - title (Stream)", FormatUtil.trackName(
+        assertEquals("author - title (Stream)", FormatUtil.trackName(locale,
                 new AudioTrackInfo("title", "author", 60 * 1000,
                         "identifier", true, "uri")));
-        assertEquals("title (Stream)", FormatUtil.trackName(
+        assertEquals("title (Stream)", FormatUtil.trackName(locale,
                 new AudioTrackInfo("title", "Unknown artist", 60 * 1000,
                         "identifier", true, "uri")));
-        assertEquals("author - title (Stream)", FormatUtil.trackName(
+        assertEquals("author - title (Stream)", FormatUtil.trackName(locale,
                 new AudioTrackInfo("   title  ", "  author    ", 60 * 1000,
                         "identifier", true, "uri")));
-        assertEquals("author - title (1:00)", FormatUtil.trackName(
+        assertEquals("author - title (1:00)", FormatUtil.trackName(locale,
                 new AudioTrackInfo("author - title", "author", 60 * 1000,
                         "identifier", false, "uri")));
-        assertEquals("Unknown video name (1:00)", FormatUtil.trackName(
+        assertEquals("Unknown video name (1:00)", FormatUtil.trackName(locale,
                 new AudioTrackInfo(null, "author", 60 * 1000,
                         "identifier", false, "uri")));
     }

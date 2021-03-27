@@ -39,12 +39,12 @@ public class PlaylistCmd extends BaseCmd {
                 .formatted(musicCount));
 
         playlistStr.append("%n\t**1.** [%s](%s)"
-                .formatted(FormatUtil.trackName(currentTrack.getInfo()), currentTrack.getInfo().uri));
+                .formatted(FormatUtil.trackName(context.getLocale(), currentTrack.getInfo()), currentTrack.getInfo().uri));
 
         int count = 2;
         for (final AudioTrack track : trackScheduler.getPlaylist()) {
             final String name = "%n\t**%d.** [%s](%s)"
-                    .formatted(count, FormatUtil.trackName(track.getInfo()), track.getInfo().uri);
+                    .formatted(count, FormatUtil.trackName(context.getLocale(), track.getInfo()), track.getInfo().uri);
             if (playlistStr.length() + name.length() < MAX_DESCRIPTION_LENGTH) {
                 playlistStr.append(name);
             } else {

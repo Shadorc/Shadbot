@@ -27,10 +27,7 @@ import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -80,11 +77,12 @@ public class MusicManager {
      * a new one is created and a request to join the {@link VoiceChannel} corresponding to the provided
      * {@code voiceChannelId} is sent.
      */
-    public static Mono<GuildMusic> getOrCreate(GatewayDiscordClient gateway, Snowflake guildId, Snowflake voiceChannelId) {
+    public static Mono<GuildMusic> getOrCreate(GatewayDiscordClient gateway, Locale locale, Snowflake guildId,
+                                               Snowflake voiceChannelId) {
         return Mono.justOrEmpty(MusicManager.getGuildMusic(guildId))
                 .switchIfEmpty(Mono.defer(() -> {
                     final AudioPlayer audioPlayer = AUDIO_PLAYER_MANAGER.createPlayer();
-                    audioPlayer.addListener(new TrackEventListener(guildId));
+                    audioPlayer.addListener(new TrackEventListener(locale, guildId));
                     final LavaplayerAudioProvider audioProvider = new LavaplayerAudioProvider(audioPlayer);
 
                     return MusicManager.joinVoiceChannel(gateway, guildId, voiceChannelId, audioProvider)

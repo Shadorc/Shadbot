@@ -15,7 +15,6 @@ import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.channel.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
@@ -28,7 +27,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -58,17 +59,6 @@ public class DiscordUtil {
      */
     public static Mono<Message> sendMessage(Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
         return DiscordUtil.sendMessage(spec -> spec.setEmbed(embed), channel, true);
-    }
-
-    /**
-     * @param content The string to send.
-     * @param embed   The {@link EmbedCreateSpec} consumer used to attach rich content when creating a message.
-     * @param channel The {@link MessageChannel} in which to send the message.
-     * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
-     * it is emitted through the Mono.
-     */
-    public static Mono<Message> sendMessage(String content, Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
-        return DiscordUtil.sendMessage(spec -> spec.setContent(content).setEmbed(embed), channel, true);
     }
 
     /**
@@ -108,78 +98,6 @@ public class DiscordUtil {
                 .timeout(Config.TIMEOUT)
                 .retryWhen(ExceptionHandler.RETRY_ON_INTERNET_FAILURES.apply("Retries exhausted trying to send message"))
                 .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc());
-    }
-
-    public static Mono<Member> extractMemberOrAuthor(Guild guild, Message message) {
-        final String[] args = message.getContent().split(" ");
-        if (args.length == 1) {
-            return message.getAuthorAsMember();
-        }
-
-        if (args.length > 2) {
-            return Mono.error(new CommandException("You can't specify more than one user."));
-        }
-
-        return message.getUserMentions()
-                .switchIfEmpty(DiscordUtil.extractMembers(guild, message.getContent()))
-                .next()
-                .flatMap(user -> user.asMember(guild.getId()))
-                .switchIfEmpty(Mono.error(new CommandException(String.format("User **%s** not found.", args[1]))));
-    }
-
-    /**
-     * @param guild The {@link Guild} containing the members to extract.
-     * @param str   The string containing members mentions and / or names.
-     * @return A {@link Member} {@link Flux} containing the extracted members.
-     */
-    public static Flux<Member> extractMembers(Guild guild, String str) {
-        final List<String> words = StringUtil.split(str);
-        return guild.getMembers()
-                .filter(member -> words.contains(member.getDisplayName())
-                        || words.contains(member.getUsername())
-                        || words.contains(member.getTag())
-                        || words.contains(member.getMention())
-                        || words.contains(member.getNicknameMention()));
-    }
-
-    /**
-     * @param guild The {@link Guild} containing the channels to extract.
-     * @param str   The string containing channels mentions and / or names.
-     * @return A {@link GuildChannel} {@link Flux} containing the extracted channels.
-     */
-    public static Flux<GuildChannel> extractChannels(Guild guild, String str) {
-        final List<String> words = StringUtil.split(str);
-        return guild.getChannels()
-                .filter(channel -> words.contains(channel.getName())
-                        || words.contains(String.format("#%s", channel.getName()))
-                        || words.contains(channel.getMention()));
-    }
-
-    /**
-     * @param guild The {@link Guild} containing the roles to extract.
-     * @param str   The string containing role mentions and / or names.
-     * @return A {@link Role} {@link Flux} containing the extracted roles.
-     */
-    public static Flux<Role> extractRoles(Guild guild, String str) {
-        final List<String> words = StringUtil.split(str);
-        return guild.getRoles()
-                .filter(role -> words.contains(role.getName())
-                        || words.contains(String.format("@%s", role.getName()))
-                        || words.contains(role.getMention()));
-    }
-
-    /**
-     * @param message The {@link Message} containing the members to extract.
-     * @return A {@link Member} {@link Flux} mentioned in the {@link Message}.
-     */
-    public static Flux<Member> getMembersFrom(Message message) {
-        if (message.mentionsEveryone()) {
-            return message.getGuild().flatMapMany(Guild::getMembers);
-        }
-        return message.getGuild()
-                .flatMapMany(Guild::getMembers)
-                .filter(member -> message.getUserMentionIds().contains(member.getId())
-                        || !Collections.disjoint(member.getRoleIds(), message.getRoleMentionIds()));
     }
 
     /**
@@ -248,9 +166,9 @@ public class DiscordUtil {
 
                     // If the user and the bot are not in the same voice channel
                     if (botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.orElseThrow()::equals).orElse(false)) {
-                        throw new CommandException(String.format("I'm currently playing music in voice channel **<#%d>**"
-                                        + ", join me before using this command.",
-                                botVoiceChannelId.map(Snowflake::asLong).get()));
+                        throw new CommandException(
+                                "I'm currently playing music in voice channel **<#%d>**, join me before using this command."
+                                        .formatted(botVoiceChannelId.map(Snowflake::asLong).get()));
                     }
 
                     return userVoiceChannelId.orElseThrow();
@@ -271,7 +189,7 @@ public class DiscordUtil {
                 .map(Enum::name)
                 .map(String::toLowerCase)
                 .map(it -> ApplicationCommandOptionChoiceData.builder().name(it).value(it).build())
-                .collect(Collectors.toCollection(LinkedList::new));
+                .collect(Collectors.toList());
     }
 
 }

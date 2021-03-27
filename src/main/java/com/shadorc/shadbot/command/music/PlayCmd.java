@@ -48,7 +48,8 @@ public class PlayCmd extends BaseCmd {
                 .zipWith(context.getChannel())
                 .flatMap(TupleUtils.function((voiceChannel, textChannel) -> {
                     final String identifier = PlayCmd.getIdentifier(query, isSoundcloud);
-                    return MusicManager.getOrCreate(context.getClient(), context.getGuildId(), voiceChannel.getId())
+                    return MusicManager
+                            .getOrCreate(context.getClient(), context.getLocale(), context.getGuildId(), voiceChannel.getId())
                             .flatMap(guildMusic -> PlayCmd.play(context, textChannel, guildMusic, identifier, playFirst));
                 }))
                 .onErrorMap(err -> {
@@ -106,7 +107,7 @@ public class PlayCmd extends BaseCmd {
                     guildMusic.setMessageChannelId(context.getChannelId());
 
                     final AudioLoadResultListener resultListener = new AudioLoadResultListener(
-                            context.getGuildId(), context.getAuthorId(), identifier, playFirst);
+                            context.getLocale(), context.getGuildId(), context.getAuthorId(), identifier, playFirst);
                     guildMusic.addAudioLoadResultListener(resultListener);
                 })
                 .switchIfEmpty(DiscordUtil.sendMessage(Emoji.LOCK, context.localize("playlist.limit.reached")

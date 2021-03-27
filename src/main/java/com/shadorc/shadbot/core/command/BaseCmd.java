@@ -37,7 +37,7 @@ public abstract class BaseCmd {
         this.permission = permission;
         this.name = name;
         this.description = description;
-        this.options = new LinkedList<>();
+        this.options = new ArrayList<>();
         this.rateLimiter = DEFAULT_RATELIMITER.get();
         this.isEnabled = true;
     }
