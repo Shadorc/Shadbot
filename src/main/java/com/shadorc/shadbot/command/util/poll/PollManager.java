@@ -49,7 +49,7 @@ public class PollManager {
                                 "https://i.imgur.com/jcrUDLY.png"));
 
         return this.context.reply(embedConsumer)
-                // TODO: Remove
+                // TODO: Do not instantiate the message when the Discord4J API is finalized
                 .map(data -> new Message(this.context.getClient(), data))
                 .flatMap(message -> Flux.fromIterable(this.spec.getReactions())
                         .flatMap(message::addReaction)

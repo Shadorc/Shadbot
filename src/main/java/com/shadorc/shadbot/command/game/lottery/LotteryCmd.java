@@ -111,7 +111,7 @@ public class LotteryCmd extends BaseCmd {
             nextDate = nextDate.plusWeeks(1);
         }
 
-        return Duration.ofMillis(TimeUtil.elapsed(nextDate.toInstant()));
+        return TimeUtil.elapsed(nextDate.toInstant());
     }
 
     public static Mono<Void> draw(GatewayDiscordClient gateway) {

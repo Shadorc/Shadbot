@@ -47,7 +47,7 @@ public class TransferCoinsCmd extends BaseCmd {
                             .flatMap(dbMembers -> {
                                 final DBMember dbSender = dbMembers.get(senderUserId);
                                 if (dbSender.getCoins() < coins) {
-                                    return Mono.error(new CommandException(ShadbotUtil.NOT_ENOUGH_COINS));
+                                    return Mono.error(new CommandException(context.localize("not.enough.coins")));
                                 }
 
                                 final DBMember dbReceiver = dbMembers.get(receiverUser.getId());

@@ -22,16 +22,16 @@ public class TimeUtilTest {
     public void testElapsedInstant() {
         final int offset = 30;
         final int millis = new Random().nextInt(10_000);
-        final long elapsed = TimeUtil.elapsed(Instant.now().minusMillis(millis));
-        assertTrue(elapsed >= millis - offset && elapsed <= millis + offset);
+        final Duration elapsed = TimeUtil.elapsed(Instant.now().minusMillis(millis));
+        assertTrue(elapsed.toMillis() >= millis - offset && elapsed.toMillis() <= millis + offset);
     }
 
     @Test
     public void testElapsedLong() {
         final int offset = 30;
         final int millis = new Random().nextInt(10_000);
-        final long elapsed = TimeUtil.elapsed(Instant.now().minusMillis(millis).toEpochMilli());
-        assertTrue(elapsed >= millis - offset && elapsed <= millis + offset);
+        final Duration elapsed = TimeUtil.elapsed(Instant.now().minusMillis(millis).toEpochMilli());
+        assertTrue(elapsed.toMillis() >= millis - offset && elapsed.toMillis() <= millis + offset);
     }
 
     @Test

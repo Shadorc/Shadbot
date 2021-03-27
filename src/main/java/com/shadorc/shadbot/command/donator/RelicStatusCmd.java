@@ -49,7 +49,7 @@ public class RelicStatusCmd extends BaseCmd {
                         relic.getActivation()
                                 .ifPresent(activation -> {
                                     final Duration durationLeft = relic.getDuration()
-                                            .minusMillis(TimeUtil.elapsed(activation.toEpochMilli()));
+                                            .minus(TimeUtil.elapsed(activation.toEpochMilli()));
                                     descBuilder.append(context.localize("relicstatus.expiration")
                                             .formatted(FormatUtil.formatDurationWords(durationLeft)));
                                 });

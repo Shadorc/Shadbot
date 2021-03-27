@@ -18,7 +18,7 @@ public class PingCmd extends BaseCmd {
         final long start = System.currentTimeMillis();
         return context.reply(Emoji.GEAR, context.localize("testing.ping"))
                 .flatMap(messageId -> context.editReply(Emoji.GEAR, context.localize("ping.message")
-                        .formatted(context.localize(TimeUtil.elapsed(start)))));
+                        .formatted(context.localize(TimeUtil.elapsed(start).toMillis()))));
     }
 
 }

@@ -64,7 +64,7 @@ public class ThisDayCmd extends BaseCmd {
             nextDate = nextDate.plusDays(1);
         }
 
-        return Duration.ofMillis(TimeUtil.elapsed(nextDate.toInstant()));
+        return TimeUtil.elapsed(nextDate.toInstant());
     }
 
 }

@@ -2,12 +2,10 @@ package com.shadorc.shadbot.utils;
 
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.TextFile;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.guilds.entity.DBMember;
-import com.shadorc.shadbot.object.Emoji;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
@@ -21,9 +19,6 @@ import java.util.function.Consumer;
 
 public class ShadbotUtil {
 
-    public static final String NOT_ENOUGH_COINS =
-            "You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.";
-
     public static final TextFile SPAMS = new TextFile("texts/spam.txt");
     public static final TextFile TIPS = new TextFile("texts/tips.txt");
 
@@ -36,12 +31,6 @@ public class ShadbotUtil {
             return "Error not specified.";
         }
         return Jsoup.parse(StringUtil.remove(err.getMessage(), "Watch on YouTube")).text().trim();
-    }
-
-    // TODO: Remove
-    public static String mustBeNsfw() {
-        return String.format(Emoji.GREY_EXCLAMATION
-                + " This must be a NSFW-channel. If you're an admin, you can use `/setting %s enable`", Setting.NSFW);
     }
 
     /**
@@ -64,7 +53,7 @@ public class ShadbotUtil {
     public static Mono<Long> requireValidBet(Snowflake guildId, Snowflake userId, String betStr) {
         final Long bet = NumberUtil.toPositiveLongOrNull(betStr);
         if (bet == null) {
-            throw new CommandException(String.format("`%s` is not a valid amount of coins.", betStr));
+            throw new CommandException("`%s` is not a valid amount of coins.".formatted(betStr));
         }
         return ShadbotUtil.requireValidBet(guildId, userId, bet);
     }
@@ -83,7 +72,8 @@ public class ShadbotUtil {
                 .map(DBMember::getCoins)
                 .map(coins -> {
                     if (coins < bet) {
-                        throw new CommandException(NOT_ENOUGH_COINS);
+                        throw new CommandException(
+                                "You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.");
                     }
                     return bet;
                 });

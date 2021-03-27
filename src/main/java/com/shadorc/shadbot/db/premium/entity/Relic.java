@@ -61,7 +61,7 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
     public boolean isExpired() {
         return this.getActivation()
                 .map(TimeUtil::elapsed)
-                .map(elapsedMillis -> elapsedMillis >= this.getDuration().toMillis())
+                .map(elapsedMillis -> elapsedMillis.compareTo(this.getDuration()) > 0)
                 .orElse(false);
     }
 

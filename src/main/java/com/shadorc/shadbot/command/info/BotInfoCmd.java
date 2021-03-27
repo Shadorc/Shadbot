@@ -67,7 +67,7 @@ public class BotInfoCmd extends BaseCmd {
 
         final String networkTitle = Emoji.SATELLITE + " " + context.localize("botinfo.title.network");
         final String networkField = context.localize("botinfo.field.network")
-                .formatted(context.localize(TimeUtil.elapsed(start)), context.localize(gatewayLatency));
+                .formatted(context.localize(TimeUtil.elapsed(start).toMillis()), context.localize(gatewayLatency));
 
         final String versionsTitle = Emoji.SCREWDRIVER + " " + context.localize("botinfo.title.versions");
         final String versionsField = context.localize("botinfo.field.versions")
