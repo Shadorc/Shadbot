@@ -52,7 +52,7 @@ public class BlackjackInputs extends Inputs {
                                 .flatMap(channel -> DiscordUtils.sendMessage(
                                         String.format(Emoji.CHECK_MARK + " Blackjack game cancelled by **%s**.",
                                                 member.getUsername()), channel))
-                                .then(Mono.fromRunnable(this.game::stop));
+                                .then(Mono.fromRunnable(this.game::destroy));
                     }
 
                     final BlackjackPlayer player = this.game.getPlayers().get(member.getId());

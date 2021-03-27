@@ -93,7 +93,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackCmd, BlackjackPlayer
                 .flatMap(results -> this.getContext().getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(
                                 String.format(Emoji.DICE + " __Results:__ %s", String.join(", ", results)), channel)))
-                .then(Mono.fromRunnable(this::stop))
+                .then(Mono.fromRunnable(this::destroy))
                 .then(this.show());
     }
 

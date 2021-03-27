@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
+public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 
     @Nullable
     private final Integer categoryId;
@@ -74,7 +74,7 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
     public Mono<Void> end() {
         return this.context.reply(Emoji.HOURGLASS, this.context.localize("trivia.time.elapsed")
                 .formatted(this.trivia.getCorrectAnswer()))
-                .then(Mono.fromRunnable(this::stop));
+                .then(Mono.fromRunnable(this::destroy));
     }
 
     @Override
@@ -106,7 +106,7 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
         final long remainingSec = this.duration.minus(TimeUtil.elapsed(this.startTime)).toSeconds();
         final long gains = (long) Math.ceil(Constants.MIN_GAINS + remainingSec * coinsPerSec);
 
-        this.stop();
+        this.destroy();
 
         Telemetry.TRIVIA_SUMMARY.labels("win").observe(gains);
 

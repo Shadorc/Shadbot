@@ -55,7 +55,7 @@ public class HangmanGame extends Game<HangmanCmd> {
     @Override
     public Mono<Void> start() {
         return Mono.fromRunnable(() -> {
-            this.schedule(Mono.fromRunnable(this::stop));
+            this.schedule(Mono.fromRunnable(this::destroy));
             this.startTime = System.currentTimeMillis();
             HangmanInputs.create(this.getContext().getClient(), this).listen();
         });
@@ -85,7 +85,7 @@ public class HangmanGame extends Game<HangmanCmd> {
                 .flatMap(text -> this.show()
                         .then(this.getContext().getChannel())
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel))
-                        .then(Mono.fromRunnable(this::stop)));
+                        .then(Mono.fromRunnable(this::destroy)));
     }
 
     @Override

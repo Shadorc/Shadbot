@@ -10,15 +10,15 @@ import reactor.core.scheduler.Schedulers;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class Game<G extends GameCmd<?>> {
+public abstract class Game {
 
-    protected final G gameCmd;
+    protected final GameCmd<?> gameCmd;
     protected final Context context;
     protected final Duration duration;
     protected final AtomicBoolean isScheduled;
     protected Disposable scheduledTask;
 
-    protected Game(G gameCmd, Context context, Duration duration) {
+    protected Game(GameCmd<?> gameCmd, Context context, Duration duration) {
         this.gameCmd = gameCmd;
         this.context = context;
         this.duration = duration;
@@ -27,14 +27,14 @@ public abstract class Game<G extends GameCmd<?>> {
 
     public abstract Mono<Void> start();
 
+    public abstract Mono<MessageData> show();
+
     public abstract Mono<Void> end();
 
-    public void stop() {
+    public void destroy() {
         this.cancelScheduledTask();
         this.gameCmd.getManagers().remove(this.context.getChannelId());
     }
-
-    public abstract Mono<MessageData> show();
 
     /**
      * Schedule a {@link Mono} that will be triggered when the game duration is elapsed.
@@ -67,7 +67,7 @@ public abstract class Game<G extends GameCmd<?>> {
         return this.scheduledTask != null && this.isScheduled.get();
     }
 
-    public G getGameCmd() {
+    public GameCmd<?> getGameCmd() {
         return this.gameCmd;
     }
 

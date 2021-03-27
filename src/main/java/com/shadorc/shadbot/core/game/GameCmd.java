@@ -7,7 +7,7 @@ import discord4j.common.util.Snowflake;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class GameCmd<T extends Game<?>> extends BaseCmd {
+public abstract class GameCmd<T extends Game> extends BaseCmd {
 
     private final Map<Snowflake, T> managers;
 
@@ -16,7 +16,6 @@ public abstract class GameCmd<T extends Game<?>> extends BaseCmd {
         this.setGameRateLimiter();
         this.managers = new ConcurrentHashMap<>();
     }
-
 
     public Map<Snowflake, T> getManagers() {
         return this.managers;

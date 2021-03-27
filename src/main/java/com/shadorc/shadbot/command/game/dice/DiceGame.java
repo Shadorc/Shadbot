@@ -65,7 +65,7 @@ public class DiceGame extends MultiplayerGame<DiceCmd, DicePlayer> {
                 .flatMap(channel -> DiscordUtils.sendMessage(
                         String.format(Emoji.DICE + " The dice is rolling... **%s** !", winningNum), channel))
                 .then(this.show())
-                .then(Mono.fromRunnable(this::stop));
+                .then(Mono.fromRunnable(this::destroy));
     }
 
     @Override

@@ -49,7 +49,7 @@ public class HangmanInputs extends Inputs {
                                 .flatMap(channel -> DiscordUtils.sendMessage(
                                         String.format(Emoji.CHECK_MARK + " Hangman game cancelled by **%s**.",
                                                 member.getUsername()), channel))
-                                .then(Mono.fromRunnable(this.game::stop));
+                                .then(Mono.fromRunnable(this.game::destroy));
                     }
 
                     final String content = event.getMessage().getContent().toLowerCase().trim();

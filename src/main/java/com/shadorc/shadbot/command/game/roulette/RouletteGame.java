@@ -76,7 +76,7 @@ public class RouletteGame extends MultiplayerGame<RouletteCmd, RoulettePlayer> {
                         String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
                                 winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"), channel))
                 .then(this.show())
-                .then(Mono.fromRunnable(this::stop));
+                .then(Mono.fromRunnable(this::destroy));
     }
 
     private static int getMultiplier(RoulettePlayer player, Place place, int winningPlace) {

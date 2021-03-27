@@ -47,7 +47,7 @@ public class DiceInputs extends Inputs {
                 .map(username -> String.format(Emoji.CHECK_MARK + " Dice game cancelled by **%s**.", username))
                 .flatMap(text -> event.getMessage().getChannel()
                         .flatMap(channel -> DiscordUtils.sendMessage(text, channel))
-                        .then(Mono.fromRunnable(this.game::stop)));
+                        .then(Mono.fromRunnable(this.game::destroy)));
     }
 
 }
