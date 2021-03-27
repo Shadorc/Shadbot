@@ -1,12 +1,8 @@
-/*
 package com.shadorc.shadbot.core.game;
 
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.ExceptionHandler;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.User;
-import discord4j.rest.util.Permission;
+import discord4j.discordjson.json.MessageData;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -16,11 +12,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class Game<G extends GameCmd<?>> {
 
-    private final G gameCmd;
-    private final Context context;
-    private final Duration duration;
-    private final AtomicBoolean isScheduled;
-    private Disposable scheduledTask;
+    protected final G gameCmd;
+    protected final Context context;
+    protected final Duration duration;
+    protected final AtomicBoolean isScheduled;
+    protected Disposable scheduledTask;
 
     protected Game(G gameCmd, Context context, Duration duration) {
         this.gameCmd = gameCmd;
@@ -38,15 +34,13 @@ public abstract class Game<G extends GameCmd<?>> {
         this.gameCmd.getManagers().remove(this.context.getChannelId());
     }
 
-    public abstract Mono<Void> show();
+    public abstract Mono<MessageData> show();
 
-    */
-/**
+    /**
      * Schedule a {@link Mono} that will be triggered when the game duration is elapsed.
      *
      * @param mono The {@link Mono} to trigger after the game duration has elapsed.
-     *//*
-
+     */
     protected <T> void schedule(Mono<T> mono) {
         this.cancelScheduledTask();
         this.isScheduled.set(true);
@@ -56,11 +50,9 @@ public abstract class Game<G extends GameCmd<?>> {
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
-    */
-/**
+    /**
      * Cancel the current task, if scheduled.
-     *//*
-
+     */
     private void cancelScheduledTask() {
         if (this.isScheduled()) {
             this.scheduledTask.dispose();
@@ -68,35 +60,9 @@ public abstract class Game<G extends GameCmd<?>> {
         }
     }
 
-    */
-/**
-     * @param message The {@link Message} to check.
-     * @return A {@link Mono} that returns {@code true} if the {@link Message} is a valid
-     * cancel command, {@code false} otherwise.
-     *//*
-
-    public Mono<Boolean> isCancelMessage(Message message) {
-        if (message.getContent().isEmpty() || message.getAuthor().isEmpty()) {
-            return Mono.just(false);
-        }
-
-        final String content = message.getContent();
-        final User author = message.getAuthor().orElseThrow();
-        if (content.equals("/cancel")) {
-            return message.getChannel()
-                    .flatMap(channel -> DiscordUtils.hasPermission(channel, author.getId(), Permission.ADMINISTRATOR))
-                    // The author is the author of the game or he is an administrator
-                    .map(isAdmin -> this.context.getAuthorId().equals(author.getId()) || isAdmin);
-        }
-
-        return Mono.just(false);
-    }
-
-    */
-/**
+    /**
      * @return {@code true} if a task is currently scheduled, {@code false} otherwise.
-     *//*
-
+     */
     public boolean isScheduled() {
         return this.scheduledTask != null && this.isScheduled.get();
     }
@@ -114,4 +80,3 @@ public abstract class Game<G extends GameCmd<?>> {
     }
 
 }
-*/

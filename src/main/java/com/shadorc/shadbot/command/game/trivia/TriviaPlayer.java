@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.game.trivia;
 
 import com.shadorc.shadbot.core.game.player.Player;
@@ -22,4 +21,3 @@ public class TriviaPlayer extends Player {
     }
 
 }
-*/

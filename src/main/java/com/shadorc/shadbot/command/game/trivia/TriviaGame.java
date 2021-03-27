@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.game.trivia;
 
 import com.shadorc.shadbot.api.json.trivia.TriviaResponse;
@@ -9,14 +8,13 @@ import com.shadorc.shadbot.core.game.player.Player;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.MessageData;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
@@ -45,80 +43,81 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
 
     @Override
     public Mono<Void> start() {
-        final String url = String.format("https://opentdb.com/api.php?amount=1&category=%s",
-                Objects.toString(this.categoryId, ""));
-        return RequestHelper.fromUrl(url)
-                .to(TriviaResponse.class)
-                .map(TriviaResponse::getResults)
-                .map(list -> list.get(0))
-                .doOnNext(trivia -> {
-                    this.trivia = trivia;
-
-                    if ("multiple".equals(this.trivia.getType())) {
-                        this.answers.addAll(this.trivia.getIncorrectAnswers());
-                        this.answers.add(this.trivia.getCorrectAnswer());
-                        Collections.shuffle(this.answers);
-                    } else {
-                        this.answers.addAll(List.of("True", "False"));
-                    }
-
-                    this.schedule(this.end());
-                    this.startTime = System.currentTimeMillis();
-                    TriviaInputs.create(this.getContext().getClient(), this).listen();
-                })
-                .then();
-    }
-
-    @Override
-    public Mono<Void> end() {
-        return this.getContext().getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(
-                        String.format(Emoji.HOURGLASS + " Time elapsed, the correct answer was **%s**.",
-                                this.trivia.getCorrectAnswer()), channel))
-                .then(Mono.fromRunnable(this::stop));
-    }
-
-    @Override
-    public Mono<Void> show() {
         return Mono.defer(() -> {
-            final String description = String.format("**%s**%n%s",
-                    this.trivia.getQuestion(),
-                    FormatUtils.numberedList(this.answers.size(), this.answers.size(),
-                            count -> String.format("\t**%d**. %s", count, this.answers.get(count - 1))));
+            final String url = "https://opentdb.com/api.php"
+                    + "?amount=1"
+                    + "&category=%s".formatted(Objects.toString(this.categoryId, ""));
+            return RequestHelper.fromUrl(url)
+                    .to(TriviaResponse.class)
+                    .map(TriviaResponse::getResults)
+                    .map(list -> list.get(0))
+                    .doOnNext(trivia -> {
+                        this.trivia = trivia;
 
-            final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
-                    .andThen(embed -> embed.setAuthor("Trivia", null, this.getContext().getAvatarUrl())
-                            .setDescription(description)
-                            .addField("Category", String.format("`%s`", this.trivia.getCategory()), true)
-                            .addField("Type", String.format("`%s`", this.trivia.getType()), true)
-                            .addField("Difficulty", String.format("`%s`", this.trivia.getDifficulty()), true)
-                            .setFooter(String.format("You have %d seconds to answer. Use %scancel to force the stop.",
-                                    this.getDuration().toSeconds(), this.getContext().getPrefix()), null));
+                        if ("multiple".equals(this.trivia.getType())) {
+                            this.answers.addAll(this.trivia.getIncorrectAnswers());
+                            this.answers.add(this.trivia.getCorrectAnswer());
+                            Collections.shuffle(this.answers);
+                        } else {
+                            this.answers.addAll(List.of("True", "False"));
+                        }
 
-            return this.getContext().getChannel()
-                    .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
+                        this.schedule(this.end());
+                        this.startTime = System.currentTimeMillis();
+                        TriviaInputs.create(this.getContext().getClient(), this).listen();
+                    })
                     .then();
         });
     }
 
-    protected Mono<Message> win(Member member) {
-        final double coinsPerSec = (double) Constants.MAX_BONUS / this.getDuration().toSeconds();
-        final Duration remainingDuration = this.getDuration().minusMillis(TimeUtils.getMillisUntil(this.startTime));
-        final long gains = (long) Math.ceil(Constants.MIN_GAINS + remainingDuration.toSeconds() * coinsPerSec);
+    @Override
+    public Mono<Void> end() {
+        return this.context.reply(Emoji.HOURGLASS, this.context.localize("trivia.time.elapsed")
+                .formatted(this.trivia.getCorrectAnswer()))
+                .then(Mono.fromRunnable(this::stop));
+    }
+
+    @Override
+    public Mono<MessageData> show() {
+        return Mono.defer(() -> {
+            final String description = "**%s**\n%s"
+                    .formatted(this.trivia.getQuestion(),
+                            FormatUtil.numberedList(this.answers.size(), this.answers.size(),
+                                    count -> "\t**%d**. %s".formatted(count, this.answers.get(count - 1))));
+
+            final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultEmbed(
+                    embed -> embed.setAuthor("Trivia", null, this.context.getAuthorAvatar())
+                            .setDescription(description)
+                            .addField(this.context.localize("trivia.category"),
+                                    "`%s`".formatted(this.trivia.getCategory()), true)
+                            .addField(this.context.localize("trivia.type"),
+                                    "`%s`".formatted(this.trivia.getType()), true)
+                            .addField(this.context.localize("trivia.difficulty"),
+                                    "`%s`".formatted(this.trivia.getDifficulty()), true)
+                            .setFooter(this.context.localize("trivia.footer")
+                                    .formatted(this.duration.toSeconds(), Emoji.RED_CROSS), null));
+
+            return this.context.reply(embedConsumer);
+        });
+    }
+
+    protected Mono<MessageData> win(Member member) {
+        final double coinsPerSec = (double) Constants.MAX_BONUS / this.duration.toSeconds();
+        final long remainingSec = this.duration.minus(TimeUtil.elapsed(this.startTime)).toSeconds();
+        final long gains = (long) Math.ceil(Constants.MIN_GAINS + remainingSec * coinsPerSec);
 
         this.stop();
 
         Telemetry.TRIVIA_SUMMARY.labels("win").observe(gains);
 
-        return new Player(this.getContext().getGuildId(), member.getId())
+        return new Player(this.context.getGuildId(), member.getId())
                 .win(gains)
-                .then(this.getContext().getChannel())
-                .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CLAP + " (**%s**) Correct ! You won " +
-                        "**%s**.", member.getUsername(), FormatUtils.coins(gains)), channel));
+                .then(this.context.reply(Emoji.CLAP, this.context.localize("trivia.win")
+                        .formatted(this.context.localize(gains))));
     }
 
     public void hasAnswered(Snowflake userId) {
-        final TriviaPlayer player = new TriviaPlayer(this.getContext().getGuildId(), userId);
+        final TriviaPlayer player = new TriviaPlayer(this.context.getGuildId(), userId);
         if (!this.addPlayerIfAbsent(player)) {
             this.getPlayers().get(userId).setAnswered(true);
         }
@@ -133,4 +132,3 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
     }
 
 }
-*/

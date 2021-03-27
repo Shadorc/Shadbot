@@ -28,6 +28,7 @@ import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -188,6 +189,12 @@ public class DiscordUtil {
         return Arrays.stream(enumClass.getEnumConstants())
                 .map(Enum::name)
                 .map(String::toLowerCase)
+                .map(it -> ApplicationCommandOptionChoiceData.builder().name(it).value(it).build())
+                .collect(Collectors.toList());
+    }
+
+    public static <T extends Enum<T>> List<ApplicationCommandOptionChoiceData> toOptions(Collection<String> list) {
+        return list.stream()
                 .map(it -> ApplicationCommandOptionChoiceData.builder().name(it).value(it).build())
                 .collect(Collectors.toList());
     }
