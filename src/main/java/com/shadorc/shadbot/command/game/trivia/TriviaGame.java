@@ -86,12 +86,10 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
                                     count -> "\t**%d**. %s".formatted(count, this.answers.get(count - 1))));
 
             final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultEmbed(
-                    embed -> embed.setAuthor("Trivia", null, this.context.getAuthorAvatar())
+                    embed -> embed.setAuthor(this.context.localize("trivia.title"), null, this.context.getAuthorAvatar())
                             .setDescription(description)
                             .addField(this.context.localize("trivia.category"),
                                     "`%s`".formatted(this.trivia.getCategory()), true)
-                            .addField(this.context.localize("trivia.type"),
-                                    "`%s`".formatted(this.trivia.getType()), true)
                             .addField(this.context.localize("trivia.difficulty"),
                                     "`%s`".formatted(this.trivia.getDifficulty()), true)
                             .setFooter(this.context.localize("trivia.footer")
