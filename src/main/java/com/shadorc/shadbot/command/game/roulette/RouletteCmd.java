@@ -1,22 +1,15 @@
-/*
 package com.shadorc.shadbot.command.game.roulette;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.EnumUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.EnumUtil;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
-import reactor.util.function.Tuples;
 
-import java.util.List;
-import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 public class RouletteCmd extends GameCmd<RouletteGame> {
@@ -29,58 +22,41 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
     }
 
     public RouletteCmd() {
-        super(List.of("roulette"));
+        super("roulette", "Play roulette");
+        this.addOption("bet", "Your bet", true, ApplicationCommandOptionType.INTEGER);
+        this.addOption("place", "number between 1 and 36, %s".formatted(FormatUtil.format(Place.class, ", "),
+                true, ApplicationCommandOptionType.STRING);
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final List<String> args = context.requireArgs(2);
+    public Mono<?> execute(Context context) {
+        final long bet = context.getOptionAsLong("bet").orElseThrow();
+        final String place = context.getOptionAsString("place").orElseThrow().toLowerCase();
 
-        final String place = args.get(1).toLowerCase();
-        return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), args.get(0))
-                .flatMap(bet -> {
+        return ShadbotUtil.requireValidBet(context.getGuildId(), context.getAuthorId(), bet)
+                .flatMap(__ -> {
                     // Match [1-36], red, black, odd, even, high or low
-                    if (!NUMBER_PATTERN.matcher(place).matches() && EnumUtils.parseEnum(Place.class, place) == null) {
-                        return Mono.error(new CommandException(
-                                String.format("`%s` is not a valid place, must be a number between **1 and 36**, %s.",
-                                        place, FormatUtils.format(Place.values(),
-                                                value -> String.format("**%s**", value.toString().toLowerCase()), ", "))));
+                    if (!NUMBER_PATTERN.matcher(place).matches() && EnumUtil.parseEnum(Place.class, place) == null) {
+                        return Mono.error(new CommandException(context.localize("roulette.invalid.place")
+                                .formatted(place, FormatUtil.format(Place.class, ", "))));
                     }
 
                     if (this.getManagers().containsKey(context.getChannelId())) {
-                        return Mono.just(Tuples.of(this.getManagers().get(context.getChannelId()), bet));
+                        return Mono.just(this.getManagers().get(context.getChannelId()));
                     } else {
                         final RouletteGame game = new RouletteGame(this, context);
                         this.getManagers().put(context.getChannelId(), game);
                         return game.start()
-                                .thenReturn(Tuples.of(game, bet));
+                                .thenReturn(game);
                     }
                 })
-                .flatMap(TupleUtils.function((rouletteGame, bet) -> {
+                .flatMap(rouletteGame -> {
                     final RoulettePlayer player = new RoulettePlayer(context.getGuildId(), context.getAuthorId(), bet, place);
                     if (rouletteGame.addPlayerIfAbsent(player)) {
                         return player.bet().then(rouletteGame.show());
                     } else {
-                        return context.getChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(
-                                        String.format(Emoji.INFO + " (**%s**) You're already participating.",
-                                                context.getUsername()), channel))
-                                .then();
+                        return context.reply(Emoji.INFO, context.localize("roulette.already.participating"));
                     }
-                }));
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Play a roulette game in which everyone can participate.")
-                .addArg("bet", false)
-                .addArg("place", String.format("number between 1 and 36, %s",
-                        FormatUtils.format(Place.class, ", ")), false)
-                .addField("Info", "**low** - numbers between 1 and 18"
-                        + "\n**high** - numbers between 19 and 36", false)
-                .addField("Gains", "The game follows the same rules and winnings as real Roulette.", false)
-                .build();
+                });
     }
 }
-*/
