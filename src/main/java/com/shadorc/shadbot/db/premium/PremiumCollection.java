@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.db.premium;
 
-import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoDatabase;
+import com.shadorc.shadbot.core.cache.SingleValueCache;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseCollection;
@@ -19,14 +19,36 @@ import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 
 public class PremiumCollection extends DatabaseCollection {
 
     public static final Logger LOGGER = LogUtil.getLogger(PremiumCollection.class, LogUtil.Category.DATABASE);
 
+    private final SingleValueCache<List<Relic>> relicCache;
+
     public PremiumCollection(MongoDatabase database) {
         super(database, "premium");
+        this.relicCache = SingleValueCache.Builder.create(this.getRelics().collectList()).withInfiniteTtl().build();
+    }
+
+    private Flux<Relic> getRelics() {
+        final Publisher<Document> request = this.getCollection()
+                .find();
+
+        final Mono<List<Relic>> getRelics = Flux.from(request)
+                .map(document -> document.toJson(JSON_WRITER_SETTINGS))
+                .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, RelicBean.class)))
+                .map(Relic::new)
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[Relic] Request collection");
+                    Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc();
+                })
+                .collectList();
+
+        return this.relicCache.getOrCache(getRelics)
+                .flatMapMany(Flux::fromIterable);
     }
 
     /**
@@ -34,45 +56,18 @@ public class PremiumCollection extends DatabaseCollection {
      * @return The {@link Relic} corresponding to the provided {@code relicId}.
      */
     public Mono<Relic> getRelicById(String relicId) {
-        LOGGER.debug("[Relic {}] Request", relicId);
-
-        final Publisher<Document> request = this.getCollection()
-                .find(Filters.eq("_id", relicId))
-                .first();
-
-        return Mono.from(request)
-                .map(document -> document.toJson(JSON_WRITER_SETTINGS))
-                .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, RelicBean.class)))
-                .map(Relic::new)
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
+        return this.getRelics()
+                .filter(relic -> relic.getId().equals(relicId))
+                .next();
     }
 
     /**
      * @param userId The {@link Snowflake} ID of the {@link User}.
-     * @return A {@link Flux} containing the {@link Relic} possessed by an {@link User}.
+     * @return A {@link Flux} containing the {@link Relic} possessed by a {@link User}.
      */
     public Flux<Relic> getUserRelics(Snowflake userId) {
-        LOGGER.debug("[Premium] Request relics for user {}", userId.asLong());
-
-        final Publisher<Document> request = this.getCollection()
-                .find(Filters.eq("user_id", userId.asString()));
-
-        return Flux.from(request)
-                .map(document -> document.toJson(JSON_WRITER_SETTINGS))
-                .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, RelicBean.class)))
-                .map(Relic::new)
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
-    }
-
-    /**
-     * @param type The {@link RelicType} type of the {@link Relic} to generate.
-     * @return The generated {@link Relic} inserted in the database.
-     */
-    public static Mono<Relic> generateRelic(RelicType type) {
-        final Relic relic = new Relic(UUID.randomUUID(), type, Duration.ofDays(Config.RELIC_DURATION));
-        LOGGER.info("Relic generated. Type: {}, ID: {}", relic.getType(), relic.getId());
-        return relic.insert()
-                .thenReturn(relic);
+        return this.getRelics()
+                .filter(relic -> relic.getUserId().map(userId::equals).orElse(false));
     }
 
     /**
@@ -83,16 +78,25 @@ public class PremiumCollection extends DatabaseCollection {
      * @return {@code true} if the {@link Guild} or the {@link User} is premium, {@code false} otherwise.
      */
     public Mono<Boolean> isPremium(Snowflake guildId, Snowflake userId) {
-        LOGGER.debug("[Premium] Check if user {} in guild {} is premium", userId.asLong(), guildId.asLong());
+        return this.getRelics()
+                .filter(relic -> relic.getUserId().map(userId::equals).orElse(false)
+                        || relic.getGuildId().map(guildId::equals).orElse(false))
+                .hasElements();
+    }
 
-        final Publisher<Document> request = this.getCollection()
-                .find(Filters.or(
-                        Filters.eq("user_id", userId.asString()),
-                        Filters.eq("guild_id", guildId.asString())));
+    /**
+     * @param type The {@link RelicType} type of the {@link Relic} to generate.
+     * @return The generated {@link Relic} inserted in the database.
+     */
+    public static Mono<Relic> generateRelic(RelicType type) {
+        final Relic relic = new Relic(UUID.randomUUID(), type, Duration.ofDays(Config.RELIC_DURATION));
+        return relic.insert()
+                .thenReturn(relic)
+                .doOnSubscribe(__ -> LOGGER.info("Relic generated. Type: {}, ID: {}", relic.getType(), relic.getId()));
+    }
 
-        return Flux.from(request)
-                .hasElements()
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc());
+    public void invalidateCache() {
+        this.relicCache.invalidate();
     }
 
 }

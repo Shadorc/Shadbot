@@ -3,6 +3,7 @@ package com.shadorc.shadbot.db.premium.entity;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.db.DatabaseEntity;
 import com.shadorc.shadbot.db.DatabaseManager;
 import com.shadorc.shadbot.db.SerializableEntity;
@@ -66,8 +67,6 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
     }
 
     public Mono<UpdateResult> activate(Snowflake userId, @Nullable Snowflake guildId) {
-        LOGGER.debug("[Relic {}] Activation", this.getId());
-
         return Mono.from(DatabaseManager.getPremium()
                 .getCollection()
                 .updateOne(Filters.eq("_id", this.getId()),
@@ -75,28 +74,39 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
                                 Updates.set("user_id", userId.asString()),
                                 Updates.set("guild_id", guildId == null ? null : guildId.asString()),
                                 Updates.set("activation", Instant.now().toEpochMilli()))))
-                .doOnNext(result -> LOGGER.trace("[Relic {}] Activation result; {}", this.getId(), result));
+                .doOnNext(result -> LOGGER.trace("[Relic {}] Activation result; {}", this.getId(), result))
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[Relic {}] Activation", this.getId());
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getPremium().getName()).inc();
+                })
+                .doOnTerminate(DatabaseManager.getPremium()::invalidateCache);
     }
 
     @Override
     public Mono<Void> insert() {
-        LOGGER.debug("[Relic {}] Insertion", this.getId());
-
         return Mono.from(DatabaseManager.getPremium()
                 .getCollection()
                 .insertOne(this.toDocument()))
                 .doOnNext(result -> LOGGER.trace("[Relic {}] Insertion result: {}", this.getId(), result))
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[Relic {}] Insertion", this.getId());
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getPremium().getName()).inc();
+                })
+                .doOnTerminate(DatabaseManager.getPremium()::invalidateCache)
                 .then();
     }
 
     @Override
     public Mono<Void> delete() {
-        LOGGER.debug("[Relic {}] Deletion", this.getId());
-
         return Mono.from(DatabaseManager.getPremium()
                 .getCollection()
                 .deleteOne(Filters.eq("_id", this.getId())))
                 .doOnNext(result -> LOGGER.trace("[Relic {}] Deletion result: {}", this.getId(), result))
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[Relic {}] Deletion", this.getId());
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getPremium().getName()).inc();
+                })
+                .doOnTerminate(DatabaseManager.getPremium()::invalidateCache)
                 .then();
     }
 
