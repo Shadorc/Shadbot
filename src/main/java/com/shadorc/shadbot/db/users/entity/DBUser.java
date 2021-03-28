@@ -49,12 +49,9 @@ public class DBUser extends SerializableEntity<DBUserBean> implements DatabaseEn
     private Mono<UpdateResult> updateAchievement(int achievements) {
         // If the achievement is already in this state, no need to request an update
         if (this.getBean().getAchievements() == achievements) {
-            LOGGER.debug("[DBUser {}] Achievements update useless, aborting: {}",
-                    this.getId().asLong(), achievements);
+            LOGGER.debug("[DBUser {}] Achievements update useless, aborting: {}", this.getId().asString(), achievements);
             return Mono.empty();
         }
-
-        LOGGER.debug("[DBUser {}] Achievements update: {}", this.getId().asLong(), achievements);
 
         return Mono.from(DatabaseManager.getUsers()
                 .getCollection()
@@ -62,9 +59,13 @@ public class DBUser extends SerializableEntity<DBUserBean> implements DatabaseEn
                         Filters.eq("_id", this.getId().asString()),
                         Updates.set("achievements", achievements),
                         new UpdateOptions().upsert(true)))
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[DBUser {}] Achievements update: {}", this.getId().asString(), achievements);
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getUsers().getName()).inc();
+                })
                 .doOnNext(result -> LOGGER.trace("[DBUser {}] Achievements update result: {}",
-                        this.getId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getUsers().getName()).inc());
+                        this.getId().asString(), result))
+                .doOnTerminate(() -> DatabaseManager.getUsers().invalidateCache(this.getId()));
     }
 
     @Override
