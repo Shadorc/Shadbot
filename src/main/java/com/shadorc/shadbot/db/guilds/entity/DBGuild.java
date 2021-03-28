@@ -52,65 +52,67 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
         return Optional.ofNullable(this.getBean().getLocale())
                 .map(Locale::forLanguageTag)
                 .orElse(Locale.FRENCH);
-                // TODO .orElse(Config.DEFAULT_LOCALE);
+        // TODO .orElse(Config.DEFAULT_LOCALE);
     }
 
     /**
      * {@code value} must be serializable or serialized.
      */
     public <T> Mono<UpdateResult> updateSetting(Setting setting, T value) {
-        LOGGER.debug("[DBGuild {}] Setting update: {}={}", this.getId().asLong(), setting, value);
-        DatabaseManager.getGuilds().invalidateCache(this.getId());
-
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
                         Filters.eq("_id", this.getId().asString()),
-                        Updates.set(String.format("settings.%s", setting), value),
+                        Updates.set("settings.%s".formatted(setting), value),
                         new UpdateOptions().upsert(true)))
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[DBGuild {}] Setting update: {}={}", this.getId().asString(), setting, value);
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
+                })
                 .doOnNext(result -> LOGGER.trace("[DBGuild {}] Setting update result: {}",
-                        this.getId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc());
+                        this.getId().asString(), result))
+                .doOnTerminate(() -> DatabaseManager.getGuilds().invalidateCache(this.getId()));
     }
 
     public Mono<UpdateResult> removeSetting(Setting setting) {
-        LOGGER.debug("[DBGuild {}] Setting deletion: {}", this.getId().asLong(), setting);
-        DatabaseManager.getGuilds().invalidateCache(this.getId());
-
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
                         Filters.eq("_id", this.getId().asString()),
                         Updates.unset(String.format("settings.%s", setting))))
-                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Setting deletion result: {}",
-                        this.getId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc());
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[DBGuild {}] Setting deletion: {}", this.getId().asString(), setting);
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
+                })
+                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Setting deletion result: {}", this.getId().asString(), result))
+                .doOnTerminate(() -> DatabaseManager.getGuilds().invalidateCache(this.getId()));
     }
 
     @Override
     public Mono<Void> insert() {
-        LOGGER.debug("[DBGuild {}] Insertion", this.getId().asLong());
-        DatabaseManager.getGuilds().invalidateCache(this.getId());
-
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .insertOne(this.toDocument()))
-                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Insertion result: {}",
-                        this.getId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[DBGuild {}] Insertion", this.getId().asString());
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
+                })
+                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Insertion result: {}", this.getId().asString(), result))
+                .doOnTerminate(() -> DatabaseManager.getGuilds().invalidateCache(this.getId()))
                 .then();
     }
 
     @Override
     public Mono<Void> delete() {
-        LOGGER.debug("[DBGuild {}] Deletion", this.getId().asLong());
-        DatabaseManager.getGuilds().invalidateCache(this.getId());
-
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .deleteOne(Filters.eq("_id", this.getId().asString())))
-                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Deletion result: {}", this.getId().asLong(), result))
-                .doOnTerminate(() -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[DBGuild {}] Deletion", this.getId().asString());
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
+                })
+                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Deletion result: {}", this.getId().asString(), result))
+                .doOnTerminate(() -> DatabaseManager.getGuilds().invalidateCache(this.getId()))
                 .then();
     }
 

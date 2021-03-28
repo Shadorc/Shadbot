@@ -74,11 +74,11 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
                                 Updates.set("user_id", userId.asString()),
                                 Updates.set("guild_id", guildId == null ? null : guildId.asString()),
                                 Updates.set("activation", Instant.now().toEpochMilli()))))
-                .doOnNext(result -> LOGGER.trace("[Relic {}] Activation result; {}", this.getId(), result))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[Relic {}] Activation", this.getId());
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getPremium().getName()).inc();
                 })
+                .doOnNext(result -> LOGGER.trace("[Relic {}] Activation result; {}", this.getId(), result))
                 .doOnTerminate(DatabaseManager.getPremium()::invalidateCache);
     }
 
@@ -87,11 +87,11 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
         return Mono.from(DatabaseManager.getPremium()
                 .getCollection()
                 .insertOne(this.toDocument()))
-                .doOnNext(result -> LOGGER.trace("[Relic {}] Insertion result: {}", this.getId(), result))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[Relic {}] Insertion", this.getId());
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getPremium().getName()).inc();
                 })
+                .doOnNext(result -> LOGGER.trace("[Relic {}] Insertion result: {}", this.getId(), result))
                 .doOnTerminate(DatabaseManager.getPremium()::invalidateCache)
                 .then();
     }
@@ -101,11 +101,11 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
         return Mono.from(DatabaseManager.getPremium()
                 .getCollection()
                 .deleteOne(Filters.eq("_id", this.getId())))
-                .doOnNext(result -> LOGGER.trace("[Relic {}] Deletion result: {}", this.getId(), result))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[Relic {}] Deletion", this.getId());
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getPremium().getName()).inc();
                 })
+                .doOnNext(result -> LOGGER.trace("[Relic {}] Deletion result: {}", this.getId(), result))
                 .doOnTerminate(DatabaseManager.getPremium()::invalidateCache)
                 .then();
     }
