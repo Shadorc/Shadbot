@@ -25,8 +25,8 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableWebhookMessageEditRequest;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.WebhookExecuteRequest;
+import discord4j.rest.util.MultipartRequest;
 import discord4j.rest.util.Permission;
-import discord4j.rest.util.WebhookMultipartRequest;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -207,7 +207,7 @@ public class Context implements InteractionContext, I18nContext {
     public Mono<MessageData> reply(String message) {
         return this.event.getInteractionResponse()
                 .createFollowupMessage(message)
-                .doOnNext(messageData -> this.replyId.set(Long.parseLong(messageData.id())));
+                .doOnNext(messageData -> this.replyId.set(messageData.id().asLong()));
     }
 
     @Override
@@ -219,7 +219,7 @@ public class Context implements InteractionContext, I18nContext {
     public Mono<MessageData> reply(Consumer<EmbedCreateSpec> embed) {
         final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
         embed.accept(mutatedSpec);
-        return this.event.getInteractionResponse().createFollowupMessage(new WebhookMultipartRequest(
+        return this.event.getInteractionResponse().createFollowupMessage(MultipartRequest.ofRequest(
                 WebhookExecuteRequest.builder()
                         .addEmbed(mutatedSpec.asRequest())
                         .build()), true)

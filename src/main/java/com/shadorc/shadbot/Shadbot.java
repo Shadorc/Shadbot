@@ -12,6 +12,8 @@ import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.LogUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
+import discord4j.common.store.Store;
+import discord4j.common.store.legacy.LegacyStoreLayout;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -109,12 +111,11 @@ public class Shadbot {
                         Intent.GUILD_MESSAGES,
                         Intent.GUILD_MESSAGE_REACTIONS,
                         Intent.DIRECT_MESSAGES))
-                .setStoreService(MappingStoreService.create()
+                .setStore(Store.fromLayout(LegacyStoreLayout.of(MappingStoreService.create()
                         // Stores messages during 30 minutes
-                        // TODO: Is it still useful?
                         .setMapping(new CaffeineStoreService(
                                 builder -> builder.expireAfterWrite(Duration.ofMinutes(30))), MessageData.class)
-                        .setFallback(new JdkStoreService()))
+                        .setFallback(new JdkStoreService()))))
                 .setInitialStatus(__ -> ShadbotUtil.getRandomStatus())
                 .setMemberRequestFilter(MemberRequestFilter.none())
                 .withGateway(gateway -> {

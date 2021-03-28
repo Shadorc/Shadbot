@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.roulette;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -24,8 +25,8 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
     public RouletteCmd() {
         super("roulette", "Play roulette");
         this.addOption("bet", "Your bet", true, ApplicationCommandOptionType.INTEGER);
-        this.addOption("place", "number between 1 and 36, %s".formatted(FormatUtil.format(Place.class, ", "),
-                true, ApplicationCommandOptionType.STRING);
+        //this.addOption("place", "number between 1 and 36, %s".formatted(FormatUtil.format(Place.class, ", "),
+        //        true, ApplicationCommandOptionType.STRING));
     }
 
     @Override
@@ -60,3 +61,4 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                 });
     }
 }
+*/

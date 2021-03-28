@@ -98,8 +98,11 @@
             <url>https://dl.bintray.com/sedmelluq/com.sedmelluq</url>
         </repository>
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <id>oss.sonatype.org-snapshot</id>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
     <dependencies>
@@ -111,9 +114,9 @@
         </dependency>
         <!-- Discord4J -->
         <dependency>
-            <groupId>com.discord4j.discord4j</groupId>
+            <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>master-SNAPSHOT</version>
+            <version>3.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.discord4j</groupId>

@@ -18,11 +18,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class PollManager {
@@ -76,7 +73,7 @@ public class PollManager {
                 .flatMap(this::sendResults);
     }
 
-    private Mono<MessageData> sendResults(Set<Reaction> reactionSet) {
+    private Mono<MessageData> sendResults(List<Reaction> reactionSet) {
         final Map<ReactionEmoji, String> reactionsChoices = MapUtil.inverse(this.spec.getChoices());
 
         final Map<String, Integer> choiceVoteMap = new HashMap<>(reactionsChoices.size());

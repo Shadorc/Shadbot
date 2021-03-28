@@ -1,3 +1,4 @@
+/*
 package com.shadorc.shadbot.command.game.roulette;
 
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
@@ -17,3 +18,4 @@ public class RoulettePlayer extends GamblerPlayer {
     }
 
 }
+*/
