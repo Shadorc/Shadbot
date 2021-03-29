@@ -13,6 +13,8 @@ import com.shadorc.shadbot.command.owner.OwnerGroup;
 import com.shadorc.shadbot.command.setting.SettingGroup;
 import com.shadorc.shadbot.command.support.SupportGroup;
 import com.shadorc.shadbot.command.util.UtilGroup;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.object.ExceptionHandler;
 import discord4j.rest.service.ApplicationService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -54,12 +56,13 @@ public class CommandManager {
 
     public Mono<Long> register(ApplicationService applicationService, long applicationId) {
         return Flux.fromIterable(this.commandsMap.values())
-                .flatMap(cmd -> cmd.register(applicationService, applicationId)
-                        .onErrorResume(err -> Mono.fromRunnable(() ->
-                                DEFAULT_LOGGER.error("An error occurred during '{}' registration: {}",
-                                        cmd.getName(), err.getMessage()))))
+                .map(BaseCmd::asRequest)
+                .collectList()
+                .flatMapMany(requests -> applicationService
+                        .bulkOverwriteGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, requests))
                 .count()
-                .doOnNext(cmdCount -> DEFAULT_LOGGER.info("{} commands registered", cmdCount));
+                .doOnNext(cmdCount -> DEFAULT_LOGGER.info("{} commands registered", cmdCount))
+                .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err)));
     }
 
     public Map<String, BaseCmd> getCommands() {

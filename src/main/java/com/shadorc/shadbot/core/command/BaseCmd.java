@@ -1,11 +1,12 @@
 package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
-import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.*;
-import discord4j.rest.service.ApplicationService;
+import discord4j.discordjson.json.ApplicationCommandOptionChoiceData;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
@@ -63,19 +64,12 @@ public abstract class BaseCmd {
         return optionsData;
     }
 
-    public Mono<ApplicationCommandData> register(ApplicationService applicationService, long applicationId) {
-        final ImmutableApplicationCommandRequest request = ApplicationCommandRequest.builder()
+    public ApplicationCommandRequest asRequest() {
+        return ApplicationCommandRequest.builder()
                 .name(this.getName())
                 .description(this.getDescription())
                 .addAllOptions(this.buildOptions())
                 .build();
-
-        // TODO: Enable for release
-        if (true/*this.getPermission().equals(CommandPermission.OWNER)*/) {
-            return applicationService.createGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, request);
-        } else {
-            return applicationService.createGlobalApplicationCommand(applicationId, request);
-        }
     }
 
     public abstract Mono<?> execute(Context context);
