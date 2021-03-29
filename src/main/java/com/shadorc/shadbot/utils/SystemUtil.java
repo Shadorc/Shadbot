@@ -30,7 +30,7 @@ public class SystemUtil {
     }
 
     /**
-     * @return The recent CPU usage for the operating environment.
+     * @return The recent CPU usage for the operating environment in percentage.
      */
     public static double getSystemCpuUsage() {
         return OS_BEAN.getCpuLoad() * 100.0d;
@@ -61,14 +61,14 @@ public class SystemUtil {
      * @return The total amount of memory in megabytes.
      */
     public static long getTotalMemory() {
-        return OS_BEAN.getTotalMemorySize();
+        return OS_BEAN.getTotalMemorySize() / MB_UNIT;
     }
 
     /**
      * @return The amount of free memory in megabytes.
      */
     public static long getFreeMemory() {
-        return OS_BEAN.getFreeMemorySize();
+        return OS_BEAN.getFreeMemorySize() / MB_UNIT;
     }
 
     /**
@@ -83,14 +83,14 @@ public class SystemUtil {
     }
 
     /**
-     * @return The total Garbage Collection Time in milliseconds.
+     * @return The total Garbage Collection Time.
      */
-    public static long getGCTime() {
-        return GC_BEAN.stream()
+    public static Duration getGCTime() {
+        return Duration.ofMillis(GC_BEAN.stream()
                 .map(GarbageCollectorMXBean::getCollectionTime)
                 .mapToInt(Long::intValue)
                 .filter(time -> time > 0)
-                .sum();
+                .sum());
     }
 
     /**

@@ -39,6 +39,7 @@ public class FormatUtil {
     }
 
     /**
+     * @param locale   The locale used to translate the message.
      * @param duration The duration to format.
      * @return The formatted duration as D day(s) H hour(s) M minute(s) or S second(s).
      */
@@ -77,7 +78,8 @@ public class FormatUtil {
     }
 
     /**
-     * @param date The {@link LocalDateTime} to format.
+     * @param locale The locale used to translate the message.
+     * @param date   The {@link LocalDateTime} to format.
      * @return The formatted instant (e.g Y year(s), M month(s), D day(s)).
      */
     public static String formatLongDuration(Locale locale, LocalDateTime date) {
@@ -95,12 +97,12 @@ public class FormatUtil {
         if (years > 0) {
             units.add(years == 1
                     ? I18nManager.localize(locale, "one.year")
-                    : I18nManager.localize(locale, "several.years"));
+                    : I18nManager.localize(locale, "several.years").formatted(years));
         }
         if (months > 0) {
             units.add(months == 1
                     ? I18nManager.localize(locale, "one.month")
-                    : I18nManager.localize(locale, "several.months"));
+                    : I18nManager.localize(locale, "several.months").formatted(months));
         }
         if (days > 0) {
             units.add(days == 1
@@ -132,10 +134,6 @@ public class FormatUtil {
         return "%d:%02d".formatted(duration.toMinutesPart(), duration.toSecondsPart());
     }
 
-    public static <T extends Enum<T>> String format(Class<T> enumClass, CharSequence delimiter) {
-        return FormatUtil.format(enumClass.getEnumConstants(), value -> value.name().toLowerCase(), delimiter);
-    }
-
     public static <T> String format(T[] array, Function<T, String> mapper, CharSequence delimiter) {
         return FormatUtil.format(Arrays.stream(array), mapper, delimiter);
     }
@@ -149,11 +147,11 @@ public class FormatUtil {
     }
 
     /**
-     * @param number The double number to format.
      * @param locale The desired locale.
-     * @return The formatted number as a string using English locale.
+     * @param number The double number to format.
+     * @return The formatted number as a string using the provided locale.
      */
-    public static String number(double number, Locale locale) {
+    public static String number(Locale locale, double number) {
         return NumberFormat.getNumberInstance(locale).format(number);
     }
 

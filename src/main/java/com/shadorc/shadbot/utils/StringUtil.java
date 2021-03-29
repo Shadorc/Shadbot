@@ -14,30 +14,19 @@ public class StringUtil {
     private static final Pattern SPACES_PATTERN = Pattern.compile(" +");
 
     /**
-     * @param str      The string to check, may be {@code null}.
+     * @param str      The string to abbreviate, may be {@code null}.
      * @param maxWidth Maximum length of result string, must be at least 4.
      * @return Abbreviated string, {@code null} if null string input.
      * @throws IllegalArgumentException If the width is too small.
      */
     public static String abbreviate(@Nullable String str, int maxWidth) {
-        return abbreviate(str, "...", maxWidth);
-    }
-
-    /**
-     * @param str          The string to check, may be {@code null}.
-     * @param abbrevMarker The string used as replacement marker.
-     * @param maxWidth     Maximum length of result string.
-     * @return Abbreviated string, {@code null} if null string input.
-     * @throws IllegalArgumentException If the width is too small.
-     */
-    @Nullable
-    public static String abbreviate(@Nullable String str, String abbrevMarker, int maxWidth) {
         if (str == null) {
             return null;
         }
         if (str.length() <= maxWidth) {
             return str;
         }
+        final String abbrevMarker = "...";
         if (str.length() - abbrevMarker.length() <= 0) {
             throw new IllegalArgumentException("Minimum abbreviation width is %d".formatted(abbrevMarker.length() + 1));
         }
@@ -69,16 +58,6 @@ public class StringUtil {
             return str;
         }
         return SPACES_PATTERN.matcher(str.trim()).replaceAll(" ");
-    }
-
-    /**
-     * @param str      The string from which to remove patterns, may be {@code null}.
-     * @param toRemove The strings to be substituted for each match.
-     * @return The resulting string.
-     */
-    @Nullable
-    public static String remove(@Nullable String str, @NonNull List<String> toRemove) {
-        return StringUtil.remove(str, toRemove.toArray(new String[0]));
     }
 
     /**

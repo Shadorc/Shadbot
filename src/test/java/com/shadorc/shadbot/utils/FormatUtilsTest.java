@@ -69,6 +69,16 @@ public class FormatUtilsTest {
         assertEquals("1:01:15",
                 FormatUtil.formatLongDuration(locale, localDateTime.minusHours(1).minusMinutes(1).minusSeconds(15)));
         assertEquals("1 day", FormatUtil.formatLongDuration(locale, localDateTime.minusDays(1)));
+        /* TODO: These tests are inconsistent
+        assertEquals("1 month", FormatUtil.formatLongDuration(locale, localDateTime.minusMonths(1)));
+        assertEquals("1 year", FormatUtil.formatLongDuration(locale, localDateTime.minusYears(1)));
+        assertEquals("3 months, 4 days",
+                FormatUtil.formatLongDuration(locale, localDateTime.minusMonths(3).minusDays(4)));
+        assertEquals("2 years, 4 days",
+                FormatUtil.formatLongDuration(locale, localDateTime.minusYears(2).minusDays(4)));
+        assertEquals("2 years, 3 months, 4 days",
+                FormatUtil.formatLongDuration(locale, localDateTime.minusYears(2).minusMonths(3).minusDays(4)));
+         */
     }
 
     @Test

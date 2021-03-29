@@ -37,16 +37,6 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testRemove() {
-        assertEquals("bar", StringUtil.remove("foo bar", List.of("foo ")));
-        assertEquals(" ", StringUtil.remove("foo bar", "foo", "bar"));
-        assertEquals("foo bar", StringUtil.remove("foo bar"));
-        assertEquals("foo bar", StringUtil.remove("foo bar", "*"));
-        assertEquals("foo bar", StringUtil.remove("foo bar", ""));
-        assertNull(StringUtil.remove(null));
-    }
-
-    @Test
     public void testSplit() {
         assertEquals(List.of("foo", "bar", "hi"), StringUtil.split("foo bar hi"));
         assertEquals(List.of("foo", "bar", "hi"), StringUtil.split("foo bar hi "));

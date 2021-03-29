@@ -2,7 +2,8 @@ package com.shadorc.shadbot.utils;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class EnumUtilTest {
 
@@ -11,7 +12,7 @@ public class EnumUtilTest {
 
         @Override
         public String toString() {
-            return "not value 1";
+            return "This method should not be used for parsing";
         }
     }
 
@@ -21,17 +22,9 @@ public class EnumUtilTest {
         assertEquals(FakeEnum.VALUE_1, EnumUtil.parseEnum(FakeEnum.class, "value_1"));
         assertEquals(FakeEnum.VALUE_1, EnumUtil.parseEnum(FakeEnum.class, "vAluE_1"));
         assertNull(EnumUtil.parseEnum(FakeEnum.class, null));
+        assertNull(EnumUtil.parseEnum(FakeEnum.class, ""));
         assertNull(EnumUtil.parseEnum(FakeEnum.class, "alue_1"));
-    }
-
-    @Test
-    public void testParseEnumException() {
-        final RuntimeException err = new RuntimeException("Enum not found.");
-        assertEquals(FakeEnum.VALUE_1, EnumUtil.parseEnum(FakeEnum.class, "VALUE_1", err));
-        assertEquals(FakeEnum.VALUE_1, EnumUtil.parseEnum(FakeEnum.class, "value_1", err));
-        assertEquals(FakeEnum.VALUE_1, EnumUtil.parseEnum(FakeEnum.class, "vAluE_1", err));
-        assertThrows(err.getClass(), () -> EnumUtil.parseEnum(FakeEnum.class, null, err));
-        assertThrows(err.getClass(), () -> EnumUtil.parseEnum(FakeEnum.class, "alue_1", err));
+        assertNull(EnumUtil.parseEnum(FakeEnum.class, "value"));
     }
 
 }

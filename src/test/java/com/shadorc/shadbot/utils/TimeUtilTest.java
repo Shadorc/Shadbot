@@ -2,21 +2,15 @@ package com.shadorc.shadbot.utils;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TimeUtilTest {
-
-    @Test
-    public void testIsLocalDateInTheSameWeek() {
-        assertTrue(TimeUtil.isLocalDateInTheSameWeek(LocalDate.now(), LocalDate.now()));
-        assertTrue(TimeUtil.isLocalDateInTheSameWeek(
-                LocalDate.of(2020, 4, 11), LocalDate.of(2020, 4, 6)));
-        assertFalse(TimeUtil.isLocalDateInTheSameWeek(
-                LocalDate.of(2020, 4, 11), LocalDate.of(2020, 4, 13)));
-    }
 
     @Test
     public void testElapsedInstant() {

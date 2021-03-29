@@ -34,7 +34,7 @@ public class I18nManager {
     }
 
     public static String localize(Locale locale, double number) {
-        return FormatUtil.number(number, locale);
+        return FormatUtil.number(locale, number);
     }
 
 }

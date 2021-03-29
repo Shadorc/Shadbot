@@ -36,31 +36,13 @@ public class ShadbotUtil {
      * @return A random client presence showing "Playing /help | {tip}"
      */
     public static ClientPresence getRandomStatus() {
-        final String presence = String.format("/help | %s", TIPS.getRandomLineFormatted());
+        final String presence = "/help | %s".formatted(TIPS.getRandomLineFormatted());
         return ClientPresence.online(ClientActivity.playing(presence));
     }
 
     /**
-     * @param guildId The {@link Snowflake} ID of the {@link discord4j.core.object.entity.Guild} in which the
-     *                {@link discord4j.core.object.entity.User} made the bet.
-     * @param userId  The {@link Snowflake} ID of the {@link discord4j.core.object.entity.User} who made the bet.
-     * @param betStr  The string representing the bet.
-     * @return A long representing {@code betStr}.
-     * @throws CommandException thrown if {@code betStr} cannot be casted to a long or if the user does not have
-     *                          enough coins.
-     */
-    public static Mono<Long> requireValidBet(Snowflake guildId, Snowflake userId, String betStr) {
-        final Long bet = NumberUtil.toPositiveLongOrNull(betStr);
-        if (bet == null) {
-            throw new CommandException("`%s` is not a valid amount of coins.".formatted(betStr));
-        }
-        return ShadbotUtil.requireValidBet(guildId, userId, bet);
-    }
-
-    /**
-     * @param guildId The {@link Snowflake} ID of the {@link discord4j.core.object.entity.Guild} in which the
-     *                {@link discord4j.core.object.entity.User} made the bet.
-     * @param userId  The {@link Snowflake} ID of the {@link discord4j.core.object.entity.User} who made the bet.
+     * @param guildId The ID of the Guild in which the User made the bet.
+     * @param userId  The ID of the User who bet.
      * @param bet     The bet.
      * @return The bet.
      * @throws CommandException thrown if the user does not have enough coins.
@@ -72,6 +54,7 @@ public class ShadbotUtil {
                 .map(coins -> {
                     if (coins < bet) {
                         throw new CommandException(
+                                // TODO: I18n
                                 "You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.");
                     }
                     return bet;

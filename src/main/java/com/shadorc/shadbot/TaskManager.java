@@ -68,7 +68,7 @@ public class TaskManager {
                     Telemetry.TOTAL_MEMORY_GAUGE.set(SystemUtil.getTotalMemory());
                     Telemetry.FREE_MEMORY_GAUGE.set(SystemUtil.getFreeMemory());
                     Telemetry.GC_COUNT_GAUGE.set(SystemUtil.getGCCount());
-                    Telemetry.GC_TIME_GAUGE.set(SystemUtil.getGCTime());
+                    Telemetry.GC_TIME_GAUGE.set(SystemUtil.getGCTime().toMillis());
                     Telemetry.THREAD_COUNT_GAUGE.set(SystemUtil.getThreadCount());
                     Telemetry.DAEMON_THREAD_COUNT_GAUGE.set(SystemUtil.getDaemonThreadCount());
 
