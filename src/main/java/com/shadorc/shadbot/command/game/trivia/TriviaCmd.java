@@ -14,6 +14,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
 
     // https://opentdb.com/api_category.php <ID, Name>
     private static final Map<String, Integer> CATEGORIES = new HashMap<>();
+
     static {
         CATEGORIES.put("General Knowledge", 9);
         CATEGORIES.put("Entertainment: Books", 10);
