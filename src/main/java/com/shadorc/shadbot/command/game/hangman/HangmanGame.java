@@ -112,7 +112,6 @@ public class HangmanGame extends Game<HangmanCmd> {
                                         .formatted(this.context.localize(gains))));
                     }
                 })
-                .then(this.show())
                 .then(Mono.fromRunnable(this::destroy));
     }
 

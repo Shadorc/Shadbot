@@ -44,6 +44,7 @@ public class HangmanInputs extends MessageInputs {
             return Mono.empty();
         }
 
+        // TODO: Replying will overwrite the last followup message
         final Mono<Boolean> checkRateLimit = this.game.getRateLimiter().isLimitedAndWarn(this.game.getContext())
                 .filter(Boolean.FALSE::equals);
 

@@ -30,14 +30,14 @@ public class PremiumCollection extends DatabaseCollection {
 
     public PremiumCollection(MongoDatabase database) {
         super(database, "premium");
-        this.relicCache = SingleValueCache.Builder.create(this.getRelics().collectList()).withInfiniteTtl().build();
+        this.relicCache = SingleValueCache.Builder.create(this.requestRelics()).withInfiniteTtl().build();
     }
 
-    private Flux<Relic> getRelics() {
+    private Mono<List<Relic>> requestRelics() {
         final Publisher<Document> request = this.getCollection()
                 .find();
 
-        final Mono<List<Relic>> getRelics = Flux.from(request)
+        return Flux.from(request)
                 .map(document -> document.toJson(JSON_WRITER_SETTINGS))
                 .flatMap(json -> Mono.fromCallable(() -> NetUtil.MAPPER.readValue(json, RelicBean.class)))
                 .map(Relic::new)
@@ -46,8 +46,10 @@ public class PremiumCollection extends DatabaseCollection {
                     Telemetry.DB_REQUEST_COUNTER.labels(this.getName()).inc();
                 })
                 .collectList();
+    }
 
-        return this.relicCache.getOrCache(getRelics)
+    public Flux<Relic> getRelics() {
+        return this.relicCache.getOrCache(this.requestRelics())
                 .flatMapMany(Flux::fromIterable);
     }
 
