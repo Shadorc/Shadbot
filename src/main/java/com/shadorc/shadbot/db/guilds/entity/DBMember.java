@@ -57,8 +57,6 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
             return Mono.empty();
         }
 
-        LOGGER.debug("[DBMember {}/{}] Coins update: {} coins",
-                this.getId().asString(), this.getGuildId().asString(), coins);
         return this.update(Updates.set("members.$.coins", coins), this.toDocument().append("coins", coins))
                 .then(Mono.defer(() -> {
                     if (coins >= 1_000_000_000) {
@@ -72,12 +70,12 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                                 .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.MILLIONAIRE));
                     }
                     return Mono.empty();
-                }));
+                }))
+                .doOnSubscribe(__ -> LOGGER.debug("[DBMember {}/{}] Coins update: {} coins",
+                        this.getId().asString(), this.getGuildId().asString(), coins));
     }
 
     private Mono<UpdateResult> update(Bson update, Document document) {
-        DatabaseManager.getGuilds().invalidateCache(this.getGuildId());
-
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(
@@ -104,43 +102,47 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                     }
                     return Mono.empty();
                 })
-                .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc());
+                .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
+                .doOnTerminate(() -> DatabaseManager.getGuilds().invalidateCache(this.getGuildId()));
     }
 
     // Note: If one day, a member contains more data than just coins, this method will need to be updated
     public Mono<Void> resetCoins() {
-        LOGGER.debug("[DBMember {}/{}] Coins deletion", this.getId().asString(), this.getGuildId().asString());
-        return this.delete();
+        return this.delete()
+                .doOnSubscribe(__ -> LOGGER.debug("[DBMember {}/{}] Coins deletion",
+                        this.getId().asString(), this.getGuildId().asString()));
     }
 
     @Override
     public Mono<Void> insert() {
-        LOGGER.debug("[DBMember {}/{}] Insertion", this.getId().asString(), this.getGuildId().asString());
-        DatabaseManager.getGuilds().invalidateCache(this.getGuildId());
-
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(Filters.eq("_id", this.getGuildId().asString()),
                         Updates.push("members", this.toDocument()),
                         new UpdateOptions().upsert(true)))
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[DBMember {}/{}] Insertion", this.getId().asString(), this.getGuildId().asString());
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
+                })
                 .doOnNext(result -> LOGGER.trace("[DBMember {}/{}] Insertion result: {}",
                         this.getId().asString(), this.getGuildId().asString(), result))
-                .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
+                .doOnTerminate(() -> DatabaseManager.getGuilds().invalidateCache(this.getGuildId()))
                 .then();
     }
 
     @Override
     public Mono<Void> delete() {
-        LOGGER.debug("[DBMember {}/{}] Deletion", this.getId().asString(), this.getGuildId().asString());
-        DatabaseManager.getGuilds().invalidateCache(this.getGuildId());
-
         return Mono.from(DatabaseManager.getGuilds()
                 .getCollection()
                 .updateOne(Filters.eq("_id", this.getGuildId().asString()),
                         Updates.pull("members", Filters.eq("_id", this.getId().asString()))))
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[DBMember {}/{}] Deletion", this.getId().asString(), this.getGuildId().asString());
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
+                })
                 .doOnNext(result -> LOGGER.trace("[DBMember {}/{}] Deletion result: {}",
                         this.getId().asString(), this.getGuildId().asString(), result))
-                .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc())
+                .doOnTerminate(() -> DatabaseManager.getGuilds().invalidateCache(this.getGuildId()))
                 .then();
     }
 

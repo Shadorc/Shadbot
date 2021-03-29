@@ -84,7 +84,8 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                     LOGGER.debug("[DBGuild {}] Setting deletion: {}", this.getId().asString(), setting);
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
                 })
-                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Setting deletion result: {}", this.getId().asString(), result))
+                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Setting deletion result: {}",
+                        this.getId().asString(), result))
                 .doOnTerminate(() -> DatabaseManager.getGuilds().invalidateCache(this.getId()));
     }
 
@@ -97,7 +98,8 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                     LOGGER.debug("[DBGuild {}] Insertion", this.getId().asString());
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
                 })
-                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Insertion result: {}", this.getId().asString(), result))
+                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Insertion result: {}",
+                        this.getId().asString(), result))
                 .doOnTerminate(() -> DatabaseManager.getGuilds().invalidateCache(this.getId()))
                 .then();
     }
