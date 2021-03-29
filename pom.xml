@@ -112,16 +112,10 @@
             <artifactId>reactor-core</artifactId>
             <version>3.4.4</version>
         </dependency>
-        <!-- Discord4J -->
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
             <version>3.2.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.discord4j</groupId>
-            <artifactId>stores-caffeine</artifactId>
-            <version>3.1.5</version>
         </dependency>
         <!-- lavaplayer -->
         <dependency>
