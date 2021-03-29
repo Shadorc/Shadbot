@@ -1,6 +1,7 @@
 package com.shadorc.shadbot;
 
 import com.shadorc.shadbot.api.BotListStats;
+import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.core.retriever.SpyRestEntityRetriever;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
@@ -92,7 +93,7 @@ public class Shadbot {
         DEFAULT_LOGGER.info("Owner ID: {} | Application ID: {}", Shadbot.OWNER_ID.get(), applicationId);
 
         DEFAULT_LOGGER.info("Registering commands");
-        //CommandManager.getInstance().register(client.getApplicationService(), applicationId).block();
+        CommandManager.getInstance().register(client.getApplicationService(), applicationId).block();
 
         DEFAULT_LOGGER.info("Connecting to Discord");
         client.gateway()
