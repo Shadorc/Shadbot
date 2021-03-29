@@ -1,19 +1,13 @@
-/*
 package com.shadorc.shadbot.command.game.hangman;
 
-import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.EnumUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
@@ -27,48 +21,41 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
     private final WordsList hardWords;
 
     public HangmanCmd() {
-        super(List.of("hangman"));
+        super("hangman", "Start a Hangman game");
+        this.addOption("difficulty", "The difficulty of the word to find, easy by default", false,
+                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Difficulty.class));
 
-        this.easyWords = new WordsList("https://gist.githubusercontent.com/" +
-                "deekayen/4148741/raw/01c6252ccc5b5fb307c1bb899c95989a8a284616/1-1000.txt");
-        this.hardWords = new WordsList("https://raw.githubusercontent.com/" +
-                "dwyl/english-words/master/words_alpha.txt");
+        this.easyWords = new WordsList(
+                "https://gist.githubusercontent.com/deekayen/4148741/raw/01c6252ccc5b5fb307c1bb899c95989a8a284616/1-1000.txt");
+        this.hardWords = new WordsList(
+                "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt");
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final Difficulty difficulty = EnumUtils.parseEnum(Difficulty.class, context.getArg().orElse("easy"),
-                new CommandException(String.format("`%s` is not a valid difficulty. %s",
-                        context.getArg().orElse(""), FormatUtils.options(Difficulty.class))));
-
+    public Mono<?> execute(Context context) {
+        final Difficulty difficulty = context.getOptionAsEnum(Difficulty.class, "difficulty").orElse(Difficulty.EASY);
         return this.loadWords(difficulty)
                 .then(Mono.defer(() -> {
-                    final HangmanGame hangmanManager = this.getManagers()
-                            .putIfAbsent(context.getChannelId(), new HangmanGame(this, context, difficulty));
-                    if (hangmanManager == null) {
-                        final HangmanGame newHangmanManager = this.getManagers().get(context.getChannelId());
-                        return newHangmanManager.start()
-                                .then(newHangmanManager.show())
-                                .doOnError(err -> this.getManagers().remove(context.getChannelId()));
-                    } else {
-                        return context.getChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(
-                                        String.format(Emoji.INFO + " (**%s**) A Hangman game has already been started by **%s**."
-                                                        + " Please, wait for him to finish.",
-                                                context.getUsername(), hangmanManager.getContext().getUsername()), channel))
-                                .then();
+                    if (this.getManagers().containsKey(context.getChannelId())) {
+                        return context.reply(Emoji.INFO, context.localize("hangman.already.started"));
                     }
+
+                    final HangmanGame game = new HangmanGame(this, context, difficulty);
+                    this.getManagers().put(context.getChannelId(), game);
+                    return game.start()
+                            .then(game.show())
+                            .doOnError(err -> this.getManagers().remove(context.getChannelId()));
                 }));
 
     }
 
-    private Mono<Void> loadWords(Difficulty difficulty) {
+    private Mono<List<String>> loadWords(Difficulty difficulty) {
         if (difficulty == Difficulty.EASY && !this.easyWords.isLoaded()) {
             return this.easyWords.load()
-                    .doOnSuccess(__ -> DEFAULT_LOGGER.info("Hangman word list (difficulty: easy) obtained"));
+                    .doOnSuccess(__ -> DEFAULT_LOGGER.info("Hangman word list (difficulty: easy) loaded"));
         } else if (difficulty == Difficulty.HARD && !this.hardWords.isLoaded()) {
             return this.hardWords.load()
-                    .doOnSuccess(__ -> DEFAULT_LOGGER.info("Hangman word list (difficulty: hard) obtained"));
+                    .doOnSuccess(__ -> DEFAULT_LOGGER.info("Hangman word list (difficulty: hard) loaded"));
         }
         return Mono.empty();
     }
@@ -81,17 +68,4 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
         return this.hardWords;
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Start a Hangman game.")
-                .addArg("difficulty", String.format("%s. The difficulty of the word to find",
-                        FormatUtils.format(Difficulty.class, "/")), true)
-                .addField("Gains", String.format("The winner gets **%s** plus a bonus (**%s max.**) depending " +
-                                "on his number of errors. Gains are multiplied depending on the difficulty.",
-                        FormatUtils.coins(Constants.MIN_GAINS),
-                        FormatUtils.coins(Constants.MAX_BONUS)), false)
-                .build();
-    }
 }
-*/

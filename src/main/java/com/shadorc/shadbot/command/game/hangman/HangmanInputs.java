@@ -1,10 +1,6 @@
-/*
 package com.shadorc.shadbot.command.game.hangman;
 
-import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.Inputs;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.common.util.Snowflake;
+import com.shadorc.shadbot.object.inputs.MessageInputs;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
@@ -12,7 +8,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.regex.Pattern;
 
-public class HangmanInputs extends Inputs {
+public class HangmanInputs extends MessageInputs {
 
     private static final Pattern WORD_PATTERN = Pattern.compile("[a-z]+");
 
@@ -29,9 +25,9 @@ public class HangmanInputs extends Inputs {
 
     @Override
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
-        final Member member = event.getMember().orElseThrow();
-        return this.game.isCancelMessage(event.getMessage())
-                .map(isCancelCmd -> isCancelCmd || this.game.getContext().getAuthorId().equals(member.getId()));
+        return Mono.justOrEmpty(event.getMember())
+                .map(Member::getId)
+                .map(id -> this.game.getContext().getAuthorId().equals(id));
     }
 
     @Override
@@ -41,36 +37,23 @@ public class HangmanInputs extends Inputs {
 
     @Override
     public Mono<Void> processEvent(MessageCreateEvent event) {
-        return this.game.isCancelMessage(event.getMessage())
-                .flatMap(isCancelMsg -> {
-                    final Member member = event.getMember().orElseThrow();
-                    if (isCancelMsg) {
-                        return event.getMessage().getChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(
-                                        String.format(Emoji.CHECK_MARK + " Hangman game cancelled by **%s**.",
-                                                member.getUsername()), channel))
-                                .then(Mono.fromRunnable(this.game::destroy));
-                    }
+        final String content = event.getMessage().getContent().toLowerCase().trim();
 
-                    final String content = event.getMessage().getContent().toLowerCase().trim();
+        // Check only if content is an unique word/letter
+        if (!WORD_PATTERN.matcher(content).matches()) {
+            return Mono.empty();
+        }
 
-                    // Check only if content is an unique word/letter
-                    if (!WORD_PATTERN.matcher(content).matches()) {
-                        return Mono.empty();
-                    }
+        final Mono<Boolean> checkRateLimit = this.game.getRateLimiter().isLimitedAndWarn(this.game.getContext())
+                .filter(Boolean.FALSE::equals);
 
-                    final Snowflake channelId = this.game.getContext().getChannelId();
-                    if (content.length() == 1
-                            && !this.game.getRateLimiter().isLimitedAndWarn(channelId, member)) {
-                        return this.game.checkLetter(content);
-                    } else if (content.length() == this.game.getWord().length()
-                            && !this.game.getRateLimiter().isLimitedAndWarn(channelId, member)) {
-                        return this.game.checkWord(content);
-                    }
+        if (content.length() == 1) {
+            return checkRateLimit.flatMap(__ -> this.game.checkLetter(content));
+        } else if (content.length() == this.game.getWord().length()) {
+            return checkRateLimit.flatMap(__ -> this.game.checkWord(content));
+        }
 
-                    return Mono.empty();
-                });
+        return Mono.empty();
     }
 
 }
-*/

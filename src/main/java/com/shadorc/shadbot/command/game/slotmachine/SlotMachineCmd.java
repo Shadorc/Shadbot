@@ -27,7 +27,7 @@ public class SlotMachineCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final GamblerPlayer player = new GamblerPlayer(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST);
 
-        return ShadbotUtil.requireValidBet(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
+        return ShadbotUtil.requireValidBet(context.getLocale(), context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
                 .then(player.bet())
                 .then(Mono.defer(() -> {
                     final List<SlotOptions> slots = SlotMachineCmd.randSlots();

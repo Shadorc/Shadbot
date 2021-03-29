@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.game.hangman;
 
 import com.shadorc.shadbot.core.command.Context;
@@ -7,35 +6,35 @@ import com.shadorc.shadbot.core.game.player.Player;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.*;
-import discord4j.common.util.Snowflake;
-import discord4j.core.object.entity.Message;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.StringUtil;
+import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.MessageData;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class HangmanGame extends Game<HangmanCmd> {
 
     private static final List<String> IMG_LIST = List.of(
-            HangmanGame.getImageUrl("8/8b", 0),
-            HangmanGame.getImageUrl("3/30", 1),
-            HangmanGame.getImageUrl("7/70", 2),
-            HangmanGame.getImageUrl("9/97", 3),
-            HangmanGame.getImageUrl("2/27", 4),
-            HangmanGame.getImageUrl("6/6b", 5),
-            HangmanGame.getImageUrl("d/d6", 6));
+            HangmanGame.buildImageUrl("8/8b", 0),
+            HangmanGame.buildImageUrl("3/30", 1),
+            HangmanGame.buildImageUrl("7/70", 2),
+            HangmanGame.buildImageUrl("9/97", 3),
+            HangmanGame.buildImageUrl("2/27", 4),
+            HangmanGame.buildImageUrl("6/6b", 5),
+            HangmanGame.buildImageUrl("d/d6", 6));
     private static final float BONUS_PER_IMAGE = (float) Constants.MAX_BONUS / IMG_LIST.size();
 
     private final HangmanCmd.Difficulty difficulty;
     private final RateLimiter rateLimiter;
-    private final AtomicLong messageId;
     private final String word;
     private final Set<String> lettersTested;
 
@@ -46,7 +45,6 @@ public class HangmanGame extends Game<HangmanCmd> {
         super(gameCmd, context, Duration.ofMinutes(3));
         this.difficulty = difficulty;
         this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(1));
-        this.messageId = new AtomicLong(-1);
         this.word = this.getWord(difficulty);
         this.lettersTested = new HashSet<>();
         this.failCount = 0;
@@ -62,57 +60,29 @@ public class HangmanGame extends Game<HangmanCmd> {
     }
 
     @Override
-    public Mono<Void> end() {
-        return Mono.defer(() -> {
-            final StringBuilder strBuilder = new StringBuilder();
-            if (this.failCount == IMG_LIST.size()) {
-                return Mono.just(strBuilder.append(
-                        String.format(Emoji.THUMBSDOWN + " (**%s**) You lose, the word to guess was **%s** !",
-                                this.getContext().getUsername(), this.word)));
-            } else {
-                final float imagesRemaining = IMG_LIST.size() - this.failCount;
-                final int difficultyMultiplicator = this.difficulty == HangmanCmd.Difficulty.HARD ? 4 : 1;
-                final int gains = (int) (Constants.MIN_GAINS + Math.ceil(BONUS_PER_IMAGE * imagesRemaining) * difficultyMultiplicator);
-                Telemetry.HANGMAN_SUMMARY.labels("win").observe(gains);
-                return new Player(this.getContext().getGuildId(), this.getContext().getAuthorId())
-                        .win(gains)
-                        .thenReturn(strBuilder.append(
-                                String.format(Emoji.PURSE + " (**%s**) Well played, you found the word ! You won **%s**.",
-                                        this.getContext().getUsername(), FormatUtils.coins(gains))));
-            }
-        })
-                .map(StringBuilder::toString)
-                .flatMap(text -> this.show()
-                        .then(this.getContext().getChannel())
-                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel))
-                        .then(Mono.fromRunnable(this::destroy)));
-    }
-
-    @Override
-    public Mono<Void> show() {
-        final List<String> missedLetters = this.lettersTested.stream()
-                .filter(letter -> !this.word.contains(letter))
-                .map(String::toUpperCase)
-                .collect(Collectors.toList());
-
-        final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
-                .andThen(embed -> {
-                    embed.setAuthor("Hangman Game", null, this.getContext().getAvatarUrl());
+    public Mono<MessageData> show() {
+        final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultEmbed(
+                embed -> {
+                    embed.setAuthor(this.context.localize("hangman.title"), null, this.getContext().getAuthorAvatar());
                     embed.setThumbnail("https://i.imgur.com/Vh9WyaU.png");
-                    embed.addField("Word", this.getRepresentation(this.word), false);
-                    embed.setDescription("Type letters or enter a word if you think you've guessed it.");
+                    embed.addField(this.context.localize("hangman.word"), this.getRepresentation(this.word), false);
+                    embed.setDescription(this.context.localize("hangman.description"));
 
+                    final List<String> missedLetters = this.lettersTested.stream()
+                            .filter(letter -> !this.word.contains(letter))
+                            .map(String::toUpperCase)
+                            .collect(Collectors.toList());
                     if (!missedLetters.isEmpty()) {
-                        embed.addField("Misses", String.join(", ", missedLetters), false);
+                        embed.addField(this.context.localize("hangman.misses"),
+                                String.join(", ", missedLetters), false);
                     }
 
                     if (this.isScheduled()) {
-                        final Duration remainingDuration = this.getDuration()
-                                .minusMillis(TimeUtils.getMillisUntil(this.startTime));
-                        embed.setFooter(String.format("Will automatically stop in %s seconds. Use %scancel to force the stop.",
-                                remainingDuration.toSeconds(), this.getContext().getPrefix()), null);
+                        final Duration remainingDuration = this.getDuration().minus(TimeUtil.elapsed(this.startTime));
+                        embed.setFooter(this.context.localize("hangman.footer")
+                                .formatted(remainingDuration.toSeconds()), null);
                     } else {
-                        embed.setFooter("Finished.", null);
+                        embed.setFooter(this.context.localize("hangman.footer.finished"), null);
                     }
 
                     if (this.failCount > 0) {
@@ -120,17 +90,30 @@ public class HangmanGame extends Game<HangmanCmd> {
                     }
                 });
 
-        return this.getContext().getClient()
-                .getMessageById(this.getContext().getChannelId(), Snowflake.of(this.messageId.get()))
-                .flatMap(message -> message.editFollowupMessage(spec -> spec.setEmbed(embedConsumer)))
-                .switchIfEmpty(Mono.error(new RuntimeException("Message not found.")))
-                // An error can occur if the message is not found or if the message id is -1
-                .onErrorResume(err -> this.getContext().getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel)))
-                .map(Message::getId)
-                .map(Snowflake::asLong)
-                .doOnNext(this.messageId::set)
-                .then();
+        return this.context.editReply(embedConsumer);
+    }
+
+    @Override
+    public Mono<Void> end() {
+        return Mono.
+                defer(() -> {
+                    if (this.failCount == IMG_LIST.size()) {
+                        return this.context.reply(Emoji.THUMBSDOWN, this.context.localize("hangman.lose")
+                                .formatted(this.word));
+                    } else {
+                        final float imagesRemaining = IMG_LIST.size() - this.failCount;
+                        final int difficultyMultiplicator = this.difficulty == HangmanCmd.Difficulty.HARD ? 4 : 1;
+                        final int gains = (int) (Constants.MIN_GAINS + Math.ceil(BONUS_PER_IMAGE * imagesRemaining) * difficultyMultiplicator);
+
+                        Telemetry.HANGMAN_SUMMARY.labels("win").observe(gains);
+                        return new Player(this.getContext().getGuildId(), this.getContext().getAuthorId())
+                                .win(gains)
+                                .then(this.context.reply(Emoji.PURSE, this.context.localize("hangman.win")
+                                        .formatted(this.context.localize(gains))));
+                    }
+                })
+                .then(this.show())
+                .then(Mono.fromRunnable(this::destroy));
     }
 
     private String getWord(HangmanCmd.Difficulty difficulty) {
@@ -155,17 +138,19 @@ public class HangmanGame extends Game<HangmanCmd> {
         this.lettersTested.add(chr);
 
         // The word has been entirely guessed
-        if (StringUtils.remove(this.getRepresentation(this.word), "\\", " ", "*").equalsIgnoreCase(this.word)) {
+        if (this.getRepresentation(this.word).replace("\\", "")
+                .replace(" ", "")
+                .replace("*", "").equalsIgnoreCase(this.word)) {
             return this.end();
         }
 
-        return this.show();
+        return this.show().then();
     }
 
     protected Mono<Void> checkWord(String word) {
         // If the word has been guessed
         if (this.word.equalsIgnoreCase(word)) {
-            this.lettersTested.addAll(StringUtils.split(word, ""));
+            this.lettersTested.addAll(StringUtil.split(word, ""));
             return this.end();
         }
 
@@ -173,7 +158,12 @@ public class HangmanGame extends Game<HangmanCmd> {
         if (this.failCount == IMG_LIST.size()) {
             return this.end();
         }
-        return this.show();
+        return this.show().then();
+    }
+
+    private static String buildImageUrl(String path, int num) {
+        return "https://upload.wikimedia.org/wikipedia/commons/thumb/%s/Hangman-%d.png/60px-Hangman-%d.png"
+                .formatted(path, num, num);
     }
 
     public RateLimiter getRateLimiter() {
@@ -185,14 +175,8 @@ public class HangmanGame extends Game<HangmanCmd> {
     }
 
     private String getRepresentation(String word) {
-        return String.format("**%s**",
-                FormatUtils.format(StringUtils.split(word, ""),
-                        letter -> this.lettersTested.contains(letter) ? letter.toUpperCase() : "\\_", " "));
+        return "**%s**".formatted(FormatUtil.format(StringUtil.split(word, ""),
+                letter -> this.lettersTested.contains(letter) ? letter.toUpperCase() : "\\_", " "));
     }
 
-    private static String getImageUrl(String path, int num) {
-        return String.format("https://upload.wikimedia.org/wikipedia/commons/thumb/%s/Hangman-%d.png/60px-Hangman-%d.png",
-                path, num, num);
-    }
-
-}*/
+}

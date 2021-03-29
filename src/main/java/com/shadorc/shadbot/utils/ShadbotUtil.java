@@ -2,6 +2,7 @@ package com.shadorc.shadbot.utils;
 
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.shadorc.shadbot.command.CommandException;
+import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.TextFile;
 import com.shadorc.shadbot.database.DatabaseManager;
@@ -14,6 +15,7 @@ import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.NonNull;
 
+import java.util.Locale;
 import java.util.function.Consumer;
 
 public class ShadbotUtil {
@@ -47,15 +49,13 @@ public class ShadbotUtil {
      * @return The bet.
      * @throws CommandException thrown if the user does not have enough coins.
      */
-    public static Mono<Long> requireValidBet(Snowflake guildId, Snowflake userId, long bet) {
+    public static Mono<Long> requireValidBet(Locale locae, Snowflake guildId, Snowflake userId, long bet) {
         return DatabaseManager.getGuilds()
                 .getDBMember(guildId, userId)
                 .map(DBMember::getCoins)
                 .map(coins -> {
                     if (coins < bet) {
-                        throw new CommandException(
-                                // TODO: I18n
-                                "You don't have enough coins. You can get some by playing **RPS**, **Hangman** or **Trivia**.");
+                        throw new CommandException(I18nManager.localize(locae, "not.enough.coins"));
                     }
                     return bet;
                 });

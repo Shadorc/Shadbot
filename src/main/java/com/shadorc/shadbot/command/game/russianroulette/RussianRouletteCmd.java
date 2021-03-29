@@ -31,7 +31,7 @@ public class RussianRouletteCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         final RussianRoulettePlayer player = this.getPlayer(context.getGuildId(), context.getAuthorId());
-        return ShadbotUtil.requireValidBet(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
+        return ShadbotUtil.requireValidBet(context.getLocale(), context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
                 .then(Mono.defer(() -> {
                     if (!player.isAlive()) {
                         return context.reply(Emoji.BROKEN_HEART, context.localize("russianroulette.already.dead")
