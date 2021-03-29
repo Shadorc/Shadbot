@@ -98,6 +98,7 @@ public class PremiumCollection extends DatabaseCollection {
     }
 
     public void invalidateCache() {
+        LOGGER.trace("Cache invalidated");
         this.relicCache.invalidate();
     }
 

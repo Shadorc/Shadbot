@@ -142,10 +142,12 @@ public class LotteryCollection extends DatabaseCollection {
     }
 
     public void invalidateGamblersCache() {
+        LOGGER.trace("Gamblers cache invalidated");
         this.gamblersCache.invalidate();
     }
 
     public void invalidateHistoricCache() {
+        LOGGER.trace("Historic cache invalidated");
         this.historicCache.invalidate();
     }
 

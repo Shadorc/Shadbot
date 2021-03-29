@@ -32,10 +32,8 @@ public class BassBoostCmd extends BaseCmd {
                 .switchIfEmpty(Mono.error(new CommandException(context.localize("bassboost.unlock")
                         .formatted(Config.PATREON_URL, Achievement.VOTER.getTitle(context)))))
                 .flatMap(__ -> {
-                    final String arg = context.getOptionAsString("percentage").orElseThrow();
-
-                    final Integer percentage = NumberUtil.toIntBetweenOrNull(arg, VALUE_MIN, VALUE_MAX);
-                    if (percentage == null) {
+                    final int percentage = context.getOptionAsLong("percentage").orElseThrow().intValue();
+                    if (!NumberUtil.isBetween(percentage, VALUE_MIN, VALUE_MAX)) {
                         return Mono.error(new CommandException(context.localize("bassboost.invalid")
                                 .formatted(VALUE_MIN, VALUE_MAX)));
                     }

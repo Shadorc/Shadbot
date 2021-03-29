@@ -31,11 +31,11 @@ public class SkipCmd extends BaseCmd {
 
         final Mono<MessageData> sendMessage = context.reply(Emoji.TRACK_NEXT, context.localize("skip.message"));
 
-        final Optional<String> option = context.getOptionAsString("index");
-        if (option.isPresent()) {
+        final Optional<Long> indexOpt = context.getOptionAsLong("index");
+        if (indexOpt.isPresent()) {
             final int playlistSize = guildMusic.getTrackScheduler().getPlaylist().size();
-            final Integer index = NumberUtil.toIntBetweenOrNull(option.orElseThrow(), 1, playlistSize);
-            if (index == null) {
+            final int index = indexOpt.orElseThrow().intValue();
+            if (!NumberUtil.isBetween(index, 1, playlistSize)) {
                 return Mono.error(new CommandException(context.localize("skip.out.of.index")
                         .formatted(playlistSize)));
             }

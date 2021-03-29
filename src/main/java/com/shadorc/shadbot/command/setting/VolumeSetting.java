@@ -31,12 +31,11 @@ public class VolumeSetting extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String volumeStr = context.getOptionAsString("volume").orElseThrow();
+        final long volume = context.getOptionAsLong("volume").orElseThrow();
 
-        final Integer volume = NumberUtil.toIntBetweenOrNull(volumeStr, MIN_VOLUME, MAX_VOLUME);
-        if (volume == null) {
+        if (!NumberUtil.isBetween(volume, MIN_VOLUME, MAX_VOLUME)) {
             return Mono.error(new CommandException(context.localize("setting.volume.invalid")
-                    .formatted(volumeStr, MIN_VOLUME, MAX_VOLUME)));
+                    .formatted(MIN_VOLUME, MAX_VOLUME)));
         }
 
         return DatabaseManager.getGuilds()

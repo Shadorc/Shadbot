@@ -41,7 +41,9 @@ public class NSFWSetting extends BaseCmd {
                             case DISABLE -> false;
                         }))
                         .flatMap(nsfw -> channel.edit(spec -> spec.setNsfw(nsfw))))
-                .map(channel -> channel.isNsfw() ? context.localize("setting.nsfw.nsfw") : context.localize("setting.nsfw.sfw"))
+                .map(channel -> channel.isNsfw()
+                        ? context.localize("setting.nsfw.nsfw").formatted(channel.getMention())
+                        : context.localize("setting.nsfw.sfw").formatted(channel.getMention()))
                 .flatMap(message -> context.reply(Emoji.CHECK_MARK, message));
     }
 

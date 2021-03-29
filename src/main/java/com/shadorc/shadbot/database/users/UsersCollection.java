@@ -50,6 +50,7 @@ public class UsersCollection extends DatabaseCollection {
     }
 
     public void invalidateCache(Snowflake userId) {
+        LOGGER.trace("{User ID: {}} Cache invalidated", userId.asString());
         this.usersCache.remove(userId);
     }
 

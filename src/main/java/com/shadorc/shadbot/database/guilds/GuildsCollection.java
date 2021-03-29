@@ -82,6 +82,7 @@ public class GuildsCollection extends DatabaseCollection {
     }
 
     public void invalidateCache(Snowflake guildId) {
+        LOGGER.trace("{Guild ID: {}} Cache invalidated", guildId.asString());
         this.guildCache.remove(guildId);
     }
 
