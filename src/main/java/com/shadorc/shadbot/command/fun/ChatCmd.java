@@ -16,6 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,7 +55,8 @@ public class ChatCmd extends BaseCmd {
         }
 
         return this.getResponse(context.getChannelId(), message)
-                .flatMap(response -> context.reply(Emoji.SPEECH, response));
+                .flatMap(response -> context.reply(Emoji.SPEECH, response))
+                .switchIfEmpty(Mono.error(new IOException("Bots are unreachable")));
     }
 
     private Mono<String> getResponse(Snowflake channelId, String message) {
@@ -77,7 +79,7 @@ public class ChatCmd extends BaseCmd {
                 .doOnNext(chat -> this.channelsCustid.put(channelId, chat.getCustId()))
                 .map(ChatBotResult::getResponse)
                 .onErrorResume(err -> Mono.fromRunnable(() ->
-                        LOGGER.info("{} is not reachable, trying another one.", botId)));
+                        LOGGER.info("{} is not reachable, trying another one: {}", botId, err.getMessage())));
     }
 
 }
