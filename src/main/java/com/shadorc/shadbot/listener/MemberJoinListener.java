@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;

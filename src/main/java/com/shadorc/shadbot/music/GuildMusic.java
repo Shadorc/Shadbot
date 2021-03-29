@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.music;
 
 import com.shadorc.shadbot.core.i18n.I18nManager;
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.database.DatabaseManager;
+import com.shadorc.shadbot.database.guilds.entity.DBGuild;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.ExceptionHandler;

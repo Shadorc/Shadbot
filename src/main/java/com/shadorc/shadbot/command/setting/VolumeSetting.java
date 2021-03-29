@@ -7,7 +7,7 @@ import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.NumberUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;

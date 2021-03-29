@@ -2,8 +2,8 @@ package com.shadorc.shadbot.command.todo;
 
 import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.Settings;
+import com.shadorc.shadbot.database.DatabaseManager;
+import com.shadorc.shadbot.database.guilds.entity.Settings;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;

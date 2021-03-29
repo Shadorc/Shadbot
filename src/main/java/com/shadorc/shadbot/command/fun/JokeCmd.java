@@ -19,7 +19,7 @@ public class JokeCmd extends BaseCmd {
     private static final String HOME_URL = "https://icanhazdadjoke.com/";
 
     public JokeCmd() {
-        super(CommandCategory.FUN, "joke", "Random joke");
+        super(CommandCategory.FUN, "joke", "Random dad joke");
     }
 
     @Override

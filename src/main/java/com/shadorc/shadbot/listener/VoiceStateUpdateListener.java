@@ -2,8 +2,8 @@ package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.data.Telemetry;
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.database.DatabaseManager;
+import com.shadorc.shadbot.database.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;

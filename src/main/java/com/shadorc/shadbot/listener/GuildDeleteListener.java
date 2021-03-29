@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
+import com.shadorc.shadbot.database.DatabaseManager;
+import com.shadorc.shadbot.database.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.MusicManager;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;

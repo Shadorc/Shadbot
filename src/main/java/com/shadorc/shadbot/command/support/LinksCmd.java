@@ -4,7 +4,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
+import com.shadorc.shadbot.database.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import reactor.core.publisher.Mono;

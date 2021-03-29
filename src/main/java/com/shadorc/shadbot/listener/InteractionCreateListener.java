@@ -2,7 +2,7 @@ package com.shadorc.shadbot.listener;
 
 import com.shadorc.shadbot.core.command.CommandProcessor;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.database.DatabaseManager;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import reactor.core.publisher.Mono;
 

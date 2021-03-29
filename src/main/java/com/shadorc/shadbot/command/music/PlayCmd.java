@@ -7,7 +7,7 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
-import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;

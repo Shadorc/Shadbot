@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBMember;
+import com.shadorc.shadbot.database.DatabaseManager;
+import com.shadorc.shadbot.database.guilds.entity.DBMember;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.object.entity.Message;
 import reactor.core.publisher.Mono;

@@ -7,7 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.music.TrackScheduler;

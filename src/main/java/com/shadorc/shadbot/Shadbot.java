@@ -6,7 +6,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
-import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtil;

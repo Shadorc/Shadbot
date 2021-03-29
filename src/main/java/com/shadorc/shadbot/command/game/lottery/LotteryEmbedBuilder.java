@@ -1,8 +1,8 @@
 package com.shadorc.shadbot.command.game.lottery;
 
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
-import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
+import com.shadorc.shadbot.database.lottery.entity.LotteryGambler;
+import com.shadorc.shadbot.database.lottery.entity.LotteryHistoric;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
