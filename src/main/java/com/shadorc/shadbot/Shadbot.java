@@ -18,6 +18,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
+import discord4j.core.object.presence.ClientPresence;
 import discord4j.core.retriever.EntityRetrievalStrategy;
 import discord4j.core.retriever.FallbackEntityRetriever;
 import discord4j.core.shard.MemberRequestFilter;
@@ -116,7 +117,7 @@ public class Shadbot {
                         .setMapping(new CaffeineStoreService(
                                 builder -> builder.expireAfterWrite(Duration.ofMinutes(30))), MessageData.class)
                         .setFallback(new JdkStoreService()))))
-                .setInitialStatus(__ -> ShadbotUtil.getRandomStatus())
+                .setInitialPresence(__ -> ShadbotUtil.getRandomStatus())
                 .setMemberRequestFilter(MemberRequestFilter.none())
                 .withGateway(gateway -> {
                     Shadbot.gateway = gateway;

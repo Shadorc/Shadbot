@@ -62,7 +62,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
         final Snowflake guildId = event.getCurrent().getGuildId();
         return Mono.defer(() -> Mono.justOrEmpty(MusicManager.getGuildMusic(guildId)))
                 .flatMap(guildMusic -> event.getClient()
-                        .getMemberById(guildId, event.getClient().getSelfId())
+                        .getSelfMember(guildId)
                         .flatMap(Member::getVoiceState)
                         .flatMap(VoiceState::getChannel)
                         .flatMapMany(VoiceChannel::getVoiceStates)

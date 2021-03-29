@@ -7,8 +7,7 @@ import com.shadorc.shadbot.data.TextFile;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.guilds.entity.DBMember;
 import discord4j.common.util.Snowflake;
-import discord4j.core.object.presence.Activity;
-import discord4j.core.object.presence.Presence;
+import discord4j.core.object.presence.*;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.gateway.StatusUpdate;
 import org.jsoup.Jsoup;
@@ -34,11 +33,11 @@ public class ShadbotUtil {
     }
 
     /**
-     * @return A random status update showing "Playing {prefix}help | {tip}"
+     * @return A random client presence showing "Playing /help | {tip}"
      */
-    public static StatusUpdate getRandomStatus() {
+    public static ClientPresence getRandomStatus() {
         final String presence = String.format("/help | %s", TIPS.getRandomLineFormatted());
-        return Presence.online(Activity.playing(presence));
+        return ClientPresence.online(ClientActivity.playing(presence));
     }
 
     /**
