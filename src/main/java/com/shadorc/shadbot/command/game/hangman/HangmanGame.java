@@ -10,15 +10,14 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
-import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.MessageData;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class HangmanGame extends Game<HangmanCmd> {
@@ -38,7 +37,7 @@ public class HangmanGame extends Game<HangmanCmd> {
     private final String word;
     private final Set<String> lettersTested;
 
-    private long startTime;
+    private Instant startTimer;
     private int failCount;
 
     public HangmanGame(HangmanCmd gameCmd, Context context, HangmanCmd.Difficulty difficulty) {
@@ -53,15 +52,16 @@ public class HangmanGame extends Game<HangmanCmd> {
     @Override
     public Mono<Void> start() {
         return Mono.fromRunnable(() -> {
-            this.schedule(Mono.fromRunnable(this::destroy));
-            this.startTime = System.currentTimeMillis();
+            this.schedule(this.show()
+                    .then(Mono.fromRunnable(this::destroy)));
+            this.startTimer = Instant.now();
             HangmanInputs.create(this.getContext().getClient(), this).listen();
         });
     }
 
     @Override
     public Mono<MessageData> show() {
-        final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultEmbed(
+        return Mono.fromCallable(() -> ShadbotUtil.getDefaultEmbed(
                 embed -> {
                     embed.setAuthor(this.context.localize("hangman.title"), null, this.getContext().getAuthorAvatar());
                     embed.setThumbnail("https://i.imgur.com/Vh9WyaU.png");
@@ -78,19 +78,19 @@ public class HangmanGame extends Game<HangmanCmd> {
                     }
 
                     if (this.isScheduled()) {
-                        final Duration remainingDuration = this.getDuration().minus(TimeUtil.elapsed(this.startTime));
+                        final Duration remainingDuration = this.getDuration().minus(TimeUtil.elapsed(this.startTimer));
                         embed.setFooter(this.context.localize("hangman.footer")
                                 .formatted(remainingDuration.toSeconds()), null);
                     } else {
-                        embed.setFooter(this.context.localize("hangman.footer.finished"), null);
+                        embed.setFooter(this.context.localize("hangman.footer.finished")
+                                .formatted(this.word), null);
                     }
 
                     if (this.failCount > 0) {
                         embed.setImage(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failCount) - 1));
                     }
-                });
-
-        return this.context.editReply(embedConsumer);
+                }))
+                .flatMap(this.context::editReply);
     }
 
     @Override
