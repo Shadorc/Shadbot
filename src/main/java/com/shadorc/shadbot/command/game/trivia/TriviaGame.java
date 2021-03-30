@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +33,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
     private final List<String> answers;
 
     private TriviaResult trivia;
-    private long startTime;
+    private Instant startTimer;
 
     // Trivia API doc : https://opentdb.com/api_config.php
     public TriviaGame(TriviaCmd gameCmd, Context context, @Nullable Integer categoryId) {
@@ -63,7 +64,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
                         }
 
                         this.schedule(this.end());
-                        this.startTime = System.currentTimeMillis();
+                        this.startTimer = Instant.now();
                         TriviaInputs.create(this.getContext().getClient(), this).listen();
                     })
                     .then();
@@ -101,7 +102,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 
     protected Mono<MessageData> win(Member member) {
         final double coinsPerSec = (double) Constants.MAX_BONUS / this.duration.toSeconds();
-        final long remainingSec = this.duration.minus(TimeUtil.elapsed(this.startTime)).toSeconds();
+        final long remainingSec = this.duration.minus(TimeUtil.elapsed(this.startTimer)).toSeconds();
         final long gains = (long) Math.ceil(Constants.MIN_GAINS + remainingSec * coinsPerSec);
 
         this.destroy();

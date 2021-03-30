@@ -2,7 +2,6 @@ package com.shadorc.shadbot.command.game.trivia;
 
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.inputs.MessageInputs;
-import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -33,7 +32,7 @@ public class TriviaInputs extends MessageInputs {
     }
 
     @Override
-    public Mono<Void> processEvent(MessageCreateEvent event) {
+    public Mono<?> processEvent(MessageCreateEvent event) {
         // It's a number or a text
         final String content = event.getMessage().getContent();
         final Integer choice = NumberUtil.toIntBetweenOrNull(content, 1, this.game.getAnswers().size());
@@ -45,27 +44,25 @@ public class TriviaInputs extends MessageInputs {
 
         // If the user has already answered and has been warned, ignore him
         final Member member = event.getMember().orElseThrow();
-        if (this.game.getPlayers().containsKey(member.getId())
-                && this.game.getPlayers().get(member.getId()).hasAnswered()) {
+        final TriviaPlayer player = this.game.getPlayers().get(member.getId());
+        if (player != null && player.hasAnswered()) {
             return Mono.empty();
         }
 
-        final String answer = choice == null ? content : this.game.getAnswers().get(choice - 1);
+        this.game.hasAnswered(member.getId());
 
-        if (this.game.getPlayers().containsKey(member.getId())) {
-            this.game.hasAnswered(member.getId());
-            return event.getMessage().getChannel()
-                    .flatMap(channel -> DiscordUtil.sendMessage(Emoji.GREY_EXCLAMATION, "(**%s**) You can only answer once."
-                            .formatted(member.getUsername()), channel))
-                    .then();
+        final String answer = choice == null ? content : this.game.getAnswers().get(choice - 1);
+        // The user was already a player, so they already guessed something, but was not yet warned
+        if (player != null) {
+            return this.game.getContext()
+                    .reply(Emoji.GREY_EXCLAMATION, this.game.getContext().localize("trivia.already.answered")
+                            .formatted(member.getUsername()));
         } else if (answer.equalsIgnoreCase(this.game.getCorrectAnswer())) {
-            return this.game.win(member).then();
+            return this.game.win(member);
         } else {
-            this.game.hasAnswered(member.getId());
-            return event.getMessage().getChannel()
-                    .flatMap(channel -> DiscordUtil.sendMessage(Emoji.THUMBSDOWN, "(**%s**) Wrong answer."
-                            .formatted(member.getUsername()), channel))
-                    .then();
+            return this.game.getContext()
+                    .reply(Emoji.THUMBSDOWN, this.game.getContext().localize("trivia.wrong.answer")
+                            .formatted(member.getUsername()));
         }
     }
 
