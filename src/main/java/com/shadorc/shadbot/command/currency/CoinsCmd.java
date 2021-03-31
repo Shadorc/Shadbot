@@ -13,8 +13,10 @@ public class CoinsCmd extends BaseCmd {
 
     public CoinsCmd() {
         super(CommandCategory.CURRENCY, "coins", "Show how many coins a user has");
-        this.addOption("user", "If not specified, it will show your coins", false,
-                ApplicationCommandOptionType.USER);
+        this.addOption(option -> option.name("user")
+                .description("If not specified, it will show your coins")
+                .required(false)
+                .type(ApplicationCommandOptionType.USER.getValue()));
     }
 
     @Override

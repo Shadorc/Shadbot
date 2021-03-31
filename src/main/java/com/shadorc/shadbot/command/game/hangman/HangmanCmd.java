@@ -22,8 +22,11 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
 
     public HangmanCmd() {
         super("hangman", "Start a Hangman game");
-        this.addOption("difficulty", "The difficulty of the word to find, easy by default", false,
-                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Difficulty.class));
+        this.addOption(option -> option.name("difficulty")
+                .description("The difficulty of the word to find, easy by default")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Difficulty.class)));
 
         this.easyWords = new WordsList(
                 "https://gist.githubusercontent.com/deekayen/4148741/raw/01c6252ccc5b5fb307c1bb899c95989a8a284616/1-1000.txt");

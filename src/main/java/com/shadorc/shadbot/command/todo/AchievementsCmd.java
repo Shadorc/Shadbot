@@ -21,8 +21,10 @@ public class AchievementsCmd extends BaseCmd {
 
     public AchievementsCmd() {
         super(CommandCategory.INFO, "achievements", "Show user's achievements");
-        this.addOption("user", "If not specified, it will show your achievements", false,
-                ApplicationCommandOptionType.USER);
+        this.addOption(option -> option.name("user")
+                .description("If not specified, it will show your achievements")
+                .required(false)
+                .type(ApplicationCommandOptionType.USER.getValue()));
     }
 
     @Override

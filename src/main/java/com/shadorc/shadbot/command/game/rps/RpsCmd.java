@@ -27,8 +27,11 @@ public class RpsCmd extends BaseCmd {
         super(CommandCategory.GAME, "rps", "Play a Rock–paper–scissors game, win-streak increases gains");
         this.setGameRateLimiter();
 
-        this.addOption("handsign", "Your next move", true, ApplicationCommandOptionType.STRING,
-                DiscordUtil.toOptions(Handsign.class));
+        this.addOption(option -> option.name("handsign")
+                .description("Your next move")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Handsign.class)));
 
         this.players = new ConcurrentHashMap<>();
     }

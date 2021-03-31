@@ -17,8 +17,14 @@ public class SendMessageCmd extends BaseCmd {
 
     public SendMessageCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "send_message", "Send a private message to a user");
-        this.addOption("user", "The user to send a message to", true, ApplicationCommandOptionType.USER);
-        this.addOption("message", "The message to send", true, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("user")
+                .description("The user to send a message to")
+                .required(true)
+                .type(ApplicationCommandOptionType.USER.getValue()));
+        this.addOption(option -> option.name("message")
+                .description("The message to send")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override

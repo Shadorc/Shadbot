@@ -30,12 +30,18 @@ public class PlayCmd extends BaseCmd {
     public PlayCmd() {
         super(CommandCategory.MUSIC, "play", "Play the music(s) from the url, search terms or playlist");
 
-        this.addOption("music", "The url, search terms or playlist", true,
-                ApplicationCommandOptionType.STRING);
-        this.addOption("first", "Add the song first in the playlist", false,
-                ApplicationCommandOptionType.BOOLEAN);
-        this.addOption("soundcloud", "Search on SoundCloud", false,
-                ApplicationCommandOptionType.BOOLEAN);
+        this.addOption(option -> option.name("music")
+                .description("The url, search terms or playlist")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("first")
+                .description("Add the song first in the playlist")
+                .required(false)
+                .type(ApplicationCommandOptionType.BOOLEAN.getValue()));
+        this.addOption(option -> option.name("soundcloud")
+                .description("Search on SoundCloud")
+                .required(false)
+                .type(ApplicationCommandOptionType.BOOLEAN.getValue()));
     }
 
     @Override

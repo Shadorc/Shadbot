@@ -47,8 +47,10 @@ public class LyricsCmd extends BaseCmd {
 
     public LyricsCmd() {
         super(CommandCategory.UTILS, "lyrics", "Search for music lyrics");
-        this.addOption("music", "Search lyrics for a music or for the music currently playing", false,
-                ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("music")
+                .description("Search lyrics for a music or for the music currently playing")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override

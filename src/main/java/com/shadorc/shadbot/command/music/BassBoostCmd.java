@@ -20,8 +20,11 @@ public class BassBoostCmd extends BaseCmd {
 
     public BassBoostCmd() {
         super(CommandCategory.MUSIC, "bass_boost", "Drop the bass");
-        this.addOption("percentage", "Bass boost in percent, must be between **%d%%** and **%d%%**."
-                .formatted(VALUE_MIN, VALUE_MAX), true, ApplicationCommandOptionType.INTEGER);
+        this.addOption(option -> option.name("percentage")
+                .description("Bass boost in percent, must be between **%d%%** and **%d%%**."
+                        .formatted(VALUE_MIN, VALUE_MAX))
+                .required(true)
+                .type(ApplicationCommandOptionType.INTEGER.getValue()));
     }
 
     @Override

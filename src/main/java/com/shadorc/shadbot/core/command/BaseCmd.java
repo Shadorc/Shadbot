@@ -6,7 +6,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ApplicationCommandOptionChoiceData;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.ImmutableApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandOptionData;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
@@ -30,7 +30,7 @@ public abstract class BaseCmd {
     private final CommandPermission permission;
     private final String name;
     private final String description;
-    private final List<Option> options;
+    private final List<ApplicationCommandOptionData> options;
 
     @Nullable
     private RateLimiter rateLimiter;
@@ -50,25 +50,11 @@ public abstract class BaseCmd {
         this(category, CommandPermission.USER, name, description);
     }
 
-    public List<ApplicationCommandOptionData> buildOptions() {
-        final List<ApplicationCommandOptionData> optionsData = new ArrayList<>();
-        for (final Option option : this.options) {
-            optionsData.add(ApplicationCommandOptionData.builder()
-                    .name(option.getName())
-                    .description(option.getDescription())
-                    .required(option.isRequired())
-                    .type(option.getType())
-                    .choices(option.getChoices())
-                    .build());
-        }
-        return optionsData;
-    }
-
     public ApplicationCommandRequest asRequest() {
         return ApplicationCommandRequest.builder()
                 .name(this.getName())
                 .description(this.getDescription())
-                .addAllOptions(this.buildOptions())
+                .addAllOptions(this.getOptions())
                 .build();
     }
 
@@ -94,12 +80,12 @@ public abstract class BaseCmd {
         return this.description;
     }
 
-    public List<Option> getOptions() {
-        return Collections.unmodifiableList(this.options);
-    }
-
     public Optional<RateLimiter> getRateLimiter() {
         return Optional.ofNullable(this.rateLimiter);
+    }
+
+    public List<ApplicationCommandOptionData> getOptions() {
+        return Collections.unmodifiableList(this.options);
     }
 
     public boolean isEnabled() {
@@ -118,13 +104,22 @@ public abstract class BaseCmd {
         this.isEnabled = isEnabled;
     }
 
-    public void addOption(String name, String description, boolean isRequired, ApplicationCommandOptionType type) {
-        this.options.add(new Option(name, description, isRequired, type));
+    // TODO: Remove
+    public void addOption(String name, String description, boolean required, ApplicationCommandOptionType type) {
+        this.addOption(option -> option.name(name).description(description).required(required).type(type.getValue()));
     }
 
-    public void addOption(String name, String description, boolean isRequired, ApplicationCommandOptionType type,
+    // TODO: Remove
+    public void addOption(String name, String description, boolean required, ApplicationCommandOptionType type,
                           List<ApplicationCommandOptionChoiceData> choices) {
-        this.options.add(new Option(name, description, isRequired, type, choices));
+        this.addOption(option -> option.name(name).description(description)
+                .required(required).type(type.getValue()).choices(choices));
+    }
+
+    public void addOption(Consumer<ImmutableApplicationCommandOptionData.Builder> option) {
+        final ImmutableApplicationCommandOptionData.Builder mutatedOption = ApplicationCommandOptionData.builder();
+        option.accept(mutatedOption);
+        this.options.add(mutatedOption.build());
     }
 
 }

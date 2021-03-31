@@ -18,7 +18,10 @@ public class LeaveGuildCmd extends BaseCmd {
 
     public LeaveGuildCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "leave_guild", "Leave a guild");
-        this.addOption("guildId", "The ID of the guild to leave", true, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("guildId")
+                .description("The ID of the guild to leave")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override

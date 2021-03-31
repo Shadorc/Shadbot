@@ -32,12 +32,18 @@ public class PruneCmd extends BaseCmd {
 
     public PruneCmd() {
         super(CommandCategory.ADMIN, CommandPermission.ADMIN, "prune", "Delete messages (include embeds)");
-        this.addOption("authors", "Authors of the messages, comma separated", false,
-                ApplicationCommandOptionType.USER);
-        this.addOption("words", "Words contained in the messages, comma separated", false,
-                ApplicationCommandOptionType.STRING);
-        this.addOption("limit", "Maximum number of messages to delete (max: %d)".formatted(MAX_MESSAGES),
-                false, ApplicationCommandOptionType.INTEGER);
+        this.addOption(option -> option.name("authors")
+                .description("Authors of the messages, comma separated")
+                .required(false)
+                .type(ApplicationCommandOptionType.USER.getValue()));
+        this.addOption(option -> option.name("words")
+                .description("Words contained in the messages, comma separated")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("limit")
+                .description("Maximum number of messages to delete (max: %d)".formatted(MAX_MESSAGES))
+                .required(false)
+                .type(ApplicationCommandOptionType.INTEGER.getValue()));
     }
 
     @Override

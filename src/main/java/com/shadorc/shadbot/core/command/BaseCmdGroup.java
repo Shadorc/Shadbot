@@ -36,17 +36,17 @@ public abstract class BaseCmdGroup extends BaseCmd {
     }
 
     @Override
-    public List<ApplicationCommandOptionData> buildOptions() {
+    public List<ApplicationCommandOptionData> getOptions() {
         final List<ApplicationCommandOptionData> options = new ArrayList<>();
         for (final BaseCmd cmd : this.cmds.values()) {
             options.add(ApplicationCommandOptionData.builder()
                     .name(cmd.getName())
                     .description(cmd.getDescription())
                     .type(ApplicationCommandOptionType.SUB_COMMAND.getValue())
-                    .options(cmd.buildOptions())
+                    .options(cmd.getOptions())
                     .build());
         }
-        return options;
+        return Collections.unmodifiableList(options);
     }
 
 }

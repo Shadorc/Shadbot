@@ -44,8 +44,11 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
 
     public TriviaCmd() {
         super("trivia", "Start a Trivia game in which everyone can participate.");
-        this.addOption("category", "The category of the question", false,
-                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(CATEGORIES.keySet()));
+        this.addOption(option -> option.name("category")
+                .description("The category of the question")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(CATEGORIES.keySet())));
     }
 
     @Override

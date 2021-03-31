@@ -12,10 +12,14 @@ public class EnableCommandCmd extends BaseCmd {
 
     public EnableCommandCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "enable_command", "Enable/disable a command");
-        this.addOption("command", "The command to enable/disable", true,
-                ApplicationCommandOptionType.STRING);
-        this.addOption("enabled", "True to enable, false to disable", true,
-                ApplicationCommandOptionType.BOOLEAN);
+        this.addOption(option -> option.name("command")
+                .description("The command to enable/disable")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("enabled")
+                .description("True to enable, false to disable")
+                .required(true)
+                .type(ApplicationCommandOptionType.BOOLEAN.getValue()));
     }
 
     @Override

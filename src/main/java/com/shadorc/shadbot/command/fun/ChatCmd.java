@@ -40,8 +40,10 @@ public class ChatCmd extends BaseCmd {
 
     public ChatCmd() {
         super(CommandCategory.FUN, "chat", "Chat with an artificial intelligence");
-        this.addOption("message", "The message to send, must not exceed %d characters".formatted(MAX_CHARACTERS),
-                true, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("message")
+                .description("The message to send, must not exceed %d characters".formatted(MAX_CHARACTERS))
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
 
         this.channelsCustid = new ConcurrentHashMap<>();
     }

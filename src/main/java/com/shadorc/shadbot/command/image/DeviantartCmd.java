@@ -36,7 +36,10 @@ public class DeviantartCmd extends BaseCmd {
 
     public DeviantartCmd() {
         super(CommandCategory.IMAGE, "deviantart", "Search random image from DeviantArt");
-        this.addOption("query", "Search for an image", true, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("query")
+                .description("Search for an image")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
 
         this.clientId = CredentialManager.get(Credential.DEVIANTART_CLIENT_ID);
         this.apiSecret = CredentialManager.get(Credential.DEVIANTART_API_SECRET);

@@ -46,8 +46,10 @@ public class CounterStrikeCmd extends BaseCmd {
 
     public CounterStrikeCmd() {
         super(CommandCategory.GAMESTATS, "csgo", "Search for Counter-Strike: Global Offensive statistics");
-        this.addOption("steamid", "Steam ID, custom ID or profile URL", true,
-                ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("steamid")
+                .description("Steam ID, custom ID or profile URL")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
 
         this.apiKey = CredentialManager.get(Credential.STEAM_API_KEY);
         this.steamIdCache = MultiValueCache.Builder.<String, String>create().withTtl(Config.CACHE_TTL).build();

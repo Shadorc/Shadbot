@@ -24,8 +24,11 @@ public class NSFWSetting extends BaseCmd {
         super(CommandCategory.SETTING, CommandPermission.ADMIN, "nsfw", "Manage current channel's NSFW state.");
         this.setting = Setting.NSFW;
 
-        this.addOption("action", "Change the NSFW state of the server", true,
-                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Action.class));
+        this.addOption(option -> option.name("action")
+                .description("Change the NSFW state of the server")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Action.class)));
     }
 
     @Override

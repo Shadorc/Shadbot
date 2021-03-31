@@ -1,10 +1,10 @@
 package com.shadorc.shadbot.object.help;
 
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.command.Option;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
 import reactor.util.annotation.Nullable;
@@ -18,7 +18,7 @@ public abstract class HelpBuilder {
 
     protected final Context context;
 
-    protected final List<Option> options;
+    protected final List<ApplicationCommandOptionData> options;
     protected final List<ImmutableEmbedFieldData> fields;
 
     @Nullable
@@ -135,13 +135,15 @@ public abstract class HelpBuilder {
 
         return "`/%s %s`".formatted(this.getCommandName(),
                 FormatUtil.format(this.options,
-                        option -> String.format(option.isRequired() ? "<%s>" : "[<%s>]", option.getName()), " "));
+                        option -> String.format(option.required().toOptional().orElse(false) ? "<%s>" : "[<%s>]",
+                                option.name()), " "));
     }
 
     private String getArguments() {
         return this.options.stream()
                 .map(option -> "%n**%s** %s - %s"
-                        .formatted(option.getName(), option.isRequired() ? "" : "[optional] ", option.getDescription()))
+                        .formatted(option.name(), option.required().toOptional().orElse(false) ? "" : "[optional] ",
+                                option.description()))
                 .collect(Collectors.joining());
     }
 }

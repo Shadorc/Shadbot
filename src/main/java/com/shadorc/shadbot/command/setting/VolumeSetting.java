@@ -24,9 +24,11 @@ public class VolumeSetting extends BaseCmd {
         super(CommandCategory.SETTING, CommandPermission.ADMIN, "default_volume", "Manage music's default volume.");
         this.setting = Setting.DEFAULT_VOLUME;
 
-        this.addOption("volume", "New default volume (min:%d / max:%d / default:%d)"
-                        .formatted(MIN_VOLUME, MAX_VOLUME, Config.DEFAULT_VOLUME), true,
-                ApplicationCommandOptionType.INTEGER);
+        this.addOption(option -> option.name("volume")
+                .description("New default volume (min:%d / max:%d / default:%d)"
+                        .formatted(MIN_VOLUME, MAX_VOLUME, Config.DEFAULT_VOLUME))
+                .required(true)
+                .type(ApplicationCommandOptionType.INTEGER.getValue()));
     }
 
     @Override

@@ -30,7 +30,10 @@ public class UrbanCmd extends BaseCmd {
 
     public UrbanCmd() {
         super(CommandCategory.UTILS, "urban", "Search for Urban Dictionary definition");
-        this.addOption("word", "Search for a word", true, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("word")
+                .description("Search for a word")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override

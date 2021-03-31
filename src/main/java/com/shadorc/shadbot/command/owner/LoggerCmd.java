@@ -28,10 +28,15 @@ public class LoggerCmd extends BaseCmd {
 
     public LoggerCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "logger", "Change the level of a logger");
-        this.addOption("name", "Can be 'root' to change root logger", true,
-                ApplicationCommandOptionType.STRING);
-        this.addOption("level", "The new logger level", true, ApplicationCommandOptionType.STRING,
-                DiscordUtil.toOptions(LogLevel.class));
+        this.addOption(option -> option.name("name")
+                .description("Can be 'root' to change root logger")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("level")
+                .description("The new logger level")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(LogLevel.class)));
     }
 
     @Override

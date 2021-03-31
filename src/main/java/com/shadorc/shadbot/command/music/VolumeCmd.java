@@ -19,8 +19,10 @@ public class VolumeCmd extends BaseCmd {
 
     public VolumeCmd() {
         super(CommandCategory.MUSIC, "volume", "Show or change current volume level");
-        this.addOption("volume", "Volume to set, must be between 1%% and %d%%".formatted(Config.VOLUME_MAX),
-                false, ApplicationCommandOptionType.INTEGER);
+        this.addOption(option -> option.name("volume")
+                .description("Volume to set, must be between 1%% and %d%%".formatted(Config.VOLUME_MAX))
+                .required(false)
+                .type(ApplicationCommandOptionType.INTEGER.getValue()));
     }
 
     @Override

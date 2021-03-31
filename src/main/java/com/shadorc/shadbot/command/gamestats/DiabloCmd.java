@@ -51,9 +51,15 @@ public class DiabloCmd extends BaseCmd {
 
     public DiabloCmd() {
         super(CommandCategory.GAMESTATS, "diablo", "Search for Diablo 3 statistics");
-        this.addOption("region", "User's region", true, ApplicationCommandOptionType.STRING,
-                DiscordUtil.toOptions(Region.class));
-        this.addOption("battletag", "User's battletag", true, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("region")
+                .description("User's region")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Region.class)));
+        this.addOption(option -> option.name("battletag")
+                .description("User's battletag")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
 
         this.clientId = CredentialManager.get(Credential.BLIZZARD_CLIENT_ID);
         this.clientSecret = CredentialManager.get(Credential.BLIZZARD_CLIENT_SECRET);
