@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
+public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 
     @Nullable
     private final Integer categoryId;
@@ -36,8 +36,8 @@ public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
     private Instant startTimer;
 
     // Trivia API doc : https://opentdb.com/api_config.php
-    public TriviaGame(TriviaCmd gameCmd, Context context, @Nullable Integer categoryId) {
-        super(gameCmd, context, Duration.ofSeconds(30));
+    public TriviaGame(Context context, @Nullable Integer categoryId) {
+        super(context, Duration.ofSeconds(30));
         this.categoryId = categoryId;
         this.answers = new ArrayList<>();
     }

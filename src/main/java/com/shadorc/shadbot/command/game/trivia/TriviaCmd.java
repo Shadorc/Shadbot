@@ -57,16 +57,15 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
                 .map(CATEGORIES::get)
                 .orElse(null);
 
-        if (this.getManagers().containsKey(context.getChannelId())) {
+        if (this.isGameStarted(context.getChannelId())) {
             return context.reply(Emoji.INFO, context.localize("trivia.already.started"));
         } else {
-            final TriviaGame triviaManager = new TriviaGame(this, context, categoryId);
-            this.getManagers().put(context.getChannelId(), triviaManager);
-            return triviaManager.start()
-                    .then(triviaManager.show())
-                    .doOnError(err -> this.getManagers().remove(context.getChannelId()));
+            final TriviaGame game = new TriviaGame(context, categoryId);
+            this.addGame(context.getChannelId(), game);
+            return game.start()
+                    .then(game.show())
+                    .doOnError(err -> this.removeGame(context.getChannelId()));
         }
-
     }
 
 }

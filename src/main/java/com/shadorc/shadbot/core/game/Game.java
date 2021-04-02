@@ -8,20 +8,23 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class Game<G extends GameCmd<?>> {
+public abstract class Game {
 
-    protected final G gameCmd;
     protected final Context context;
     protected final Duration duration;
     protected final AtomicBoolean isScheduled;
+    protected final List<GameListener> listeners;
+
     protected Disposable scheduledTask;
 
-    protected Game(G gameCmd, Context context, Duration duration) {
-        this.gameCmd = gameCmd;
+    protected Game(Context context, Duration duration) {
         this.context = context;
         this.duration = duration;
+        this.listeners = new ArrayList<>(1);
         this.isScheduled = new AtomicBoolean(false);
     }
 
@@ -31,9 +34,13 @@ public abstract class Game<G extends GameCmd<?>> {
 
     public abstract Mono<Void> end();
 
+    public void addGameListener(GameListener listener) {
+        this.listeners.add(listener);
+    }
+
     public void destroy() {
         this.cancelScheduledTask();
-        this.gameCmd.getManagers().remove(this.context.getChannelId());
+        this.listeners.forEach(listener -> listener.onGameDestroy(this.context.getChannelId()));
     }
 
     /**
@@ -65,10 +72,6 @@ public abstract class Game<G extends GameCmd<?>> {
      */
     public boolean isScheduled() {
         return this.scheduledTask != null && this.isScheduled.get();
-    }
-
-    public G getGameCmd() {
-        return this.gameCmd;
     }
 
     public Context getContext() {

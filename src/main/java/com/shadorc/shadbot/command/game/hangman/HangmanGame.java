@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class HangmanGame extends MultiplayerGame<HangmanCmd, HangmanPlayer> {
+public class HangmanGame extends MultiplayerGame<HangmanPlayer> {
 
     private static final List<String> IMG_LIST = List.of(
             HangmanGame.buildImageUrl("8/8b", 0),
@@ -40,11 +40,11 @@ public class HangmanGame extends MultiplayerGame<HangmanCmd, HangmanPlayer> {
     private Instant startTimer;
     private int failCount;
 
-    public HangmanGame(HangmanCmd gameCmd, Context context, HangmanCmd.Difficulty difficulty) {
-        super(gameCmd, context, Duration.ofMinutes(3));
+    public HangmanGame(Context context, HangmanCmd.Difficulty difficulty, String word) {
+        super(context, Duration.ofMinutes(3));
         this.difficulty = difficulty;
+        this.word = word;
         this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(1));
-        this.word = this.getWord(difficulty);
         this.lettersTested = new HashSet<>();
         this.failCount = 0;
     }
@@ -115,13 +115,6 @@ public class HangmanGame extends MultiplayerGame<HangmanCmd, HangmanPlayer> {
                     }
                 })
                 .then(Mono.fromRunnable(this::destroy));
-    }
-
-    private String getWord(HangmanCmd.Difficulty difficulty) {
-        return switch (difficulty) {
-            case EASY -> this.getGameCmd().getEasyWords().getRandomWord();
-            case HARD -> this.getGameCmd().getHardWords().getRandomWord();
-        };
     }
 
     protected Mono<Void> checkLetter(String chr) {

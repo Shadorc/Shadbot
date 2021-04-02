@@ -3,7 +3,6 @@ package com.shadorc.shadbot.command.game.hangman;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
-import com.shadorc.shadbot.core.game.player.Player;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
@@ -59,7 +58,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
     }
 
     private Mono<?> join(Context context) {
-        final HangmanGame game = this.getManagers().get(context.getChannelId());
+        final HangmanGame game = this.getGame(context.getChannelId());
         if (game == null) {
             return Mono.error(new CommandException(context.localize("hangman.cannot.join")
                     .formatted(context.getCommandName(), context.getSubCommandGroupName().orElseThrow(), CREATE_SUB_COMMAND)));
@@ -74,17 +73,18 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
         final Difficulty difficulty = context.getOptionAsEnum(Difficulty.class, "difficulty").orElse(Difficulty.EASY);
         return this.loadWords(difficulty)
                 .then(Mono.defer(() -> {
-                    if (this.getManagers().containsKey(context.getChannelId())) {
+                    if (this.isGameStarted(context.getChannelId())) {
                         return Mono.error(new CommandException(context.localize("hangman.already.started")
                                 .formatted(context.getCommandName(), context.getSubCommandGroupName().orElseThrow(), CREATE_SUB_COMMAND)));
                     }
 
-                    final HangmanGame game = new HangmanGame(this, context, difficulty);
+                    final String word = this.getWord(difficulty);
+                    final HangmanGame game = new HangmanGame(context, difficulty, word);
                     game.addPlayerIfAbsent(new HangmanPlayer(context.getGuildId(), context.getAuthorId()));
-                    this.getManagers().put(context.getChannelId(), game);
+                    this.addGame(context.getChannelId(), game);
                     return game.start()
                             .then(game.show())
-                            .doOnError(err -> this.getManagers().remove(context.getChannelId()));
+                            .doOnError(err -> this.removeGame(context.getChannelId()));
                 }));
     }
 
@@ -99,12 +99,11 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
         return Mono.empty();
     }
 
-    protected WordsList getEasyWords() {
-        return this.easyWords;
-    }
-
-    protected WordsList getHardWords() {
-        return this.hardWords;
+    private String getWord(HangmanCmd.Difficulty difficulty) {
+        return switch (difficulty) {
+            case EASY -> this.easyWords.getRandomWord();
+            case HARD -> this.hardWords.getRandomWord();
+        };
     }
 
 }
