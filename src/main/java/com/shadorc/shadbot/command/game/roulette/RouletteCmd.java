@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.game.roulette;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -24,9 +23,15 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
 
     public RouletteCmd() {
         super("roulette", "Play roulette");
-        this.addOption("bet", "Your bet", true, ApplicationCommandOptionType.INTEGER);
-        //this.addOption("place", "number between 1 and 36, %s".formatted(FormatUtil.format(Place.class, ", "),
-        //        true, ApplicationCommandOptionType.STRING));
+        this.addOption(option -> option.name("bet")
+                .description("Your bet")
+                .required(true)
+                .type(ApplicationCommandOptionType.INTEGER.getValue()));
+        this.addOption(option -> option.name("place")
+                .description("number between 1 and 36, %s"
+                        .formatted(FormatUtil.format(Place.class, it -> it.name().toLowerCase(), ", ")))
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override
@@ -34,12 +39,12 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
         final long bet = context.getOptionAsLong("bet").orElseThrow();
         final String place = context.getOptionAsString("place").orElseThrow().toLowerCase();
 
-        return ShadbotUtil.requireValidBet(context.getGuildId(), context.getAuthorId(), bet)
+        return ShadbotUtil.requireValidBet(context.getLocale(), context.getGuildId(), context.getAuthorId(), bet)
                 .flatMap(__ -> {
                     // Match [1-36], red, black, odd, even, high or low
                     if (!NUMBER_PATTERN.matcher(place).matches() && EnumUtil.parseEnum(Place.class, place) == null) {
                         return Mono.error(new CommandException(context.localize("roulette.invalid.place")
-                                .formatted(place, FormatUtil.format(Place.class, ", "))));
+                                .formatted(place, FormatUtil.format(Place.class, it -> it.name().toLowerCase(), ", "))));
                     }
 
                     if (this.getManagers().containsKey(context.getChannelId())) {
@@ -61,4 +66,3 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                 });
     }
 }
-*/
