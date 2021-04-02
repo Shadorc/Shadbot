@@ -98,7 +98,7 @@ public class BlacklistSettingCmd extends BaseSetting {
 
                     final Set<String> cmdNames = new HashSet<>();
                     for (final CommandCategory category : categories) {
-                        for (final BaseCmd cmd : CommandManager.getInstance().getCommands().values()) {
+                        for (final BaseCmd cmd : CommandManager.getCommands().values()) {
                             if (cmd.getCategory() == category) {
                                 cmdNames.add(cmd.getName());
                             }
@@ -127,7 +127,7 @@ public class BlacklistSettingCmd extends BaseSetting {
 
     private Mono<Void> blacklistCommands(Context context, Action action, List<String> cmdNames) {
         final Set<String> unknownCmds = cmdNames.stream()
-                .filter(cmd -> CommandManager.getInstance().getCommand(cmd) == null)
+                .filter(cmd -> CommandManager.getCommand(cmd) == null)
                 .collect(Collectors.toUnmodifiableSet());
 
         if (!unknownCmds.isEmpty()) {
@@ -136,7 +136,7 @@ public class BlacklistSettingCmd extends BaseSetting {
         }
 
         // Do not allow to blacklist setting command
-        for (final String settingCmdName : CommandManager.getInstance().getCommand("setting").getNames()) {
+        for (final String settingCmdName : CommandManager.getCommand("setting").getNames()) {
             if (cmdNames.contains(settingCmdName)) {
                 return Mono.error(new CommandException(String.format("You cannot blacklist the command `%s%s`.",
                         context.getPrefix(), settingCmdName)));

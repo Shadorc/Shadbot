@@ -27,16 +27,10 @@ import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class CommandManager {
 
-    private static CommandManager instance;
+    private static final Map<String, BaseCmd> COMMANDS_MAP;
 
     static {
-        CommandManager.instance = new CommandManager();
-    }
-
-    private final Map<String, BaseCmd> commandsMap;
-
-    private CommandManager() {
-        this.commandsMap = CommandManager.initialize(
+        COMMANDS_MAP = CommandManager.initialize(
                 new InfoGroup(), new SupportGroup(), new ImageGroup(), new ModerationGroup(), new OwnerGroup(),
                 new UtilGroup(), new FunGroup(), new GameStatsGroup(), new CurrencyGroup(), new SettingGroup(),
                 new MusicGroup(), new DonatorGroup(), new GameGroup());
@@ -54,8 +48,8 @@ public class CommandManager {
         return Collections.unmodifiableMap(map);
     }
 
-    public Mono<Long> register(ApplicationService applicationService, long applicationId) {
-        return Flux.fromIterable(this.commandsMap.values())
+    public static Mono<Long> register(ApplicationService applicationService, long applicationId) {
+        return Flux.fromIterable(COMMANDS_MAP.values())
                 .map(BaseCmd::asRequest)
                 .collectList()
                 .flatMapMany(requests -> applicationService
@@ -65,16 +59,11 @@ public class CommandManager {
                 .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err)));
     }
 
-    public Map<String, BaseCmd> getCommands() {
-        return this.commandsMap;
+    public static Map<String, BaseCmd> getCommands() {
+        return COMMANDS_MAP;
     }
 
-    public BaseCmd getCommand(String name) {
-        return this.commandsMap.get(name);
-    }
-
-    // TODO: Remove
-    public static CommandManager getInstance() {
-        return CommandManager.instance;
+    public static BaseCmd getCommand(String name) {
+        return COMMANDS_MAP.get(name);
     }
 }

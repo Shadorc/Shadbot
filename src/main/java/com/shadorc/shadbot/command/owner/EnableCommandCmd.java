@@ -25,7 +25,7 @@ public class EnableCommandCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         final String commandName = context.getOptionAsString("command").orElseThrow();
-        final BaseCmd cmd = CommandManager.getInstance().getCommand(commandName);
+        final BaseCmd cmd = CommandManager.getCommand(commandName);
         if (cmd == null) {
             return Mono.error(new CommandException("Command `%s` not found.".formatted(commandName)));
         }

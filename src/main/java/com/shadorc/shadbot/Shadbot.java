@@ -93,7 +93,7 @@ public class Shadbot {
         DEFAULT_LOGGER.info("Owner ID: {} | Application ID: {}", Shadbot.OWNER_ID.get(), applicationId);
 
         DEFAULT_LOGGER.info("Registering commands");
-        CommandManager.getInstance().register(client.getApplicationService(), applicationId).block();
+        CommandManager.register(client.getApplicationService(), applicationId).block();
 
         DEFAULT_LOGGER.info("Connecting to Discord");
         client.gateway()

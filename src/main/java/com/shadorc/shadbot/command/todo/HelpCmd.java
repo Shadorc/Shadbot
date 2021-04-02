@@ -26,7 +26,7 @@ public class HelpCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final Optional<String> cmdName = context.getOptionAsString("command");
         if (cmdName.isPresent()) {
-            final BaseCmd cmd = CommandManager.getInstance().getCommand(cmdName.orElseThrow());
+            final BaseCmd cmd = CommandManager.getCommand(cmdName.orElseThrow());
             if (cmd == null) {
                 return Mono.empty();
             }
@@ -71,7 +71,7 @@ public class HelpCmd extends BaseCmd {
                 .cache();
 
         // Iterates over all commands...
-        return Flux.fromIterable(CommandManager.getInstance().getCommands().values())
+        return Flux.fromIterable(CommandManager.getCommands().values())
                 // ... and removes duplicate ...
                 .distinct()
                 // ... and removes commands that the author cannot use ...

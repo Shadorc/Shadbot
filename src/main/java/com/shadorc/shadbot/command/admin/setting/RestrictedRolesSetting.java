@@ -76,7 +76,7 @@ public class RestrictedRolesSetting extends BaseSetting {
         final Set<BaseCmd> commands = new HashSet<>();
         switch (type) {
             case COMMAND -> {
-                final BaseCmd command = CommandManager.getInstance().getCommand(name);
+                final BaseCmd command = CommandManager.getCommand(name);
                 if (command == null) {
                     return Mono.error(new CommandException(String.format("`%s` is not a valid command.", name)));
                 }
@@ -86,7 +86,7 @@ public class RestrictedRolesSetting extends BaseSetting {
                 final CommandCategory category = EnumUtils.parseEnum(CommandCategory.class, name,
                         new CommandException(String.format("`%s` is not a valid category. %s",
                                 name, FormatUtils.options(CommandCategory.class))));
-                commands.addAll(CommandManager.getInstance().getCommands().values().stream()
+                commands.addAll(CommandManager.getCommands().values().stream()
                         .filter(cmd -> cmd.getCategory() == category)
                         .collect(Collectors.toSet()));
             }

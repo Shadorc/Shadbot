@@ -156,7 +156,7 @@ public class Settings extends SerializableEntity<SettingsBean> {
                 .collect(Collectors.toMap(entry -> Snowflake.of(entry.getKey()),
                         entry -> entry.getValue()
                                 .stream()
-                                .map(CommandManager.getInstance()::getCommand)
+                                .map(CommandManager::getCommand)
                                 .collect(Collectors.toSet())));
     }
 
@@ -169,7 +169,7 @@ public class Settings extends SerializableEntity<SettingsBean> {
                 .collect(Collectors.toMap(entry -> Snowflake.of(entry.getKey()),
                         entry -> entry.getValue()
                                 .stream()
-                                .map(CommandManager.getInstance()::getCommand)
+                                .map(CommandManager::getCommand)
                                 .collect(Collectors.toSet())));
     }
 
