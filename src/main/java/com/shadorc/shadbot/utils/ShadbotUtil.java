@@ -49,13 +49,13 @@ public class ShadbotUtil {
      * @return The bet.
      * @throws CommandException thrown if the user does not have enough coins.
      */
-    public static Mono<Long> requireValidBet(Locale locae, Snowflake guildId, Snowflake userId, long bet) {
+    public static Mono<Long> requireValidBet(Locale locale, Snowflake guildId, Snowflake userId, long bet) {
         return DatabaseManager.getGuilds()
                 .getDBMember(guildId, userId)
                 .map(DBMember::getCoins)
                 .map(coins -> {
                     if (coins < bet) {
-                        throw new CommandException(I18nManager.localize(locae, "not.enough.coins"));
+                        throw new CommandException(I18nManager.localize(locale, "not.enough.coins"));
                     }
                     return bet;
                 });
