@@ -27,7 +27,7 @@ public class HangmanInputs extends MessageInputs {
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getMember())
                 .map(Member::getId)
-                .map(this.game.getPlayers()::contains);
+                .map(this.game.getPlayers()::containsKey);
     }
 
     @Override

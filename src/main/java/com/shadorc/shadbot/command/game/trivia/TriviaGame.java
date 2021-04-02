@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
+public class TriviaGame extends MultiplayerGame<TriviaCmd, TriviaPlayer> {
 
     @Nullable
     private final Integer categoryId;

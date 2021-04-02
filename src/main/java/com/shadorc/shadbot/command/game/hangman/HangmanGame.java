@@ -1,8 +1,7 @@
 package com.shadorc.shadbot.command.game.hangman;
 
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.game.Game;
-import com.shadorc.shadbot.core.game.player.Player;
+import com.shadorc.shadbot.core.game.MultiplayerGame;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
@@ -10,21 +9,18 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
-import discord4j.common.util.Snowflake;
 import discord4j.discordjson.json.MessageData;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-public class HangmanGame extends Game<HangmanCmd> {
+public class HangmanGame extends MultiplayerGame<HangmanCmd, HangmanPlayer> {
 
     private static final List<String> IMG_LIST = List.of(
             HangmanGame.buildImageUrl("8/8b", 0),
@@ -36,7 +32,6 @@ public class HangmanGame extends Game<HangmanCmd> {
             HangmanGame.buildImageUrl("d/d6", 6));
     private static final float BONUS_PER_IMAGE = (float) Constants.MAX_BONUS / IMG_LIST.size();
 
-    private final List<Snowflake> players;
     private final HangmanCmd.Difficulty difficulty;
     private final RateLimiter rateLimiter;
     private final String word;
@@ -47,7 +42,6 @@ public class HangmanGame extends Game<HangmanCmd> {
 
     public HangmanGame(HangmanCmd gameCmd, Context context, HangmanCmd.Difficulty difficulty) {
         super(gameCmd, context, Duration.ofMinutes(3));
-        this.players = new CopyOnWriteArrayList<>();
         this.difficulty = difficulty;
         this.rateLimiter = new RateLimiter(1, Duration.ofSeconds(1));
         this.word = this.getWord(difficulty);
@@ -114,18 +108,13 @@ public class HangmanGame extends Game<HangmanCmd> {
                         final int gains = (int) (Constants.MIN_GAINS + Math.ceil(BONUS_PER_IMAGE * imagesRemaining) * difficultyMultiplicator);
 
                         Telemetry.HANGMAN_SUMMARY.labels("win").observe(gains);
-                        return Flux.fromIterable(this.players)
-                                .map(id -> new Player(this.getContext().getGuildId(), id))
+                        return Flux.fromIterable(this.players.values())
                                 .flatMap(player -> player.win(gains))
                                 .then(this.context.reply(Emoji.PURSE, this.context.localize("hangman.win")
                                         .formatted(this.context.localize(gains))));
                     }
                 })
                 .then(Mono.fromRunnable(this::destroy));
-    }
-
-    public List<Snowflake> getPlayers() {
-        return Collections.unmodifiableList(this.players);
     }
 
     private String getWord(HangmanCmd.Difficulty difficulty) {
@@ -176,13 +165,6 @@ public class HangmanGame extends Game<HangmanCmd> {
     private static String buildImageUrl(String path, int num) {
         return "https://upload.wikimedia.org/wikipedia/commons/thumb/%s/Hangman-%d.png/60px-Hangman-%d.png"
                 .formatted(path, num, num);
-    }
-
-    public boolean addPlayer(Snowflake memberId) {
-        if (this.players.contains(memberId)) {
-            return false;
-        }
-        return this.players.add(memberId);
     }
 
     public RateLimiter getRateLimiter() {
