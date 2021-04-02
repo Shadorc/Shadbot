@@ -12,6 +12,9 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.VoiceState;
+import discord4j.core.object.command.ApplicationCommandInteraction;
+import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.command.ApplicationCommandOption;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
@@ -27,10 +30,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -197,6 +197,20 @@ public class DiscordUtil {
         return list.stream()
                 .map(it -> ApplicationCommandOptionChoiceData.builder().name(it).value(it).build())
                 .collect(Collectors.toList());
+    }
+
+    public static List<ApplicationCommandInteractionOption> flattenOptions(ApplicationCommandInteraction interaction) {
+        final ArrayList<ApplicationCommandInteractionOption> options = new ArrayList<>();
+        DiscordUtil.flattenOptionRecursive(options, interaction.getOptions());
+        return options;
+    }
+
+    private static void flattenOptionRecursive(List<ApplicationCommandInteractionOption> list,
+                                            List<ApplicationCommandInteractionOption> options) {
+        for (final ApplicationCommandInteractionOption option : options) {
+            list.add(option);
+            DiscordUtil.flattenOptionRecursive(list, option.getOptions());
+        }
     }
 
 }

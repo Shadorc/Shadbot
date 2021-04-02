@@ -70,19 +70,10 @@ public class CommandManager {
     }
 
     public BaseCmd getCommand(String name) {
-        final BaseCmd cmd = this.commandsMap.get(name);
-        if (cmd != null) {
-            return cmd;
-        }
-
-        return this.commandsMap.values().stream()
-                .filter(it -> it instanceof BaseCmdGroup)
-                .flatMap(it -> ((BaseCmdGroup) it).getSubCommands().stream())
-                .filter(it -> it.getName().equals(name))
-                .findFirst()
-                .orElse(null);
+        return this.commandsMap.get(name);
     }
 
+    // TODO: Remove
     public static CommandManager getInstance() {
         return CommandManager.instance;
     }

@@ -31,19 +31,27 @@ public abstract class BaseCmd {
     private final String name;
     private final String description;
     private final List<ApplicationCommandOptionData> options;
+    @Nullable
+    private final ApplicationCommandOptionType type;
 
     @Nullable
     private RateLimiter rateLimiter;
     private boolean isEnabled;
 
-    protected BaseCmd(CommandCategory category, CommandPermission permission, String name, String description) {
+    protected BaseCmd(CommandCategory category, CommandPermission permission, String name, String description,
+                      @Nullable ApplicationCommandOptionType type) {
         this.category = category;
         this.permission = permission;
         this.name = name;
         this.description = description;
+        this.type = type;
         this.options = new ArrayList<>();
         this.rateLimiter = DEFAULT_RATELIMITER.get();
         this.isEnabled = true;
+    }
+
+    protected BaseCmd(CommandCategory category, CommandPermission permission, String name, String description) {
+        this(category, permission, name, description, null);
     }
 
     protected BaseCmd(CommandCategory category, String name, String description) {
@@ -80,12 +88,16 @@ public abstract class BaseCmd {
         return this.description;
     }
 
-    public Optional<RateLimiter> getRateLimiter() {
-        return Optional.ofNullable(this.rateLimiter);
-    }
-
     public List<ApplicationCommandOptionData> getOptions() {
         return Collections.unmodifiableList(this.options);
+    }
+
+    public Optional<ApplicationCommandOptionType> getType() {
+        return Optional.ofNullable(this.type);
+    }
+
+    public Optional<RateLimiter> getRateLimiter() {
+        return Optional.ofNullable(this.rateLimiter);
     }
 
     public boolean isEnabled() {

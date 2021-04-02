@@ -29,7 +29,7 @@ public class CommandProcessor {
         // The command does not exist
         if (command == null) {
             DEFAULT_LOGGER.error("{Guild ID: {}} Command {} not found",
-                    context.getGuildId().asString(), context.getCommandName());
+                    context.getGuildId().asString(), context.getFullCommandName());
             return Mono.empty();
         }
 

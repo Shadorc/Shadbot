@@ -4,7 +4,10 @@ import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -26,13 +29,12 @@ public abstract class BaseCmdGroup extends BaseCmd {
         return cmds.stream().collect(Collectors.toUnmodifiableMap(BaseCmd::getName, Function.identity()));
     }
 
-    public Collection<BaseCmd> getSubCommands() {
-        return Collections.unmodifiableCollection(this.cmds.values());
-    }
-
     @Override
     public Mono<?> execute(Context context) {
-        throw new IllegalStateException();
+        final String cmdName = context.getSubCommandGroupName()
+                .orElse(context.getSubCommandName()
+                        .orElseThrow());
+        return this.cmds.get(cmdName).execute(context);
     }
 
     @Override
@@ -42,7 +44,7 @@ public abstract class BaseCmdGroup extends BaseCmd {
             options.add(ApplicationCommandOptionData.builder()
                     .name(cmd.getName())
                     .description(cmd.getDescription())
-                    .type(ApplicationCommandOptionType.SUB_COMMAND.getValue())
+                    .type(cmd.getType().orElse(ApplicationCommandOptionType.SUB_COMMAND).getValue())
                     .options(cmd.getOptions())
                     .build());
         }

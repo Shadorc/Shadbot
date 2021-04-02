@@ -25,6 +25,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableWebhookMessageEditRequest;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.WebhookExecuteRequest;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.MultipartRequest;
 import discord4j.rest.util.Permission;
 import reactor.bool.BooleanUtils;
@@ -37,7 +38,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 public class Context implements InteractionContext, I18nContext {
 
@@ -63,12 +63,32 @@ public class Context implements InteractionContext, I18nContext {
         return this.event.getClient();
     }
 
-    public String getCommandName() {
-        return Optional.of(this.event.getInteraction().getCommandInteraction().getOptions())
-                .filter(Predicate.not(List::isEmpty))
-                .map(list -> list.get(0))
+    public String getFullCommandName() {
+        final List<String> cmds = new ArrayList<>();
+        cmds.add(this.getCommandName());
+        this.getSubCommandGroupName().ifPresent(cmds::add);
+        this.getSubCommandName().ifPresent(cmds::add);
+        return String.join(" ", cmds);
+    }
+
+    public Optional<String> getSubCommandGroupName() {
+        return DiscordUtil.flattenOptions(this.event.getInteraction().getCommandInteraction())
+                .stream()
+                .filter(option -> option.getType() == ApplicationCommandOptionType.SUB_COMMAND_GROUP)
                 .map(ApplicationCommandInteractionOption::getName)
-                .orElse(this.event.getCommandName());
+                .findFirst();
+    }
+
+    public Optional<String> getSubCommandName() {
+        return DiscordUtil.flattenOptions(this.event.getInteraction().getCommandInteraction())
+                .stream()
+                .filter(option -> option.getType() == ApplicationCommandOptionType.SUB_COMMAND)
+                .map(ApplicationCommandInteractionOption::getName)
+                .findFirst();
+    }
+
+    public String getCommandName() {
+        return this.event.getCommandName();
     }
 
     public Mono<Guild> getGuild() {
@@ -108,11 +128,9 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     public Optional<ApplicationCommandInteractionOptionValue> getOption(String name) {
-        final List<ApplicationCommandInteractionOption> options = this.getEvent().getInteraction()
-                .getCommandInteraction().getOptions();
-        final List<ApplicationCommandInteractionOption> list = new ArrayList<>(options);
-        options.forEach(option -> list.addAll(option.getOptions()));
-        return list.stream()
+        final List<ApplicationCommandInteractionOption> options =
+                DiscordUtil.flattenOptions(this.getEvent().getInteraction().getCommandInteraction());
+        return options.stream()
                 .filter(option -> option.getName().equals(name))
                 .findFirst()
                 .flatMap(ApplicationCommandInteractionOption::getValue);
