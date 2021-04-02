@@ -20,6 +20,7 @@ public class GamblerPlayer extends Player {
         return this.lose(this.bet);
     }
 
+    // TODO: Bet only when needed?
     public Mono<Void> cancelBet() {
         return this.win(this.bet);
     }
