@@ -134,6 +134,10 @@ public class FormatUtil {
         return "%d:%02d".formatted(duration.toMinutesPart(), duration.toSecondsPart());
     }
 
+    public static <T> String format(Class<T> enumClass, Function<T, String> mapper, CharSequence delimiter) {
+        return FormatUtil.format(Arrays.stream(enumClass.getEnumConstants()), mapper, delimiter);
+    }
+
     public static <T> String format(T[] array, Function<T, String> mapper, CharSequence delimiter) {
         return FormatUtil.format(Arrays.stream(array), mapper, delimiter);
     }
