@@ -3,26 +3,34 @@ package com.shadorc.shadbot.core.game.player;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.guilds.entity.DBMember;
 import discord4j.common.util.Snowflake;
-import discord4j.core.GatewayDiscordClient;
-import discord4j.core.object.entity.User;
 import reactor.core.publisher.Mono;
+import reactor.util.annotation.Nullable;
+
+import java.util.Optional;
 
 public class Player {
 
     private final Snowflake guildId;
     private final Snowflake userId;
+    @Nullable
+    private final String username;
 
-    public Player(Snowflake guildId, Snowflake userId) {
+    public Player(Snowflake guildId, Snowflake userId, @Nullable String username) {
         this.guildId = guildId;
         this.userId = userId;
+        this.username = username;
+    }
+
+    public Player(Snowflake guildId, Snowflake userId) {
+        this(guildId, userId, null);
     }
 
     public Snowflake getUserId() {
         return this.userId;
     }
 
-    public Mono<String> getUsername(GatewayDiscordClient gateway) {
-        return gateway.getUserById(this.userId).map(User::getUsername);
+    public Optional<String> getUsername() {
+        return Optional.ofNullable(this.username);
     }
 
     public Mono<DBMember> getDBMember() {

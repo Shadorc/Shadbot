@@ -45,15 +45,15 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                         return Mono.error(new CommandException(context.localize("roulette.invalid.number")));
                     }
 
-                    final RoulettePlayer player = new RoulettePlayer(context.getGuildId(), context.getAuthorId(), bet,
-                            place, number);
+                    final RoulettePlayer player = new RoulettePlayer(context.getGuildId(), context.getAuthorId(),
+                            context.getAuthorName(), bet, place, number);
 
                     if (this.isGameStarted(context.getChannelId())) {
                         final RouletteGame game = this.getGame(context.getChannelId());
                         if (game.addPlayerIfAbsent(player)) {
                             return player.bet()
                                     .then(game.show())
-                                    .doOnError(err -> this.removeGame(context.getChannelId()));
+                                    .doOnError(err -> game.destroy());
                         }
                         return context.reply(Emoji.INFO, context.localize("roulette.already.participating"));
                     } else {
@@ -63,7 +63,7 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                         return game.start()
                                 .then(player.bet())
                                 .then(game.show())
-                                .doOnError(err -> this.removeGame(context.getChannelId()));
+                                .doOnError(err -> game.destroy());
                     }
                 });
     }

@@ -12,8 +12,9 @@ public class RoulettePlayer extends GamblerPlayer {
     @Nullable
     private final Long number;
 
-    public RoulettePlayer(Snowflake guildId, Snowflake userId, long bet, RouletteCmd.Place place, @Nullable Long number) {
-        super(guildId, userId, bet);
+    public RoulettePlayer(Snowflake guildId, Snowflake userId, String username, long bet, RouletteCmd.Place place,
+                          @Nullable Long number) {
+        super(guildId, userId, username, bet);
         this.place = place;
         this.number = number;
     }

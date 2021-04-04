@@ -14,7 +14,6 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.command.ApplicationCommandInteraction;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
-import discord4j.core.object.command.ApplicationCommandOption;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
@@ -206,7 +205,7 @@ public class DiscordUtil {
     }
 
     private static void flattenOptionRecursive(List<ApplicationCommandInteractionOption> list,
-                                            List<ApplicationCommandInteractionOption> options) {
+                                               List<ApplicationCommandInteractionOption> options) {
         for (final ApplicationCommandInteractionOption option : options) {
             list.add(option);
             DiscordUtil.flattenOptionRecursive(list, option.getOptions());

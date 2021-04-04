@@ -5,7 +5,6 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import discord4j.common.util.Snowflake;
 import discord4j.rest.util.ApplicationCommandOptionType;
-import net.aksingh.owmjapis.model.param.Snow;
 import reactor.util.annotation.Nullable;
 
 import java.util.Map;

@@ -10,7 +10,6 @@ import com.shadorc.shadbot.utils.*;
 import discord4j.discordjson.json.MessageData;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -33,7 +32,6 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
             Place.ODD, num -> num % 2 != 0);
 
     private Instant startTimer;
-    private String results;
 
     public RouletteGame(Context context) {
         super(context, Duration.ofSeconds(30));
@@ -49,43 +47,36 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
 
     @Override
     public Mono<MessageData> show() {
-        return Flux.fromIterable(this.getPlayers().values())
-                .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.context.getClient())))
-                .collectList()
-                .map(list -> ShadbotUtil.getDefaultEmbed(
-                        embed -> {
-                            final String description = this.context.localize("roulette.description")
-                                    .formatted(this.context.getCommandName());
-                            final String desc = FormatUtil.format(list,
-                                    TupleUtils.function((player, username) -> this.context.localize("roulette.player.field")
-                                            .formatted(username, this.context.localize(player.getBet()))), "\n");
-                            final String place = this.getPlayers().values().stream()
-                                    .map(player -> player.getPlace() == Place.NUMBER
-                                            ? player.getNumber().orElseThrow()
-                                            : player.getPlace())
-                                    .map(Object::toString)
-                                    .map(StringUtil::capitalize)
-                                    .collect(Collectors.joining("\n"));
+        return Mono.fromCallable(() -> ShadbotUtil.getDefaultEmbed(
+                embed -> {
+                    final String description = this.context.localize("roulette.description")
+                            .formatted(this.context.getCommandName());
+                    final String desc = FormatUtil.format(this.players.values(),
+                            player -> this.context.localize("roulette.player.field")
+                                    .formatted(player.getUsername().orElseThrow(), this.context.localize(player.getBet())), "\n");
+                    final String place = this.getPlayers().values().stream()
+                            .map(player -> player.getPlace() == Place.NUMBER
+                                    ? player.getNumber().orElseThrow()
+                                    : player.getPlace())
+                            .map(Object::toString)
+                            .map(StringUtil::capitalize)
+                            .collect(Collectors.joining("\n"));
 
-                            embed.setAuthor(this.context.localize("roulette.title"), null, this.context.getAuthorAvatar())
-                                    .setThumbnail("https://i.imgur.com/D7xZd6C.png")
-                                    .setDescription(description)
-                                    .addField(this.context.localize("roulette.player.title"), desc, true)
-                                    .addField(this.context.localize("roulette.place.title"), place, true);
+                    embed.setAuthor(this.context.localize("roulette.title"), null, this.context.getAuthorAvatar())
+                            .setThumbnail("https://i.imgur.com/D7xZd6C.png")
+                            .setDescription(description)
+                            .addField(this.context.localize("roulette.player.title"), desc, true)
+                            .addField(this.context.localize("roulette.place.title"), place, true);
 
-                            if (this.results != null) {
-                                embed.addField(this.context.localize("roulette.results"), this.results, false);
-                            }
-
-                            if (this.isScheduled()) {
-                                final Duration remainingDuration = this.getDuration()
-                                        .minus(TimeUtil.elapsed(this.startTimer));
-                                embed.setFooter(this.context.localize("roulette.footer.remaining")
-                                        .formatted(remainingDuration.toSeconds()), null);
-                            } else {
-                                embed.setFooter(this.context.localize("roulette.footer.finished"), null);
-                            }
-                        }))
+                    if (this.isScheduled()) {
+                        final Duration remainingDuration = this.getDuration()
+                                .minus(TimeUtil.elapsed(this.startTimer));
+                        embed.setFooter(this.context.localize("roulette.footer.remaining")
+                                .formatted(remainingDuration.toSeconds()), null);
+                    } else {
+                        embed.setFooter(this.context.localize("roulette.footer.finished"), null);
+                    }
+                }))
                 .flatMap(this.context::editReply);
     }
 
@@ -93,28 +84,29 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
     public Mono<Void> end() {
         final int winningPlace = ThreadLocalRandom.current().nextInt(1, 37);
         return Flux.fromIterable(this.getPlayers().values())
-                .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.context.getClient())))
-                .flatMap(TupleUtils.function((player, username) -> {
+                .flatMap(player -> {
                     final int multiplier = RouletteGame.getMultiplier(player, winningPlace);
                     if (multiplier > 0) {
                         final long gains = Math.min(player.getBet() * multiplier, Config.MAX_COINS);
                         Telemetry.ROULETTE_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
-                                .thenReturn("**%s** (Gains: **%s coin(s)**)"
-                                        .formatted(username, this.context.localize(gains)));
+                                .thenReturn(this.context.localize("roulette.player.gains")
+                                        .formatted(player.getUsername(), this.context.localize(gains)));
                     } else {
                         Telemetry.ROULETTE_SUMMARY.labels("loss").observe(player.getBet());
-                        return Mono.just("**%s** (Losses: **%s coin(s)**)"
-                                .formatted(username, this.context.localize(player.getBet())));
+                        return Mono.just(this.context.localize("roulette.player.losses")
+                                .formatted(player.getUsername(), this.context.localize(player.getBet())));
                     }
-                }))
-                .collectSortedList()
-                .doOnNext(list -> this.results = String.join(", ", list))
-                .then(this.context.getChannel())
-                .flatMap(channel -> DiscordUtil.sendMessage(
-                        String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
-                                winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"), channel))
-                .then(this.show())
+                })
+                .collectList()
+                .map(list -> String.join("\n", list))
+                .flatMap(text -> {
+                    final String color = RED_NUMS.contains(winningPlace)
+                            ? this.context.localize("roulette.red")
+                            : this.context.localize("roulette.black");
+                    return this.context.reply(Emoji.DICE, this.context.localize("roulette.results")
+                            .formatted(winningPlace, color, text));
+                })
                 .then(Mono.fromRunnable(this::destroy));
     }
 
