@@ -4,21 +4,16 @@ import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.EnumUtil;
-import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.NumberUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-import java.util.regex.Pattern;
-
 public class RouletteCmd extends GameCmd<RouletteGame> {
 
-    // Match [1-36]
-    private static final Pattern NUMBER_PATTERN = Pattern.compile("^([1-9]|1[0-9]|2[0-9]|3[0-6])$");
-
     public enum Place {
-        RED, BLACK, ODD, EVEN, LOW, HIGH
+        NUMBER, RED, BLACK, ODD, EVEN, LOW, HIGH
     }
 
     public RouletteCmd() {
@@ -28,26 +23,30 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                 .required(true)
                 .type(ApplicationCommandOptionType.INTEGER.getValue()));
         this.addOption(option -> option.name("place")
-                .description("number between 1 and 36, %s"
-                        .formatted(FormatUtil.format(Place.class, it -> it.name().toLowerCase(), ", ")))
+                .description("The place of your bet")
                 .required(true)
-                .type(ApplicationCommandOptionType.STRING.getValue()));
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Place.class)));
+        this.addOption(option -> option.name("number")
+                .description("The number you're betting on, if the place chosen is 'number'")
+                .required(false)
+                .type(ApplicationCommandOptionType.INTEGER.getValue()));
     }
 
     @Override
     public Mono<?> execute(Context context) {
         final long bet = context.getOptionAsLong("bet").orElseThrow();
-        final String place = context.getOptionAsString("place").orElseThrow().toLowerCase();
+        final Place place = context.getOptionAsEnum(Place.class, "place").orElseThrow();
+        final Long number = context.getOptionAsLong("number").orElse(null);
 
         return ShadbotUtil.requireValidBet(context.getLocale(), context.getGuildId(), context.getAuthorId(), bet)
                 .flatMap(__ -> {
-                    // Match [1-36], red, black, odd, even, high or low
-                    if (!NUMBER_PATTERN.matcher(place).matches() && EnumUtil.parseEnum(Place.class, place) == null) {
-                        return Mono.error(new CommandException(context.localize("roulette.invalid.place")
-                                .formatted(place, FormatUtil.format(Place.class, it -> it.name().toLowerCase(), ", "))));
+                    if (place == Place.NUMBER && (number == null || NumberUtil.isBetween(number, 1, 36))) {
+                        return Mono.error(new CommandException(context.localize("roulette.invalid.number")));
                     }
 
-                    final RoulettePlayer player = new RoulettePlayer(context.getGuildId(), context.getAuthorId(), bet, place);
+                    final RoulettePlayer player = new RoulettePlayer(context.getGuildId(), context.getAuthorId(), bet,
+                            place, number);
 
                     if (this.isGameStarted(context.getChannelId())) {
                         final RouletteGame game = this.getGame(context.getChannelId());
@@ -57,14 +56,15 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                                     .doOnError(err -> this.removeGame(context.getChannelId()));
                         }
                         return context.reply(Emoji.INFO, context.localize("roulette.already.participating"));
+                    } else {
+                        final RouletteGame game = new RouletteGame(context);
+                        game.addPlayerIfAbsent(player);
+                        this.addGame(context.getChannelId(), game);
+                        return game.start()
+                                .then(player.bet())
+                                .then(game.show())
+                                .doOnError(err -> this.removeGame(context.getChannelId()));
                     }
-
-                    final RouletteGame game = new RouletteGame(context);
-                    this.addGame(context.getChannelId(), game);
-                    return game.start()
-                            .then(player.bet())
-                            .then(game.show())
-                            .doOnError(err -> this.removeGame(context.getChannelId()));
                 });
     }
 }

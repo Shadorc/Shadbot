@@ -50,39 +50,40 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
     @Override
     public Mono<MessageData> show() {
         return Flux.fromIterable(this.getPlayers().values())
-                .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
+                .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.context.getClient())))
                 .collectList()
                 .map(list -> ShadbotUtil.getDefaultEmbed(
                         embed -> {
-                            final String description = String.format("**Use `/%s <bet> <place>` to join the game.**"
-                                            + "%n%n**place** is a `number between 1 and 36`, %s",
-                                    this.getContext().getCommandName(),
-                                    FormatUtil.format(Place.values(),
-                                            value -> "`%s`".formatted(value.name().toLowerCase()), ", "));
+                            final String description = this.context.localize("roulette.description")
+                                    .formatted(this.context.getCommandName());
                             final String desc = FormatUtil.format(list,
-                                    TupleUtils.function((player, username) -> String.format("**%s** (%s coin(s))",
-                                            username, this.context.localize(player.getBet()))), "\n");
+                                    TupleUtils.function((player, username) -> this.context.localize("roulette.player.field")
+                                            .formatted(username, this.context.localize(player.getBet()))), "\n");
                             final String place = this.getPlayers().values().stream()
-                                    .map(RoulettePlayer::getPlace)
+                                    .map(player -> player.getPlace() == Place.NUMBER
+                                            ? player.getNumber().orElseThrow()
+                                            : player.getPlace())
+                                    .map(Object::toString)
+                                    .map(StringUtil::capitalize)
                                     .collect(Collectors.joining("\n"));
 
-                            embed.setAuthor("Roulette Game", null, this.getContext().getAuthorAvatar())
+                            embed.setAuthor(this.context.localize("roulette.title"), null, this.context.getAuthorAvatar())
                                     .setThumbnail("https://i.imgur.com/D7xZd6C.png")
                                     .setDescription(description)
-                                    .addField("Player (Bet)", desc, true)
-                                    .addField("Place", place, true);
+                                    .addField(this.context.localize("roulette.player.title"), desc, true)
+                                    .addField(this.context.localize("roulette.place.title"), place, true);
 
                             if (this.results != null) {
-                                embed.addField("Results", this.results, false);
+                                embed.addField(this.context.localize("roulette.results"), this.results, false);
                             }
 
                             if (this.isScheduled()) {
                                 final Duration remainingDuration = this.getDuration()
                                         .minus(TimeUtil.elapsed(this.startTimer));
-                                embed.setFooter(String.format("You have %d seconds to make your bets.",
-                                        remainingDuration.toSeconds()), null);
+                                embed.setFooter(this.context.localize("roulette.footer.remaining")
+                                        .formatted(remainingDuration.toSeconds()), null);
                             } else {
-                                embed.setFooter("Finished.", null);
+                                embed.setFooter(this.context.localize("roulette.footer.finished"), null);
                             }
                         }))
                 .flatMap(this.context::editReply);
@@ -92,11 +93,9 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
     public Mono<Void> end() {
         final int winningPlace = ThreadLocalRandom.current().nextInt(1, 37);
         return Flux.fromIterable(this.getPlayers().values())
-                .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.getContext().getClient())))
+                .flatMap(player -> Mono.zip(Mono.just(player), player.getUsername(this.context.getClient())))
                 .flatMap(TupleUtils.function((player, username) -> {
-                    final Place place = EnumUtil.parseEnum(Place.class, player.getPlace());
-
-                    final int multiplier = RouletteGame.getMultiplier(player, place, winningPlace);
+                    final int multiplier = RouletteGame.getMultiplier(player, winningPlace);
                     if (multiplier > 0) {
                         final long gains = Math.min(player.getBet() * multiplier, Config.MAX_COINS);
                         Telemetry.ROULETTE_SUMMARY.labels("win").observe(gains);
@@ -111,7 +110,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                 }))
                 .collectSortedList()
                 .doOnNext(list -> this.results = String.join(", ", list))
-                .then(this.getContext().getChannel())
+                .then(this.context.getChannel())
                 .flatMap(channel -> DiscordUtil.sendMessage(
                         String.format(Emoji.DICE + " No more bets. *The wheel is spinning...* **%d (%s)** !",
                                 winningPlace, RED_NUMS.contains(winningPlace) ? "Red" : "Black"), channel))
@@ -119,10 +118,10 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                 .then(Mono.fromRunnable(this::destroy));
     }
 
-    private static int getMultiplier(RoulettePlayer player, Place place, int winningPlace) {
-        if (player.getPlace().equals(Integer.toString(winningPlace))) {
+    private static int getMultiplier(RoulettePlayer player, int winningPlace) {
+        if (player.getNumber().map(number -> number == winningPlace).orElse(false)) {
             return 36;
-        } else if (place != null && TESTS.get(place).test(winningPlace)) {
+        } else if (TESTS.get(player.getPlace()).test(winningPlace)) {
             return 2;
         } else {
             return 0;
