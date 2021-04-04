@@ -2,6 +2,7 @@ package com.shadorc.shadbot.command.game.hangman;
 
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.MultiplayerGame;
+import com.shadorc.shadbot.core.game.player.Player;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class HangmanGame extends MultiplayerGame<HangmanPlayer> {
+public class HangmanGame extends MultiplayerGame<Player> {
 
     private static final List<String> IMG_LIST = List.of(
             HangmanGame.buildImageUrl("8/8b", 0),

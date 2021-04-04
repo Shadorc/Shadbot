@@ -3,6 +3,7 @@ package com.shadorc.shadbot.command.game.hangman;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
+import com.shadorc.shadbot.core.game.player.Player;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
@@ -63,7 +64,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
             return Mono.error(new CommandException(context.localize("hangman.cannot.join")
                     .formatted(context.getCommandName(), context.getSubCommandGroupName().orElseThrow(), CREATE_SUB_COMMAND)));
         }
-        if (game.addPlayerIfAbsent(new HangmanPlayer(context.getGuildId(), context.getAuthorId()))) {
+        if (game.addPlayerIfAbsent(new Player(context.getGuildId(), context.getAuthorId()))) {
             return context.reply(Emoji.CHECK_MARK, context.localize("hangman.joined"));
         }
         return Mono.error(new CommandException(context.localize("hangman.already.participating")));
@@ -80,7 +81,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
 
                     final String word = this.getWord(difficulty);
                     final HangmanGame game = new HangmanGame(context, difficulty, word);
-                    game.addPlayerIfAbsent(new HangmanPlayer(context.getGuildId(), context.getAuthorId()));
+                    game.addPlayerIfAbsent(new Player(context.getGuildId(), context.getAuthorId()));
                     this.addGame(context.getChannelId(), game);
                     return game.start()
                             .then(game.show())
