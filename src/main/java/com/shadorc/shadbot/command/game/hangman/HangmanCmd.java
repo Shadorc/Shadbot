@@ -85,7 +85,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                     this.addGame(context.getChannelId(), game);
                     return game.start()
                             .then(game.show())
-                            .doOnError(err -> this.removeGame(context.getChannelId()));
+                            .doOnError(err -> game.destroy());
                 }));
     }
 

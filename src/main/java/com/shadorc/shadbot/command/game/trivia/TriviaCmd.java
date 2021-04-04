@@ -64,7 +64,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
             this.addGame(context.getChannelId(), game);
             return game.start()
                     .then(game.show())
-                    .doOnError(err -> this.removeGame(context.getChannelId()));
+                    .doOnError(err -> game.destroy());
         }
     }
 
