@@ -1,4 +1,3 @@
-/*
 package com.shadorc.shadbot.command.game.roulette;
 
 import com.shadorc.shadbot.command.CommandException;
@@ -48,23 +47,24 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                                 .formatted(place, FormatUtil.format(Place.class, it -> it.name().toLowerCase(), ", "))));
                     }
 
-                    if (this.getManagers().containsKey(context.getChannelId())) {
-                        return Mono.just(this.getManagers().get(context.getChannelId()));
-                    } else {
-                        final RouletteGame game = new RouletteGame(this, context);
-                        this.getManagers().put(context.getChannelId(), game);
-                        return game.start()
-                                .thenReturn(game);
-                    }
-                })
-                .flatMap(rouletteGame -> {
                     final RoulettePlayer player = new RoulettePlayer(context.getGuildId(), context.getAuthorId(), bet, place);
-                    if (rouletteGame.addPlayerIfAbsent(player)) {
-                        return player.bet().then(rouletteGame.show());
-                    } else {
+
+                    if (this.isGameStarted(context.getChannelId())) {
+                        final RouletteGame game = this.getGame(context.getChannelId());
+                        if (game.addPlayerIfAbsent(player)) {
+                            return player.bet()
+                                    .then(game.show())
+                                    .doOnError(err -> this.removeGame(context.getChannelId()));
+                        }
                         return context.reply(Emoji.INFO, context.localize("roulette.already.participating"));
                     }
+
+                    final RouletteGame game = new RouletteGame(context);
+                    this.addGame(context.getChannelId(), game);
+                    return game.start()
+                            .then(player.bet())
+                            .then(game.show())
+                            .doOnError(err -> this.removeGame(context.getChannelId()));
                 });
     }
 }
-*/
