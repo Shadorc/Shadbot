@@ -1,124 +1,108 @@
-/*
 package com.shadorc.shadbot.command.game.dice;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.command.MissingArgumentException;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
-import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.NumberUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class DiceCmd extends GameCmd<DiceGame> {
 
+    protected static final String JOIN_SUB_COMMAND = "join";
+    protected static final String CREATE_SUB_COMMAND = "create";
+
     public DiceCmd() {
-        super(List.of("dice"));
-    }
+        super("dice", "Start a dice game with a common bet");
 
-    @Override
-    public Mono<Void> execute(Context context) {
-        final List<String> args = context.requireArgs(1, 2);
-
-        // This boolean indicates if the user is trying to join or to create a game
-        final boolean isJoining = args.size() == 1;
-
-        final Integer number = NumberUtils.toIntBetweenOrNull(args.get(0), 1, 6);
-        if (number == null) {
-            return Mono.error(new CommandException(
-                    String.format("`%s` is not a valid number, must be between **1** and **6**.",
-                            args.get(0))));
-        }
-
-        // A game is already started...
-        if (this.getManagers().containsKey(context.getChannelId())) {
-            // ... and the user is trying to create a game
-            if (!isJoining) {
-                return context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO
-                                        + " (**%s**) A **Dice Game** has already been started. "
-                                        + "Use `%s%s <num>` to join it.",
-                                context.getUsername(), context.getPrefix(), this.getName()), channel))
-                        .then();
-            }
-
-            final DiceGame diceManager = this.getManagers().get(context.getChannelId());
-
-            if (diceManager.getPlayers().containsKey(context.getAuthorId())) {
-                return context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.INFO
-                                        + " (**%s**) You're already participating.",
-                                context.getUsername()), channel))
-                        .then();
-            }
-
-            if (diceManager.getPlayers().size() == 6) {
-                return context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION
-                                        + " (**%s**) Sorry, there are already 6 players.",
-                                context.getUsername()), channel))
-                        .then();
-            }
-
-            if (diceManager.getPlayers().values().stream().anyMatch(player -> player.getNumber() == number)) {
-                return context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.GREY_EXCLAMATION
-                                        + " (**%s**) This number has already been bet, please try with another one.",
-                                context.getUsername()), channel))
-                        .then();
-            }
-
-            return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), diceManager.getBet())
-                    .flatMap(bet -> {
-                        final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(), bet, number);
-                        if (diceManager.addPlayerIfAbsent(player)) {
-                            return player.bet().then(diceManager.show());
-                        } else {
-                            return diceManager.show();
-                        }
-                    });
-        }
-        // A game is not already started...
-        else {
-            // ... and the user tries to join a game
-            if (isJoining) {
-                return Mono.error(new MissingArgumentException());
-            }
-
-            return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), args.get(1))
-                    .map(bet -> this.getManagers().computeIfAbsent(context.getChannelId(),
-                            __ -> new DiceGame(this, context, bet)))
-                    .flatMap(diceManager -> {
-                        final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(),
-                                diceManager.getBet(), number);
-                        if (diceManager.addPlayerIfAbsent(player)) {
-                            return player.bet()
-                                    .then(diceManager.start())
-                                    .then(diceManager.show());
-                        } else {
-                            return diceManager.start()
-                                    .then(diceManager.show());
-                        }
-                    });
-        }
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Start a dice game with a common bet.")
-                .addArg("num", "number between 1 and 6\nYou can't bet on a number that has already " +
-                        "been chosen by another player.", false)
-                .addArg("bet", false)
-                .addField("Gains", String.format("The winner gets the prize pool plus **%.1f times** " +
-                        "his bet.", Constants.WIN_MULTIPLICATOR), false)
+        final ApplicationCommandOptionData numberOption = ApplicationCommandOptionData.builder()
+                .name("number")
+                .description("The number you're betting on")
+                .required(true)
+                .type(ApplicationCommandOptionType.INTEGER.getValue())
                 .build();
+
+        this.addOption(option -> option.name(JOIN_SUB_COMMAND)
+                .description("Join Dice game")
+                .type(ApplicationCommandOptionType.SUB_COMMAND.getValue())
+                .addOption(numberOption));
+        this.addOption(option -> option.name(CREATE_SUB_COMMAND)
+                .description("Create Dice game")
+                .type(ApplicationCommandOptionType.SUB_COMMAND.getValue())
+                .addOption(ApplicationCommandOptionData.builder().name("bet")
+                        .description("The common bet")
+                        .required(true)
+                        .type(ApplicationCommandOptionType.INTEGER.getValue())
+                        .build())
+                .addOption(numberOption));
     }
+
+    @Override
+    public Mono<?> execute(Context context) {
+        final long number = context.getOptionAsLong("number").orElseThrow();
+        if (!NumberUtil.isBetween(number, 1, 6)) {
+            return Mono.error(new CommandException(context.localize("dice.invalid.number")));
+        }
+
+        final String subCmd = context.getSubCommandName().orElseThrow();
+        if (subCmd.equals(JOIN_SUB_COMMAND)) {
+            return this.join(context, (int) number);
+        } else if (subCmd.equals(CREATE_SUB_COMMAND)) {
+            return this.create(context, (int) number);
+        }
+        return Mono.error(new IllegalStateException());
+    }
+
+    private Mono<?> join(Context context, int number) {
+        final DiceGame game = this.getGame(context.getChannelId());
+        if (game == null) {
+            return Mono.error(new CommandException(context.localize("dice.cannot.join")
+                    .formatted(context.getCommandName(), context.getSubCommandGroupName().orElseThrow(), CREATE_SUB_COMMAND)));
+        }
+
+        if (game.getPlayers().size() == 6) {
+            return Mono.error(new CommandException(context.localize("dice.full")));
+        }
+
+        if (game.getPlayers().values().stream().anyMatch(player -> player.getNumber() == number)) {
+            return Mono.error(new CommandException(context.localize("dice.number.already.used")));
+        }
+
+        return ShadbotUtil.requireValidBet(context.getLocale(), context.getGuildId(), context.getAuthorId(), game.getBet())
+                .flatMap(bet -> {
+                    final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(),
+                            context.getAuthorName(), bet, number);
+                    if (game.addPlayerIfAbsent(player)) {
+                        return player.bet()
+                                .then(game.show());
+                    } else {
+                        return Mono.error(new CommandException(context.localize("dice.already.participating")));
+                    }
+                });
+    }
+
+    private Mono<?> create(Context context, int number) {
+        final long bet = context.getOptionAsLong("bet").orElseThrow();
+
+        if (this.isGameStarted(context.getChannelId())) {
+            return Mono.error(new CommandException(context.localize("dice.already.started")
+                    .formatted(context.getCommandName(), context.getSubCommandGroupName().orElseThrow(), CREATE_SUB_COMMAND)));
+        }
+
+        return ShadbotUtil.requireValidBet(context.getLocale(), context.getGuildId(), context.getAuthorId(), bet)
+                .flatMap(__ -> {
+                    final DiceGame game = new DiceGame(context, bet);
+                    final DicePlayer player = new DicePlayer(context.getGuildId(), context.getAuthorId(),
+                            context.getAuthorName(), bet, number);
+                    game.addPlayerIfAbsent(player);
+                    this.addGame(context.getChannelId(), game);
+                    return player.bet()
+                            .then(game.start())
+                            .then(game.show())
+                            .doOnError(err -> game.destroy());
+                });
+    }
+
 }
-*/
