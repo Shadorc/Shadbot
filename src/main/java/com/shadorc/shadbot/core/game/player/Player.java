@@ -10,10 +10,10 @@ import java.util.Optional;
 
 public class Player {
 
-    private final Snowflake guildId;
-    private final Snowflake userId;
+    protected final Snowflake guildId;
+    protected final Snowflake userId;
     @Nullable
-    private final String username;
+    protected final String username;
 
     public Player(Snowflake guildId, Snowflake userId, @Nullable String username) {
         this.guildId = guildId;

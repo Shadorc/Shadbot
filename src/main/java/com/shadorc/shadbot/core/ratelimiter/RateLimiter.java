@@ -1,16 +1,20 @@
 package com.shadorc.shadbot.core.ratelimiter;
 
-import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.object.Emoji;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.discordjson.json.MessageData;
+import discord4j.core.GatewayDiscordClient;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.channel.MessageChannel;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,17 +43,18 @@ public class RateLimiter {
         this.bandwidth = bandwidth;
     }
 
-    public Mono<Boolean> isLimitedAndWarn(Context context) {
+    public Mono<Boolean> isLimitedAndWarn(GatewayDiscordClient gateway, Snowflake guildId, Snowflake channelId,
+                                          Snowflake userId, Locale locale) {
         final LimitedUser limitedUser = this.guildsLimitedMap
-                .computeIfAbsent(context.getGuildId(), __ -> new LimitedGuild(this.bandwidth))
-                .getUser(context.getAuthorId());
+                .computeIfAbsent(guildId, __ -> new LimitedGuild(this.bandwidth))
+                .getUser(userId);
 
         // The token could not been consumed, the user is limited
         if (!limitedUser.getBucket().tryConsume(1)) {
             // The user has not yet been warned
             if (!limitedUser.isWarned()) {
                 limitedUser.warned(true);
-                return this.sendWarningMessage(context)
+                return this.sendWarningMessage(gateway, channelId, locale)
                         .thenReturn(true);
             }
             return Mono.just(true);
@@ -59,13 +64,14 @@ public class RateLimiter {
         return Mono.just(false);
     }
 
-    private Mono<MessageData> sendWarningMessage(Context context) {
+    private Mono<Message> sendWarningMessage(GatewayDiscordClient gateway, Snowflake channelId, Locale locale) {
         final String message = ShadbotUtil.SPAMS.getRandomLine();
-        final String duration = FormatUtil.formatDurationWords(
-                context.getLocale(),
-                Duration.ofNanos(this.bandwidth.getRefillPeriodNanos()));
-        return context.reply(Emoji.STOPWATCH, context.localize("ratelimit.message")
-                .formatted(message, this.bandwidth.getCapacity(), duration));
+        final String duration = FormatUtil.formatDurationWords(locale, Duration.ofNanos(this.bandwidth.getRefillPeriodNanos()));
+        return gateway.getChannelById(channelId)
+                .cast(MessageChannel.class)
+                .flatMap(channel -> DiscordUtil.sendMessage(Emoji.STOPWATCH,
+                        I18nManager.localize(locale, "ratelimit.message")
+                                .formatted(message, this.bandwidth.getCapacity(), duration), channel));
     }
 
 }

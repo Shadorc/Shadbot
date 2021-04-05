@@ -1,14 +1,11 @@
-/*
 package com.shadorc.shadbot.command.game.blackjack;
 
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
 import com.shadorc.shadbot.object.casino.Card;
 import com.shadorc.shadbot.object.casino.Hand;
 import discord4j.common.util.Snowflake;
-import discord4j.core.GatewayDiscordClient;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
-import reactor.core.publisher.Mono;
 
 public class BlackjackPlayer extends GamblerPlayer {
 
@@ -17,8 +14,8 @@ public class BlackjackPlayer extends GamblerPlayer {
     private boolean isDoubleDown;
     private boolean isStanding;
 
-    public BlackjackPlayer(Snowflake guildId, Snowflake userId, long bet) {
-        super(guildId, userId, bet);
+    public BlackjackPlayer(Snowflake guildId, Snowflake userId, String username, long bet) {
+        super(guildId, userId, username, bet);
         this.hand = new Hand();
         this.isDoubleDown = false;
         this.isStanding = false;
@@ -42,19 +39,18 @@ public class BlackjackPlayer extends GamblerPlayer {
         this.stand();
     }
 
-    public Mono<ImmutableEmbedFieldData> format(GatewayDiscordClient gateway) {
-        return this.getUsername(gateway)
-                .map(username -> {
-                    final StringBuilder name = new StringBuilder(String.format("%s's hand", username));
-                    if (this.isStanding) {
-                        name.append(" (Stand)");
-                    }
-                    if (this.isDoubleDown) {
-                        name.append(" (Double down)");
-                    }
+    public ImmutableEmbedFieldData format() {
+        final StringBuilder name = new StringBuilder("%s's hand".formatted(this.getUsername()));
+        if (this.isStanding) {
+            name.append(' ')
+                    .append("(Stand)");
+        }
+        if (this.isDoubleDown) {
+            name.append(' ')
+                    .append("(Double down)");
+        }
 
-                    return ImmutableEmbedFieldData.of(name.toString(), this.hand.format(), Possible.of(true));
-                });
+        return ImmutableEmbedFieldData.of(name.toString(), this.hand.format(), Possible.of(true));
     }
 
     @Override
@@ -71,4 +67,3 @@ public class BlackjackPlayer extends GamblerPlayer {
     }
 
 }
-*/

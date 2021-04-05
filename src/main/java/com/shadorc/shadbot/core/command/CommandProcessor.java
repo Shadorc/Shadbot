@@ -70,7 +70,8 @@ public class CommandProcessor {
 
     private static Mono<Boolean> isRateLimited(Context context, BaseCmd cmd) {
         return Mono.justOrEmpty(cmd.getRateLimiter())
-                .flatMap(rateLimiter -> rateLimiter.isLimitedAndWarn(context))
+                .flatMap(rateLimiter -> rateLimiter.isLimitedAndWarn(context.getClient(), context.getGuildId(),
+                        context.getChannelId(), context.getAuthorId(), context.getLocale()))
                 .defaultIfEmpty(false);
     }
 

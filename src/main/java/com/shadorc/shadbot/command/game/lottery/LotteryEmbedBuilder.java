@@ -39,7 +39,7 @@ public class LotteryEmbedBuilder {
                 .filter(lotteryGambler -> lotteryGambler.getUserId().equals(this.context.getAuthorId()))
                 .findFirst()
                 .ifPresent(gambler -> this.embedConsumer = this.embedConsumer.andThen(
-                        embed -> embed.setFooter(context.localize("lottery.embed.bet")
+                        embed -> embed.setFooter(this.context.localize("lottery.embed.bet")
                                         .formatted(gambler.getNumber()),
                                 "https://i.imgur.com/btJAaAt.png")));
 
