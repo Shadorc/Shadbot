@@ -15,7 +15,8 @@ public class DiceCmd extends GameCmd<DiceGame> {
     protected static final String CREATE_SUB_COMMAND = "create";
 
     public DiceCmd() {
-        super("dice", "Start a dice game with a common bet");
+        super("dice", "Start a dice game with a common bet",
+                ApplicationCommandOptionType.SUB_COMMAND_GROUP);
 
         final ApplicationCommandOptionData numberOption = ApplicationCommandOptionData.builder()
                 .name("number")
