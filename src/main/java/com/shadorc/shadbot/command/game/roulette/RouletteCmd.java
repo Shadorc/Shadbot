@@ -41,7 +41,7 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
 
         return ShadbotUtil.requireValidBet(context.getLocale(), context.getGuildId(), context.getAuthorId(), bet)
                 .flatMap(__ -> {
-                    if (place == Place.NUMBER && (number == null || NumberUtil.isBetween(number, 1, 36))) {
+                    if (place == Place.NUMBER && (number == null || !NumberUtil.isBetween(number, 1, 36))) {
                         return Mono.error(new CommandException(context.localize("roulette.invalid.number")));
                     }
 

@@ -91,11 +91,11 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                         Telemetry.ROULETTE_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
                                 .thenReturn(this.context.localize("roulette.player.gains")
-                                        .formatted(player.getUsername(), this.context.localize(gains)));
+                                        .formatted(player.getUsername().orElseThrow(), this.context.localize(gains)));
                     } else {
                         Telemetry.ROULETTE_SUMMARY.labels("loss").observe(player.getBet());
                         return Mono.just(this.context.localize("roulette.player.losses")
-                                .formatted(player.getUsername(), this.context.localize(player.getBet())));
+                                .formatted(player.getUsername().orElseThrow(), this.context.localize(player.getBet())));
                     }
                 })
                 .collectList()
