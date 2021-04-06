@@ -50,7 +50,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
         return Mono.fromCallable(() -> ShadbotUtil.getDefaultEmbed(
                 embed -> {
                     final String description = this.context.localize("roulette.description")
-                            .formatted(this.context.getCommandName());
+                            .formatted(this.context.getFullCommandName());
                     final String desc = FormatUtil.format(this.players.values(),
                             player -> this.context.localize("roulette.player.field")
                                     .formatted(player.getUsername().orElseThrow(), this.context.localize(player.getBet())), "\n");

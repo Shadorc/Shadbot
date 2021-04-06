@@ -81,8 +81,8 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
     @Override
     public Mono<MessageData> show() {
         return Mono.defer(() -> {
-            final String description = "**%s**\n%s"
-                    .formatted(this.trivia.getQuestion(),
+            final String description = "**%s**\n**%s**\n%s"
+                    .formatted(this.context.localize("trivia.description"), this.trivia.getQuestion(),
                             FormatUtil.numberedList(this.answers.size(), this.answers.size(),
                                     count -> "\t**%d**. %s".formatted(count, this.answers.get(count - 1))));
 

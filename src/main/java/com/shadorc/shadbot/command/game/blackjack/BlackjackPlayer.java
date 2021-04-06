@@ -40,7 +40,7 @@ public class BlackjackPlayer extends GamblerPlayer {
     }
 
     public ImmutableEmbedFieldData format() {
-        final StringBuilder name = new StringBuilder("%s's hand".formatted(this.getUsername()));
+        final StringBuilder name = new StringBuilder("%s's hand".formatted(this.getUsername().orElseThrow()));
         if (this.isStanding) {
             name.append(' ')
                     .append("(Stand)");

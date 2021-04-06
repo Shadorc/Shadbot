@@ -82,7 +82,7 @@ public class HangmanGame extends MultiplayerGame<Player> {
 
                     if (this.isScheduled()) {
                         final Duration remainingDuration = this.getDuration().minus(TimeUtil.elapsed(this.startTimer));
-                        embed.setFooter(this.context.localize("hangman.footer")
+                        embed.setFooter(this.context.localize("hangman.footer.remaining")
                                 .formatted(remainingDuration.toSeconds()), null);
                     } else {
                         embed.setFooter(this.context.localize("hangman.footer.finished")
