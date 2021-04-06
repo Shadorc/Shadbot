@@ -111,8 +111,11 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
     }
 
     private static int getMultiplier(RoulettePlayer player, int winningPlace) {
-        if (player.getNumber().map(number -> number == winningPlace).orElse(false)) {
-            return 36;
+        if (player.getPlace() == Place.NUMBER) {
+            if (player.getNumber().orElseThrow() == winningPlace) {
+                return 36;
+            }
+            return 0;
         } else if (TESTS.get(player.getPlace()).test(winningPlace)) {
             return 2;
         } else {

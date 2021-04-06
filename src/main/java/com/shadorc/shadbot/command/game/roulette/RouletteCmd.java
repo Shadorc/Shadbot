@@ -55,7 +55,7 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
                                     .then(game.show())
                                     .doOnError(err -> game.destroy());
                         }
-                        return context.reply(Emoji.INFO, context.localize("roulette.already.participating"));
+                        return Mono.error(new CommandException(context.localize("roulette.already.participating")));
                     } else {
                         final RouletteGame game = new RouletteGame(context);
                         game.addPlayerIfAbsent(player);
