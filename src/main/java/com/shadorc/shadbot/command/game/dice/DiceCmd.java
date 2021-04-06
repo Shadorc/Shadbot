@@ -89,7 +89,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
 
         if (this.isGameStarted(context.getChannelId())) {
             return Mono.error(new CommandException(context.localize("dice.already.started")
-                    .formatted(context.getCommandName(), context.getSubCommandGroupName().orElseThrow(), CREATE_SUB_COMMAND)));
+                    .formatted(context.getCommandName(), context.getSubCommandGroupName().orElseThrow(), JOIN_SUB_COMMAND)));
         }
 
         return ShadbotUtil.requireValidBet(context.getLocale(), context.getGuildId(), context.getAuthorId(), bet)

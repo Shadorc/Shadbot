@@ -45,14 +45,15 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                         Telemetry.DICE_SUMMARY.labels("win").observe(gains);
                         return player.win(gains)
                                 .thenReturn(this.context.localize("dice.player.gains")
-                                        .formatted(player.getUsername(), this.context.localize(gains)));
+                                        .formatted(player.getUsername().orElseThrow(), this.context.localize(gains)));
                     } else {
                         Telemetry.DICE_SUMMARY.labels("loss").observe(this.bet);
                         return Mono.just(this.context.localize("dice.player.losses")
-                                .formatted(player.getUsername(), this.context.localize(this.bet)));
+                                .formatted(player.getUsername().orElseThrow(), this.context.localize(this.bet)));
                     }
                 })
                 .collectList()
+                .map(results -> String.join("\n", results))
                 .flatMap(text -> this.context.reply(Emoji.DICE, this.context.localize("dice.results")
                         .formatted(winningNum, text)))
                 .then(Mono.fromRunnable(this::destroy));
@@ -65,7 +66,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                     embed.setAuthor(this.context.localize("dice.title"), null, this.getContext().getAuthorAvatar())
                             .setThumbnail("https://i.imgur.com/XgOilIW.png")
                             .setDescription(this.context.localize("dice.description")
-                                    .formatted(this.context.getCommandName(), this.context.getSubCommandGroupName(),
+                                    .formatted(this.context.getCommandName(), this.context.getSubCommandGroupName().orElseThrow(),
                                             DiceCmd.JOIN_SUB_COMMAND, this.context.localize(this.bet)))
                             .addField(this.context.localize("dice.player.title"), FormatUtil.format(this.players.values(),
                                     player -> player.getUsername().orElseThrow(), "\n"), true)
