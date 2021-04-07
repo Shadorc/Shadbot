@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.todo;
+package com.shadorc.shadbot.command;
 
 import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.data.Config;
@@ -81,6 +81,19 @@ public class HelpCmd extends BaseCmd {
                         getSettings.map(settings -> settings.isCommandAllowed(cmd) && settings.isCommandAllowedInChannel(cmd, context.getChannelId()))
                                 .defaultIfEmpty(true)))
                 .collectMultimap(BaseCmd::getCategory, cmd -> String.format("`/%s`", cmd.getName()));
+    }
+
+    // Essential part of Shadbot (Thanks to @Bluerin)
+    private String howToDoAChocolateCake() {
+        final String meal = "50g farine";
+        final String chocolate = "200g chocolat";
+        final String eggs = "3 oeufs";
+        final String sugar = "100g sucre";
+        final String butter = "100g beurre";
+        return "Mélanger " + meal + " " + sugar + " " + eggs + " dans un saladier." +
+                "\nFaire fondre au bain-marie " + chocolate + " " + butter +
+                "\nRajouter le chocolat et le beurre dans le saladier." +
+                "\nVerser le mélange dans un moule et enfourner pendant 25min à 180°C.";
     }
 
 }

@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.todo;
+package com.shadorc.shadbot.command;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;

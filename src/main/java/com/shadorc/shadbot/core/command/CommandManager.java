@@ -1,5 +1,8 @@
 package com.shadorc.shadbot.core.command;
 
+import com.shadorc.shadbot.command.AchievementsCmd;
+import com.shadorc.shadbot.command.HelpCmd;
+import com.shadorc.shadbot.command.PingCmd;
 import com.shadorc.shadbot.command.currency.CurrencyGroup;
 import com.shadorc.shadbot.command.donator.DonatorGroup;
 import com.shadorc.shadbot.command.fun.FunGroup;
@@ -33,7 +36,8 @@ public class CommandManager {
         COMMANDS_MAP = CommandManager.initialize(
                 new InfoGroup(), new SupportGroup(), new ImageGroup(), new ModerationGroup(), new OwnerGroup(),
                 new UtilGroup(), new FunGroup(), new GameStatsGroup(), new CurrencyGroup(), new SettingGroup(),
-                new MusicGroup(), new DonatorGroup(), new GameGroup());
+                new MusicGroup(), new DonatorGroup(), new GameGroup(), new PingCmd(), new HelpCmd(),
+                new AchievementsCmd());
     }
 
     private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {
