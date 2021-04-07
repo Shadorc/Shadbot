@@ -9,7 +9,7 @@ public class ModerationGroup extends BaseCmdGroup {
 
     public ModerationGroup() {
         super(CommandCategory.MODERATION, "moderation", "Manages your server",
-                List.of(new RolelistCmd(), new PruneCmd()));
+                List.of(new RolelistCmd(), new PruneCmd(), new KickCmd(), new BanCmd(), new SoftBanCmd()));
     }
 
 }
