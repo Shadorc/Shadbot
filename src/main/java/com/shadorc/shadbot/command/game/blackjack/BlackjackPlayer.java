@@ -1,11 +1,14 @@
 package com.shadorc.shadbot.command.game.blackjack;
 
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
+import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.object.casino.Card;
 import com.shadorc.shadbot.object.casino.Hand;
 import discord4j.common.util.Snowflake;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
+
+import java.util.Locale;
 
 public class BlackjackPlayer extends GamblerPlayer {
 
@@ -39,15 +42,16 @@ public class BlackjackPlayer extends GamblerPlayer {
         this.stand();
     }
 
-    public ImmutableEmbedFieldData format() {
-        final StringBuilder name = new StringBuilder("%s's hand".formatted(this.getUsername().orElseThrow()));
+    public ImmutableEmbedFieldData format(Locale locale) {
+        final StringBuilder name = new StringBuilder(I18nManager.localize(locale, "blackjack.user.hand")
+                .formatted(this.getUsername().orElseThrow()));
         if (this.isStanding) {
             name.append(' ')
-                    .append("(Stand)");
+                    .append(I18nManager.localize(locale, "blackjack.user.standing"));
         }
         if (this.isDoubleDown) {
             name.append(' ')
-                    .append("(Double down)");
+                    .append(I18nManager.localize(locale, "blackjack.user.doubledown"));
         }
 
         return ImmutableEmbedFieldData.of(name.toString(), this.hand.format(), Possible.of(true));

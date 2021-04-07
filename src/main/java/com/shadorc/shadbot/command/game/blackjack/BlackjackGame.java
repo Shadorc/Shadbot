@@ -78,7 +78,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                     }
 
                     this.players.values().stream()
-                            .map(BlackjackPlayer::format)
+                            .map(player -> player.format(this.context.getLocale()))
                             .forEach(field -> embed.addField(field.name(), field.value(), field.inline().get()));
                 }))
                 .flatMap(this.context::editReply);
