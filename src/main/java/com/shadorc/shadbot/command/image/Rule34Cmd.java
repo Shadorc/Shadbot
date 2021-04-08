@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 public class Rule34Cmd extends BaseCmd {
 
     private static final String HOME_URL = "https://rule34.xxx/index.php";
-    private static final int MAX_TAGS_CHAR = 250;
+    private static final int MAX_TAGS_CHAR = 300;
 
     public Rule34Cmd() {
         super(CommandCategory.IMAGE, "rule34", "Show random image from Rule34");
@@ -88,7 +88,7 @@ public class Rule34Cmd extends BaseCmd {
 
                     final String resolution = "%dx%d".formatted(post.getWidth(), post.getHeight());
                     final String formattedTags = Rule34Cmd.formatTags(post.getTags());
-                    embed.setAuthor("Rule34: %s".formatted(tag), post.getFileUrl(), context.getAuthorAvatar())
+                    embed.setAuthor(context.localize("rule34.title").formatted(tag), post.getFileUrl(), context.getAuthorAvatar())
                             .setThumbnail("https://i.imgur.com/t6JJWFN.png")
                             .addField(context.localize("rule34.resolution"), resolution, false)
                             .addField(context.localize("rule34.tags"), formattedTags, false)
