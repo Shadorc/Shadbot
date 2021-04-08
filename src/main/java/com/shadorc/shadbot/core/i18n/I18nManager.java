@@ -28,8 +28,13 @@ public class I18nManager {
     public static String localize(Locale locale, String key) {
         try {
             return I18nManager.getBundle(locale).getString(key);
-        } catch (final MissingResourceException err) {
-            return I18nManager.getBundle(Config.DEFAULT_LOCALE).getString(key);
+        } catch (final MissingResourceException ignored) {
+            try {
+                return I18nManager.getBundle(Config.DEFAULT_LOCALE).getString(key);
+            } catch (final MissingResourceException err) {
+                DEFAULT_LOGGER.error("Can't find resource for key: %s".formatted(key), err);
+                return key;
+            }
         }
     }
 
