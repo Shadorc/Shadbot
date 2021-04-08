@@ -61,12 +61,19 @@ public class WallhavenCmd extends BaseCmd {
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, String title, Wallpaper wallpaper) {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> {
+                    wallpaper.getSource().ifPresent(source -> {
+                        if (NetUtil.isUrl(source)) {
+                            embed.setDescription(context.localize("wallhaven.source.url").formatted(source));
+                        } else {
+                            embed.addField(context.localize("wallhaven.source"), source, false);
+                        }
+                    });
+
                     embed.setAuthor(title, wallpaper.getUrl(), context.getAuthorAvatar())
+                            .setThumbnail("https://wallhaven.cc/images/layout/logo_sm.png")
                             .setImage(wallpaper.getPath())
                             .addField(context.localize("wallhaven.resolution"), wallpaper.getResolution(), false);
 
-                    wallpaper.getSource().ifPresent(source ->
-                            embed.addField(context.localize("wallhaven.source"), source, false));
                 });
     }
 
