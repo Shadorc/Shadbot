@@ -113,7 +113,7 @@ public abstract class RemoveMembersCmd extends BaseCmd {
                         context.localize("%s.private.message".formatted(this.keyword))
                                 .formatted(guild.getName(), author.getUsername(), reason), privateChannel))
                 .switchIfEmpty(Mono.error(
-                        new CommandException(context.localize("%s.exception.private.message".formatted(this.keyword))
+                        new CommandException(context.localize("exception.private.message")
                                 .formatted(memberToRemove.getUsername()))));
     }
 }
