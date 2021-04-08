@@ -132,6 +132,7 @@ public class Context implements InteractionContext, I18nContext {
                 DiscordUtil.flattenOptions(this.getEvent().getInteraction().getCommandInteraction());
         return options.stream()
                 .filter(option -> option.getName().equals(name))
+                .filter(option -> option.getValue().isPresent())
                 .findFirst()
                 .flatMap(ApplicationCommandInteractionOption::getValue);
     }
