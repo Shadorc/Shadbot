@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.support;
+package com.shadorc.shadbot.command.standalone;
 
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.core.command.BaseCmd;
@@ -28,9 +28,9 @@ public class FeedbackCmd extends BaseCmd {
                 .getUserById(Shadbot.getOwnerId())
                 .flatMap(User::getPrivateChannel)
                 .flatMap(channel -> DiscordUtil.sendMessage(
-                        String.format(Emoji.SPEECH + " Feedback from **%s** (User ID: %d, Guild ID: %d):%n%s",
-                                context.getAuthorName(), context.getAuthorId().asLong(),
-                                context.getGuildId().asLong(), message), channel))
+                        String.format(Emoji.SPEECH + " Feedback from **%s** (User ID: %s, Guild ID: %s):%n%s",
+                                context.getAuthor().getTag(), context.getAuthorId().asString(),
+                                context.getGuildId().asString(), message), channel))
                 .then(context.reply(Emoji.INFO, context.localize("feedback.message")));
     }
 
