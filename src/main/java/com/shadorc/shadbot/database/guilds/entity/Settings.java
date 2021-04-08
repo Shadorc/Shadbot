@@ -177,6 +177,11 @@ public class Settings extends SerializableEntity<SettingsBean> {
                                 .collect(Collectors.toSet())));
     }
 
+    @Deprecated
+    public Optional<String> getPrefix() {
+        return Optional.ofNullable(this.getBean().getPrefix());
+    }
+
     private Set<Snowflake> toSnowflakeSet(Function<SettingsBean, List<String>> mapper) {
         return Optional.ofNullable(this.getBean())
                 .map(mapper)

@@ -44,6 +44,7 @@ public class SettingsBean implements Bean {
     @JsonProperty("message_channel_id")
     private String messageChannelId;
     @Nullable
+    @Deprecated
     @JsonProperty("prefix")
     private String prefix;
     @Nullable
@@ -110,6 +111,7 @@ public class SettingsBean implements Bean {
     }
 
     @Nullable
+    @Deprecated
     public String getPrefix() {
         return this.prefix;
     }

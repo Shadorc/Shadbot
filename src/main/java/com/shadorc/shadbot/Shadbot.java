@@ -134,6 +134,7 @@ public class Shadbot {
                     }
 
                     DEFAULT_LOGGER.info("Registering listeners");
+                    Shadbot.register(gateway, new MessageCreateListener());
                     Shadbot.register(gateway, new TextChannelDeleteListener());
                     Shadbot.register(gateway, new GuildCreateListener());
                     Shadbot.register(gateway, new GuildDeleteListener());
