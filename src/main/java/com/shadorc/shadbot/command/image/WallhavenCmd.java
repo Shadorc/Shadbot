@@ -60,9 +60,14 @@ public class WallhavenCmd extends BaseCmd {
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, String title, Wallpaper wallpaper) {
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor(title, wallpaper.getUrl(), context.getAuthorAvatar())
-                        .setImage(wallpaper.getPath())
-                        .addField(context.localize("wallhaven.resolution"), wallpaper.getResolution(), false));
+                embed -> {
+                    embed.setAuthor(title, wallpaper.getUrl(), context.getAuthorAvatar())
+                            .setImage(wallpaper.getPath())
+                            .addField(context.localize("wallhaven.resolution"), wallpaper.getResolution(), false);
+
+                    wallpaper.getSource().ifPresent(source ->
+                            embed.addField(context.localize("wallhaven.source"), source, false));
+                });
     }
 
     private Mono<Wallpaper> getWallpaper(final String query) {

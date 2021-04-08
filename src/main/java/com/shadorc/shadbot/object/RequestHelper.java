@@ -97,8 +97,8 @@ public class RequestHelper {
                         .<T>fromCallable(() -> {
                             final String json = isXml ? XML.toJSONObject(body).toString() : body;
                             if (LOGGER.isDebugEnabled()) {
-                                LOGGER.debug("JSON deserialized from {}: {}",
-                                        resp.fullPath(), new JSONObject(json).toString(2));
+                                LOGGER.debug("JSON deserialized from {}:\n{}",
+                                        resp.resourceUrl(), new JSONObject(json).toString(2));
                             }
                             return NetUtil.MAPPER.readValue(json, type);
                         })
@@ -106,6 +106,6 @@ public class RequestHelper {
                                 err -> new IOException(err.getMessage(),
                                         new IOException("Invalid JSON received (response: %s): %s".formatted(resp, body)))))
                 .retryWhen(ExceptionHandler.RETRY_ON_INTERNET_FAILURES
-                        .apply("Retries exhausted while accessing %s".formatted(resp.fullPath())));
+                        .apply("Retries exhausted while accessing %s".formatted(resp.resourceUrl())));
     }
 }

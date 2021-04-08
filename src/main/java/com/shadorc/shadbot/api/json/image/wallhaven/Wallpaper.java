@@ -2,6 +2,9 @@ package com.shadorc.shadbot.api.json.image.wallhaven;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Optional;
+import java.util.function.Predicate;
+
 public class Wallpaper {
 
     @JsonProperty("url")
@@ -12,6 +15,8 @@ public class Wallpaper {
     private String resolution;
     @JsonProperty("purity")
     private String purity;
+    @JsonProperty("source")
+    private String source;
 
     public String getUrl() {
         return this.url;
@@ -29,6 +34,11 @@ public class Wallpaper {
         return this.purity;
     }
 
+    public Optional<String> getSource() {
+        return Optional.of(this.source).
+                filter(Predicate.not(String::isBlank));
+    }
+
     @Override
     public String toString() {
         return "Wallpaper{" +
@@ -36,6 +46,7 @@ public class Wallpaper {
                 ", path='" + this.path + '\'' +
                 ", resolution='" + this.resolution + '\'' +
                 ", purity='" + this.purity + '\'' +
+                ", source='" + this.source + '\'' +
                 '}';
     }
 }
