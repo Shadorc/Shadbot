@@ -1,8 +1,10 @@
 package com.shadorc.shadbot.command.game.blackjack;
 
+import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.inputs.MessageInputs;
 import com.shadorc.shadbot.utils.DiscordUtil;
+import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
@@ -10,6 +12,7 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
+import java.util.Locale;
 import java.util.function.Consumer;
 
 public class BlackjackInputs extends MessageInputs {
@@ -27,8 +30,8 @@ public class BlackjackInputs extends MessageInputs {
 
     @Override
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
-        final Member member = event.getMember().orElseThrow();
-        if (!this.game.getPlayers().containsKey(member.getId())) {
+        final Snowflake memberId = event.getMember().orElseThrow().getId();
+        if (!this.game.getPlayers().containsKey(memberId)) {
             return Mono.just(false);
         }
 
@@ -37,10 +40,10 @@ public class BlackjackInputs extends MessageInputs {
             return Mono.just(false);
         }
 
-        final Mono<Boolean> isLimited = this.game.getRateLimiter()
-                .isLimitedAndWarn(event.getClient(), event.getGuildId().orElseThrow(), event.getMessage().getChannelId(),
-                        event.getMember().orElseThrow().getId(), this.game.getContext().getLocale());
-        return BooleanUtils.not(isLimited);
+        final Snowflake guildId = event.getGuildId().orElseThrow();
+        final Snowflake channelId = event.getMessage().getChannelId();
+        return BooleanUtils.not(this.game.getRateLimiter()
+                .isLimitedAndWarn(event.getClient(), guildId, channelId, memberId, this.game.getContext().getLocale()));
     }
 
     @Override
@@ -52,12 +55,16 @@ public class BlackjackInputs extends MessageInputs {
     public Mono<Void> processEvent(MessageCreateEvent event) {
         final Member member = event.getMember().orElseThrow();
         final Mono<MessageChannel> getChannel = event.getMessage().getChannel();
+        final Locale locale = this.game.getContext().getLocale();
+        final Mono<Void> deleteMessage = event.getMessage().delete()
+                .onErrorResume(err -> Mono.empty());
 
         final BlackjackPlayer player = this.game.getPlayers().get(member.getId());
         if (player.isStanding()) {
             return getChannel
                     .flatMap(channel -> DiscordUtil.sendMessage(Emoji.GREY_EXCLAMATION,
-                            "(**%s**) You're standing, you can't play anymore.".formatted(member.getUsername()), channel))
+                            I18nManager.localize(locale, "blackjack.exception.standing")
+                                    .formatted(member.getUsername()), channel))
                     .then();
         }
 
@@ -67,7 +74,7 @@ public class BlackjackInputs extends MessageInputs {
                     if ("double down".equals(content) && player.getHand().count() != 2) {
                         return getChannel
                                 .flatMap(channel -> DiscordUtil.sendMessage(Emoji.GREY_EXCLAMATION,
-                                        "(**%s**) You must have a maximum of 2 cards to use `double down`."
+                                        I18nManager.localize(locale, "blackjack.exception.double.down")
                                                 .formatted(member.getUsername()), channel))
                                 .then();
                     }
@@ -80,9 +87,11 @@ public class BlackjackInputs extends MessageInputs {
                     action.accept(player);
 
                     if (this.game.areAllPlayersStanding()) {
-                        return this.game.end();
+                        return deleteMessage
+                                .then(this.game.end());
                     }
-                    return this.game.show();
+                    return deleteMessage
+                            .then(this.game.show());
                 })
                 .then();
     }
