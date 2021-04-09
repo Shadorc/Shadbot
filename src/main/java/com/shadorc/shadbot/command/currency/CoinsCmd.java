@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 public class CoinsCmd extends BaseCmd {
 
     public CoinsCmd() {
-        super(CommandCategory.CURRENCY, "coins", "Show how many coins a user has");
+        super(CommandCategory.CURRENCY, "coins", "Show user's coins");
         this.addOption(option -> option.name("user")
                 .description("If not specified, it will show your coins")
                 .required(false)
@@ -32,7 +32,7 @@ public class CoinsCmd extends BaseCmd {
                                         .formatted(context.localize(coins)));
                             } else {
                                 return context.reply(Emoji.PURSE, context.localize("coins.user")
-                                        .formatted(context.localize(coins)));
+                                        .formatted(user.getUsername(), context.localize(coins)));
                             }
                         }));
     }
