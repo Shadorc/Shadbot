@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.command.game.hangman;
 
 import com.shadorc.shadbot.object.inputs.MessageInputs;
+import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
@@ -44,15 +45,21 @@ public class HangmanInputs extends MessageInputs {
             return Mono.empty();
         }
 
+        final Snowflake guildId = event.getGuildId().orElseThrow();
+        final Snowflake channelId = event.getMessage().getChannelId();
+        final Snowflake memberId = event.getMember().orElseThrow().getId();
         final Mono<Boolean> checkRateLimit = this.game.getRateLimiter().isLimitedAndWarn(
-                event.getClient(), event.getGuildId().orElseThrow(), event.getMessage().getChannelId(),
-                event.getMember().orElseThrow().getId(), this.game.getContext().getLocale())
+                event.getClient(), guildId, channelId, memberId, this.game.getContext().getLocale())
                 .filter(Boolean.FALSE::equals);
+        final Mono<Void> deleteMessage = event.getMessage().delete()
+                .onErrorResume(err -> Mono.empty());
 
         if (content.length() == 1) {
-            return checkRateLimit.flatMap(__ -> this.game.checkLetter(content));
+            return checkRateLimit.flatMap(__ -> deleteMessage
+                    .then(this.game.checkLetter(content)));
         } else if (content.length() == this.game.getWord().length()) {
-            return checkRateLimit.flatMap(__ -> this.game.checkWord(content));
+            return checkRateLimit.flatMap(__ -> deleteMessage
+                    .then(this.game.checkWord(content)));
         }
 
         return Mono.empty();
