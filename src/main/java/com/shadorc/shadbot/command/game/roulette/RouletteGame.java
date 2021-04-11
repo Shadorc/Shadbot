@@ -7,7 +7,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.*;
-import discord4j.discordjson.json.MessageData;
+import discord4j.core.object.entity.Message;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -46,7 +46,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
     }
 
     @Override
-    public Mono<MessageData> show() {
+    public Mono<Message> show() {
         return Mono.fromCallable(() -> ShadbotUtil.getDefaultEmbed(
                 embed -> {
                     final String description = this.context.localize("roulette.description")

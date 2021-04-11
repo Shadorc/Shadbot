@@ -16,8 +16,8 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.discordjson.json.MessageData;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -75,7 +75,7 @@ public class LotteryCmd extends BaseCmd {
                 });
     }
 
-    private static Mono<MessageData> show(Context context) {
+    private static Mono<Message> show(Context context) {
         final Mono<List<LotteryGambler>> getGamblers = DatabaseManager.getLottery()
                 .getGamblers()
                 .collectList();

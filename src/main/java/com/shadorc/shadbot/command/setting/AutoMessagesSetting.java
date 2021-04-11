@@ -8,8 +8,8 @@ import com.shadorc.shadbot.core.setting.Setting;
 import com.shadorc.shadbot.database.guilds.entity.setting.AutoMessage;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.TextChannel;
-import discord4j.discordjson.json.MessageData;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -44,7 +44,7 @@ public class AutoMessagesSetting extends BaseCmd {
         return this.updateMessage(context, action, type);
     }
 
-    private Mono<MessageData> updateMessage(Context context, Action action, Type type) {
+    private Mono<Message> updateMessage(Context context, Action action, Type type) {
         final String typeStr = type == Type.JOIN_MESSAGE ? "join" : "leave";
         final Setting setting = type == Type.JOIN_MESSAGE ? Setting.AUTO_JOIN_MESSAGE : Setting.AUTO_LEAVE_MESSAGE;
         switch (action) {

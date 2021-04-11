@@ -9,6 +9,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 
+// TODO: Remove? Use for rate limit messages?
 public class TemporaryMessage {
 
     private final GatewayDiscordClient gateway;

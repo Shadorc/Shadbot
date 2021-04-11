@@ -11,7 +11,6 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.MessageData;
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Flux;
@@ -54,7 +53,6 @@ public class PollManager {
                                 "https://i.imgur.com/jcrUDLY.png"));
 
         return this.context.reply(embedConsumer)
-                .map(data -> new Message(this.context.getClient(), data))
                 .flatMap(message -> Flux.fromIterable(this.spec.getReactions())
                         .flatMap(message::addReaction)
                         .then(Mono.fromRunnable(() -> this.scheduleEnd(message.getId()))));
@@ -66,7 +64,7 @@ public class PollManager {
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
-    private Mono<MessageData> end(Snowflake messageId) {
+    private Mono<Message> end(Snowflake messageId) {
         return Mono.fromRunnable(() -> this.pollCmd.getManagers().remove(this.context.getChannelId()))
                 .then(this.context.getClient()
                         .getMessageById(this.context.getChannelId(), messageId))
@@ -76,7 +74,7 @@ public class PollManager {
                 .flatMap(this::sendResults);
     }
 
-    private Mono<MessageData> sendResults(List<Reaction> reactionSet) {
+    private Mono<Message> sendResults(List<Reaction> reactionSet) {
         final Map<ReactionEmoji, String> reactionsChoices = MapUtil.inverse(this.spec.getChoices());
 
         final Map<String, Integer> choiceVoteMap = new HashMap<>(reactionsChoices.size());

@@ -13,8 +13,8 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.MessageData;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
@@ -79,7 +79,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
     }
 
     @Override
-    public Mono<MessageData> show() {
+    public Mono<Message> show() {
         return Mono.defer(() -> {
             final String description = "**%s**\n**%s**\n%s"
                     .formatted(this.context.localize("trivia.description"), this.trivia.getQuestion(),
@@ -100,7 +100,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
         });
     }
 
-    protected Mono<MessageData> win(Member member) {
+    protected Mono<Message> win(Member member) {
         final double coinsPerSec = (double) Constants.MAX_BONUS / this.duration.toSeconds();
         final long remainingSec = this.duration.minus(TimeUtil.elapsed(this.startTimer)).toSeconds();
         final long gains = (long) Math.ceil(Constants.MIN_GAINS + remainingSec * coinsPerSec);

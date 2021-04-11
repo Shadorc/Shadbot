@@ -10,7 +10,7 @@ import com.shadorc.shadbot.object.casino.Deck;
 import com.shadorc.shadbot.object.casino.Hand;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
-import discord4j.discordjson.json.MessageData;
+import discord4j.core.object.entity.Message;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -58,7 +58,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
     }
 
     @Override
-    public Mono<MessageData> show() {
+    public Mono<Message> show() {
         return Mono.
                 fromCallable(() -> ShadbotUtil.getDefaultEmbed(embed -> {
                     final Hand visibleDealerHand = this.isScheduled() ?

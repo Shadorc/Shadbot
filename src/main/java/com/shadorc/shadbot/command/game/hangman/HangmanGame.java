@@ -10,7 +10,7 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
-import discord4j.discordjson.json.MessageData;
+import discord4j.core.object.entity.Message;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -61,7 +61,7 @@ public class HangmanGame extends MultiplayerGame<Player> {
     }
 
     @Override
-    public Mono<MessageData> show() {
+    public Mono<Message> show() {
         return Mono.fromCallable(() -> ShadbotUtil.getDefaultEmbed(
                 embed -> {
                     embed.setAuthor(this.context.localize("hangman.title"), null, this.getContext().getAuthorAvatar());

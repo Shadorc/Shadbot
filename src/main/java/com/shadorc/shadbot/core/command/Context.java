@@ -15,15 +15,11 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
-import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.Role;
-import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.*;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableWebhookMessageEditRequest;
-import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.WebhookExecuteRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.MultipartRequest;
@@ -100,7 +96,7 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     public Mono<TextChannel> getChannel() {
-        return this.getEvent().getInteraction().getChannel();
+        return this.getEvent().getInteraction().getChannel().cast(TextChannel.class);
     }
 
     public Snowflake getChannelId() {
@@ -223,41 +219,44 @@ public class Context implements InteractionContext, I18nContext {
     /////////////////////////////////////////////
 
     @Override
-    public Mono<MessageData> reply(String message) {
+    public Mono<Message> reply(String str) {
         return this.event.getInteractionResponse()
-                .createFollowupMessage(message)
-                .doOnNext(messageData -> this.replyId.set(messageData.id().asLong()));
+                .createFollowupMessage(str)
+                .map(data -> new Message(this.getClient(), data))
+                .doOnNext(message -> this.replyId.set(message.getId().asLong()));
     }
 
     @Override
-    public Mono<MessageData> reply(Emoji emoji, String message) {
-        return this.reply("%s %s".formatted(emoji, message));
+    public Mono<Message> reply(Emoji emoji, String str) {
+        return this.reply("%s %s".formatted(emoji, str));
     }
 
     @Override
-    public Mono<MessageData> reply(Consumer<EmbedCreateSpec> embed) {
+    public Mono<Message> reply(Consumer<EmbedCreateSpec> embed) {
         final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
         embed.accept(mutatedSpec);
         return this.event.getInteractionResponse().createFollowupMessage(MultipartRequest.ofRequest(
                 WebhookExecuteRequest.builder()
                         .addEmbed(mutatedSpec.asRequest())
                         .build()), true)
-                .doOnNext(messageData -> this.replyId.set(Snowflake.asLong(messageData.id())));
+                .map(data -> new Message(this.getClient(), data))
+                .doOnNext(message -> this.replyId.set(message.getId().asLong()));
     }
 
     @Override
-    public Mono<MessageData> editReply(Emoji emoji, String message) {
+    public Mono<Message> editReply(Emoji emoji, String message) {
         return Mono.fromCallable(this.replyId::get)
                 .filter(messageId -> messageId > 0)
                 .flatMap(messageId -> this.event.getInteractionResponse()
                         .editFollowupMessage(messageId, ImmutableWebhookMessageEditRequest.builder()
                                 .content("%s %s".formatted(emoji, message))
                                 .build(), true))
+                .map(data -> new Message(this.getClient(), data))
                 .switchIfEmpty(this.reply(emoji, message));
     }
 
     @Override
-    public Mono<MessageData> editReply(Consumer<EmbedCreateSpec> embed) {
+    public Mono<Message> editReply(Consumer<EmbedCreateSpec> embed) {
         return Mono.fromCallable(this.replyId::get)
                 .filter(messageId -> messageId > 0)
                 .flatMap(messageId -> {
@@ -269,6 +268,7 @@ public class Context implements InteractionContext, I18nContext {
                                     .embeds(List.of(mutatedSpec.asRequest()))
                                     .build(), true);
                 })
+                .map(data -> new Message(this.getClient(), data))
                 .switchIfEmpty(this.reply(embed));
     }
 

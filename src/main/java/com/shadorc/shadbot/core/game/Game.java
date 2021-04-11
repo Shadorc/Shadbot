@@ -2,7 +2,7 @@ package com.shadorc.shadbot.core.game;
 
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.ExceptionHandler;
-import discord4j.discordjson.json.MessageData;
+import discord4j.core.object.entity.Message;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -30,7 +30,7 @@ public abstract class Game {
 
     public abstract Mono<Void> start();
 
-    public abstract Mono<MessageData> show();
+    public abstract Mono<Message> show();
 
     public abstract Mono<Void> end();
 
