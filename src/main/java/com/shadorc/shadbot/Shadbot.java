@@ -24,6 +24,7 @@ import discord4j.discordjson.json.ApplicationInfoData;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.response.ResponseFunction;
+import discord4j.rest.util.AllowedMentions;
 import io.prometheus.client.exporter.HTTPServer;
 import io.sentry.Sentry;
 import reactor.core.publisher.Hooks;
@@ -84,6 +85,7 @@ public class Shadbot {
         Objects.requireNonNull(discordToken, "Missing Discord bot token");
         final DiscordClient client = DiscordClient.builder(discordToken)
                 .onClientResponse(ResponseFunction.emptyIfNotFound())
+                .setDefaultAllowedMentions(AllowedMentions.suppressEveryone())
                 .build();
 
         final ApplicationInfoData applicationInfo = client.getApplicationInfo().block();
