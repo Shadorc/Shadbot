@@ -13,6 +13,10 @@ public class UrbanDefinition {
     private String word;
     @JsonProperty("permalink")
     private String permalink;
+    @JsonProperty("thumbs_up")
+    private int thumbsUp;
+    @JsonProperty("thumbs_down")
+    private int thumbsDown;
 
     public String getDefinition() {
         return StringUtil.remove(this.definition, "[", "]");
@@ -30,6 +34,10 @@ public class UrbanDefinition {
         return this.permalink;
     }
 
+    public int getRatio() {
+        return this.thumbsUp - this.thumbsDown;
+    }
+
     @Override
     public String toString() {
         return "UrbanDefinition{" +
@@ -37,6 +45,8 @@ public class UrbanDefinition {
                 ", example='" + this.example + '\'' +
                 ", word='" + this.word + '\'' +
                 ", permalink='" + this.permalink + '\'' +
+                ", thumbsUp=" + this.thumbsUp +
+                ", thumbsDown=" + this.thumbsDown +
                 '}';
     }
 }

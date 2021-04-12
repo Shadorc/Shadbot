@@ -22,6 +22,7 @@ import reactor.util.retry.Retry;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.function.Consumer;
 
 public class UrbanCmd extends BaseCmd {
@@ -77,6 +78,7 @@ public class UrbanCmd extends BaseCmd {
         return RequestHelper.fromUrl(url)
                 .to(UrbanDictionaryResponse.class)
                 .flatMapIterable(UrbanDictionaryResponse::getDefinitions)
+                .sort(Comparator.comparingInt(UrbanDefinition::getRatio).reversed())
                 .next()
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
                         .filter(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR))
