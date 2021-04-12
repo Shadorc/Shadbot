@@ -172,11 +172,12 @@ public class CounterStrikeCmd extends BaseCmd {
                         .setThumbnail(player.getAvatarFull())
                         .setDescription(context.localize("cs.description").formatted(player.getPersonaName()))
                         .addField(context.localize("cs.kills"), context.localize(kills), true)
-                        .addField(context.localize("cs.playtime"), context.localize(timePlayed), true)
+                        .addField(context.localize("cs.playtime"), context.localize("counterstrike.time.played")
+                                .formatted(context.localize(timePlayed)), true)
                         .addField(context.localize("cs.mvp"), context.localize(mvps), true)
-                        .addField(context.localize("cs.win"), context.localize(winRate), true)
-                        .addField(context.localize("cs.accuracy"), context.localize(accuracyRate), true)
-                        .addField(context.localize("cs.headshot"), context.localize(headshotRate), true)
+                        .addField(context.localize("cs.win"), "%s%%".formatted(context.localize(winRate)), true)
+                        .addField(context.localize("cs.accuracy"), "%s%%".formatted(context.localize(accuracyRate)), true)
+                        .addField(context.localize("cs.headshot"), "%s%%".formatted(context.localize(headshotRate)), true)
                         .addField(context.localize("cs.ratio"), context.localize(ratio), true));
     }
 
