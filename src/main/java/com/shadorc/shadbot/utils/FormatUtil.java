@@ -156,7 +156,9 @@ public class FormatUtil {
      * @return The formatted number as a string using the provided locale.
      */
     public static String number(Locale locale, double number) {
-        return NumberFormat.getNumberInstance(locale).format(number);
+        final NumberFormat formatter = NumberFormat.getNumberInstance(locale);
+        formatter.setMaximumFractionDigits(2);
+        return formatter.format(number);
     }
 
     /**
