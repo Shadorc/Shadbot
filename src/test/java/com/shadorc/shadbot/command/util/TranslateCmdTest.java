@@ -2,7 +2,9 @@ package com.shadorc.shadbot.command.util;
 
 import com.shadorc.shadbot.command.CmdTest;
 import com.shadorc.shadbot.command.util.translate.TranslateCmd;
-import com.shadorc.shadbot.command.util.translate.TranslateData;
+import com.shadorc.shadbot.command.util.translate.TranslateRequest;
+import com.shadorc.shadbot.command.util.translate.TranslateResponse;
+import com.shadorc.shadbot.data.Config;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,53 +14,52 @@ public class TranslateCmdTest extends CmdTest<TranslateCmd> {
 
     @Test
     public void testGetTranslationLangFullName() {
-        final TranslateData data = new TranslateData();
-        data.setSourceLang("english");
-        data.setDestLang("french");
-        data.setSourceText("Hello, how are you?");
-        assertEquals("Bonjour comment vas-tu?", this.invoke("getTranslation", data));
+        final TranslateRequest data = new TranslateRequest(Config.DEFAULT_LOCALE,
+                "english", "french", "Hello, how are you?");
+        final TranslateResponse response = this.invoke("getTranslation", data);
+        assertEquals("en", response.getSourceLang());
+        assertEquals("Bonjour comment vas-tu?", response.getTranslatedText());
     }
 
     @Test
     public void testGetTranslationLangShortName() {
-        final TranslateData data = new TranslateData();
-        data.setSourceLang("en");
-        data.setDestLang("fr");
-        data.setSourceText("Hello, how are you?");
-        assertEquals("Bonjour comment vas-tu?", this.invoke("getTranslation", data));
+        final TranslateRequest data = new TranslateRequest(Config.DEFAULT_LOCALE,
+                "en", "fr", "Hello, how are you?");
+        final TranslateResponse response = this.invoke("getTranslation", data);
+        assertEquals("en", response.getSourceLang());
+        assertEquals("Bonjour comment vas-tu?", response.getTranslatedText());
     }
 
     @Test
     public void testGetTranslationFuzzy() {
-        final TranslateData data = new TranslateData();
-        data.setSourceLang("en");
-        data.setDestLang("fr");
-        data.setSourceText(SPECIAL_CHARS);
+        final TranslateRequest data = new TranslateRequest(Config.DEFAULT_LOCALE,
+                "en", "fr", SPECIAL_CHARS);
+        final TranslateResponse response = this.invoke("getTranslation", data);
+        assertEquals("en", response.getSourceLang());
         assertEquals("& ~ # {([- | `_\" '\\ ^ @)] =} ° + ¨ ^ $ £ ¤% * µ,?;.: /! § <> + - * /",
-                this.invoke("getTranslation", data));
+                response.getTranslatedText());
     }
 
     @Test
     public void testGetTranslationOnlyDest() {
-        final TranslateData data = new TranslateData();
-        data.setDestLang("fr");
-        data.setSourceText("Hello, how are you?");
-        assertEquals("Bonjour comment vas-tu?", this.invoke("getTranslation", data));
+        final TranslateRequest data = new TranslateRequest(Config.DEFAULT_LOCALE,
+                "auto", "fr", "Hello, how are you?");
+        final TranslateResponse response = this.invoke("getTranslation", data);
+        assertEquals("en", response.getSourceLang());
+        assertEquals("Bonjour comment vas-tu?", response.getTranslatedText());
     }
 
     @Test
     public void testGetTranslationWrongDest() {
-        final TranslateData data = new TranslateData();
-        data.setDestLang("something");
-        data.setSourceText("Hello, how are you?");
+        final TranslateRequest data = new TranslateRequest(Config.DEFAULT_LOCALE,
+                "auto", "something", "Hello, how are you?");
         assertThrows(IllegalArgumentException.class, () -> this.invoke("getTranslation", data));
     }
 
     @Test
     public void testGetTranslationNoText() {
-        final TranslateData data = new TranslateData();
-        data.setSourceLang("en");
-        assertThrows(IllegalArgumentException.class, () -> data.setDestLang("en"));
+        assertThrows(IllegalArgumentException.class, () -> new TranslateRequest(Config.DEFAULT_LOCALE,
+                "en", "en", "Hello world"));
     }
 
 }

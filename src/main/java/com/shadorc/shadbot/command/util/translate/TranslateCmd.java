@@ -4,7 +4,7 @@ import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.i18n.I18nContext;
+import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.ShadbotUtil;
@@ -36,12 +36,12 @@ public class TranslateCmd extends BaseCmd {
         final String destLang = context.getOptionAsString("destination_lang").orElseThrow();
         final String text = context.getOptionAsString("text").orElseThrow();
 
-        return Mono.fromCallable(() -> new TranslateRequest(context.getLocale(), destLang, sourceLang, text))
+        return Mono.fromCallable(() -> new TranslateRequest(context.getLocale(), sourceLang, destLang, text))
                 .onErrorMap(IllegalArgumentException.class,
                         err -> new CommandException(context.localize("translate.exception.doc")
                                 .formatted(err.getMessage(), this.getName())))
                 .flatMap(request -> context.reply(Emoji.HOURGLASS, context.localize("translate.loading"))
-                        .then(TranslateCmd.getTranslation(context, request))
+                        .then(TranslateCmd.getTranslation(request))
                         .flatMap(response -> context.editReply(
                                 TranslateCmd.formatEmbed(context, request, response)))
                         .onErrorMap(IllegalArgumentException.class,
@@ -60,13 +60,14 @@ public class TranslateCmd extends BaseCmd {
                                 response.getTranslatedText())));
     }
 
-    private static Mono<TranslateResponse> getTranslation(I18nContext context, TranslateRequest data) {
+    private static Mono<TranslateResponse> getTranslation(TranslateRequest data) {
         return RequestHelper.request(data.getUrl())
                 .map(body -> {
                     // The body is an error 400 if one of the specified language
                     // exists but is not supported by Google translator
                     if (!TranslateCmd.isValidBody(body)) {
-                        throw new IllegalArgumentException(context.localize("translate.unsupported.language"));
+                        throw new IllegalArgumentException(I18nManager.localize(data.getLocale(),
+                                "translate.unsupported.language"));
                     }
 
                     final JSONArray array = new JSONArray(body);
@@ -77,7 +78,8 @@ public class TranslateCmd extends BaseCmd {
                     }
 
                     if (translatedText.toString().equalsIgnoreCase(data.getSourceText())) {
-                        throw new IllegalArgumentException(context.localize("translate.exception"));
+                        throw new IllegalArgumentException(I18nManager.localize(data.getLocale(),
+                                "translate.exception"));
                     }
 
                     final String sourceLang = array.getString(2);

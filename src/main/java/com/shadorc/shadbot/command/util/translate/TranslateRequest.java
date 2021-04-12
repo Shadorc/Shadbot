@@ -25,7 +25,7 @@ public class TranslateRequest {
     private String sourceLang;
     private String sourceText;
 
-    public TranslateRequest(final Locale locale, final String destLang, final String sourceLang,
+    public TranslateRequest(final Locale locale, final String sourceLang, final String destLang,
                             final String sourceText) {
         this.locale = locale;
 
@@ -80,6 +80,10 @@ public class TranslateRequest {
         return "%s?client=gtx&ie=UTF-8&oe=UTF-8&sl=%s&tl=%s&dt=t&q=%s"
                 .formatted(API_URL, NetUtil.encode(this.sourceLang),
                         NetUtil.encode(this.destLang), NetUtil.encode(this.sourceText));
+    }
+
+    public Locale getLocale() {
+        return this.locale;
     }
 
     public String getDestLang() {
