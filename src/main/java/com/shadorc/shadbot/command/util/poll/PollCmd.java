@@ -4,7 +4,6 @@ import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
@@ -33,7 +32,7 @@ public class PollCmd extends BaseCmd {
     private static final int MIN_DURATION = 10;
     private static final int MAX_DURATION = 3600;
 
-    private final Map<Snowflake, PollManager> managers;
+    private final Map<Snowflake /*CommandId*/, PollManager> managers;
 
     public PollCmd() {
         super(CommandCategory.UTILS, "poll", "Create a poll");
@@ -56,12 +55,12 @@ public class PollCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        if (this.getManagers().containsKey(context.getChannelId())) {
-            // TODO: Remove this limit
-            return context.reply(Emoji.INFO, context.localize("poll.already.started"));
-        } else {
-            return this.start(context);
-        }
+        return context.getChannel()
+                .flatMap(channel -> DiscordUtil.requirePermissions(channel, Permission.ADD_REACTIONS))
+                .thenReturn(this.createPoll(context))
+                .doOnNext(pollManager -> this.managers.put(context.getEvent().getCommandId(), pollManager))
+                .flatMap(PollManager::show)
+                .doOnError(__ -> this.managers.remove(context.getEvent().getCommandId()));
     }
 
     private PollManager createPoll(Context context) {
@@ -90,14 +89,6 @@ public class PollCmd extends BaseCmd {
         }
 
         return new PollManager(this, context, new PollCreateSpec(duration, question, choicesReactions));
-    }
-
-    public Mono<?> start(Context context) {
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtil.requirePermissions(channel, Permission.ADD_REACTIONS))
-                .thenReturn(this.createPoll(context))
-                .doOnNext(pollManager -> this.managers.put(context.getChannelId(), pollManager))
-                .flatMap(PollManager::show);
     }
 
     public Map<Snowflake, PollManager> getManagers() {
