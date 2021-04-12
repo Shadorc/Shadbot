@@ -28,6 +28,7 @@ public class PollCmd extends BaseCmd {
             "\u0031\u20E3", "\u0032\u20E3", "\u0033\u20E3", "\u0034\u20E3", "\u0035\u20E3",
             "\u0036\u20E3", "\u0037\u20E3", "\u0038\u20E3", "\u0039\u20E3", "\uD83D\uDD1F");
 
+    private static final int MIN_CHOICES_NUM = 2;
     private static final int MAX_CHOICES_NUM = 10;
     private static final int MIN_DURATION = 10;
     private static final int MAX_DURATION = 3600;
@@ -82,6 +83,10 @@ public class PollCmd extends BaseCmd {
                 .filter(Predicate.not(String::isBlank))
                 .distinct()
                 .collect(Collectors.toList());
+
+        if(choices.size() < MIN_CHOICES_NUM) {
+            throw new CommandException(context.localize("poll.exception.min.choices"));
+        }
 
         final Map<String, ReactionEmoji> choicesReactions = new LinkedHashMap<>();
         for (int i = 0; i < choices.size(); i++) {
