@@ -11,4 +11,10 @@ public class HeroId {
         return this.id;
     }
 
+    @Override
+    public String toString() {
+        return "HeroId{" +
+                "id=" + id +
+                '}';
+    }
 }

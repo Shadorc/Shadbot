@@ -97,7 +97,7 @@ public class DeviantartCmd extends BaseCmd {
                         + "&grant_type=client_credentials")
                 .flatMap(url -> RequestHelper.fromUrl(url)
                         .to(TokenResponse.class))
-                .doOnNext(token -> DEFAULT_LOGGER.info("DeviantArt token generated {}, expires in %ds",
+                .doOnNext(token -> DEFAULT_LOGGER.info("DeviantArt token generated {}, expires in {}s",
                         token.getAccessToken(), token.getExpiresIn().toSeconds()));
     }
 

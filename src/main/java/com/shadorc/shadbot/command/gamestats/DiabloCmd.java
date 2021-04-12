@@ -28,7 +28,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -96,14 +95,14 @@ public class DiabloCmd extends BaseCmd {
                                                         err -> Mono.empty())))
                                         .filter(hero -> hero.getCode().isEmpty())
                                         // Sort heroes by ascending damage
-                                        .sort(Comparator.comparingDouble(hero -> hero.getStats().getDamage()))
+                                        .sort(Comparator.<HeroResponse>comparingDouble(hero -> hero.getStats().getDamage())
+                                                .reversed())
                                         .collectList()
                                         .flatMap(heroResponses -> {
                                             if (heroResponses.isEmpty()) {
                                                 return context.editReply(Emoji.MAGNIFYING_GLASS,
                                                         context.localize("diablo3.no.heroes"));
                                             }
-                                            Collections.reverse(heroResponses);
                                             return context.editReply(DiabloCmd.formatEmbed(context, profile, heroResponses));
                                         });
                             });
@@ -146,7 +145,7 @@ public class DiabloCmd extends BaseCmd {
                 .setMethod(HttpMethod.POST)
                 .addHeaders(HttpHeaderNames.AUTHORIZATION, this.buildAuthorizationValue())
                 .to(TokenResponse.class)
-                .doOnNext(token -> DEFAULT_LOGGER.info("Blizzard token generated {}, expires in %ds",
+                .doOnNext(token -> DEFAULT_LOGGER.info("Blizzard token generated {}, expires in {}s",
                         token.getAccessToken(), token.getExpiresIn().toSeconds()));
     }
 
