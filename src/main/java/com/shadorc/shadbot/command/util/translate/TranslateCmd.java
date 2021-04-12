@@ -19,6 +19,8 @@ import java.util.function.Consumer;
 
 public class TranslateCmd extends BaseCmd {
 
+    private static final String DOC_URL = "https://cloud.google.com/translate/docs/languages";
+
     public TranslateCmd() {
         super(CommandCategory.UTILS, "translate", "Translate a text");
         this.addOption("source_lang", "Source language, 'auto' to automatically detect",
@@ -34,35 +36,31 @@ public class TranslateCmd extends BaseCmd {
         final String destLang = context.getOptionAsString("destination_lang").orElseThrow();
         final String text = context.getOptionAsString("text").orElseThrow();
 
-        final TranslateData data = new TranslateData();
-        data.setSourceText(text);
-        try {
-            data.setSourceLang(sourceLang);
-            data.setDestLang(destLang);
-        } catch (final IllegalArgumentException err) {
-            return Mono.error(new CommandException("%s. Use `/help %s` to see a complete list of supported languages."
-                    .formatted(err.getMessage(), this.getName())));
-        }
-
-        return context.reply(Emoji.HOURGLASS, context.localize("translate.loading"))
-                .then(TranslateCmd.getTranslation(context, data))
-                .flatMap(translatedText -> context.editReply(
-                        TranslateCmd.formatEmbed(context, data, translatedText)))
+        return Mono.fromCallable(() -> new TranslateRequest(context.getLocale(), destLang, sourceLang, text))
                 .onErrorMap(IllegalArgumentException.class,
-                        // TODO: How can we get supported language ?
-                        err -> new CommandException("%s. Use `/help %s` to see a complete list of supported languages."
-                                .formatted(err.getMessage(), this.getName())));
+                        err -> new CommandException(context.localize("translate.exception.doc")
+                                .formatted(err.getMessage(), this.getName())))
+                .flatMap(request -> context.reply(Emoji.HOURGLASS, context.localize("translate.loading"))
+                        .then(TranslateCmd.getTranslation(context, request))
+                        .flatMap(response -> context.editReply(
+                                TranslateCmd.formatEmbed(context, request, response)))
+                        .onErrorMap(IllegalArgumentException.class,
+                                err -> new CommandException(context.localize("translate.exception.doc")
+                                        .formatted(err.getMessage(), this.getName()))));
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, TranslateData data, String translatedText) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, TranslateRequest request,
+                                                         TranslateResponse response) {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(context.localize("translate.title"), null, context.getAuthorAvatar())
                         .setDescription("**%s**%n%s%n%n**%s**%n%s".formatted(
-                                StringUtil.capitalize(TranslateData.isoToLang(data.getSourceLang())), data.getSourceText(),
-                                StringUtil.capitalize(TranslateData.isoToLang(data.getDestLang())), translatedText)));
+                                StringUtil.capitalize(request.isoToLang(response.getSourceLang())),
+                                request.getSourceText(),
+                                StringUtil.capitalize(request.isoToLang(request.getDestLang())),
+                                response.getTranslatedText())));
     }
 
-    private static Mono<String> getTranslation(I18nContext context, TranslateData data) {
+    private static Mono<TranslateResponse> getTranslation(I18nContext context, TranslateRequest data) {
         return RequestHelper.request(data.getUrl())
                 .map(body -> {
                     // The body is an error 400 if one of the specified language
@@ -71,7 +69,8 @@ public class TranslateCmd extends BaseCmd {
                         throw new IllegalArgumentException(context.localize("translate.unsupported.language"));
                     }
 
-                    final JSONArray translations = new JSONArray(body).getJSONArray(0);
+                    final JSONArray array = new JSONArray(body);
+                    final JSONArray translations = array.getJSONArray(0);
                     final StringBuilder translatedText = new StringBuilder();
                     for (int i = 0; i < translations.length(); i++) {
                         translatedText.append(translations.getJSONArray(i).getString(0));
@@ -81,7 +80,8 @@ public class TranslateCmd extends BaseCmd {
                         throw new IllegalArgumentException(context.localize("translate.exception"));
                     }
 
-                    return translatedText.toString();
+                    final String sourceLang = array.getString(2);
+                    return new TranslateResponse(translatedText.toString(), sourceLang);
                 });
     }
 
