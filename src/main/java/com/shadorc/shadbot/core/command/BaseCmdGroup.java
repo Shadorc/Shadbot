@@ -32,9 +32,7 @@ public abstract class BaseCmdGroup extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String cmdName = context.getSubCommandGroupName()
-                .orElse(context.getSubCommandName()
-                        .orElseThrow());
+        final String cmdName = context.getLastCommandName();
         return this.cmds.get(cmdName).execute(context);
     }
 

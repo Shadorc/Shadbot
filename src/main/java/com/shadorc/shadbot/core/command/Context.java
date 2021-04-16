@@ -87,6 +87,12 @@ public class Context implements InteractionContext, I18nContext {
         return this.event.getCommandName();
     }
 
+    public String getLastCommandName() {
+        return this.getSubCommandGroupName()
+                .orElse(this.getSubCommandName()
+                        .orElse(this.getCommandName()));
+    }
+
     public Mono<Guild> getGuild() {
         return this.getEvent().getInteraction().getGuild();
     }

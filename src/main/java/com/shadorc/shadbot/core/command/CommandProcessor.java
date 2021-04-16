@@ -25,7 +25,7 @@ public class CommandProcessor {
     }
 
     private static Mono<?> executeCommand(Context context) {
-        final BaseCmd command = CommandManager.getCommand(context.getCommandName());
+        final BaseCmd command = CommandManager.getCommand(context.getLastCommandName());
         // The command does not exist
         if (command == null) {
             DEFAULT_LOGGER.error("{Guild ID: {}} Command {} not found",
