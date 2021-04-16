@@ -70,7 +70,7 @@ public class RestrictedRolesSetting extends BaseCmd {
                 final CommandCategory category = EnumUtil.parseEnum(CommandCategory.class, name);
                 if (category == null) {
                     return Mono.error(new CommandException(context.localize("restrictedroles.invalid.category")
-                            .formatted(name, FormatUtil.format(CommandCategory.values(), FormatUtil::capitalizeEnum, ", "))));
+                            .formatted(name, FormatUtil.format(CommandCategory.class, FormatUtil::capitalizeEnum, ", "))));
                 }
                 commands.addAll(CommandManager.getCommands().values().stream()
                         .filter(cmd -> cmd.getCategory() == category)

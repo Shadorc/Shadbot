@@ -14,7 +14,7 @@ public class HeroId {
     @Override
     public String toString() {
         return "HeroId{" +
-                "id=" + id +
+                "id=" + this.id +
                 '}';
     }
 }

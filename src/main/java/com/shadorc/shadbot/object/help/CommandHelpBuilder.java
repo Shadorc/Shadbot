@@ -21,11 +21,6 @@ public class CommandHelpBuilder extends HelpBuilder {
         return new CommandHelpBuilder(cmd, context);
     }
 
-    public CommandHelpBuilder setUsage(String usage) {
-        this.setFullUsage(String.format("/%s %s", this.cmd.getName(), usage));
-        return this;
-    }
-
     @Override
     public String getCommandName() {
         return this.cmd.getName();

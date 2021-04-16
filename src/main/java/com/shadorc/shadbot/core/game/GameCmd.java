@@ -43,6 +43,6 @@ public abstract class GameCmd<G extends Game> extends BaseCmd implements GameLis
 
     @Override
     public void onGameDestroy(Snowflake channelId) {
-        this.managers.remove(channelId);
+        this.removeGame(channelId);
     }
 }

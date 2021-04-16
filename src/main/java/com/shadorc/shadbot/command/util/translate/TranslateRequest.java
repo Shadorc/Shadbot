@@ -69,7 +69,7 @@ public class TranslateRequest {
         this.destLang = this.langToIso(destLang);
 
         if (this.destLang == null) {
-            throw new IllegalArgumentException(I18nManager.localize(locale, "translate.exception.dest.lang"));
+            throw new IllegalArgumentException(I18nManager.localize(this.locale, "translate.exception.dest.lang"));
         }
         if (Objects.equals(this.sourceLang, this.destLang)) {
             throw new IllegalArgumentException(I18nManager.localize(this.locale, "translate.exception.same.langs"));
