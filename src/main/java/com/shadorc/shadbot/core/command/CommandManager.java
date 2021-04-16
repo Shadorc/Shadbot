@@ -65,6 +65,16 @@ public class CommandManager {
     }
 
     public static BaseCmd getCommand(String name) {
-        return COMMANDS_MAP.get(name);
+        final BaseCmd cmd = COMMANDS_MAP.get(name);
+        if (cmd != null) {
+            return cmd;
+        }
+
+        return COMMANDS_MAP.values().stream()
+                .filter(it -> it instanceof BaseCmdGroup)
+                .flatMap(it -> ((BaseCmdGroup) it).getCommands().stream())
+                .filter(it -> it.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 }
