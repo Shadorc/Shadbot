@@ -23,7 +23,7 @@ public class MemberLeaveListener implements EventListener<MemberLeaveEvent> {
                 .flatMap(DBMember::delete);
 
         // Send an automatic leave message if one was configured
-        final Mono<Message> sendLeaveMessage = DatabaseManager.getGuilds()
+        @Deprecated final Mono<Message> sendLeaveMessageDeprecated = DatabaseManager.getGuilds()
                 .getSettings(event.getGuildId())
                 .flatMap(settings -> Mono.zip(
                         Mono.justOrEmpty(settings.getMessageChannelId()),
@@ -31,7 +31,15 @@ public class MemberLeaveListener implements EventListener<MemberLeaveEvent> {
                 .flatMap(TupleUtils.function((channelId, leaveMessage) ->
                         MemberJoinListener.sendAutoMessage(event.getClient(), event.getUser(), channelId, leaveMessage)));
 
+        final Mono<Message> sendLeaveMessage = DatabaseManager.getGuilds()
+                .getSettings(event.getGuildId())
+                .flatMap(settings -> Mono.justOrEmpty(settings.getAutoLeaveMessage()))
+                .flatMap(autoLeaveMessage ->
+                        MemberJoinListener.sendAutoMessage(event.getClient(), event.getUser(),
+                                autoLeaveMessage.getChannelId(), autoLeaveMessage.getMessage()));
+
         return deleteMember
+                .and(sendLeaveMessageDeprecated)
                 .and(sendLeaveMessage);
     }
 }

@@ -15,7 +15,6 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.database.DatabaseManager;
-import com.shadorc.shadbot.database.guilds.entity.Settings;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.listener.music.TrackEventListener;
 import com.shadorc.shadbot.utils.LogUtil;
@@ -87,7 +86,7 @@ public class MusicManager {
 
                     return MusicManager.joinVoiceChannel(gateway, guildId, voiceChannelId, audioProvider)
                             .flatMap(voiceConnection -> DatabaseManager.getGuilds().getSettings(voiceConnection.getGuildId()))
-                            .map(Settings::getDefaultVol)
+                            .map(settings -> settings.getDefaultVol().orElse(Config.DEFAULT_VOLUME))
                             .map(volume -> new TrackScheduler(audioPlayer, volume))
                             .map(trackScheduler -> new GuildMusic(gateway, guildId, trackScheduler))
                             .doOnNext(guildMusic -> {

@@ -2,6 +2,7 @@ package com.shadorc.shadbot.database.guilds.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.shadorc.shadbot.database.Bean;
+import com.shadorc.shadbot.database.guilds.bean.setting.AutoMessageBean;
 import com.shadorc.shadbot.database.guilds.bean.setting.IamBean;
 import reactor.util.annotation.Nullable;
 
@@ -35,12 +36,15 @@ public class SettingsBean implements Bean {
     @JsonProperty("iam_messages")
     private List<IamBean> iam;
     @Nullable
+    @Deprecated
     @JsonProperty("join_message")
     private String joinMessage;
     @Nullable
+    @Deprecated
     @JsonProperty("leave_message")
     private String leaveMessage;
     @Nullable
+    @Deprecated
     @JsonProperty("message_channel_id")
     private String messageChannelId;
     @Nullable
@@ -53,6 +57,12 @@ public class SettingsBean implements Bean {
     @Nullable
     @JsonProperty("restricted_roles")
     private Map<String, Set<String>> restrictedRoles;
+    @Nullable
+    @JsonProperty("auto_join_message")
+    private AutoMessageBean autoJoinMessage;
+    @Nullable
+    @JsonProperty("auto_leave_message")
+    private AutoMessageBean autoLeaveMessage;
 
     public SettingsBean() {
 
@@ -126,6 +136,16 @@ public class SettingsBean implements Bean {
         return this.restrictedRoles;
     }
 
+    @Nullable
+    public AutoMessageBean getAutoJoinMessage() {
+        return this.autoJoinMessage;
+    }
+
+    @Nullable
+    public AutoMessageBean getAutoLeaveMessage() {
+        return this.autoLeaveMessage;
+    }
+
     @Override
     public String toString() {
         return "SettingsBean{" +
@@ -140,8 +160,10 @@ public class SettingsBean implements Bean {
                 ", leaveMessage='" + this.leaveMessage + '\'' +
                 ", messageChannelId='" + this.messageChannelId + '\'' +
                 ", prefix='" + this.prefix + '\'' +
-                ", restrictedCategories=" + this.restrictedChannels +
+                ", restrictedChannels=" + this.restrictedChannels +
                 ", restrictedRoles=" + this.restrictedRoles +
+                ", autoJoinMessage=" + this.autoJoinMessage +
+                ", autoLeaveMessage=" + this.autoLeaveMessage +
                 '}';
     }
 }

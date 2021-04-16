@@ -2,9 +2,9 @@ package com.shadorc.shadbot.database.guilds.entity;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandManager;
-import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.database.SerializableEntity;
 import com.shadorc.shadbot.database.guilds.bean.SettingsBean;
+import com.shadorc.shadbot.database.guilds.entity.setting.AutoMessage;
 import com.shadorc.shadbot.database.guilds.entity.setting.Iam;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Role;
@@ -120,10 +120,9 @@ public class Settings extends SerializableEntity<SettingsBean> {
                 .orElse(new HashSet<>());
     }
 
-    public Integer getDefaultVol() {
+    public Optional<Integer> getDefaultVol() {
         return Optional.ofNullable(this.getBean())
-                .map(SettingsBean::getDefaultVolume)
-                .orElse(Config.DEFAULT_VOLUME);
+                .map(SettingsBean::getDefaultVolume);
     }
 
     public List<Iam> getIam() {
@@ -175,6 +174,18 @@ public class Settings extends SerializableEntity<SettingsBean> {
                                 .stream()
                                 .map(CommandManager::getCommand)
                                 .collect(Collectors.toSet())));
+    }
+
+    public Optional<AutoMessage> getAutoJoinMessage() {
+        return Optional.ofNullable(this.getBean())
+                .map(SettingsBean::getAutoJoinMessage)
+                .map(AutoMessage::new);
+    }
+
+    public Optional<AutoMessage> getAutoLeaveMessage() {
+        return Optional.ofNullable(this.getBean())
+                .map(SettingsBean::getAutoLeaveMessage)
+                .map(AutoMessage::new);
     }
 
     @Deprecated
