@@ -23,7 +23,7 @@ public class ManageAchievementsCmd extends BaseCmd {
 
     public ManageAchievementsCmd() {
         super(CommandCategory.OWNER, CommandPermission.OWNER, "manage_achievements", "Manage user's achievements");
-        this.addOption("action", "The action", true, ApplicationCommandOptionType.STRING,
+        this.addOption("action", "Whether to add or remove an achievment", true, ApplicationCommandOptionType.STRING,
                 DiscordUtil.toOptions(Action.class));
         this.addOption("achievement", "The achievement", true,
                 ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Achievement.class));

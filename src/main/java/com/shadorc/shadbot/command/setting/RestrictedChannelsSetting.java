@@ -30,12 +30,12 @@ public class RestrictedChannelsSetting extends BaseCmd {
         super(CommandCategory.ADMIN, "restricted_channels", "Restrict commands to specific channels.");
 
         this.addOption(option -> option.name("action")
-                .description("") // TODO
+                .description("Whether to add or remove a channel from the restricted ones")
                 .required(true)
                 .type(ApplicationCommandOptionType.STRING.getValue())
                 .choices(DiscordUtil.toOptions(Action.class)));
         this.addOption(option -> option.name("type")
-                .description("") // TODO
+                .description("Restrict a command or a category")
                 .required(true)
                 .type(ApplicationCommandOptionType.STRING.getValue())
                 .choices(DiscordUtil.toOptions(Type.class)));

@@ -31,7 +31,7 @@ public class ManageCoinsCmd extends BaseCmd {
     public ManageCoinsCmd() {
         super(CommandCategory.ADMIN, CommandPermission.ADMIN, "manage_coins", "Manage users coins");
         this.addOption(option -> option.name("action")
-                .description("The action???") // TODO
+                .description("Whether to add, remove or reset coins")
                 .type(ApplicationCommandOptionType.STRING.getValue())
                 .required(true)
                 .choices(DiscordUtil.toOptions(Action.class)));

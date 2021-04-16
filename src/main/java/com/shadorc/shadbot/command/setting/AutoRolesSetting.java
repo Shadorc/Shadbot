@@ -27,17 +27,17 @@ public class AutoRolesSetting extends BaseCmd {
 
     public AutoRolesSetting() {
         super(CommandCategory.SETTING, "auto_roles", "Manage auto assigned role(s).");
-        this.addOption("action", "Whether to add or remove a role to automatically add", true,
+        this.addOption("action", "Whether to add or remove a role from the auto ones", true,
                 ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Action.class));
-        this.addOption("role1", "The first role to automatically add", true,
+        this.addOption("role1", "The first role", true,
                 ApplicationCommandOptionType.ROLE);
-        this.addOption("role2", "The second role to automatically add", false,
+        this.addOption("role2", "The second role", false,
                 ApplicationCommandOptionType.ROLE);
-        this.addOption("role3", "The third role to automatically add", false,
+        this.addOption("role3", "The third role", false,
                 ApplicationCommandOptionType.ROLE);
-        this.addOption("role4", "The fourth role to automatically add", false,
+        this.addOption("role4", "The fourth role", false,
                 ApplicationCommandOptionType.ROLE);
-        this.addOption("role5", "The fifth role to automatically add", false,
+        this.addOption("role5", "The fifth role", false,
                 ApplicationCommandOptionType.ROLE);
     }
 

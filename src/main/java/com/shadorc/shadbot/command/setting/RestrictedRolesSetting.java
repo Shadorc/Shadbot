@@ -30,12 +30,12 @@ public class RestrictedRolesSetting extends BaseCmd {
         super(CommandCategory.ADMIN, "restricted_roles", "Restrict commands to specific roles.");
 
         this.addOption(option -> option.name("action")
-                .description("") // TODO
+                .description("Whether to add or remove a role from the restricted ones")
                 .required(true)
                 .type(ApplicationCommandOptionType.STRING.getValue())
                 .choices(DiscordUtil.toOptions(Action.class)));
         this.addOption(option -> option.name("type")
-                .description("") // TODO
+                .description("Restrict a command or a category")
                 .required(true)
                 .type(ApplicationCommandOptionType.STRING.getValue())
                 .choices(DiscordUtil.toOptions(Type.class)));

@@ -17,23 +17,23 @@ import reactor.function.TupleUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class RolelistCmd extends BaseCmd {
 
-    // TODO: Uses varargs when available
     public RolelistCmd() {
         super(CommandCategory.MODERATION, "rolelist", "Show a list of members with specific role(s)");
-        this.addOption("role_1", "The first role to have", true, ApplicationCommandOptionType.ROLE);
-        this.addOption("role_2", "The second role to have", false, ApplicationCommandOptionType.ROLE);
-        this.addOption("role_3", "The third role to have", false, ApplicationCommandOptionType.ROLE);
+        this.addOption("role1", "The first role to have", true, ApplicationCommandOptionType.ROLE);
+        this.addOption("role2", "The second role to have", false, ApplicationCommandOptionType.ROLE);
+        this.addOption("role3", "The third role to have", false, ApplicationCommandOptionType.ROLE);
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        return Flux.merge(
-                context.getOptionAsRole("role_1"),
-                context.getOptionAsRole("role_2"),
-                context.getOptionAsRole("role_3"))
+        final Flux<Role> getRoles = Flux.fromStream(IntStream.range(1, 4).boxed())
+                .flatMap(index -> context.getOptionAsRole("role%d".formatted(index)));
+
+        return getRoles
                 .collectList()
                 .flatMap(mentionedRoles -> {
                     final List<Snowflake> mentionedRoleIds = mentionedRoles

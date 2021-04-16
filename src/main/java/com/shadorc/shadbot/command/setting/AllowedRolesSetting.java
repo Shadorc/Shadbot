@@ -28,28 +28,28 @@ public class AllowedRolesSetting extends BaseCmd {
         super(CommandCategory.ADMIN, "allowed_roles", "Manage role(s) that can interact with Shadbot.");
 
         this.addOption(option -> option.name("action")
-                .description("TODO")
+                .description("Whether to add or remove a role from the allowed ones")
                 .type(ApplicationCommandOptionType.STRING.getValue())
                 .required(true)
                 .choices(DiscordUtil.toOptions(Action.class)));
         this.addOption(option -> option.name("role1")
-                .description("The first role to allow")
+                .description("The first role")
                 .required(true)
                 .type(ApplicationCommandOptionType.ROLE.getValue()));
         this.addOption(option -> option.name("role2")
-                .description("The second role to allow")
+                .description("The second role")
                 .required(false)
                 .type(ApplicationCommandOptionType.ROLE.getValue()));
         this.addOption(option -> option.name("role3")
-                .description("The third role to allow")
+                .description("The third role")
                 .required(false)
                 .type(ApplicationCommandOptionType.ROLE.getValue()));
         this.addOption(option -> option.name("role4")
-                .description("The fourth role to allow")
+                .description("The fourth role")
                 .required(false)
                 .type(ApplicationCommandOptionType.ROLE.getValue()));
         this.addOption(option -> option.name("role5")
-                .description("The fifth role to allow")
+                .description("The fifth role")
                 .required(false)
                 .type(ApplicationCommandOptionType.ROLE.getValue()));
 

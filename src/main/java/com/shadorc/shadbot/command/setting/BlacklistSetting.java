@@ -30,12 +30,12 @@ public class BlacklistSetting extends BaseCmd {
         super(CommandCategory.ADMIN, "blacklist", "Manage blacklisted command(s).");
 
         this.addOption(option -> option.name("action")
-                .description("TODO") // TODO
+                .description("Whether to add or remove a command/category from the blacklisted ones")
                 .required(true)
                 .type(ApplicationCommandOptionType.STRING.getValue())
                 .choices(DiscordUtil.toOptions(Action.class)));
         this.addOption(option -> option.name("type")
-                .description("TODO") // TODO
+                .description("Blacklist a command or a category")
                 .required(true)
                 .type(ApplicationCommandOptionType.STRING.getValue())
                 .choices(DiscordUtil.toOptions(Type.class)));
