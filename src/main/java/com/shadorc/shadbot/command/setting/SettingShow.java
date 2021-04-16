@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 import reactor.util.function.Tuple2;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -63,6 +64,10 @@ public class SettingShow extends BaseCmd {
                 getAutoLeaveMessage)
                 .map(TupleUtils.function((allowedRoles, autoRoles, restrictedChannels, restrictedRoles, autoJoinMessage, autoLeaveMessage) ->
                         ShadbotUtil.getDefaultEmbed(embed -> {
+                            embed.setAuthor("Shadbot Settings", "https://github.com/Shadorc/Shadbot/wiki/Settings",
+                                    context.getAuthorAvatar());
+                            embed.setFooter("Documentation available by clicking on the title", null);
+
                             defaultVolume.ifPresent(volume ->
                                     embed.addField("Default volume", "%d%%".formatted(volume), false));
                             autoJoinMessage.ifPresent(it ->
@@ -96,6 +101,10 @@ public class SettingShow extends BaseCmd {
                                                 entry -> FormatUtil.format(entry.getValue(), BaseCmd::getName, "\n - "),
                                                 "\n"),
                                         false);
+                            }
+
+                            if(embed.asRequest().fields().toOptional().map(List::isEmpty).orElse(true)) {
+                                embed.setDescription("There is no settings currently set.");
                             }
                         })))
                 .flatMap(context::reply);
