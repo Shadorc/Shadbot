@@ -1,11 +1,7 @@
 package com.shadorc.shadbot.command.setting;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandManager;
-import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.setting.Setting;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.EnumUtil;
@@ -73,7 +69,7 @@ public class RestrictedChannelsSetting extends BaseCmd {
                 final CommandCategory category = EnumUtil.parseEnum(CommandCategory.class, name);
                 if (category == null) {
                     return Mono.error(new CommandException(context.localize("restrictedchannels.invalid.category")
-                            .formatted(name, FormatUtil.format(CommandCategory.values(), Enum::name, ", "))));
+                            .formatted(name, FormatUtil.format(CommandCategory.values(), FormatUtil::capitalizeEnum, ", "))));
                 }
                 commands.addAll(CommandManager.getCommands().values().stream()
                         .filter(cmd -> cmd.getCategory() == category)

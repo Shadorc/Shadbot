@@ -4,7 +4,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
-import com.shadorc.shadbot.core.setting.Setting;
+import com.shadorc.shadbot.core.command.Setting;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.database.DatabaseEntity;
 import com.shadorc.shadbot.database.DatabaseManager;

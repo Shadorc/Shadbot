@@ -84,7 +84,7 @@ public class PollCmd extends BaseCmd {
                 .distinct()
                 .collect(Collectors.toList());
 
-        if(choices.size() < MIN_CHOICES_NUM) {
+        if (choices.size() < MIN_CHOICES_NUM) {
             throw new CommandException(context.localize("poll.exception.min.choices"));
         }
 

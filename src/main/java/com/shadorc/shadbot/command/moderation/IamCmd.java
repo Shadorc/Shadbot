@@ -1,10 +1,6 @@
 package com.shadorc.shadbot.command.moderation;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandPermission;
-import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.setting.Setting;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.guilds.bean.setting.IamBean;
 import com.shadorc.shadbot.database.guilds.entity.setting.Iam;

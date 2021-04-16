@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.core.setting.Setting;
+import com.shadorc.shadbot.core.command.Setting;
 import com.shadorc.shadbot.database.DatabaseManager;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
