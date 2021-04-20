@@ -38,8 +38,8 @@ public class PollManager {
 
     public Mono<?> show() {
         final StringBuilder representation = new StringBuilder();
-        for (int i = 0; i < this.spec.getChoices().size(); i++) {
-            representation.append("\n\t**%d.** %s".formatted(i + 1, this.spec.getChoices().keySet().toArray()[i]));
+        for (int i = 0; i < this.spec.choices().size(); i++) {
+            representation.append("\n\t**%d.** %s".formatted(i + 1, this.spec.choices().keySet().toArray()[i]));
         }
 
         final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultEmbed(
@@ -47,19 +47,19 @@ public class PollManager {
                                 .formatted(this.context.getAuthorName()),
                         null, this.context.getAuthorAvatar())
                         .setDescription(this.context.localize("poll.description")
-                                .formatted(this.spec.getQuestion(), representation))
+                                .formatted(this.spec.question(), representation))
                         .setFooter(this.context.localize("poll.footer")
-                                        .formatted(FormatUtil.formatDuration(this.spec.getDuration()), Emoji.RED_CROSS),
+                                        .formatted(FormatUtil.formatDuration(this.spec.duration()), Emoji.RED_CROSS),
                                 "https://i.imgur.com/jcrUDLY.png"));
 
         return this.context.reply(embedConsumer)
-                .flatMap(message -> Flux.fromIterable(this.spec.getReactions())
+                .flatMap(message -> Flux.fromIterable(this.spec.choices().values())
                         .flatMap(message::addReaction)
                         .then(Mono.fromRunnable(() -> this.scheduleEnd(message.getId()))));
     }
 
     private void scheduleEnd(Snowflake messageId) {
-        Mono.delay(this.spec.getDuration(), Schedulers.boundedElastic())
+        Mono.delay(this.spec.duration(), Schedulers.boundedElastic())
                 .then(this.end(messageId))
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
@@ -75,7 +75,7 @@ public class PollManager {
     }
 
     private Mono<Message> sendResults(List<Reaction> reactionSet) {
-        final Map<ReactionEmoji, String> reactionsChoices = MapUtil.inverse(this.spec.getChoices());
+        final Map<ReactionEmoji, String> reactionsChoices = MapUtil.inverse(this.spec.choices());
 
         final Map<String, Integer> choiceVoteMap = new HashMap<>(reactionsChoices.size());
         for (final Reaction reaction : reactionSet) {
@@ -106,7 +106,7 @@ public class PollManager {
         final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(this.context.localize("poll.results.title"),
                         null, this.context.getAuthorAvatar())
-                        .setDescription("__**%s**__%s".formatted(this.spec.getQuestion(), representation))
+                        .setDescription("__**%s**__%s".formatted(this.spec.question(), representation))
                         .setFooter(this.context.localize("poll.results.footer")
                                 .formatted(this.context.getAuthorName()), null));
 

@@ -40,11 +40,11 @@ public class Hand {
 
         int value = 0;
         for (final Card card : this.cards) {
-            if (card.getValue() == Value.ACE) {
+            if (card.value() == Value.ACE) {
                 aceCount++;
             } else {
                 // King, Queen and Jack have a number superior to 10 but their value is 10
-                value += Math.min(10, card.getValue().getNumeric());
+                value += Math.min(10, card.value().getNumeric());
             }
         }
 
@@ -60,7 +60,7 @@ public class Hand {
         return "%s%nValue: %d"
                 .formatted(
                         FormatUtil.format(this.getCards(),
-                                card -> "`%s` %s".formatted(card.getValue().getIdent(), card.getSuit().getEmoji()),
+                                card -> "`%s` %s".formatted(card.value().getIdent(), card.suit().getEmoji()),
                                 " | "),
                         this.getValue());
     }

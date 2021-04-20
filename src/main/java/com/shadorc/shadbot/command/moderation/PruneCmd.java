@@ -67,8 +67,7 @@ public class PruneCmd extends BaseCmd {
                             int limit = limitOpt.map(NumberUtil::toPositiveIntOrNull).orElse(MAX_MESSAGES);
                             limit = Math.min(MAX_MESSAGES, limit + MESSAGES_OFFSET);
 
-                            final List<Snowflake> authorIds = Arrays.stream(authors).map(Snowflake::of)
-                                    .collect(Collectors.toUnmodifiableList());
+                            final List<Snowflake> authorIds = Arrays.stream(authors).map(Snowflake::of).toList();
 
                             return channel.getMessagesBefore(Snowflake.of(Instant.now()))
                                     .take(limit)

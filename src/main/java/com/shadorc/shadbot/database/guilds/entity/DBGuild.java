@@ -41,7 +41,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                 .getMembers()
                 .stream()
                 .map(memberBean -> new DBMember(this.getId(), memberBean))
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
     }
 
     public Settings getSettings() {

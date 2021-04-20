@@ -16,7 +16,7 @@ public class LyricsCmdTest extends CmdTest<LyricsCmd> {
         assertFalse(result.getArtist().isBlank());
         assertFalse(result.getImageUrl().isBlank());
         assertFalse(result.getTitle().isBlank());
-        assertFalse(result.getUrl().isBlank());
+        assertFalse(result.url().isBlank());
     }
 
     @Test

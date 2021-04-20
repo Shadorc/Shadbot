@@ -54,10 +54,10 @@ public class TranslateCmd extends BaseCmd {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(context.localize("translate.title"), null, context.getAuthorAvatar())
                         .setDescription("**%s**%n%s%n%n**%s**%n%s".formatted(
-                                StringUtil.capitalize(request.isoToLang(response.getSourceLang())),
+                                StringUtil.capitalize(request.isoToLang(response.sourceLang())),
                                 request.getSourceText(),
                                 StringUtil.capitalize(request.isoToLang(request.getDestLang())),
-                                response.getTranslatedText())));
+                                response.translatedText())));
     }
 
     private static Mono<TranslateResponse> getTranslation(TranslateRequest data) {

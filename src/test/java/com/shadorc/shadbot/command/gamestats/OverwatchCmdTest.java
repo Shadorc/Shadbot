@@ -13,14 +13,14 @@ public class OverwatchCmdTest extends CmdTest<OverwatchCmd> {
     public void testGetResponse() {
         final String method = "getOverwatchProfile";
         final OverwatchProfile result = this.invoke(method, "Shadorc#2503", OverwatchCmd.Platform.PC);
-        assertEquals(OverwatchCmd.Platform.PC, result.getPlatform());
-        assertNull(result.getProfile().getMessage().orElse(null));
-        assertFalse(result.getProfile().isPrivate());
-        assertFalse(result.getProfile().getUsername().isBlank());
-        assertNotNull(result.getProfile().getGames().getQuickplayWon());
-        assertFalse(result.getProfile().getLevel().isBlank());
-        assertFalse(result.getProfile().getPortrait().isBlank());
-        assertFalse(result.getProfile().getQuickplayPlaytime().isBlank());
+        assertEquals(OverwatchCmd.Platform.PC, result.platform());
+        assertNull(result.profile().getMessage().orElse(null));
+        assertFalse(result.profile().isPrivate());
+        assertFalse(result.profile().getUsername().isBlank());
+        assertNotNull(result.profile().getGames().getQuickplayWon());
+        assertFalse(result.profile().getLevel().isBlank());
+        assertFalse(result.profile().getPortrait().isBlank());
+        assertFalse(result.profile().getQuickplayPlaytime().isBlank());
         assertFalse(result.getQuickplay().getEliminationsPerLife().isBlank());
         assertFalse(result.getQuickplay().getPlayed().isBlank());
     }

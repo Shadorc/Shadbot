@@ -17,8 +17,8 @@ public class TranslateCmdTest extends CmdTest<TranslateCmd> {
         final TranslateRequest data = new TranslateRequest(Config.DEFAULT_LOCALE,
                 "english", "french", "Hello, how are you?");
         final TranslateResponse response = this.invoke("getTranslation", data);
-        assertEquals("en", response.getSourceLang());
-        assertEquals("Bonjour comment vas-tu?", response.getTranslatedText());
+        assertEquals("en", response.sourceLang());
+        assertEquals("Bonjour comment vas-tu?", response.translatedText());
     }
 
     @Test
@@ -26,8 +26,8 @@ public class TranslateCmdTest extends CmdTest<TranslateCmd> {
         final TranslateRequest data = new TranslateRequest(Config.DEFAULT_LOCALE,
                 "en", "fr", "Hello, how are you?");
         final TranslateResponse response = this.invoke("getTranslation", data);
-        assertEquals("en", response.getSourceLang());
-        assertEquals("Bonjour comment vas-tu?", response.getTranslatedText());
+        assertEquals("en", response.sourceLang());
+        assertEquals("Bonjour comment vas-tu?", response.translatedText());
     }
 
     @Test
@@ -35,9 +35,9 @@ public class TranslateCmdTest extends CmdTest<TranslateCmd> {
         final TranslateRequest data = new TranslateRequest(Config.DEFAULT_LOCALE,
                 "en", "fr", SPECIAL_CHARS);
         final TranslateResponse response = this.invoke("getTranslation", data);
-        assertEquals("en", response.getSourceLang());
+        assertEquals("en", response.sourceLang());
         assertEquals("& ~ # {([- | `_\" '\\ ^ @)] =} ° + ¨ ^ $ £ ¤% * µ,?;.: /! § <> + - * /",
-                response.getTranslatedText());
+                response.translatedText());
     }
 
     @Test
@@ -45,8 +45,8 @@ public class TranslateCmdTest extends CmdTest<TranslateCmd> {
         final TranslateRequest data = new TranslateRequest(Config.DEFAULT_LOCALE,
                 "auto", "fr", "Hello, how are you?");
         final TranslateResponse response = this.invoke("getTranslation", data);
-        assertEquals("en", response.getSourceLang());
-        assertEquals("Bonjour comment vas-tu?", response.getTranslatedText());
+        assertEquals("en", response.sourceLang());
+        assertEquals("Bonjour comment vas-tu?", response.translatedText());
     }
 
     @Test

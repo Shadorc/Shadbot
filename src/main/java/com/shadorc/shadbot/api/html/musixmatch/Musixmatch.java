@@ -4,19 +4,7 @@ import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import org.jsoup.nodes.Document;
 
-public class Musixmatch {
-
-    private final Document document;
-    private final String url;
-
-    public Musixmatch(Document document, String url) {
-        this.document = document;
-        this.url = url;
-    }
-
-    public String getUrl() {
-        return this.url;
-    }
+public record Musixmatch(Document document, String url) {
 
     public String getArtist() {
         return this.document.getElementsByClass("mxm-track-title__artist").text();

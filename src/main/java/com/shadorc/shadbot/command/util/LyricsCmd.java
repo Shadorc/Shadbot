@@ -68,7 +68,7 @@ public class LyricsCmd extends BaseCmd {
         final String musicTitle = StringUtil.abbreviate(musixmatch.getTitle(), MAX_TITLE_LENGTH);
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(context.localize("lyrics.title").formatted(artist, musicTitle),
-                        musixmatch.getUrl(), context.getAuthorAvatar())
+                        musixmatch.url(), context.getAuthorAvatar())
                         .setThumbnail(musixmatch.getImageUrl())
                         .setDescription(StringUtil.abbreviate(musixmatch.getLyrics(), MAX_LYRICS_LENGTH))
                         .setFooter(context.localize("lyrics.footer"), "https://i.imgur.com/G7q6Hmq.png"));

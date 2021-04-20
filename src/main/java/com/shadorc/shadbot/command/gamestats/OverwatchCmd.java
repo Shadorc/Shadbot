@@ -68,34 +68,35 @@ public class OverwatchCmd extends BaseCmd {
         return context.reply(Emoji.HOURGLASS, context.localize("overwatch.loading"))
                 .then(this.getOverwatchProfile(context, battletag, platform))
                 .flatMap(profile -> {
-                    if (profile.getProfile().isPrivate()) {
+                    if (profile.profile().isPrivate()) {
                         return context.editReply(Emoji.ACCESS_DENIED, context.localize("overwatch.private"));
                     }
                     return context.editReply(OverwatchCmd.formatEmbed(context, profile, platform));
                 });
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, OverwatchProfile profile, Platform platform) {
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, OverwatchProfile overwatchProfile, Platform platform) {
+        final ProfileResponse profile = overwatchProfile.profile();
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(context.localize("overwatch.title"),
                         "https://playoverwatch.com/en-gb/career/%s/%s"
-                                .formatted(platform.getName(), profile.getProfile().getUsername()),
+                                .formatted(platform.getName(), profile.getUsername()),
                         context.getAuthorAvatar())
-                        .setThumbnail(profile.getProfile().getPortrait())
+                        .setThumbnail(profile.getPortrait())
                         .setDescription(context.localize("overwatch.description")
-                                .formatted(profile.getProfile().getUsername()))
+                                .formatted(profile.getUsername()))
                         .addField(context.localize("overwatch.level"),
-                                profile.getProfile().getLevel(), true)
+                                profile.getLevel(), true)
                         .addField(context.localize("overwatch.playtime"),
-                                profile.getProfile().getQuickplayPlaytime(), true)
+                                profile.getQuickplayPlaytime(), true)
                         .addField(context.localize("overwatch.games.won"),
-                                context.localize(profile.getProfile().getGames().getQuickplayWon()), true)
+                                context.localize(profile.getGames().getQuickplayWon()), true)
                         .addField(context.localize("overwatch.ranks"),
-                                OverwatchCmd.formatCompetitive(context, profile.getProfile().getCompetitive()), true)
+                                OverwatchCmd.formatCompetitive(context, profile.getCompetitive()), true)
                         .addField(context.localize("overwatch.heroes.played"),
-                                profile.getQuickplay().getPlayed(), true)
+                                overwatchProfile.getQuickplay().getPlayed(), true)
                         .addField(context.localize("overwatch.heroes.ratio"),
-                                profile.getQuickplay().getEliminationsPerLife(), true));
+                                overwatchProfile.getQuickplay().getEliminationsPerLife(), true));
     }
 
     private static String formatCompetitive(Context context, Competitive competitive) {
@@ -128,7 +129,7 @@ public class OverwatchCmd extends BaseCmd {
         return this.cachedValues
                 .getOrCache(profileUrl, Mono.zip(Mono.just(platform), getProfile, getStats)
                         .map(TupleUtils.function(OverwatchProfile::new)))
-                .filter(overwatchProfile -> overwatchProfile.getProfile().getPortrait() != null)
+                .filter(overwatchProfile -> overwatchProfile.profile().getPortrait() != null)
                 .switchIfEmpty(Mono.error(new IOException("Overwatch API returned malformed JSON")));
     }
 
