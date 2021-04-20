@@ -73,7 +73,7 @@ public class DeviantartCmd extends BaseCmd {
                 .flatMap(url -> RequestHelper.fromUrl(url)
                         .to(DeviantArtResponse.class))
                 .flatMapIterable(DeviantArtResponse::results)
-                .filter(image -> image.getContent().isPresent())
+                .filter(image -> image.content().isPresent())
                 .collectList()
                 .map(list -> Optional.ofNullable(RandUtil.randValue(list)))
                 .flatMap(Mono::justOrEmpty);
@@ -86,7 +86,7 @@ public class DeviantartCmd extends BaseCmd {
                         .addField(context.localize("deviantart.title"), image.title(), false)
                         .addField(context.localize("deviantart.author"), image.author().username(), false)
                         .addField(context.localize("deviantart.category"), image.categoryPath(), false)
-                        .setImage(image.getContent().map(Content::source).orElseThrow()));
+                        .setImage(image.content().map(Content::source).orElseThrow()));
     }
 
     private Mono<TokenResponse> requestAccessToken() {

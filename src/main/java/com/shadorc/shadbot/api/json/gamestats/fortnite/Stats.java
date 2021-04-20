@@ -1,39 +1,38 @@
 package com.shadorc.shadbot.api.json.gamestats.fortnite;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import reactor.util.annotation.Nullable;
 
-import java.util.Objects;
+import java.util.Optional;
 
-public record Stats(@Nullable @JsonProperty("p2") SubStats soloStats,
-                    @Nullable @JsonProperty("p10") SubStats duoStats,
-                    @Nullable @JsonProperty("p9") SubStats squadStats,
-                    @Nullable @JsonProperty("curr_p2") SubStats seasonSoloStats,
-                    @Nullable @JsonProperty("curr_p10") SubStats seasonDuoStats,
-                    @Nullable @JsonProperty("curr_p9") SubStats seasonSquadStats) {
+public record Stats(@JsonProperty("p2") Optional<SubStats> soloStats,
+                    @JsonProperty("p10") Optional<SubStats> duoStats,
+                    @JsonProperty("p9") Optional<SubStats> squadStats,
+                    @JsonProperty("curr_p2") Optional<SubStats> seasonSoloStats,
+                    @JsonProperty("curr_p10") Optional<SubStats> seasonDuoStats,
+                    @JsonProperty("curr_p9") Optional<SubStats> seasonSquadStats) {
 
     public SubStats getSoloStats() {
-        return Objects.requireNonNullElse(this.soloStats, SubStats.DEFAULT);
+        return this.soloStats.orElse(SubStats.DEFAULT);
     }
 
     public SubStats getDuoStats() {
-        return Objects.requireNonNullElse(this.duoStats, SubStats.DEFAULT);
+        return this.duoStats.orElse(SubStats.DEFAULT);
     }
 
     public SubStats getSquadStats() {
-        return Objects.requireNonNullElse(this.squadStats, SubStats.DEFAULT);
+        return this.squadStats.orElse(SubStats.DEFAULT);
     }
 
     public SubStats getSeasonSoloStats() {
-        return Objects.requireNonNullElse(this.seasonSoloStats, SubStats.DEFAULT);
+        return this.seasonSoloStats.orElse(SubStats.DEFAULT);
     }
 
     public SubStats getSeasonDuoStats() {
-        return Objects.requireNonNullElse(this.seasonDuoStats, SubStats.DEFAULT);
+        return this.seasonDuoStats.orElse(SubStats.DEFAULT);
     }
 
     public SubStats getSeasonSquadStats() {
-        return Objects.requireNonNullElse(this.seasonSquadStats, SubStats.DEFAULT);
+        return this.seasonSquadStats.orElse(SubStats.DEFAULT);
     }
 
 }

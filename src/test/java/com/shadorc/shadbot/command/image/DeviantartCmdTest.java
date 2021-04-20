@@ -15,7 +15,7 @@ public class DeviantartCmdTest extends CmdTest<DeviantartCmd> {
     public void testGetPopularImage() {
         final TokenResponse token = this.invoke("requestAccessToken");
         final Image result = this.invoke("getPopularImage", token.accessToken(), "dab");
-        assertFalse(result.getContent().map(Content::source).orElseThrow().isBlank());
+        assertFalse(result.content().map(Content::source).orElseThrow().isBlank());
         assertFalse(result.author().username().isBlank());
         assertFalse(result.categoryPath().isBlank());
         assertFalse(result.title().isBlank());

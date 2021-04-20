@@ -1,11 +1,9 @@
 package com.shadorc.shadbot.api.json.gamestats.overwatch.profile;
 
-import reactor.util.annotation.Nullable;
-
 import java.util.Map;
 import java.util.Optional;
 
-public record ProfileResponse(@Nullable String message,
+public record ProfileResponse(Optional<String> message,
                               String username,
                               int level,
                               String portrait,
@@ -14,10 +12,6 @@ public record ProfileResponse(@Nullable String message,
                               Map<String, String> playtime,
                               Competitive competitive) {
 
-
-    public Optional<String> getMessage() {
-        return Optional.ofNullable(this.message);
-    }
 
     public String getQuickplayPlaytime() {
         return this.playtime.get("quickplay");

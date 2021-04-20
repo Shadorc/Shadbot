@@ -11,8 +11,8 @@ public class WikipediaCmdTest extends CmdTest<WikipediaCmd> {
     @Test
     public void testGetWikipediaPage() {
         final WikipediaPage result = this.invoke("getWikipediaPage", "21 guns");
-        assertNotNull(result.extract());
-        assertFalse(result.extract().isBlank());
+        assertTrue(result.extract().isPresent());
+        assertFalse(result.extract().orElseThrow().isBlank());
         assertFalse(result.title().isBlank());
         assertFalse(result.getEncodedTitle().isBlank());
     }

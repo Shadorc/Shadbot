@@ -64,9 +64,9 @@ public class Rule34Cmd extends BaseCmd {
 
         return RequestHelper.fromUrl(url)
                 .to(R34Response.class)
-                .map(R34Response::getPosts)
+                .map(R34Response::posts)
                 .flatMap(Mono::justOrEmpty)
-                .map(R34Posts::getPosts)
+                .map(R34Posts::posts)
                 .flatMap(Mono::justOrEmpty)
                 .map(RandUtil::randValue);
     }

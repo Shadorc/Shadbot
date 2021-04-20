@@ -14,7 +14,7 @@ public class OverwatchCmdTest extends CmdTest<OverwatchCmd> {
         final String method = "getOverwatchProfile";
         final OverwatchProfile result = this.invoke(method, "Shadorc#2503", OverwatchCmd.Platform.PC);
         assertEquals(OverwatchCmd.Platform.PC, result.platform());
-        assertNull(result.profile().getMessage().orElse(null));
+        assertNull(result.profile().message().orElse(null));
         assertFalse(result.profile().isPrivate());
         assertFalse(result.profile().username().isBlank());
         assertNotEquals(0, result.profile().games().getQuickplayWon());

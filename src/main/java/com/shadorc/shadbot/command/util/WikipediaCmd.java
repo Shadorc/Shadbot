@@ -34,7 +34,7 @@ public class WikipediaCmd extends BaseCmd {
         return context.reply(Emoji.HOURGLASS, context.localize("wikipedia.loading"))
                 .then(WikipediaCmd.getWikipediaPage(context, word))
                 .flatMap(page -> {
-                    if (page.getExtract().orElseThrow().endsWith("may refer to:")) {
+                    if (page.extract().orElseThrow().endsWith("may refer to:")) {
                         return context.editReply(Emoji.MAGNIFYING_GLASS,
                                 context.localize("wikipedia.several.results"));
                     }
@@ -46,7 +46,7 @@ public class WikipediaCmd extends BaseCmd {
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, WikipediaPage page) {
-        final String extract = StringUtil.abbreviate(page.getExtract().orElseThrow(), Embed.MAX_DESCRIPTION_LENGTH);
+        final String extract = StringUtil.abbreviate(page.extract().orElseThrow(), Embed.MAX_DESCRIPTION_LENGTH);
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(context.localize("wikipedia.title").formatted(page.title()),
                         "https://%s.wikipedia.org/wiki/%s"
@@ -74,7 +74,7 @@ public class WikipediaCmd extends BaseCmd {
                 .map(WikipediaQuery::pages)
                 .flatMapIterable(Map::entrySet)
                 .next()
-                .filter(entry -> !"-1".equals(entry.getKey()) && entry.getValue().getExtract().isPresent())
+                .filter(entry -> !"-1".equals(entry.getKey()) && entry.getValue().extract().isPresent())
                 .map(Map.Entry::getValue);
     }
 

@@ -82,7 +82,7 @@ public class DiabloCmd extends BaseCmd {
                     return this.profileCache.getOrCache(profileUrl, RequestHelper.fromUrl(profileUrl)
                             .to(ProfileResponse.class))
                             .flatMap(profile -> {
-                                if ("NOTFOUND".equals(profile.getCode().orElse(""))) {
+                                if ("NOTFOUND".equals(profile.code().orElse(""))) {
                                     return context.editReply(Emoji.MAGNIFYING_GLASS,
                                             context.localize("diablo3.user.not.found"));
                                 }
@@ -93,7 +93,7 @@ public class DiabloCmd extends BaseCmd {
                                                 .to(HeroResponse.class)
                                                 .onErrorResume(ServerAccessException.isStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR),
                                                         err -> Mono.empty())))
-                                        .filter(hero -> hero.getCode().isEmpty())
+                                        .filter(hero -> hero.code().isEmpty())
                                         // Sort heroes by ascending damage
                                         .sort(Comparator.<HeroResponse>comparingDouble(hero -> hero.stats().damage())
                                                 .reversed())

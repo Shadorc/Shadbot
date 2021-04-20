@@ -101,13 +101,13 @@ public class OverwatchCmd extends BaseCmd {
 
     private static String formatCompetitive(Context context, Competitive competitive) {
         final StringBuilder strBuilder = new StringBuilder();
-        competitive.damage().getRank()
+        competitive.damage().rank()
                 .ifPresent(rank -> strBuilder.append(context.localize("overwatch.competitive.damage")
                         .formatted(context.localize(rank))));
-        competitive.tank().getRank()
+        competitive.tank().rank()
                 .ifPresent(rank -> strBuilder.append(context.localize("overwatch.competitive.tank")
                         .formatted(context.localize(rank))));
-        competitive.support().getRank()
+        competitive.support().rank()
                 .ifPresent(rank -> strBuilder.append(context.localize("overwatch.competitive.support")
                         .formatted(context.localize(rank))));
         return strBuilder.isEmpty() ? context.localize("overwatch.not.ranked") : strBuilder.toString();
@@ -119,7 +119,7 @@ public class OverwatchCmd extends BaseCmd {
         final String profileUrl = OverwatchCmd.buildUrl(PROFILE_API_URL, platform, username);
         final Mono<ProfileResponse> getProfile = RequestHelper.fromUrl(profileUrl)
                 .to(ProfileResponse.class)
-                .filter(profile -> !"Error: Profile not found".equals(profile.getMessage().orElse("")))
+                .filter(profile -> !"Error: Profile not found".equals(profile.message().orElse("")))
                 .switchIfEmpty(Mono.error(new CommandException(context.localize("overwatch.not.found"))));
 
         final String statsUrl = OverwatchCmd.buildUrl(STATS_API_URL, platform, username);

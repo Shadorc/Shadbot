@@ -58,7 +58,7 @@ public class FortniteCmd extends BaseCmd {
                         .addHeaders("TRN-Api-Key", this.apiKey)
                         .to(FortniteResponse.class)))
                 .flatMap(fortnite -> {
-                    if (PLAYER_NOT_FOUND.equals(fortnite.getError().orElse(""))) {
+                    if (PLAYER_NOT_FOUND.equals(fortnite.error().orElse(""))) {
                         throw Exceptions.propagate(new IOException(PLAYER_NOT_FOUND));
                     }
 

@@ -89,8 +89,8 @@ public class CounterStrikeCmd extends BaseCmd {
                                 }
 
                                 return Mono.fromCallable(() -> NetUtil.MAPPER.readValue(body, UserStatsForGameResponse.class))
-                                        .map(userStats -> userStats.getPlayerStats()
-                                                .flatMap(PlayerStats::getStats))
+                                        .map(userStats -> userStats.playerStats()
+                                                .flatMap(PlayerStats::stats))
                                         .flatMap(Mono::justOrEmpty)
                                         .flatMap(stats -> context.editReply(
                                                 CounterStrikeCmd.formatEmbed(context, player, stats)))
@@ -127,7 +127,7 @@ public class CounterStrikeCmd extends BaseCmd {
             return RequestHelper.fromUrl(url)
                     .to(ResolveVanityUrlResponse.class)
                     .map(ResolveVanityUrlResponse::response)
-                    .map(Response::getSteamId)
+                    .map(Response::steamId)
                     .flatMap(Mono::justOrEmpty);
         }
     }
