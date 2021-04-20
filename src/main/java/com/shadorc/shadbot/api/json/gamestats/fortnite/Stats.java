@@ -5,26 +5,12 @@ import reactor.util.annotation.Nullable;
 
 import java.util.Objects;
 
-public class Stats {
-
-    @Nullable
-    @JsonProperty("p2")
-    private SubStats soloStats;
-    @Nullable
-    @JsonProperty("p10")
-    private SubStats duoStats;
-    @Nullable
-    @JsonProperty("p9")
-    private SubStats squadStats;
-    @Nullable
-    @JsonProperty("curr_p2")
-    private SubStats seasonSoloStats;
-    @Nullable
-    @JsonProperty("curr_p10")
-    private SubStats seasonDuoStats;
-    @Nullable
-    @JsonProperty("curr_p9")
-    private SubStats seasonSquadStats;
+public record Stats(@Nullable @JsonProperty("p2") SubStats soloStats,
+                    @Nullable @JsonProperty("p10") SubStats duoStats,
+                    @Nullable @JsonProperty("p9") SubStats squadStats,
+                    @Nullable @JsonProperty("curr_p2") SubStats seasonSoloStats,
+                    @Nullable @JsonProperty("curr_p10") SubStats seasonDuoStats,
+                    @Nullable @JsonProperty("curr_p9") SubStats seasonSquadStats) {
 
     public SubStats getSoloStats() {
         return Objects.requireNonNullElse(this.soloStats, SubStats.DEFAULT);

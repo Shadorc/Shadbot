@@ -6,32 +6,17 @@ import reactor.util.annotation.Nullable;
 
 import java.util.Optional;
 
-public class HeroResponse {
-
-    @Nullable
-    @JsonProperty("code")
-    private String code;
-    @JsonProperty("name")
-    private String name;
-    @JsonProperty("class")
-    private String className;
-    @JsonProperty("stats")
-    private HeroStats stats;
+public record HeroResponse(@Nullable String code,
+                           String name,
+                           @JsonProperty("class") String className,
+                           HeroStats stats) {
 
     public Optional<String> getCode() {
         return Optional.ofNullable(this.code);
     }
 
-    public String getName() {
-        return this.name;
-    }
-
     public String getClassName() {
         return StringUtil.capitalize(this.className.replace("-", " "));
-    }
-
-    public HeroStats getStats() {
-        return this.stats;
     }
 
 }

@@ -14,18 +14,18 @@ public class DeviantartCmdTest extends CmdTest<DeviantartCmd> {
     @Test
     public void testGetPopularImage() {
         final TokenResponse token = this.invoke("requestAccessToken");
-        final Image result = this.invoke("getPopularImage", token.getAccessToken(), "dab");
-        assertFalse(result.getContent().map(Content::getSource).orElseThrow().isBlank());
-        assertFalse(result.getAuthor().getUsername().isBlank());
-        assertFalse(result.getCategoryPath().isBlank());
-        assertFalse(result.getTitle().isBlank());
-        assertFalse(result.getUrl().isBlank());
+        final Image result = this.invoke("getPopularImage", token.accessToken(), "dab");
+        assertFalse(result.getContent().map(Content::source).orElseThrow().isBlank());
+        assertFalse(result.author().username().isBlank());
+        assertFalse(result.categoryPath().isBlank());
+        assertFalse(result.title().isBlank());
+        assertFalse(result.url().isBlank());
     }
 
     @Test
     public void testGetPopularImageFuzzy() {
         final TokenResponse token = this.invoke("requestAccessToken");
-        final Image result = this.invoke("getPopularImage", token.getAccessToken(), SPECIAL_CHARS);
+        final Image result = this.invoke("getPopularImage", token.accessToken(), SPECIAL_CHARS);
         assertNull(result);
     }
 

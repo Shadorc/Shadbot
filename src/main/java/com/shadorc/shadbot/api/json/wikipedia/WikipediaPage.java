@@ -1,31 +1,18 @@
 package com.shadorc.shadbot.api.json.wikipedia;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import reactor.util.annotation.Nullable;
 
-public class WikipediaPage {
+import java.util.Optional;
 
-    @JsonProperty("title")
-    private String title;
-    @JsonProperty("extract")
-    private String extract;
-
-    public String getTitle() {
-        return this.title;
-    }
+public record WikipediaPage(String title,
+                            @Nullable String extract) {
 
     public String getEncodedTitle() {
         return this.title.replace(" ", "_");
     }
 
-    public String getExtract() {
-        return this.extract;
+    public Optional<String> getExtract() {
+        return Optional.ofNullable(this.extract);
     }
 
-    @Override
-    public String toString() {
-        return "WikipediaPage{" +
-                "title='" + this.title + '\'' +
-                ", extract='" + this.extract + '\'' +
-                '}';
-    }
 }

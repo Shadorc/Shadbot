@@ -5,11 +5,7 @@ import reactor.util.annotation.Nullable;
 
 import java.util.Optional;
 
-public class Response {
-
-    @Nullable
-    @JsonProperty("steamid")
-    private String steamId;
+public record Response(@Nullable @JsonProperty("steamid") String steamId) {
 
     public Optional<String> getSteamId() {
         return Optional.ofNullable(this.steamId);

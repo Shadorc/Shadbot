@@ -14,7 +14,6 @@ import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.shadorc.shadbot.database.guilds.GuildsCollection.LOGGER;
 

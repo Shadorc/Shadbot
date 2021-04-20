@@ -50,12 +50,12 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
                     + "&category=%s".formatted(Objects.toString(this.categoryId, ""));
             return RequestHelper.fromUrl(url)
                     .to(TriviaResponse.class)
-                    .map(TriviaResponse::getResults)
+                    .map(TriviaResponse::results)
                     .map(list -> list.get(0))
                     .doOnNext(trivia -> {
                         this.trivia = trivia;
 
-                        if ("multiple".equals(trivia.getType())) {
+                        if ("multiple".equals(trivia.type())) {
                             this.answers.addAll(trivia.getIncorrectAnswers());
                             this.answers.add(trivia.getCorrectAnswer());
                             Collections.shuffle(this.answers);
@@ -90,9 +90,9 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
                     embed -> embed.setAuthor(this.context.localize("trivia.title"), null, this.context.getAuthorAvatar())
                             .setDescription(description)
                             .addField(this.context.localize("trivia.category"),
-                                    "`%s`".formatted(this.trivia.getCategory()), true)
+                                    "`%s`".formatted(this.trivia.category()), true)
                             .addField(this.context.localize("trivia.difficulty"),
-                                    "`%s`".formatted(this.trivia.getDifficulty()), true)
+                                    "`%s`".formatted(this.trivia.difficulty()), true)
                             .setFooter(this.context.localize("trivia.footer")
                                     .formatted(this.duration.toSeconds(), Emoji.RED_CROSS), null));
 

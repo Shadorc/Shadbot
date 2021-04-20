@@ -2,19 +2,6 @@ package com.shadorc.shadbot.api.json.image.deviantart;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Content {
+public record Content(@JsonProperty("src") String source) {
 
-    @JsonProperty("src")
-    private String source;
-
-    public String getSource() {
-        return this.source;
-    }
-
-    @Override
-    public String toString() {
-        return "Content{" +
-                "source='" + this.source + '\'' +
-                '}';
-    }
 }

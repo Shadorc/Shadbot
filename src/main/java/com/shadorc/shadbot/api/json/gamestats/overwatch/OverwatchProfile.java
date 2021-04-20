@@ -10,15 +10,7 @@ public record OverwatchProfile(OverwatchCmd.Platform platform,
                                StatsResponse stats) {
 
     public Quickplay getQuickplay() {
-        return this.stats.getStats().getTopHeroes().getQuickplay();
+        return this.stats.stats().topHeroes().quickplay();
     }
 
-    @Override
-    public String toString() {
-        return "OverwatchProfile{" +
-                "platform=" + this.platform +
-                ", profile=" + this.profile +
-                ", stats=" + this.stats +
-                '}';
-    }
 }

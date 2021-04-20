@@ -45,7 +45,7 @@ public class WallhavenCmd extends BaseCmd {
         return context.reply(Emoji.HOURGLASS, context.localize("wallhaven.loading"))
                 .then(Mono.zip(this.getWallpaper(query), context.isChannelNsfw()))
                 .flatMap(TupleUtils.function((wallpaper, isNsfw) -> {
-                    if (!"sfw".equals(wallpaper.getPurity()) && !isNsfw) {
+                    if (!"sfw".equals(wallpaper.purity()) && !isNsfw) {
                         return context.editReply(Emoji.GREY_EXCLAMATION,
                                 context.localize("must.be.nsfw").formatted(Setting.NSFW));
                     }
@@ -69,10 +69,10 @@ public class WallhavenCmd extends BaseCmd {
                         }
                     });
 
-                    embed.setAuthor(title, wallpaper.getUrl(), context.getAuthorAvatar())
+                    embed.setAuthor(title, wallpaper.url(), context.getAuthorAvatar())
                             .setThumbnail("https://wallhaven.cc/images/layout/logo_sm.png")
-                            .setImage(wallpaper.getPath())
-                            .addField(context.localize("wallhaven.resolution"), wallpaper.getResolution(), false);
+                            .setImage(wallpaper.path())
+                            .addField(context.localize("wallhaven.resolution"), wallpaper.resolution(), false);
 
                 });
     }
@@ -80,7 +80,7 @@ public class WallhavenCmd extends BaseCmd {
     private Mono<Wallpaper> getWallpaper(final String query) {
         return RequestHelper.fromUrl(this.buildUrl(query))
                 .to(WallhavenResponse.class)
-                .map(WallhavenResponse::getWallpapers)
+                .map(WallhavenResponse::wallpapers)
                 .filter(Predicate.not(List::isEmpty))
                 .map(RandUtil::randValue);
     }

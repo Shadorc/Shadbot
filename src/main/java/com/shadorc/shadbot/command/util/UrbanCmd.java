@@ -61,8 +61,8 @@ public class UrbanCmd extends BaseCmd {
         final String example = StringUtil.abbreviate(urbanDef.getExample(), Field.MAX_VALUE_LENGTH);
         return ShadbotUtil.getDefaultEmbed(
                 embed -> {
-                    embed.setAuthor(context.localize("urban.title").formatted(urbanDef.getWord()),
-                            urbanDef.getPermalink(), context.getAuthorAvatar())
+                    embed.setAuthor(context.localize("urban.title").formatted(urbanDef.word()),
+                            urbanDef.permalink(), context.getAuthorAvatar())
                             .setThumbnail("https://i.imgur.com/7KJtwWp.png")
                             .setDescription(definition);
 
@@ -77,7 +77,7 @@ public class UrbanCmd extends BaseCmd {
                 + "term=%s".formatted(NetUtil.encode(query));
         return RequestHelper.fromUrl(url)
                 .to(UrbanDictionaryResponse.class)
-                .flatMapIterable(UrbanDictionaryResponse::getDefinitions)
+                .flatMapIterable(UrbanDictionaryResponse::definitions)
                 .sort(Comparator.comparingInt(UrbanDefinition::getRatio).reversed())
                 .next()
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))

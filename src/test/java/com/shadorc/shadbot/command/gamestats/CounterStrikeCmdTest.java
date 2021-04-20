@@ -36,9 +36,9 @@ public class CounterStrikeCmdTest extends CmdTest<CounterStrikeCmd> {
     public void testGetPlayerSummary() {
         final String method = "getPlayerSummary";
         final PlayerSummary result = this.invoke(method, "76561198040113951");
-        assertEquals("76561198040113951", result.getSteamId());
-        assertFalse(result.getAvatarFull().isBlank());
-        assertFalse(result.getPersonaName().isBlank());
+        assertEquals("76561198040113951", result.steamId());
+        assertFalse(result.avatarFull().isBlank());
+        assertFalse(result.personaName().isBlank());
         assertNotNull(result.getCommunityVisibilityState());
     }
 

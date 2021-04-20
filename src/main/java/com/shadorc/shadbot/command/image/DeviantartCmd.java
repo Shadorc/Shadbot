@@ -54,7 +54,7 @@ public class DeviantartCmd extends BaseCmd {
 
         return context.reply(Emoji.HOURGLASS, context.localize("deviantart.loading"))
                 .then(this.token)
-                .map(TokenResponse::getAccessToken)
+                .map(TokenResponse::accessToken)
                 .flatMap(accessToken -> this.getPopularImage(accessToken, query))
                 .flatMap(image -> context.editReply(DeviantartCmd.formatEmbed(context, query, image)))
                 .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
@@ -72,7 +72,7 @@ public class DeviantartCmd extends BaseCmd {
                         + "&access_token=%s".formatted(accessToken))
                 .flatMap(url -> RequestHelper.fromUrl(url)
                         .to(DeviantArtResponse.class))
-                .flatMapIterable(DeviantArtResponse::getResults)
+                .flatMapIterable(DeviantArtResponse::results)
                 .filter(image -> image.getContent().isPresent())
                 .collectList()
                 .map(list -> Optional.ofNullable(RandUtil.randValue(list)))
@@ -81,12 +81,12 @@ public class DeviantartCmd extends BaseCmd {
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, String query, Image image) {
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor("DeviantArt: %s".formatted(query), image.getUrl(), context.getAuthorAvatar())
+                embed -> embed.setAuthor("DeviantArt: %s".formatted(query), image.url(), context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/gT4hHUB.png")
-                        .addField(context.localize("deviantart.title"), image.getTitle(), false)
-                        .addField(context.localize("deviantart.author"), image.getAuthor().getUsername(), false)
-                        .addField(context.localize("deviantart.category"), image.getCategoryPath(), false)
-                        .setImage(image.getContent().map(Content::getSource).orElseThrow()));
+                        .addField(context.localize("deviantart.title"), image.title(), false)
+                        .addField(context.localize("deviantart.author"), image.author().username(), false)
+                        .addField(context.localize("deviantart.category"), image.categoryPath(), false)
+                        .setImage(image.getContent().map(Content::source).orElseThrow()));
     }
 
     private Mono<TokenResponse> requestAccessToken() {
@@ -98,7 +98,7 @@ public class DeviantartCmd extends BaseCmd {
                 .flatMap(url -> RequestHelper.fromUrl(url)
                         .to(TokenResponse.class))
                 .doOnNext(token -> DEFAULT_LOGGER.info("DeviantArt token generated {}, expires in {}s",
-                        token.getAccessToken(), token.getExpiresIn().toSeconds()));
+                        token.accessToken(), token.getExpiresIn().toSeconds()));
     }
 
 }

@@ -103,7 +103,7 @@ public class SettingShow extends BaseCmd {
                                         false);
                             }
 
-                            if(embed.asRequest().fields().toOptional().map(List::isEmpty).orElse(true)) {
+                            if (embed.asRequest().fields().toOptional().map(List::isEmpty).orElse(true)) {
                                 embed.setDescription("There is no settings currently set.");
                             }
                         })))

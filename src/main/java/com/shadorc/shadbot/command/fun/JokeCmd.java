@@ -39,7 +39,7 @@ public class JokeCmd extends BaseCmd {
         return RequestHelper.fromUrl(HOME_URL)
                 .addHeaders(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON)
                 .to(JokeResponse.class)
-                .map(JokeResponse::getJoke);
+                .map(JokeResponse::joke);
     }
 
 }

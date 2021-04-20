@@ -11,28 +11,28 @@ public class WallhavenCmdTest extends CmdTest<WallhavenCmd> {
     @Test
     public void testGetWallpaperKeyword() {
         final Wallpaper result = this.invoke("getWallpaper", "doom");
-        assertFalse(result.getPath().isBlank());
-        assertEquals("sfw", result.getPurity());
-        assertFalse(result.getResolution().isBlank());
-        assertFalse(result.getUrl().isBlank());
+        assertFalse(result.path().isBlank());
+        assertEquals("sfw", result.purity());
+        assertFalse(result.resolution().isBlank());
+        assertFalse(result.url().isBlank());
     }
 
     @Test
     public void testGetWallpaperKeywords() {
         final Wallpaper result = this.invoke("getWallpaper", "doom, video game");
-        assertFalse(result.getPath().isBlank());
-        assertEquals("sfw", result.getPurity());
-        assertFalse(result.getResolution().isBlank());
-        assertFalse(result.getUrl().isBlank());
+        assertFalse(result.path().isBlank());
+        assertEquals("sfw", result.purity());
+        assertFalse(result.resolution().isBlank());
+        assertFalse(result.url().isBlank());
     }
 
     @Test
     public void testGetWallpaperRandom() {
         final Wallpaper result = this.invoke("getWallpaper", "");
-        assertFalse(result.getPath().isBlank());
-        assertEquals("sfw", result.getPurity());
-        assertFalse(result.getResolution().isBlank());
-        assertFalse(result.getUrl().isBlank());
+        assertFalse(result.path().isBlank());
+        assertEquals("sfw", result.purity());
+        assertFalse(result.resolution().isBlank());
+        assertFalse(result.url().isBlank());
     }
 
     @Test

@@ -63,7 +63,7 @@ public class FortniteCmd extends BaseCmd {
                     }
 
                     final String profileUrl = FortniteCmd.buildProfileUrl(platform, encodedUsername);
-                    final String description = FortniteCmd.formatDescription(context, fortnite.getStats(), username);
+                    final String description = FortniteCmd.formatDescription(context, fortnite.stats(), username);
                     return context.editReply(FortniteCmd.formatEmbed(context, profileUrl, description));
                 })
                 .onErrorResume(FortniteCmd::isNotFound,

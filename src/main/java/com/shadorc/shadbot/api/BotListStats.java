@@ -69,7 +69,7 @@ public class BotListStats {
                                             .doOnNext(content -> LOGGER.debug("Webhook event received: {}", content))
                                             .flatMap(content -> Mono.fromCallable(() ->
                                                     NetUtil.MAPPER.readValue(content, TopGgWebhookResponse.class)))
-                                            .map(TopGgWebhookResponse::getUserId)
+                                            .map(TopGgWebhookResponse::userId)
                                             .map(Snowflake::of)
                                             .flatMap(DatabaseManager.getUsers()::getDBUser)
                                             .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.VOTER))

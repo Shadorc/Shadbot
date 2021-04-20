@@ -86,13 +86,13 @@ public class Rule34Cmd extends BaseCmd {
                         }
                     });
 
-                    final String resolution = "%dx%d".formatted(post.getWidth(), post.getHeight());
+                    final String resolution = "%dx%d".formatted(post.width(), post.height());
                     final String formattedTags = Rule34Cmd.formatTags(post.getTags());
-                    embed.setAuthor(context.localize("rule34.title").formatted(tag), post.getFileUrl(), context.getAuthorAvatar())
+                    embed.setAuthor(context.localize("rule34.title").formatted(tag), post.fileUrl(), context.getAuthorAvatar())
                             .setThumbnail("https://i.imgur.com/t6JJWFN.png")
                             .addField(context.localize("rule34.resolution"), resolution, false)
                             .addField(context.localize("rule34.tags"), formattedTags, false)
-                            .setImage(post.getFileUrl())
+                            .setImage(post.fileUrl())
                             .setFooter(context.localize("rule34.footer"), null);
                 });
     }

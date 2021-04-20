@@ -77,8 +77,8 @@ public class ChatCmd extends BaseCmd {
 
         return RequestHelper.fromUrl(url)
                 .to(ChatBotResponse.class)
-                .map(ChatBotResponse::getResult)
-                .doOnNext(chat -> this.channelsCustid.put(channelId, chat.getCustId()))
+                .map(ChatBotResponse::result)
+                .doOnNext(chat -> this.channelsCustid.put(channelId, chat.custid()))
                 .map(ChatBotResult::getResponse)
                 .onErrorResume(err -> Mono.fromRunnable(() ->
                         LOGGER.info("{} is not reachable, trying another one: {}", botId, err.getMessage())));

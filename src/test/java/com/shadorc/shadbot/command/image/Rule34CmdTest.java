@@ -11,10 +11,10 @@ public class Rule34CmdTest extends CmdTest<Rule34Cmd> {
     @Test
     public void testGetR34Post() {
         final R34Post result = this.invoke("getR34Post", "dab");
-        assertFalse(result.getFileUrl().isBlank());
+        assertFalse(result.fileUrl().isBlank());
         assertFalse(result.getTags().isEmpty());
-        assertTrue(result.getHeight() > 0);
-        assertTrue(result.getWidth() > 0);
+        assertTrue(result.height() > 0);
+        assertTrue(result.width() > 0);
     }
 
     @Test

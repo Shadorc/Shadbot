@@ -76,7 +76,7 @@ public class DiabloCmd extends BaseCmd {
 
         return context.reply(Emoji.HOURGLASS, context.localize("diablo3.loading"))
                 .then(this.token)
-                .map(TokenResponse::getAccessToken)
+                .map(TokenResponse::accessToken)
                 .flatMap(token -> {
                     final String profileUrl = DiabloCmd.buildProfileApiUrl(token, region, battletag);
                     return this.profileCache.getOrCache(profileUrl, RequestHelper.fromUrl(profileUrl)
@@ -87,7 +87,7 @@ public class DiabloCmd extends BaseCmd {
                                             context.localize("diablo3.user.not.found"));
                                 }
 
-                                return Flux.fromIterable(profile.getHeroIds())
+                                return Flux.fromIterable(profile.heroIds())
                                         .map(heroId -> DiabloCmd.buildHeroApiUrl(token, region, battletag, heroId))
                                         .flatMap(heroUrl -> this.heroCache.getOrCache(heroUrl, RequestHelper.fromUrl(heroUrl)
                                                 .to(HeroResponse.class)
@@ -95,7 +95,7 @@ public class DiabloCmd extends BaseCmd {
                                                         err -> Mono.empty())))
                                         .filter(hero -> hero.getCode().isEmpty())
                                         // Sort heroes by ascending damage
-                                        .sort(Comparator.<HeroResponse>comparingDouble(hero -> hero.getStats().getDamage())
+                                        .sort(Comparator.<HeroResponse>comparingDouble(hero -> hero.stats().damage())
                                                 .reversed())
                                         .collectList()
                                         .flatMap(heroResponses -> {
@@ -116,21 +116,21 @@ public class DiabloCmd extends BaseCmd {
 
     private static String buildHeroApiUrl(String accessToken, Region region, String battletag, HeroId heroId) {
         return "https://%s.api.blizzard.com/d3/profile/%s/hero/%d?access_token=%s"
-                .formatted(region, NetUtil.encode(battletag), heroId.getId(), accessToken);
+                .formatted(region, NetUtil.encode(battletag), heroId.id(), accessToken);
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, ProfileResponse profile,
                                                          List<HeroResponse> heroResponses) {
         final String description = context.localize("diablo3.description")
-                .formatted(profile.getBattleTag(), profile.getGuildName(),
-                        profile.getParagonLevel(), profile.getParagonLevelHardcore(),
-                        profile.getParagonLevelSeason(), profile.getParagonLevelSeasonHardcore());
+                .formatted(profile.battleTag(), profile.guildName(),
+                        profile.paragonLevel(), profile.paragonLevelHardcore(),
+                        profile.paragonLevelSeason(), profile.paragonLevelSeasonHardcore());
 
         final String heroes = FormatUtil.format(heroResponses,
-                hero -> "**%s** (*%s*)".formatted(hero.getName(), hero.getClassName()), "\n");
+                hero -> "**%s** (*%s*)".formatted(hero.name(), hero.getClassName()), "\n");
 
         final String damages = FormatUtil.format(heroResponses,
-                hero -> context.localize("diablo3.hero.dps").formatted(context.localize(hero.getStats().getDamage())), "\n");
+                hero -> context.localize("diablo3.hero.dps").formatted(context.localize(hero.stats().damage())), "\n");
 
         return ShadbotUtil.getDefaultEmbed(embed ->
                 embed.setAuthor(context.localize("diablo3.title"), null, context.getAuthorAvatar())
@@ -146,7 +146,7 @@ public class DiabloCmd extends BaseCmd {
                 .addHeaders(HttpHeaderNames.AUTHORIZATION, this.buildAuthorizationValue())
                 .to(TokenResponse.class)
                 .doOnNext(token -> DEFAULT_LOGGER.info("Blizzard token generated {}, expires in {}s",
-                        token.getAccessToken(), token.getExpiresIn().toSeconds()));
+                        token.accessToken(), token.getExpiresIn().toSeconds()));
     }
 
     private String buildAuthorizationValue() {

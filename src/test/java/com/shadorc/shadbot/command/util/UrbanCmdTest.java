@@ -13,8 +13,8 @@ public class UrbanCmdTest extends CmdTest<UrbanCmd> {
         final UrbanDefinition result = this.invoke("getUrbanDefinition", "dab");
         assertFalse(result.getDefinition().isBlank());
         assertFalse(result.getExample().isBlank());
-        assertFalse(result.getPermalink().isBlank());
-        assertFalse(result.getWord().isBlank());
+        assertFalse(result.permalink().isBlank());
+        assertFalse(result.word().isBlank());
     }
 
     @Test
@@ -22,8 +22,8 @@ public class UrbanCmdTest extends CmdTest<UrbanCmd> {
         final UrbanDefinition result = this.invoke("getUrbanDefinition", SPECIAL_CHARS);
         assertFalse(result.getDefinition().isBlank());
         assertFalse(result.getExample().isBlank());
-        assertFalse(result.getPermalink().isBlank());
-        assertFalse(result.getWord().isBlank());
+        assertFalse(result.permalink().isBlank());
+        assertFalse(result.word().isBlank());
     }
 
 }

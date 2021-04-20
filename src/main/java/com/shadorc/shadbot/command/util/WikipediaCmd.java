@@ -34,7 +34,7 @@ public class WikipediaCmd extends BaseCmd {
         return context.reply(Emoji.HOURGLASS, context.localize("wikipedia.loading"))
                 .then(WikipediaCmd.getWikipediaPage(context, word))
                 .flatMap(page -> {
-                    if (page.getExtract().endsWith("may refer to:")) {
+                    if (page.getExtract().orElseThrow().endsWith("may refer to:")) {
                         return context.editReply(Emoji.MAGNIFYING_GLASS,
                                 context.localize("wikipedia.several.results"));
                     }
@@ -46,9 +46,9 @@ public class WikipediaCmd extends BaseCmd {
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, WikipediaPage page) {
-        final String extract = StringUtil.abbreviate(page.getExtract(), Embed.MAX_DESCRIPTION_LENGTH);
+        final String extract = StringUtil.abbreviate(page.getExtract().orElseThrow(), Embed.MAX_DESCRIPTION_LENGTH);
         return ShadbotUtil.getDefaultEmbed(
-                embed -> embed.setAuthor(context.localize("wikipedia.title").formatted(page.getTitle()),
+                embed -> embed.setAuthor(context.localize("wikipedia.title").formatted(page.title()),
                         "https://%s.wikipedia.org/wiki/%s"
                                 .formatted(context.getLocale().getLanguage(),
                                         page.getEncodedTitle()), context.getAuthorAvatar())
@@ -70,11 +70,11 @@ public class WikipediaCmd extends BaseCmd {
 
         return RequestHelper.fromUrl(url)
                 .to(WikipediaResponse.class)
-                .map(WikipediaResponse::getQuery)
-                .map(WikipediaQuery::getPages)
+                .map(WikipediaResponse::query)
+                .map(WikipediaQuery::pages)
                 .flatMapIterable(Map::entrySet)
                 .next()
-                .filter(entry -> !"-1".equals(entry.getKey()) && entry.getValue().getExtract() != null)
+                .filter(entry -> !"-1".equals(entry.getKey()) && entry.getValue().getExtract().isPresent())
                 .map(Map.Entry::getValue);
     }
 

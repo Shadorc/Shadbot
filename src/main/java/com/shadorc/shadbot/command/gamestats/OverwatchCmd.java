@@ -80,19 +80,19 @@ public class OverwatchCmd extends BaseCmd {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(context.localize("overwatch.title"),
                         "https://playoverwatch.com/en-gb/career/%s/%s"
-                                .formatted(platform.getName(), profile.getUsername()),
+                                .formatted(platform.getName(), profile.username()),
                         context.getAuthorAvatar())
-                        .setThumbnail(profile.getPortrait())
+                        .setThumbnail(profile.portrait())
                         .setDescription(context.localize("overwatch.description")
-                                .formatted(profile.getUsername()))
+                                .formatted(profile.username()))
                         .addField(context.localize("overwatch.level"),
-                                profile.getLevel(), true)
+                                Integer.toString(profile.level()), true)
                         .addField(context.localize("overwatch.playtime"),
                                 profile.getQuickplayPlaytime(), true)
                         .addField(context.localize("overwatch.games.won"),
-                                context.localize(profile.getGames().getQuickplayWon()), true)
+                                context.localize(profile.games().getQuickplayWon()), true)
                         .addField(context.localize("overwatch.ranks"),
-                                OverwatchCmd.formatCompetitive(context, profile.getCompetitive()), true)
+                                OverwatchCmd.formatCompetitive(context, profile.competitive()), true)
                         .addField(context.localize("overwatch.heroes.played"),
                                 overwatchProfile.getQuickplay().getPlayed(), true)
                         .addField(context.localize("overwatch.heroes.ratio"),
@@ -101,13 +101,13 @@ public class OverwatchCmd extends BaseCmd {
 
     private static String formatCompetitive(Context context, Competitive competitive) {
         final StringBuilder strBuilder = new StringBuilder();
-        competitive.getDamage().getRank()
+        competitive.damage().getRank()
                 .ifPresent(rank -> strBuilder.append(context.localize("overwatch.competitive.damage")
                         .formatted(context.localize(rank))));
-        competitive.getTank().getRank()
+        competitive.tank().getRank()
                 .ifPresent(rank -> strBuilder.append(context.localize("overwatch.competitive.tank")
                         .formatted(context.localize(rank))));
-        competitive.getSupport().getRank()
+        competitive.support().getRank()
                 .ifPresent(rank -> strBuilder.append(context.localize("overwatch.competitive.support")
                         .formatted(context.localize(rank))));
         return strBuilder.isEmpty() ? context.localize("overwatch.not.ranked") : strBuilder.toString();
@@ -129,7 +129,7 @@ public class OverwatchCmd extends BaseCmd {
         return this.cachedValues
                 .getOrCache(profileUrl, Mono.zip(Mono.just(platform), getProfile, getStats)
                         .map(TupleUtils.function(OverwatchProfile::new)))
-                .filter(overwatchProfile -> overwatchProfile.profile().getPortrait() != null)
+                .filter(overwatchProfile -> overwatchProfile.profile().portrait() != null)
                 .switchIfEmpty(Mono.error(new IOException("Overwatch API returned malformed JSON")));
     }
 

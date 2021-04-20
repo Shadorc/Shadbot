@@ -79,7 +79,7 @@ public class CounterStrikeCmd extends BaseCmd {
                     final String userStatsUrl = "%s?".formatted(USER_STATS_FOR_GAME_URL)
                             + "appid=730"
                             + "&key=%s".formatted(this.apiKey)
-                            + "&steamid=%s".formatted(player.getSteamId());
+                            + "&steamid=%s".formatted(player.steamId());
 
                     return this.userStatsCache.getOrCache(userStatsUrl, RequestHelper.request(userStatsUrl))
                             .flatMap(body -> {
@@ -126,7 +126,7 @@ public class CounterStrikeCmd extends BaseCmd {
                     + "&vanityurl=%s".formatted(NetUtil.encode(identificator));
             return RequestHelper.fromUrl(url)
                     .to(ResolveVanityUrlResponse.class)
-                    .map(ResolveVanityUrlResponse::getResponse)
+                    .map(ResolveVanityUrlResponse::response)
                     .map(Response::getSteamId)
                     .flatMap(Mono::justOrEmpty);
         }
@@ -138,15 +138,15 @@ public class CounterStrikeCmd extends BaseCmd {
                 + "&steamids=%s".formatted(steamId);
         return RequestHelper.fromUrl(url)
                 .to(PlayerSummariesResponse.class)
-                .map(PlayerSummariesResponse::getResponse)
+                .map(PlayerSummariesResponse::response)
                 // Users matching the steamId
-                .flatMapIterable(PlayerSummaries::getPlayers)
+                .flatMapIterable(PlayerSummaries::players)
                 .next();
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, PlayerSummary player, List<Stats> stats) {
         final Map<String, Integer> statsMap = stats.stream()
-                .collect(Collectors.toMap(Stats::getName, Stats::getValue));
+                .collect(Collectors.toMap(Stats::name, Stats::value));
 
         final int kills = statsMap.get("total_kills");
         final int deaths = statsMap.get("total_deaths");
@@ -168,9 +168,9 @@ public class CounterStrikeCmd extends BaseCmd {
 
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(context.localize("cs.title"),
-                        "http://steamcommunity.com/profiles/%s".formatted(player.getSteamId()), context.getAuthorAvatar())
-                        .setThumbnail(player.getAvatarFull())
-                        .setDescription(context.localize("cs.description").formatted(player.getPersonaName()))
+                        "http://steamcommunity.com/profiles/%s".formatted(player.steamId()), context.getAuthorAvatar())
+                        .setThumbnail(player.avatarFull())
+                        .setDescription(context.localize("cs.description").formatted(player.personaName()))
                         .addField(context.localize("cs.kills"), context.localize(kills), true)
                         .addField(context.localize("cs.playtime"), context.localize("counterstrike.time.played")
                                 .formatted(context.localize(timePlayed)), true)

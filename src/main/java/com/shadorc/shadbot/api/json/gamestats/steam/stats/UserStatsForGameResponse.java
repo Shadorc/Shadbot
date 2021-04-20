@@ -5,11 +5,7 @@ import reactor.util.annotation.Nullable;
 
 import java.util.Optional;
 
-public class UserStatsForGameResponse {
-
-    @Nullable
-    @JsonProperty("playerstats")
-    private PlayerStats playerStats;
+public record UserStatsForGameResponse(@Nullable @JsonProperty("playerstats") PlayerStats playerStats) {
 
     public Optional<PlayerStats> getPlayerStats() {
         return Optional.ofNullable(this.playerStats);

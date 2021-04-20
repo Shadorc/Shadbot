@@ -16,10 +16,10 @@ public class OverwatchCmdTest extends CmdTest<OverwatchCmd> {
         assertEquals(OverwatchCmd.Platform.PC, result.platform());
         assertNull(result.profile().getMessage().orElse(null));
         assertFalse(result.profile().isPrivate());
-        assertFalse(result.profile().getUsername().isBlank());
-        assertNotNull(result.profile().getGames().getQuickplayWon());
-        assertFalse(result.profile().getLevel().isBlank());
-        assertFalse(result.profile().getPortrait().isBlank());
+        assertFalse(result.profile().username().isBlank());
+        assertNotEquals(0, result.profile().games().getQuickplayWon());
+        assertNotEquals(0, result.profile().level());
+        assertFalse(result.profile().portrait().isBlank());
         assertFalse(result.profile().getQuickplayPlaytime().isBlank());
         assertFalse(result.getQuickplay().getEliminationsPerLife().isBlank());
         assertFalse(result.getQuickplay().getPlayed().isBlank());

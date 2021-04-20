@@ -12,8 +12,8 @@ public class SubStats {
     private final StatValue ratio;
 
     public SubStats() {
-        this.top1 = new StatValue();
-        this.ratio = new StatValue();
+        this.top1 = new StatValue(0, 0);
+        this.ratio = new StatValue(0, 0);
     }
 
     public StatValue getTop1() {

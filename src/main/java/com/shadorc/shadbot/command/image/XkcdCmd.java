@@ -6,14 +6,12 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.utils.EnumUtil;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.ApplicationCommandOptionChoiceData;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -34,15 +32,13 @@ public class XkcdCmd extends BaseCmd {
         super(CommandCategory.IMAGE, "xkcd", "Show random comic from XKCD");
         this.latestId = new AtomicInteger();
 
-        final List<ApplicationCommandOptionChoiceData> choices = List.of(
-                ApplicationCommandOptionChoiceData.builder().name("latest").value("latest").build(),
-                ApplicationCommandOptionChoiceData.builder().name("random").value("random").build());
-        this.addOption("sort", "Sorting option", true, ApplicationCommandOptionType.STRING, choices);
+        this.addOption("sort", "Sorting option", true, ApplicationCommandOptionType.STRING,
+                DiscordUtil.toOptions(Sort.class));
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final Sort sort = EnumUtil.parseEnum(Sort.class, context.getOption("sort").orElseThrow().asString());
+        final Sort sort = context.getOptionAsEnum(Sort.class, "sort").orElseThrow();
         final Mono<XkcdResponse> getResponse = sort == Sort.LATEST ? XkcdCmd.getLatestXkcd() : this.getRandomXkcd();
         return context.reply(Emoji.HOURGLASS, context.localize("xkcd.loading"))
                 .then(getResponse)
@@ -51,15 +47,15 @@ public class XkcdCmd extends BaseCmd {
 
     private static Consumer<EmbedCreateSpec> formatEmbed(String avatarUrl, XkcdResponse xkcd) {
         return ShadbotUtil.getDefaultEmbed(embed ->
-                embed.setAuthor("XKCD: %s".formatted(xkcd.getTitle()), "%s/%d".formatted(HOME_URL, xkcd.getNum()), avatarUrl)
-                        .setImage(xkcd.getImg()));
+                embed.setAuthor("XKCD: %s".formatted(xkcd.title()), "%s/%d".formatted(HOME_URL, xkcd.num()), avatarUrl)
+                        .setImage(xkcd.img()));
     }
 
     private Mono<XkcdResponse> getRandomXkcd() {
         return Mono.fromCallable(this.latestId::get)
                 .filter(latestId -> latestId != 0)
                 .switchIfEmpty(XkcdCmd.getLatestXkcd()
-                        .map(XkcdResponse::getNum)
+                        .map(XkcdResponse::num)
                         .doOnNext(this.latestId::set))
                 .map(ThreadLocalRandom.current()::nextInt)
                 .flatMap(id -> RequestHelper.fromUrl("%s/%d/info.0.json".formatted(HOME_URL, id))
