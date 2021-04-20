@@ -82,7 +82,7 @@ public class WeatherCmd extends BaseCmd {
     }
 
     private static Predicate<Throwable> isNotFound() {
-        return err -> err instanceof APIException && ((APIException) err).getCode() == HttpStatus.SC_NOT_FOUND;
+        return thr -> thr instanceof APIException err && err.getCode() == HttpStatus.SC_NOT_FOUND;
     }
 
     private Consumer<EmbedCreateSpec> formatEmbed(Context context, WeatherWrapper weather) {

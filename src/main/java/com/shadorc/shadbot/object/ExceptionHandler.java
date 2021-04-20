@@ -28,20 +28,20 @@ public class ExceptionHandler {
                             || err instanceof TimeoutException)
                     .onRetryExhaustedThrow((spec, signal) -> new IOException(message));
 
-    public static Mono<?> handleCommandError(Throwable err, Context context) {
-        if (err instanceof CommandException) {
-            return ExceptionHandler.onCommandException((CommandException) err, context);
+    public static Mono<?> handleCommandError(Throwable thr, Context context) {
+        if (thr instanceof CommandException err) {
+            return ExceptionHandler.onCommandException(err, context);
         }
-        if (err instanceof MissingPermissionException) {
-            return ExceptionHandler.onMissingPermissionException((MissingPermissionException) err, context);
+        if (thr instanceof MissingPermissionException err) {
+            return ExceptionHandler.onMissingPermissionException(err, context);
         }
-        if (err instanceof NoMusicException) {
+        if (thr instanceof NoMusicException) {
             return ExceptionHandler.onNoMusicException(context);
         }
-        if (err instanceof TimeoutException || err instanceof IOException) {
-            return ExceptionHandler.onServerAccessError(err, context);
+        if (thr instanceof TimeoutException || thr instanceof IOException) {
+            return ExceptionHandler.onServerAccessError(thr, context);
         }
-        return ExceptionHandler.onUnknown(err, context);
+        return ExceptionHandler.onUnknown(thr, context);
     }
 
     private static Mono<?> onCommandException(CommandException err, Context context) {

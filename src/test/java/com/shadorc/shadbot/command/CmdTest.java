@@ -41,9 +41,8 @@ public abstract class CmdTest<T> {
         } catch (final RuntimeException err) {
             throw err;
         } catch (final Exception err) {
-            final Throwable cause = err.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
+            if (err.getCause() instanceof RuntimeException cause) {
+                throw cause;
             }
             throw new RuntimeException(err);
         }
