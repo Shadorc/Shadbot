@@ -106,16 +106,19 @@ public class SettingsBean implements Bean {
     }
 
     @Nullable
+    @Deprecated
     public String getJoinMessage() {
         return this.joinMessage;
     }
 
     @Nullable
+    @Deprecated
     public String getLeaveMessage() {
         return this.leaveMessage;
     }
 
     @Nullable
+    @Deprecated
     public String getMessageChannelId() {
         return this.messageChannelId;
     }

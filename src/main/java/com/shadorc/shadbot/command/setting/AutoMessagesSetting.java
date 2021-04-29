@@ -5,6 +5,7 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.command.Setting;
+import com.shadorc.shadbot.database.guilds.bean.setting.AutoMessageBean;
 import com.shadorc.shadbot.database.guilds.entity.setting.AutoMessage;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
@@ -59,7 +60,7 @@ public class AutoMessagesSetting extends BaseCmd {
                         .ofType(TextChannel.class)
                         .switchIfEmpty(Mono.error(new CommandException(context.localize("automessage.exception.channel.type"))))
                         .flatMap(channel -> context.getDbGuild()
-                                .updateSetting(setting, new AutoMessage(message, channel.getId()))
+                                .updateSetting(setting, new AutoMessageBean(message, channel.getId().asString()))
                                 .then(context.reply(Emoji.CHECK_MARK, context.localize("automessage." + typeStr + ".enabled")
                                         .formatted(message, channel.getMention()))));
 

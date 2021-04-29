@@ -65,6 +65,7 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return allowedVoiceChannelIds.contains(channelId);
     }
 
+    // TODO: this does not work with cmd groups
     public boolean isCommandAllowedInChannel(BaseCmd cmd, Snowflake channelId) {
         final Map<Snowflake, Set<BaseCmd>> map = this.getRestrictedChannels();
         // If no permission has been set
@@ -134,16 +135,19 @@ public class Settings extends SerializableEntity<SettingsBean> {
                 .collect(Collectors.toList());
     }
 
+    @Deprecated
     public Optional<String> getJoinMessage() {
         return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getJoinMessage);
     }
 
+    @Deprecated
     public Optional<String> getLeaveMessage() {
         return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getLeaveMessage);
     }
 
+    @Deprecated
     public Optional<Snowflake> getMessageChannelId() {
         return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getMessageChannelId)

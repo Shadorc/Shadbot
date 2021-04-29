@@ -8,6 +8,7 @@ import com.mongodb.reactivestreams.client.MongoDatabase;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
+import com.shadorc.shadbot.database.codec.AutoMessageCodec;
 import com.shadorc.shadbot.database.codec.IamCodec;
 import com.shadorc.shadbot.database.codec.LongCodec;
 import com.shadorc.shadbot.database.codec.SnowflakeCodec;
@@ -22,7 +23,7 @@ public class DatabaseManager {
 
     protected static final CodecRegistry CODEC_REGISTRY = CodecRegistries.fromRegistries(
             MongoClientSettings.getDefaultCodecRegistry(),
-            CodecRegistries.fromCodecs(new SnowflakeCodec(), new LongCodec(), new IamCodec()));
+            CodecRegistries.fromCodecs(new SnowflakeCodec(), new LongCodec(), new IamCodec(), new AutoMessageCodec()));
 
     private static final MongoClient CLIENT;
     private static final PremiumCollection PREMIUM_COLLECTION;

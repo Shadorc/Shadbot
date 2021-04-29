@@ -54,7 +54,7 @@ public class AutoRolesSetting extends BaseCmd {
                             .collect(Collectors.toSet());
                     final Set<Snowflake> autoRoleIds = context.getDbGuild().getSettings().getAutoRoleIds();
                     final String roleStr = FormatUtil.format(mentionedRoles,
-                            role -> "`%s`".formatted(role.getMention()), ", ");
+                            role -> "`@%s`".formatted(role.getName()), ", ");
 
                     switch (action) {
                         case ADD:

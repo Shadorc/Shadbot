@@ -103,14 +103,18 @@ public class SettingShow extends BaseCmd {
                             if (!restrictedChannels.isEmpty()) {
                                 embed.addField(context.localize("settings.restricted.channels"),
                                         FormatUtil.format(restrictedChannels.entrySet(),
-                                                entry -> FormatUtil.format(entry.getValue(), BaseCmd::getName, "\n - "),
+                                                entry -> "%s\n - %s".formatted(
+                                                        entry.getKey().getMention(),
+                                                        FormatUtil.format(entry.getValue(), BaseCmd::getName, "\n - ")),
                                                 "\n"),
                                         false);
                             }
                             if (!restrictedRoles.isEmpty()) {
                                 embed.addField(context.localize("settings.restricted.roles"),
                                         FormatUtil.format(restrictedRoles.entrySet(),
-                                                entry -> FormatUtil.format(entry.getValue(), BaseCmd::getName, "\n - "),
+                                                entry -> "%s\n - %s".formatted(
+                                                        entry.getKey().getMention(),
+                                                        FormatUtil.format(entry.getValue(), BaseCmd::getName, "\n - ")),
                                                 "\n"),
                                         false);
                             }
