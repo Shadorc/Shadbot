@@ -5,6 +5,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.ExceptionHandler;
+import com.shadorc.shadbot.utils.ReactorUtil;
 import discord4j.core.object.entity.Guild;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
@@ -16,9 +17,11 @@ public class CommandProcessor {
     public static Mono<?> processCommand(Context context) {
         return Mono.just(context.getAuthor())
                 // The role is allowed or the author is the guild's owner
-                .filterWhen(member -> BooleanUtils.or(
-                        member.getRoles().collectList().map(context.getDbGuild().getSettings()::hasAllowedRole),
-                        member.getGuild().map(Guild::getOwnerId).map(member.getId()::equals)))
+                .filterWhen(ReactorUtil.filterWhenSwitchIfFalse(
+                        member -> BooleanUtils.or(
+                                member.getRoles().collectList().map(context.getDbGuild().getSettings()::hasAllowedRole),
+                                member.getGuild().map(Guild::getOwnerId).map(member.getId()::equals)),
+                        context.reply(Emoji.ACCESS_DENIED, context.localize("role.not.allowed"))))
                 // The channel is allowed
                 .filter(__ -> context.getDbGuild().getSettings().isTextChannelAllowed(context.getChannelId()))
                 // Execute the command
@@ -53,16 +56,16 @@ public class CommandProcessor {
         return context.getPermissions()
                 .collectList()
                 // The author has the permission to execute this command
-                .filter(userPerms -> userPerms.contains(command.getPermission()))
-                .switchIfEmpty(context.reply(Emoji.ACCESS_DENIED, context.localize("command.missing.permission"))
-                        .then(Mono.empty()))
+                .filterWhen(ReactorUtil.filterSwitchIfFalse(
+                        userPerms -> userPerms.contains(command.getPermission()),
+                        context.reply(Emoji.ACCESS_DENIED, context.localize("command.missing.permission"))))
                 // The command is allowed in the guild
-                .filter(__ -> context.getDbGuild().getSettings().isCommandAllowed(command))
-                .switchIfEmpty(context.reply(Emoji.ACCESS_DENIED, context.localize("command.blacklisted"))
-                        .then(Mono.empty()))
+                .filterWhen(ReactorUtil.filterSwitchIfFalse(
+                        __ -> context.getDbGuild().getSettings().isCommandAllowed(command),
+                        context.reply(Emoji.ACCESS_DENIED, context.localize("command.blacklisted"))))
                 // The user is not rate limited
+                // TODO: Do not acknowledge if rate limited?
                 .filterWhen(__ -> BooleanUtils.not(CommandProcessor.isRateLimited(context, command)))
-                // TODO: Send message
                 .flatMap(__ -> command.execute(context))
                 .doOnSuccess(__ -> {
                     Telemetry.COMMAND_USAGE_COUNTER.labels(command.getName()).inc();
