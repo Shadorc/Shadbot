@@ -42,7 +42,7 @@ public class RolelistCmd extends BaseCmd {
                             .collect(Collectors.toList());
 
                     final Mono<List<String>> getUsernames = context.getGuild()
-                            .flatMapMany(Guild::getMembers)
+                            .flatMapMany(Guild::requestMembers)
                             .filter(member -> !Collections.disjoint(member.getRoleIds(), mentionedRoleIds))
                             .map(Member::getUsername)
                             .distinct()
@@ -52,9 +52,7 @@ public class RolelistCmd extends BaseCmd {
                 })
                 .map(TupleUtils.function((mentionedRoles, usernames) -> ShadbotUtil.getDefaultEmbed(
                         embed -> {
-                            final String rolesFormatted = FormatUtil.format(mentionedRoles, Role::getName, ", ");
-                            embed.setAuthor(context.localize("rolelist.title").formatted(rolesFormatted), null,
-                                    context.getAuthorAvatar());
+                            embed.setAuthor(context.localize("rolelist.title"), null, context.getAuthorAvatar());
 
                             if (usernames.isEmpty()) {
                                 if (mentionedRoles.size() == 1) {
@@ -64,6 +62,10 @@ public class RolelistCmd extends BaseCmd {
                                 }
                                 return;
                             }
+
+                            final String rolesFormatted = FormatUtil.format(mentionedRoles, Role::getMention, ", ");
+                            embed.setDescription(context.localize("rolelist.description")
+                                    .formatted(rolesFormatted));
 
                             FormatUtil.createColumns(usernames, 25)
                                     .forEach(field -> embed.addField(field.name(), field.value(), true));

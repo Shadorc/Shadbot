@@ -69,7 +69,7 @@ public class ManageCoinsCmd extends BaseCmd {
 
         return Mono.justOrEmpty(roleIdOpt)
                 .flatMapMany(roleId -> context.getGuild()
-                        .flatMapMany(Guild::getMembers)
+                        .flatMapMany(Guild::requestMembers)
                         .filter(member -> member.getRoleIds().contains(roleId)))
                 .mergeWith(user)
                 .flatMap(member -> Mono.zip(
