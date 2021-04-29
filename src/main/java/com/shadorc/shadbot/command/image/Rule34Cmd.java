@@ -66,7 +66,7 @@ public class Rule34Cmd extends BaseCmd {
                 .to(R34Response.class)
                 .map(R34Response::posts)
                 .flatMap(Mono::justOrEmpty)
-                .map(R34Posts::posts)
+                .map(R34Posts::post)
                 .flatMap(Mono::justOrEmpty)
                 .map(RandUtil::randValue);
     }

@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 public record R34Post(String tags,
-                      String fileUrl,
+                      @JsonProperty("file_url") String fileUrl,
                       String source,
                       int width,
                       int height,
