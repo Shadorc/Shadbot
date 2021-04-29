@@ -78,7 +78,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                 .getCollection()
                 .updateOne(
                         Filters.eq("_id", this.getId().asString()),
-                        Updates.unset(String.format("settings.%s", setting))))
+                        Updates.unset("settings.%s".formatted(setting))))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[DBGuild {}] Setting deletion: {}", this.getId().asString(), setting);
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();

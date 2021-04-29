@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 
 public class TranslateCmd extends BaseCmd {
 
+    // TODO
     private static final String DOC_URL = "https://cloud.google.com/translate/docs/languages";
 
     public TranslateCmd() {

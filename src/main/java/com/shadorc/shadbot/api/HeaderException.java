@@ -11,19 +11,11 @@ public class HeaderException extends IOException {
     private final String body;
 
     public HeaderException(HttpClientResponse response, String body) {
-        super(String.format("%s %s wrong header (%s) %s",
-                response.method().asciiName(), response.resourceUrl(),
+        super("%s %s wrong header (%s) %s"
+                .formatted(response.method().asciiName(), response.resourceUrl(),
                 response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE), body));
         this.response = response;
         this.body = body;
-    }
-
-    public HttpClientResponse getResponse() {
-        return this.response;
-    }
-
-    public String getBody() {
-        return this.body;
     }
 
 }

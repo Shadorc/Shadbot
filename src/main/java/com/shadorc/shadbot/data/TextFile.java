@@ -5,7 +5,10 @@ import com.shadorc.shadbot.utils.RandUtil;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
@@ -27,10 +30,6 @@ public class TextFile {
         } else {
             DEFAULT_LOGGER.error("Text file {} not found", file.getPath());
         }
-    }
-
-    public List<String> getLines() {
-        return Collections.unmodifiableList(this.lines);
     }
 
     public String getRandomLine() {

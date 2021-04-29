@@ -90,10 +90,6 @@ public class TranslateRequest {
         return this.destLang;
     }
 
-    public String getSourceLang() {
-        return this.sourceLang;
-    }
-
     public String getSourceText() {
         return this.sourceText;
     }

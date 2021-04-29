@@ -48,6 +48,7 @@ public class AudioLoadResultMessageInputs extends MessageInputs {
                 .flatMap(guildMusic -> {
                     final String content = event.getMessage().getContent();
 
+                    // TODO
                     if ("/cancel".equals(content)) {
                         guildMusic.setWaitingForChoice(false);
                         return guildMusic.getMessageChannel()

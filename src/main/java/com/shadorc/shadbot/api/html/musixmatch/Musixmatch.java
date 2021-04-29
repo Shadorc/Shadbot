@@ -15,8 +15,11 @@ public record Musixmatch(Document document, String url) {
     }
 
     public String getImageUrl() {
-        return String.format("https:%s",
-                this.document.getElementsByClass("banner-album-image").select("img").first().attr("src"));
+        return "https:%s"
+                .formatted(this.document.getElementsByClass("banner-album-image")
+                        .select("img")
+                        .first()
+                        .attr("src"));
     }
 
     public String getLyrics() {

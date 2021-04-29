@@ -82,10 +82,11 @@ public class DiscordUtil {
                     if (!canSendEmbed && hasEmbed) {
                         DEFAULT_LOGGER.info("{Channel ID: {}} Missing permission: {}",
                                 channel.getId().asLong(), FormatUtil.capitalizeEnum(Permission.EMBED_LINKS));
-                        return DiscordUtil.sendMessage(String.format(Emoji.ACCESS_DENIED + " I cannot send embed" +
-                                        " links.%nPlease, check my permissions "
-                                        + "and channel-specific ones to verify that **%s** is checked.",
-                                FormatUtil.capitalizeEnum(Permission.EMBED_LINKS)), channel);
+                        // TODO: i18n
+                        return DiscordUtil.sendMessage(Emoji.ACCESS_DENIED, "I cannot send embed" +
+                                " links.%nPlease, check my permissions "
+                                + "and channel-specific ones to verify that **%s** is checked."
+                                .formatted(FormatUtil.capitalizeEnum(Permission.EMBED_LINKS)), channel);
                     }
 
                     return channel.createMessage(spec
