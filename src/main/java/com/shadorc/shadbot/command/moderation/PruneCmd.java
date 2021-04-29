@@ -8,6 +8,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
+import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.Embed;
 import discord4j.core.object.Embed.Field;
@@ -18,25 +19,27 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.annotation.Nullable;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class PruneCmd extends BaseCmd {
 
-    private static final int MAX_MESSAGES = 100;
-    private static final int MESSAGES_OFFSET = 2;
+    private static final long MIN_MESSAGES = 1;
+    private static final long MAX_MESSAGES = 100;
+    private static final int MESSAGES_OFFSET = 1;
 
     public PruneCmd() {
         super(CommandCategory.ADMIN, CommandPermission.ADMIN, "prune", "Delete messages (include embeds)");
-        this.addOption(option -> option.name("authors")
-                .description("Authors of the messages, comma separated")
+        this.addOption(option -> option.name("author")
+                .description("Author of the messages")
                 .required(false)
                 .type(ApplicationCommandOptionType.USER.getValue()));
         this.addOption(option -> option.name("words")
-                .description("Words contained in the messages, comma separated")
+                .description("Words contained in the messages, separated by comma")
                 .required(false)
                 .type(ApplicationCommandOptionType.STRING.getValue()));
         this.addOption(option -> option.name("limit")
@@ -47,42 +50,53 @@ public class PruneCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final String[] authors = context.getOptionAsString("authors").orElse("").split(",");
-        final String[] words = context.getOptionAsString("words").orElse("").split(",");
-        final Optional<String> limitOpt = context.getOptionAsString("limit");
 
         return context.reply(Emoji.HOURGLASS, context.localize("prune.loading"))
                 .then(context.getChannel())
                 .cast(GuildMessageChannel.class)
                 .flatMap(channel -> DiscordUtil.requirePermissions(channel,
                         Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)
-                        .thenMany(Flux.defer(() -> {
-                            if (limitOpt.isPresent() && NumberUtil.toPositiveIntOrNull(limitOpt.orElseThrow()) == null) {
-                                return Flux.error(new CommandException(context.localize("prune.invalid.limit")
-                                        .formatted(limitOpt.orElseThrow())));
-                            }
+                        .then(PruneCmd.getLimit(context))
+                        .flatMapMany(limit -> Flux.defer(() -> {
+                            final List<String> words = StringUtil.split(
+                                    context.getOptionAsString("words").orElse(""), ",");
 
-                            // The count is incremented by MESSAGES_OFFSET to take into account the command
-                            int limit = limitOpt.map(NumberUtil::toPositiveIntOrNull).orElse(MAX_MESSAGES);
-                            limit = Math.min(MAX_MESSAGES, limit + MESSAGES_OFFSET);
+                            final Mono<User> getAuthor = context.getOptionAsUser("authors");
+                            final Mono<Optional<Snowflake>> getAuthorId = getAuthor
+                                    .map(User::getId)
+                                    .map(Optional::of)
+                                    .defaultIfEmpty(Optional.empty());
 
-                            final List<Snowflake> authorIds = Arrays.stream(authors).map(Snowflake::of).toList();
-
-                            return channel.getMessagesBefore(Snowflake.of(Instant.now()))
-                                    .take(limit)
-                                    .filter(message -> authors.length == 0
-                                            || message.getAuthor().map(User::getId).map(authorIds::contains).orElse(false))
-                                    .filter(message -> words.length == 0
-                                            || Arrays.stream(words).anyMatch(word -> message.getContent().contains(word))
-                                            || Arrays.stream(words).anyMatch(word -> PruneCmd.getEmbedContent(message).contains(word)));
+                            return getAuthorId.flatMapMany(authorOpt ->
+                                    channel.getMessagesBefore(Snowflake.of(Instant.now()))
+                                            .take(limit)
+                                            .filter(PruneCmd.filterMessage(authorOpt.orElse(null), words)));
                         }))
                         .map(Message::getId)
                         .collectList()
                         .flatMap(messageIds -> channel.bulkDelete(Flux.fromIterable(messageIds))
                                 .count()
-                                .map(messagesNotDeleted -> messageIds.size() - messagesNotDeleted - MESSAGES_OFFSET)))
+                                .map(messagesNotDeleted -> Math.max(0, messageIds.size() - messagesNotDeleted - MESSAGES_OFFSET))))
                 .flatMap(messagesDeleted -> context.reply(Emoji.CHECK_MARK, context.localize("prune.messages.deleted")
                         .formatted(messagesDeleted)));
+    }
+
+    private static Predicate<Message> filterMessage(@Nullable Snowflake authorId, List<String> words) {
+        return message -> (authorId == null || message.getUserData().id().asLong() == authorId.asLong())
+                && (words.isEmpty()
+                || words.stream().anyMatch(word -> message.getContent().contains(word) || PruneCmd.getEmbedContent(message).contains(word)));
+    }
+
+    private static Mono<Long> getLimit(Context context) {
+        final Optional<Long> limitOpt = context.getOptionAsLong("limit");
+        final long limit = limitOpt.orElse(MAX_MESSAGES);
+        if (!NumberUtil.isBetween(limit, MIN_MESSAGES, MAX_MESSAGES)) {
+            return Mono.error(new CommandException(context.localize("prune.limit.out.of.range")
+                    .formatted(MIN_MESSAGES, MAX_MESSAGES)));
+        }
+
+        // The count is incremented by MESSAGES_OFFSET to take into account the command
+        return Mono.just(Math.min(MAX_MESSAGES, limit + MESSAGES_OFFSET));
     }
 
     private static String getEmbedContent(Message message) {
