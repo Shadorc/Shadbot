@@ -15,9 +15,13 @@ public class InteractionCreateListener implements EventListener<InteractionCreat
 
     @Override
     public Mono<?> execute(InteractionCreateEvent event) {
+        // TODO: Interactions from DM
+        if (event.getInteraction().getGuildId().isEmpty()) {
+            return Mono.empty();
+        }
         return event.acknowledge()
-                // TODO: Interactions from DM
-                .then(DatabaseManager.getGuilds().getDBGuild(event.getInteraction().getGuildId().get()))
+                .then(Mono.justOrEmpty(event.getInteraction().getGuildId())
+                        .flatMap(guildId -> DatabaseManager.getGuilds().getDBGuild(guildId)))
                 .map(dbGuild -> new Context(event, dbGuild))
                 .flatMap(CommandProcessor::processCommand);
     }
