@@ -174,20 +174,22 @@ public class Shadbot {
     }
 
     public static Mono<Void> quit() {
-        DEFAULT_LOGGER.info("Shutdown request received");
+        return Mono.defer(() -> {
+            DEFAULT_LOGGER.info("Shutdown request received");
 
-        if (Shadbot.prometheusServer != null) {
-            Shadbot.prometheusServer.stop();
-        }
-        if (Shadbot.taskManager != null) {
-            Shadbot.taskManager.stop();
-        }
-        if (Shadbot.botListStats != null) {
-            Shadbot.botListStats.stop();
-        }
+            if (Shadbot.prometheusServer != null) {
+                Shadbot.prometheusServer.stop();
+            }
+            if (Shadbot.taskManager != null) {
+                Shadbot.taskManager.stop();
+            }
+            if (Shadbot.botListStats != null) {
+                Shadbot.botListStats.stop();
+            }
 
-        return Shadbot.gateway.logout()
-                .then(Mono.fromRunnable(DatabaseManager::close));
+            return Shadbot.gateway.logout()
+                    .then(Mono.fromRunnable(DatabaseManager::close));
+        });
     }
 
 }
