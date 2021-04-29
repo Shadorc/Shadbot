@@ -23,7 +23,7 @@ public class RepeatCmd extends BaseCmd {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
         return DiscordUtil.requireVoiceChannel(context)
-                .map(__ -> {
+                .flatMap(__ -> {
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
                     final TrackScheduler.RepeatMode oldMode = scheduler.getRepeatMode();
                     final TrackScheduler.RepeatMode newMode =
@@ -57,7 +57,7 @@ public class RepeatCmd extends BaseCmd {
                         strBuilder.append(context.localize("repeat.song.enabled"));
                     }
 
-                    return context.reply(Emoji.REPEAT, strBuilder.toString());
+                    return context.reply(strBuilder.toString());
                 });
     }
 
