@@ -28,8 +28,8 @@ public class IamCmd extends BaseCmd {
     public static final Unicode REACTION = ReactionEmoji.unicode("✅");
 
     public IamCmd() {
-        super(CommandCategory.ADMIN, CommandPermission.ADMIN, "iam",
-                "A message with a reaction that gives corresponding roles");
+        super(CommandCategory.MODERATION, CommandPermission.ADMIN,
+                "iam", "A message with a reaction that gives corresponding roles");
 
         this.addOption(option -> option.name("role1")
                 .description("The first role to grant")

@@ -1,10 +1,7 @@
 package com.shadorc.shadbot.command.setting;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.command.Setting;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.database.guilds.bean.setting.AutoMessageBean;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
@@ -26,7 +23,8 @@ public class AutoMessagesSetting extends BaseCmd {
     }
 
     public AutoMessagesSetting() {
-        super(CommandCategory.SETTING, "auto_messages", "Manage auto-message(s) on user join/leave.");
+        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+                "auto_messages", "Manage auto-message(s) on user join/leave.");
 
         this.addOption("action", "Whether to enable or disable automatic messages", true,
                 ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Action.class));

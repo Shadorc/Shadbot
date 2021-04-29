@@ -1,9 +1,6 @@
 package com.shadorc.shadbot.command.setting;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.command.Setting;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.database.guilds.entity.DBGuild;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
@@ -25,7 +22,8 @@ public class AllowedRolesSetting extends BaseCmd {
     }
 
     public AllowedRolesSetting() {
-        super(CommandCategory.ADMIN, "allowed_roles", "Manage role(s) that can interact with Shadbot.");
+        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+                "allowed_roles", "Manage role(s) that can interact with Shadbot.");
 
         this.addOption(option -> option.name("action")
                 .description("Whether to add or remove a role from the allowed ones")

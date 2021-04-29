@@ -14,11 +14,9 @@ public class VolumeSetting extends BaseCmd {
     private static final int MIN_VOLUME = 1;
     private static final int MAX_VOLUME = 75;
 
-    private final Setting setting;
-
     public VolumeSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN, "default_volume", "Manage music's default volume.");
-        this.setting = Setting.DEFAULT_VOLUME;
+        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+                "default_volume", "Manage music's default volume.");
 
         this.addOption(option -> option.name("volume")
                 .description("New default volume (min:%d / max:%d / default:%d)"
@@ -38,7 +36,7 @@ public class VolumeSetting extends BaseCmd {
 
         return DatabaseManager.getGuilds()
                 .getDBGuild(context.getGuildId())
-                .flatMap(dbGuild -> dbGuild.updateSetting(this.setting, volume))
+                .flatMap(dbGuild -> dbGuild.updateSetting(Setting.DEFAULT_VOLUME, volume))
                 .then(context.getChannel())
                 .flatMap(channel -> context.reply(Emoji.CHECK_MARK,
                         context.localize("setting.volume.message").formatted(volume)));

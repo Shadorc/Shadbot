@@ -33,7 +33,9 @@ public class PruneCmd extends BaseCmd {
     private static final int MESSAGES_OFFSET = 1;
 
     public PruneCmd() {
-        super(CommandCategory.ADMIN, CommandPermission.ADMIN, "prune", "Delete messages (include embeds)");
+        super(CommandCategory.MODERATION, CommandPermission.ADMIN,
+                "prune", "Delete messages (include embeds)");
+
         this.addOption(option -> option.name("author")
                 .description("Author of the messages")
                 .required(false)
@@ -50,7 +52,6 @@ public class PruneCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-
         return context.reply(Emoji.HOURGLASS, context.localize("prune.loading"))
                 .then(context.getChannel())
                 .cast(GuildMessageChannel.class)

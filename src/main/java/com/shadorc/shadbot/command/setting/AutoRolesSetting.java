@@ -1,10 +1,7 @@
 package com.shadorc.shadbot.command.setting;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.command.Setting;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.FormatUtil;
@@ -26,7 +23,9 @@ public class AutoRolesSetting extends BaseCmd {
     }
 
     public AutoRolesSetting() {
-        super(CommandCategory.SETTING, "auto_roles", "Manage auto assigned role(s).");
+        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+                "auto_roles", "Manage auto assigned role(s).");
+
         this.addOption("action", "Whether to add or remove a role from the auto ones", true,
                 ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Action.class));
         this.addOption("role1", "The first role", true,

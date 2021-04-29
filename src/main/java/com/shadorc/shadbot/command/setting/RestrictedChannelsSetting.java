@@ -27,7 +27,8 @@ public class RestrictedChannelsSetting extends BaseCmd {
     }
 
     public RestrictedChannelsSetting() {
-        super(CommandCategory.ADMIN, "restricted_channels", "Restrict commands to specific channels.");
+        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+                "restricted_channels", "Restrict commands to specific channels.");
 
         this.addOption(option -> option.name("action")
                 .description("Whether to add or remove a channel from the restricted ones")

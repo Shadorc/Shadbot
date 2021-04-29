@@ -31,7 +31,7 @@ public abstract class RemoveMembersCmd extends BaseCmd {
     private final String keyword;
 
     public RemoveMembersCmd(Permission permission, String keyword, String description) {
-        super(CommandCategory.ADMIN, CommandPermission.ADMIN, keyword, description);
+        super(CommandCategory.MODERATION, CommandPermission.ADMIN, keyword, description);
         this.permission = permission;
         this.keyword = keyword;
 

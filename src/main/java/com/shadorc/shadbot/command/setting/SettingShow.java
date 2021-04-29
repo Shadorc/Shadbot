@@ -23,7 +23,7 @@ import java.util.function.Function;
 public class SettingShow extends BaseCmd {
 
     public SettingShow() {
-        super(CommandCategory.ADMIN, CommandPermission.USER,
+        super(CommandCategory.SETTING, CommandPermission.USER,
                 "show", "Show current settings");
     }
 

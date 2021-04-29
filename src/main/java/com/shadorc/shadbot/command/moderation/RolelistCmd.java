@@ -23,6 +23,7 @@ public class RolelistCmd extends BaseCmd {
 
     public RolelistCmd() {
         super(CommandCategory.MODERATION, "rolelist", "Show a list of members with specific role(s)");
+
         this.addOption("role1", "The first role to have", true, ApplicationCommandOptionType.ROLE);
         this.addOption("role2", "The second role to have", false, ApplicationCommandOptionType.ROLE);
         this.addOption("role3", "The third role to have", false, ApplicationCommandOptionType.ROLE);

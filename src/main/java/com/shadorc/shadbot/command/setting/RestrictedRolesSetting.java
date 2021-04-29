@@ -27,7 +27,8 @@ public class RestrictedRolesSetting extends BaseCmd {
     }
 
     public RestrictedRolesSetting() {
-        super(CommandCategory.ADMIN, "restricted_roles", "Restrict commands to specific roles.");
+        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+                "restricted_roles", "Restrict commands to specific roles.");
 
         this.addOption(option -> option.name("action")
                 .description("Whether to add or remove a role from the restricted ones")
