@@ -26,6 +26,8 @@ import java.util.Set;
 
 public class ReactionListener {
 
+    private static final Duration TMP_MESSAGE_DURATION = Duration.ofSeconds(8);
+
     private enum Action {
         ADD, REMOVE
     }
@@ -71,14 +73,14 @@ public class ReactionListener {
                         selfMember.hasHigherRoles(Set.of(role.getId())))
                         .flatMap(TupleUtils.function((canManageRoles, hasHigherRoles) -> {
                             if (!canManageRoles) {
-                                return new TemporaryMessage(message.getClient(), message.getChannelId(), Duration.ofSeconds(15))
+                                return new TemporaryMessage(message.getClient(), message.getChannelId(), TMP_MESSAGE_DURATION)
                                         .send(Emoji.ACCESS_DENIED, I18nManager.localize(locale, "iam.exception.permission.lack")
                                                 .formatted(FormatUtil.capitalizeEnum(Permission.MANAGE_ROLES)))
                                         .thenReturn(false);
                             }
 
                             if (!hasHigherRoles) {
-                                return new TemporaryMessage(message.getClient(), message.getChannelId(), Duration.ofSeconds(15))
+                                return new TemporaryMessage(message.getClient(), message.getChannelId(), TMP_MESSAGE_DURATION)
                                         .send(Emoji.ACCESS_DENIED, I18nManager.localize(locale, "iam.exception.hierarchy")
                                                 .formatted(role.getName()))
                                         .thenReturn(false);
@@ -110,7 +112,7 @@ public class ReactionListener {
                 // It wasn't the bot that reacted
                 .filter(selfId -> !userId.equals(selfId))
                 // If the bot is not the author of the message, this is not an Iam message
-                .filter(selfId -> message.getAuthor().map(User::getId).map(selfId::equals).orElse(false))
+                .filter(selfId -> message.getUserData().id().asLong() == selfId.asLong())
                 .flatMap(__ -> message.getGuild().flatMap(guild -> guild.getMemberById(userId)))
                 .flatMap(member -> ReactionListener.execute(message, member, action));
     }

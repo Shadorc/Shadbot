@@ -24,6 +24,8 @@ import java.util.Optional;
 
 public class ManageCoinsCmd extends BaseCmd {
 
+    private static final int MIN_COINS = 1;
+
     private enum Action {
         ADD, REMOVE, RESET
     }
@@ -56,17 +58,17 @@ public class ManageCoinsCmd extends BaseCmd {
         final Mono<Member> user = context.getOptionAsMember("user");
         final Optional<Snowflake> roleIdOpt = context.getOptionAsSnowflake("role");
 
-        if (action != Action.RESET && coinsOpt.isEmpty()) {
-            return Mono.error(new CommandException(context.localize("managecoins.exception.missing.coins")));
-        }
-
-        if (action == Action.RESET && !NumberUtil.isBetween(coinsOpt.orElseThrow(), 0, Config.MAX_COINS)) {
-            return Mono.error(new CommandException(context.localize("managecoins.exception.coins.out.of.range")
-                    .formatted(context.localize(Config.MAX_COINS))));
+        if (action != Action.RESET) {
+            if (coinsOpt.isEmpty()) {
+                return Mono.error(new CommandException(context.localize("managecoins.exception.missing.coins")));
+            }
+            if (!NumberUtil.isBetween(coinsOpt.orElseThrow(), MIN_COINS, Config.MAX_COINS)) {
+                return Mono.error(new CommandException(context.localize("managecoins.exception.coins.out.of.range")
+                        .formatted(MIN_COINS, context.localize(Config.MAX_COINS))));
+            }
         }
 
         // TODO: If the guild is very large, isn't this gonna break everything?
-
         return Mono.justOrEmpty(roleIdOpt)
                 .flatMapMany(roleId -> context.getGuild()
                         .flatMapMany(Guild::requestMembers)
