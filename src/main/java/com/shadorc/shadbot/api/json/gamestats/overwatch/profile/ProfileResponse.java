@@ -1,5 +1,7 @@
 package com.shadorc.shadbot.api.json.gamestats.overwatch.profile;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -7,7 +9,7 @@ public record ProfileResponse(Optional<String> message,
                               String username,
                               int level,
                               String portrait,
-                              boolean isPrivate,
+                              @JsonProperty("private") boolean isPrivate,
                               Games games,
                               Map<String, String> playtime,
                               Competitive competitive) {
