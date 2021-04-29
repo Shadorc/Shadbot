@@ -30,7 +30,7 @@ public class CommandProcessor {
         if (command == null) {
             DEFAULT_LOGGER.error("{Guild ID: {}} Command {} not found",
                     context.getGuildId().asString(), context.getFullCommandName());
-            return Mono.empty();
+            return Mono.error(new RuntimeException("Command not found"));
         }
 
         // The command has been disabled
@@ -41,12 +41,12 @@ public class CommandProcessor {
 
         // This category is not allowed in this channel
         if (!context.getDbGuild().getSettings().isCommandAllowedInChannel(command, context.getChannelId())) {
-            return Mono.empty();
+            return context.reply(Emoji.ACCESS_DENIED, context.localize("command.channel.not.allowed"));
         }
 
         // This command is not allowed to this role
         if (!context.getDbGuild().getSettings().isCommandAllowedToRole(command, context.getAuthor().getRoleIds())) {
-            return Mono.empty();
+            return context.reply(Emoji.ACCESS_DENIED, context.localize("command.role.not.allowed"));
         }
 
         return context.getPermissions()
@@ -57,6 +57,8 @@ public class CommandProcessor {
                         .then(Mono.empty()))
                 // The command is allowed in the guild
                 .filter(__ -> context.getDbGuild().getSettings().isCommandAllowed(command))
+                .switchIfEmpty(context.reply(Emoji.ACCESS_DENIED, context.localize("command.blacklisted"))
+                        .then(Mono.empty()))
                 // The user is not rate limited
                 .filterWhen(__ -> BooleanUtils.not(CommandProcessor.isRateLimited(context, command)))
                 .flatMap(__ -> command.execute(context))
