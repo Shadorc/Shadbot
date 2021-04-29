@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.database.codec;
 
 import com.shadorc.shadbot.database.guilds.bean.setting.AutoMessageBean;
-import com.shadorc.shadbot.database.guilds.bean.setting.IamBean;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;

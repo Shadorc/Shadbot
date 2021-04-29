@@ -34,7 +34,7 @@ public class SkipCmd extends BaseCmd {
         final Optional<Long> indexOpt = context.getOptionAsLong("index");
         if (indexOpt.isPresent()) {
             final int playlistSize = guildMusic.getTrackScheduler().getPlaylist().size();
-            if(playlistSize == 0) {
+            if (playlistSize == 0) {
                 return Mono.error(new CommandException(context.localize("skip.exception.no.playlist")));
             }
 

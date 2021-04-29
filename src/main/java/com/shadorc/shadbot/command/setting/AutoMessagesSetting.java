@@ -6,7 +6,6 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.command.Setting;
 import com.shadorc.shadbot.database.guilds.bean.setting.AutoMessageBean;
-import com.shadorc.shadbot.database.guilds.entity.setting.AutoMessage;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.core.object.entity.Message;

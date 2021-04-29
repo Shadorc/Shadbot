@@ -13,7 +13,7 @@ public class HeaderException extends IOException {
     public HeaderException(HttpClientResponse response, String body) {
         super("%s %s wrong header (%s) %s"
                 .formatted(response.method().asciiName(), response.resourceUrl(),
-                response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE), body));
+                        response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE), body));
         this.response = response;
         this.body = body;
     }
