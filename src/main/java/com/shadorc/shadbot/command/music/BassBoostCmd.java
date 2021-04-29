@@ -15,14 +15,15 @@ import reactor.core.publisher.Mono;
 
 public class BassBoostCmd extends BaseCmd {
 
-    private static final int VALUE_MIN = 0;
-    private static final int VALUE_MAX = 200;
+    private static final int BASSBOOST_MIN = 0;
+    private static final int BASSBOOST_MAX = 200;
+    private int percentage;
 
     public BassBoostCmd() {
         super(CommandCategory.MUSIC, "bass_boost", "Drop the bass");
         this.addOption(option -> option.name("percentage")
-                .description("Bass boost in percent, must be between **%d%%** and **%d%%**."
-                        .formatted(VALUE_MIN, VALUE_MAX))
+                .description("Bass boost in percent, must be between %d%% and %d%%."
+                        .formatted(BASSBOOST_MIN, BASSBOOST_MAX))
                 .required(true)
                 .type(ApplicationCommandOptionType.INTEGER.getValue()));
     }
@@ -35,21 +36,22 @@ public class BassBoostCmd extends BaseCmd {
                 .switchIfEmpty(Mono.error(new CommandException(context.localize("bassboost.unlock")
                         .formatted(Config.PATREON_URL, Achievement.VOTER.getTitle(context)))))
                 .flatMap(__ -> {
-                    final int percentage = context.getOptionAsLong("percentage").orElseThrow().intValue();
-                    if (!NumberUtil.isBetween(percentage, VALUE_MIN, VALUE_MAX)) {
+                    final long percentage = context.getOptionAsLong("percentage").orElseThrow();
+                    if (!NumberUtil.isBetween(percentage, BASSBOOST_MIN, BASSBOOST_MAX)) {
                         return Mono.error(new CommandException(context.localize("bassboost.invalid")
-                                .formatted(VALUE_MIN, VALUE_MAX)));
+                                .formatted(BASSBOOST_MIN, BASSBOOST_MAX)));
                     }
 
                     context.requireGuildMusic()
                             .getTrackScheduler()
-                            .bassBoost(percentage);
+                            .bassBoost((int) percentage);
 
                     if (percentage == 0) {
                         return context.reply(Emoji.CHECK_MARK, context.localize("bassboost.disabled"));
                     }
 
-                    return context.reply(Emoji.CHECK_MARK, context.localize("bassboost.message").formatted(percentage));
+                    return context.reply(Emoji.CHECK_MARK, context.localize("bassboost.message")
+                            .formatted(percentage));
                 });
     }
 

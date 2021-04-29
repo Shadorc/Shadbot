@@ -38,7 +38,7 @@ public class SkipCmd extends BaseCmd {
                 return Mono.error(new CommandException(context.localize("skip.exception.no.playlist")));
             }
 
-            final int index = indexOpt.orElseThrow().intValue();
+            final long index = indexOpt.orElseThrow();
             if (!NumberUtil.isBetween(index, 1, playlistSize)) {
                 return Mono.error(new CommandException(context.localize("skip.out.of.index")
                         .formatted(playlistSize)));
@@ -46,7 +46,7 @@ public class SkipCmd extends BaseCmd {
 
             return sendMessage
                     .doOnNext(__ -> {
-                        guildMusic.getTrackScheduler().skipTo(index);
+                        guildMusic.getTrackScheduler().skipTo((int) index);
                         // If the music has been started correctly, we resume it in case the previous music was paused
                         guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
                     });

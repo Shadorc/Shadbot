@@ -60,7 +60,7 @@ public class LotteryCmd extends BaseCmd {
                         return Mono.error(new CommandException(context.localize("not.enough.coins")));
                     }
 
-                    final int number = numberOpt.orElseThrow().intValue();
+                    final long number = numberOpt.orElseThrow();
                     if (!NumberUtil.isBetween(number, Constants.MIN_NUM, Constants.MAX_NUM)) {
                         return Mono.error(new CommandException(
                                 context.localize("lottery.invalid.number")
@@ -68,7 +68,7 @@ public class LotteryCmd extends BaseCmd {
                     }
 
                     return dbMember.addCoins(-Constants.PAID_COST)
-                            .thenReturn(new LotteryGambler(context.getGuildId(), context.getAuthorId(), number))
+                            .thenReturn(new LotteryGambler(context.getGuildId(), context.getAuthorId(), (int) number))
                             .flatMap(LotteryGambler::insert)
                             .then(context.reply(Emoji.TICKET, context.localize("lottery.message")
                                     .formatted(number, FormatUtil.formatDurationWords(context.getLocale(), LotteryCmd.getDelay()))));
