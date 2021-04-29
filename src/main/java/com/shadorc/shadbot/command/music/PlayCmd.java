@@ -101,8 +101,8 @@ public class PlayCmd extends BaseCmd {
             if (identifier.startsWith(AudioLoadResultListener.YT_SEARCH) || identifier.startsWith(AudioLoadResultListener.SC_SEARCH)) {
                 return guildMusic.getDj()
                         .map(User::getUsername)
-                        .flatMap(username -> DiscordUtil.sendMessage(Emoji.HOURGLASS,
-                                context.localize("play.other.selecting").formatted(username), channel));
+                        .flatMap(username -> context.editReply(Emoji.HOURGLASS,
+                                context.localize("play.other.selecting").formatted(username)));
             }
         }
 
@@ -113,11 +113,12 @@ public class PlayCmd extends BaseCmd {
                     guildMusic.setMessageChannelId(context.getChannelId());
 
                     final AudioLoadResultListener resultListener = new AudioLoadResultListener(
-                            context.getLocale(), context.getGuildId(), context.getAuthorId(), identifier, playFirst);
+                            context, context.getLocale(), context.getGuildId(), context.getAuthorId(), identifier, playFirst);
                     guildMusic.addAudioLoadResultListener(resultListener);
                 })
-                .switchIfEmpty(DiscordUtil.sendMessage(Emoji.LOCK, context.localize("playlist.limit.reached")
-                        .formatted(Config.PLAYLIST_SIZE, Config.PATREON_URL), channel)
+                .switchIfEmpty(context.editReply(Emoji.LOCK,
+                        context.localize("playlist.limit.reached")
+                                .formatted(Config.PLAYLIST_SIZE, Config.PATREON_URL))
                         .then(Mono.empty()));
     }
 

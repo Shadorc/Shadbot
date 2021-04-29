@@ -249,15 +249,20 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     @Override
-    public Mono<Message> editReply(Emoji emoji, String message) {
+    public Mono<Message> editReply(String message) {
         return Mono.fromCallable(this.replyId::get)
                 .filter(messageId -> messageId > 0)
                 .flatMap(messageId -> this.event.getInteractionResponse()
                         .editFollowupMessage(messageId, ImmutableWebhookMessageEditRequest.builder()
-                                .content("%s %s".formatted(emoji, message))
+                                .content(message)
                                 .build(), true))
                 .map(data -> new Message(this.getClient(), data))
-                .switchIfEmpty(this.reply(emoji, message));
+                .switchIfEmpty(this.reply(message));
+    }
+
+    @Override
+    public Mono<Message> editReply(Emoji emoji, String message) {
+        return this.editReply("%s %s".formatted(emoji, message));
     }
 
     @Override

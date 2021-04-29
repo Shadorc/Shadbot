@@ -15,6 +15,8 @@ public interface InteractionContext {
 
     Mono<Message> reply(Consumer<EmbedCreateSpec> embed);
 
+    Mono<Message> editReply(String message);
+
     Mono<Message> editReply(Emoji emoji, String message);
 
     Mono<Message> editReply(Consumer<EmbedCreateSpec> embed);
