@@ -67,15 +67,31 @@ public class CommandManager {
         return Collections.unmodifiableMap(map);
     }
 
-    public static Mono<Long> register(ApplicationService applicationService, long applicationId) {
-        return Flux.fromIterable(COMMANDS_MAP.values())
+    public static Mono<Void> register(ApplicationService applicationService, long applicationId) {
+        final Mono<Long> registerGuildCommands = Flux.fromIterable(COMMANDS_MAP.values())
+                .filter(cmd -> cmd.getCategory() == CommandCategory.OWNER)
                 .map(BaseCmd::asRequest)
                 .collectList()
                 .flatMapMany(requests -> applicationService
                         .bulkOverwriteGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, requests))
                 .count()
-                .doOnNext(cmdCount -> DEFAULT_LOGGER.info("{} commands registered", cmdCount))
+                .doOnNext(cmdCount -> DEFAULT_LOGGER.info("Guild (ID: {}) commands registered",
+                        cmdCount, Config.OWNER_GUILD_ID))
                 .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err)));
+
+        final Mono<Long> registerGlobalCommands = Flux.fromIterable(COMMANDS_MAP.values())
+                .filter(cmd -> cmd.getCategory() != CommandCategory.OWNER)
+                .map(BaseCmd::asRequest)
+                .collectList()
+                .flatMapMany(requests -> /* TODO applicationService.bulkOverwriteGlobalApplicationCommand(applicationId, requests) */
+                        applicationService
+                                .bulkOverwriteGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, requests))
+                .count()
+                .doOnNext(cmdCount -> DEFAULT_LOGGER.info("{} global commands registered", cmdCount))
+                .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err)));
+
+        return registerGuildCommands
+                .and(registerGlobalCommands);
     }
 
     public static Map<String, BaseCmd> getCommands() {
