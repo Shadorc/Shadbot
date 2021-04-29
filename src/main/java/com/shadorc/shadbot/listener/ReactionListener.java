@@ -1,12 +1,13 @@
-/*
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
-import com.shadorc.shadbot.db.guilds.entity.Settings;
+import com.shadorc.shadbot.command.moderation.IamCmd;
+import com.shadorc.shadbot.core.i18n.I18nManager;
+import com.shadorc.shadbot.database.DatabaseManager;
+import com.shadorc.shadbot.database.guilds.entity.DBGuild;
+import com.shadorc.shadbot.database.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.message.TemporaryMessage;
-import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
@@ -61,26 +62,25 @@ public class ReactionListener {
 
     private static Mono<Boolean> canManageRole(Message message, Snowflake roleId) {
         return message.getGuild()
-                .flatMap(guild -> Mono.zip(guild.getMemberById(message.getClient().getSelfId()), guild.getRoleById(roleId)))
-                .flatMap(TupleUtils.function((selfMember, role) -> Mono.zip(
+                .flatMap(guild -> Mono.zip(
+                        guild.getSelfMember(),
+                        guild.getRoleById(roleId),
+                        DatabaseManager.getGuilds().getDBGuild(guild.getId()).map(DBGuild::getLocale)))
+                .flatMap(TupleUtils.function((selfMember, role, locale) -> Mono.zip(
                         selfMember.getBasePermissions().map(set -> set.contains(Permission.MANAGE_ROLES)),
                         selfMember.hasHigherRoles(Set.of(role.getId())))
                         .flatMap(TupleUtils.function((canManageRoles, hasHigherRoles) -> {
                             if (!canManageRoles) {
                                 return new TemporaryMessage(message.getClient(), message.getChannelId(), Duration.ofSeconds(15))
-                                        .send(String.format(Emoji.ACCESS_DENIED
-                                                        + " I can't add/remove a role due to a lack of permission."
-                                                        + "%nPlease, check my permissions to verify that %s is checked.",
-                                                String.format("**%s**", FormatUtils.capitalizeEnum(Permission.MANAGE_ROLES))))
+                                        .send(Emoji.ACCESS_DENIED, I18nManager.localize(locale, "iam.exception.permission.lack")
+                                                .formatted(FormatUtil.capitalizeEnum(Permission.MANAGE_ROLES)))
                                         .thenReturn(false);
                             }
 
                             if (!hasHigherRoles) {
                                 return new TemporaryMessage(message.getClient(), message.getChannelId(), Duration.ofSeconds(15))
-                                        .send(String.format(Emoji.ACCESS_DENIED +
-                                                        " I can't add/remove role `%s` because I'm lower or " +
-                                                        "at the same level in the role hierarchy than this role.",
-                                                role.getName()))
+                                        .send(Emoji.ACCESS_DENIED, I18nManager.localize(locale, "iam.exception.hierarchy")
+                                                .formatted(role.getName()))
                                         .thenReturn(false);
                             }
 
@@ -116,4 +116,3 @@ public class ReactionListener {
     }
 
 }
-*/

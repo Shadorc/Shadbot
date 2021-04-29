@@ -61,6 +61,7 @@ public class CommandProcessor {
                         .then(Mono.empty()))
                 // The user is not rate limited
                 .filterWhen(__ -> BooleanUtils.not(CommandProcessor.isRateLimited(context, command)))
+                // TODO: Send message
                 .flatMap(__ -> command.execute(context))
                 .doOnSuccess(__ -> {
                     Telemetry.COMMAND_USAGE_COUNTER.labels(command.getName()).inc();

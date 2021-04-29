@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.object.message;
 
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
@@ -33,10 +34,10 @@ public class TemporaryMessage {
      * @param content The message's content.
      * @return A {@link Mono} representing the message sent.
      */
-    public Mono<Void> send(String content) {
+    public Mono<Void> send(Emoji emoji, String content) {
         return this.gateway.getChannelById(this.channelId)
                 .cast(MessageChannel.class)
-                .flatMap(channel -> DiscordUtil.sendMessage(content, channel))
+                .flatMap(channel -> DiscordUtil.sendMessage(emoji, content, channel))
                 .flatMap(message -> Mono.delay(this.duration, Schedulers.boundedElastic())
                         .then(message.delete()));
     }

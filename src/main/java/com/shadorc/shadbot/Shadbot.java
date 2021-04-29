@@ -42,7 +42,6 @@ public class Shadbot {
 
     private static final Duration EVENT_TIMEOUT = Duration.ofHours(12);
     private static final AtomicLong OWNER_ID = new AtomicLong();
-    private static final AtomicLong APPLICATION_ID = new AtomicLong();
 
     private static GatewayDiscordClient gateway;
     private static TaskManager taskManager;
@@ -91,8 +90,8 @@ public class Shadbot {
         final ApplicationInfoData applicationInfo = client.getApplicationInfo().block();
         Objects.requireNonNull(applicationInfo);
         Shadbot.OWNER_ID.set(Snowflake.asLong(applicationInfo.owner().id()));
-        Shadbot.APPLICATION_ID.set(Snowflake.asLong(applicationInfo.id()));
-        DEFAULT_LOGGER.info("Owner ID: {} | Application ID: {}", Shadbot.OWNER_ID.get(), Shadbot.APPLICATION_ID.get());
+        final long applicationId = Snowflake.asLong(applicationInfo.id());
+        DEFAULT_LOGGER.info("Owner ID: {} | Application ID: {}", Shadbot.OWNER_ID.get(), applicationId);
 
         DEFAULT_LOGGER.info("Registering commands");
         //CommandManager.register(client.getApplicationService(), Shadbot.APPLICATION_ID.get()).block();
@@ -143,8 +142,8 @@ public class Shadbot {
                     Shadbot.register(gateway, new MemberJoinListener());
                     Shadbot.register(gateway, new MemberLeaveListener());
                     Shadbot.register(gateway, new VoiceStateUpdateListener());
-//                    Shadbot.register(gateway, new ReactionListener.ReactionAddListener());
-//                    Shadbot.register(gateway, new ReactionListener.ReactionRemoveListener());
+                    Shadbot.register(gateway, new ReactionListener.ReactionAddListener());
+                    Shadbot.register(gateway, new ReactionListener.ReactionRemoveListener());
                     Shadbot.register(gateway, new InteractionCreateListener());
 
                     DEFAULT_LOGGER.info("Shadbot is ready");
@@ -171,13 +170,6 @@ public class Shadbot {
      */
     public static Snowflake getOwnerId() {
         return Snowflake.of(Shadbot.OWNER_ID.get());
-    }
-
-    /**
-     * @return The ID of the application.
-     */
-    public static Snowflake getApplicationId() {
-        return Snowflake.of(Shadbot.APPLICATION_ID.get());
     }
 
     public static Mono<Void> quit() {
