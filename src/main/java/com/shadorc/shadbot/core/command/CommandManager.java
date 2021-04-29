@@ -1,8 +1,12 @@
 package com.shadorc.shadbot.core.command;
 
-import com.shadorc.shadbot.command.currency.CurrencyGroup;
+import com.shadorc.shadbot.command.currency.CoinsCmd;
+import com.shadorc.shadbot.command.currency.LeaderboardCmd;
+import com.shadorc.shadbot.command.currency.TransferCoinsCmd;
 import com.shadorc.shadbot.command.donator.DonatorGroup;
-import com.shadorc.shadbot.command.fun.FunGroup;
+import com.shadorc.shadbot.command.fun.ChatCmd;
+import com.shadorc.shadbot.command.fun.JokeCmd;
+import com.shadorc.shadbot.command.fun.ThisDayCmd;
 import com.shadorc.shadbot.command.game.GameGroup;
 import com.shadorc.shadbot.command.gamestats.GameStatsGroup;
 import com.shadorc.shadbot.command.image.ImageGroup;
@@ -12,7 +16,9 @@ import com.shadorc.shadbot.command.music.*;
 import com.shadorc.shadbot.command.owner.OwnerGroup;
 import com.shadorc.shadbot.command.setting.SettingGroup;
 import com.shadorc.shadbot.command.standalone.*;
-import com.shadorc.shadbot.command.util.UtilGroup;
+import com.shadorc.shadbot.command.util.*;
+import com.shadorc.shadbot.command.util.poll.PollCmd;
+import com.shadorc.shadbot.command.util.translate.TranslateCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import discord4j.rest.service.ApplicationService;
@@ -32,13 +38,21 @@ public class CommandManager {
     static {
         COMMANDS_MAP = CommandManager.initialize(
                 new InfoGroup(), new ImageGroup(), new ModerationGroup(), new OwnerGroup(),
-                new UtilGroup(), new FunGroup(), new GameStatsGroup(), new CurrencyGroup(), new SettingGroup(),
-                new DonatorGroup(), new GameGroup(), new PingCmd(), new HelpCmd(),
-                new AchievementsCmd(), new FeedbackCmd(), new InviteCmd(),
+                new GameStatsGroup(), new SettingGroup(),
+                new DonatorGroup(), new GameGroup(),
+                // Standalone
+                new PingCmd(), new HelpCmd(), new AchievementsCmd(), new FeedbackCmd(), new InviteCmd(),
                 // Music
                 new BackwardCmd(), new BassBoostCmd(), new ClearCmd(), new ForwardCmd(), new NameCmd(),
                 new PauseCmd(), new PlaylistCmd(), new RepeatCmd(), new ShuffleCmd(), new SkipCmd(),
-                new StopCmd(), new VolumeCmd(), new PlayCmd());
+                new StopCmd(), new VolumeCmd(), new PlayCmd(),
+                // Currency
+                new CoinsCmd(), new LeaderboardCmd(), new TransferCoinsCmd(),
+                // Fun
+                new ChatCmd(), new JokeCmd(), new ThisDayCmd(),
+                // Util
+                new MathCmd(), new LyricsCmd(), new UrbanCmd(), new WeatherCmd(), new WikipediaCmd(),
+                new TranslateCmd(), new PollCmd());
     }
 
     private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {
