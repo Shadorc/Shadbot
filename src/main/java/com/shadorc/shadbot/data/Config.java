@@ -31,6 +31,7 @@ public class Config {
 
     public static final Locale DEFAULT_LOCALE = Locale.forLanguageTag(PROPERTIES.getProperty("default.locale"));
     public static final int DEFAULT_VOLUME = Integer.parseInt(PROPERTIES.getProperty("default.volume"));
+    public static final int VOLUME_MIN = Integer.parseInt(PROPERTIES.getProperty("volume.min"));
     public static final int VOLUME_MAX = Integer.parseInt(PROPERTIES.getProperty("volume.max"));
     public static final int PLAYLIST_SIZE = Integer.parseInt(PROPERTIES.getProperty("playlist.size"));
     public static final int MUSIC_SEARCHES = Integer.parseInt(PROPERTIES.getProperty("music.searches"));

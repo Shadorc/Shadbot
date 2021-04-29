@@ -18,9 +18,10 @@ import java.util.Optional;
 public class VolumeCmd extends BaseCmd {
 
     public VolumeCmd() {
-        super(CommandCategory.MUSIC, "volume", "Show or change current volume level");
-        this.addOption(option -> option.name("volume")
-                .description("Volume to set, must be between 1%% and %d%%".formatted(Config.VOLUME_MAX))
+        super(CommandCategory.MUSIC, "volume", "Show or set current volume level");
+        this.addOption(option -> option.name("percentage")
+                .description("Volume to set, must be between %d%% and %d%%"
+                        .formatted(Config.VOLUME_MIN, Config.VOLUME_MAX))
                 .required(false)
                 .type(ApplicationCommandOptionType.INTEGER.getValue()));
     }
@@ -31,25 +32,20 @@ public class VolumeCmd extends BaseCmd {
 
         return DiscordUtil.requireVoiceChannel(context)
                 .flatMap(__ -> {
-                    final Optional<String> option = context.getOptionAsString("volume");
+                    final Optional<Long> percentageOpt = context.getOptionAsLong("percentage");
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
-                    if (option.isEmpty()) {
+                    if (percentageOpt.isEmpty()) {
                         return context.reply(Emoji.SOUND, context.localize("volume.current")
                                 .formatted(scheduler.getAudioPlayer().getVolume()));
                     }
 
-                    final Integer volume = NumberUtil.toPositiveIntOrNull(option.orElseThrow());
-                    if (volume == null) {
-                        return Mono.error(new CommandException(context.localize("volume.invalid")
-                                .formatted(volume)));
+                    final long percentage = percentageOpt.orElseThrow();
+                    if (!NumberUtil.isBetween(percentage, Config.VOLUME_MIN, Config.VOLUME_MAX)) {
+                        return Mono.error(new CommandException(context.localize("volume.out.of.range")
+                                .formatted(Config.VOLUME_MIN, Config.VOLUME_MAX)));
                     }
 
-                    if (volume > Config.VOLUME_MAX) {
-                        return Mono.error(new CommandException(context.localize("volume.max.reached")
-                                .formatted(Config.VOLUME_MAX)));
-                    }
-
-                    scheduler.setVolume(volume);
+                    scheduler.setVolume((int) percentage);
                     return context.reply(Emoji.SOUND, context.localize("volume.message")
                             .formatted(scheduler.getAudioPlayer().getVolume()));
                 });
