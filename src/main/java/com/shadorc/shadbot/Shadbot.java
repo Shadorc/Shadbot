@@ -113,17 +113,6 @@ public class Shadbot {
                 .withGateway(gateway -> {
                     Shadbot.gateway = gateway;
 
-                    /*gateway.getRestClient()
-                            .getApplicationService()
-                            .getGuildApplicationCommands(applicationId, Config.OWNER_GUILD_ID)
-                            .doOnNext(command -> DEFAULT_LOGGER.info("Deleting {}", command.name()))
-                            .flatMap(commandData -> gateway.getRestClient()
-                                    .getApplicationService()
-                                    .deleteGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, Long.parseLong(commandData.id()))
-                                    .doOnTerminate(() -> DEFAULT_LOGGER.info("Deleted: {}", commandData.name())))
-                            .doOnTerminate(() -> DEFAULT_LOGGER.info("Done!"))
-                            .subscribe();*/
-
                     Shadbot.taskManager = new TaskManager();
                     Shadbot.taskManager.scheduleLottery(gateway);
                     Shadbot.taskManager.schedulePeriodicStats(gateway);
