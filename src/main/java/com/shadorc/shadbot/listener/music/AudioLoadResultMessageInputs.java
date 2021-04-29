@@ -1,13 +1,15 @@
 package com.shadorc.shadbot.listener.music;
 
+import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.database.DatabaseManager;
+import com.shadorc.shadbot.database.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.inputs.MessageInputs;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
-import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -48,21 +50,19 @@ public class AudioLoadResultMessageInputs extends MessageInputs {
                 .flatMap(guildMusic -> {
                     final String content = event.getMessage().getContent();
 
-                    // TODO
-                    if ("/cancel".equals(content)) {
+                    if ("!cancel".equals(content)) {
                         guildMusic.setWaitingForChoice(false);
-                        return guildMusic.getMessageChannel()
-                                .flatMap(channel -> DiscordUtil.sendMessage(
-                                        Emoji.CHECK_MARK, "**%s** cancelled his choice."
-                                                .formatted(event.getMember().orElseThrow().getUsername()), channel))
+                        return DatabaseManager.getGuilds().getDBGuild(guildMusic.getGuildId())
+                                .map(DBGuild::getLocale)
+                                .flatMap(locale -> guildMusic.getMessageChannel()
+                                        .flatMap(channel -> DiscordUtil.sendMessage(
+                                                Emoji.CHECK_MARK, I18nManager.localize(locale, "music.choice.cancelled")
+                                                        .formatted(event.getMember().orElseThrow().getUsername()), channel)))
                                 .then(Mono.empty());
                     }
 
-                    // Remove prefix and command name from message content
-                    final String contentCleaned = StringUtil.remove(content, "/play");
-
                     final Set<Integer> choices = new HashSet<>();
-                    for (final String choice : contentCleaned.split(",")) {
+                    for (final String choice : content.split(",")) {
                         // If the choice is not valid, ignore the message
                         final Integer num = NumberUtil.toIntBetweenOrNull(choice.trim(), 1,
                                 Math.min(Config.MUSIC_SEARCHES, this.listener.getResultTracks().size()));
