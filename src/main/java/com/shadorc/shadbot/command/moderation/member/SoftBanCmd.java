@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.moderation;
+package com.shadorc.shadbot.command.moderation.member;
 
 import discord4j.core.object.entity.Member;
 import discord4j.rest.util.Permission;

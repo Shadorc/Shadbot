@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.command.moderation;
+package com.shadorc.shadbot.command.moderation.member;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.command.MissingPermissionException;

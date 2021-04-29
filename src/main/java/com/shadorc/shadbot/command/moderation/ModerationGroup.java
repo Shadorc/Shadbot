@@ -1,5 +1,8 @@
 package com.shadorc.shadbot.command.moderation;
 
+import com.shadorc.shadbot.command.moderation.member.BanCmd;
+import com.shadorc.shadbot.command.moderation.member.KickCmd;
+import com.shadorc.shadbot.command.moderation.member.SoftBanCmd;
 import com.shadorc.shadbot.core.command.BaseCmdGroup;
 import com.shadorc.shadbot.core.command.CommandCategory;
 
