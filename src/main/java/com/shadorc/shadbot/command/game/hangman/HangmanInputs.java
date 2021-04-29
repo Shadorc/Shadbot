@@ -1,12 +1,17 @@
 package com.shadorc.shadbot.command.game.hangman;
 
+import com.shadorc.shadbot.core.ratelimiter.RateLimitResponse;
+import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.inputs.MessageInputs;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import reactor.core.publisher.Mono;
 
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 public class HangmanInputs extends MessageInputs {
@@ -45,12 +50,24 @@ public class HangmanInputs extends MessageInputs {
             return Mono.empty();
         }
 
-        final Snowflake guildId = event.getGuildId().orElseThrow();
-        final Snowflake channelId = event.getMessage().getChannelId();
-        final Snowflake memberId = event.getMember().orElseThrow().getId();
-        final Mono<Boolean> checkRateLimit = this.game.getRateLimiter().isLimitedAndWarn(
-                event.getClient(), guildId, channelId, memberId, this.game.getContext().getLocale())
+        final Mono<Boolean> checkRateLimit = Mono.
+                defer(() -> {
+                    final Snowflake guildId = event.getGuildId().orElseThrow();
+                    final Snowflake memberId = event.getMember().orElseThrow().getId();
+                    final RateLimiter rateLimiter = this.game.getRateLimiter();
+                    final RateLimitResponse response = rateLimiter.isLimited(guildId, memberId);
+                    if (response.shouldBeWarned()) {
+                        final Locale locale = this.game.getContext().getLocale();
+                        return event.getMessage().getChannel()
+                                .flatMap(channel -> DiscordUtil.sendMessage(Emoji.STOPWATCH,
+                                        rateLimiter.formatRateLimitMessage(locale), channel))
+                                .thenReturn(response.isLimited());
+                    }
+
+                    return Mono.just(response.isLimited());
+                })
                 .filter(Boolean.FALSE::equals);
+
         final Mono<Void> deleteMessage = event.getMessage().delete()
                 .onErrorResume(err -> Mono.empty());
 

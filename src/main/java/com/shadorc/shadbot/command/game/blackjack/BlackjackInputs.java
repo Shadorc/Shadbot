@@ -1,6 +1,8 @@
 package com.shadorc.shadbot.command.game.blackjack;
 
 import com.shadorc.shadbot.core.i18n.I18nManager;
+import com.shadorc.shadbot.core.ratelimiter.RateLimitResponse;
+import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.inputs.MessageInputs;
 import com.shadorc.shadbot.utils.DiscordUtil;
@@ -9,7 +11,6 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.MessageChannel;
-import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.Locale;
@@ -40,10 +41,16 @@ public class BlackjackInputs extends MessageInputs {
             return Mono.just(false);
         }
 
+        final RateLimiter ratelimiter = this.game.getRateLimiter();
         final Snowflake guildId = event.getGuildId().orElseThrow();
-        final Snowflake channelId = event.getMessage().getChannelId();
-        return BooleanUtils.not(this.game.getRateLimiter()
-                .isLimitedAndWarn(event.getClient(), guildId, channelId, memberId, this.game.getContext().getLocale()));
+        final RateLimitResponse response = ratelimiter.isLimited(guildId, memberId);
+        if (response.shouldBeWarned()) {
+            final Locale locale = this.game.getContext().getLocale();
+            return event.getMessage().getChannel()
+                    .flatMap(channel -> DiscordUtil.sendMessage(Emoji.STOPWATCH, ratelimiter.formatRateLimitMessage(locale), channel))
+                    .thenReturn(!response.isLimited());
+        }
+        return Mono.just(!response.isLimited());
     }
 
     @Override

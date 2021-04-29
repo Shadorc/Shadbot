@@ -1,17 +1,11 @@
 package com.shadorc.shadbot.core.ratelimiter;
 
 import com.shadorc.shadbot.core.i18n.I18nManager;
-import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.core.GatewayDiscordClient;
-import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.channel.MessageChannel;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.Locale;
@@ -43,8 +37,7 @@ public class RateLimiter {
         this.bandwidth = bandwidth;
     }
 
-    public Mono<Boolean> isLimitedAndWarn(GatewayDiscordClient gateway, Snowflake guildId, Snowflake channelId,
-                                          Snowflake userId, Locale locale) {
+    public RateLimitResponse isLimited(Snowflake guildId, Snowflake userId) {
         final LimitedUser limitedUser = this.guildsLimitedMap
                 .computeIfAbsent(guildId, __ -> new LimitedGuild(this.bandwidth))
                 .getUser(userId);
@@ -54,24 +47,21 @@ public class RateLimiter {
             // The user has not yet been warned
             if (!limitedUser.isWarned()) {
                 limitedUser.warned(true);
-                return this.sendWarningMessage(gateway, channelId, locale)
-                        .thenReturn(true);
+                return new RateLimitResponse(true, true);
             }
-            return Mono.just(true);
+            return new RateLimitResponse(true, false);
         }
 
         limitedUser.warned(false);
-        return Mono.just(false);
+        return new RateLimitResponse(false, false);
     }
 
-    private Mono<Message> sendWarningMessage(GatewayDiscordClient gateway, Snowflake channelId, Locale locale) {
+    public String formatRateLimitMessage(Locale locale) {
         final String message = ShadbotUtil.SPAMS.getRandomLine();
-        final String duration = FormatUtil.formatDurationWords(locale, Duration.ofNanos(this.bandwidth.getRefillPeriodNanos()));
-        return gateway.getChannelById(channelId)
-                .cast(MessageChannel.class)
-                .flatMap(channel -> DiscordUtil.sendMessage(Emoji.STOPWATCH,
-                        I18nManager.localize(locale, "ratelimit.message")
-                                .formatted(message, this.bandwidth.getCapacity(), duration), channel));
+        final String duration = FormatUtil.formatDurationWords(locale,
+                Duration.ofNanos(this.bandwidth.getRefillPeriodNanos()));
+        return I18nManager.localize(locale, "ratelimit.message")
+                .formatted(message, this.bandwidth.getCapacity(), duration);
     }
 
 }

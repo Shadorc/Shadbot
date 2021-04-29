@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.core.command;
 
+import com.shadorc.shadbot.core.ratelimiter.RateLimitResponse;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
@@ -73,8 +74,14 @@ public class CommandProcessor {
 
     private static Mono<Boolean> isRateLimited(Context context, BaseCmd cmd) {
         return Mono.justOrEmpty(cmd.getRateLimiter())
-                .flatMap(rateLimiter -> rateLimiter.isLimitedAndWarn(context.getClient(), context.getGuildId(),
-                        context.getChannelId(), context.getAuthorId(), context.getLocale()))
+                .flatMap(ratelimiter -> {
+                    final RateLimitResponse response = ratelimiter.isLimited(context.getGuildId(), context.getAuthorId());
+                    if (response.shouldBeWarned()) {
+                        return context.reply(Emoji.STOPWATCH, ratelimiter.formatRateLimitMessage(context.getLocale()))
+                                .thenReturn(response.isLimited());
+                    }
+                    return Mono.just(response.isLimited());
+                })
                 .defaultIfEmpty(false);
     }
 
