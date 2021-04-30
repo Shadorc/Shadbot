@@ -45,8 +45,10 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
             } else if (event.isJoinEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asString());
                 Telemetry.VOICE_COUNT_GAUGE.inc();
+                return Mono.empty();
             } else if (event.isMoveEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel moved", guildId.asString());
+                return Mono.empty();
             }
         }
         // If the voice state update does not come from the bot...
