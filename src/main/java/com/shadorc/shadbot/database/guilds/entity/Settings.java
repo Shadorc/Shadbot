@@ -194,11 +194,13 @@ public class Settings extends SerializableEntity<SettingsBean> {
 
     @Deprecated
     public Optional<String> getPrefix() {
-        return Optional.ofNullable(this.getBean().getPrefix());
+        return Optional.ofNullable(this.getBean())
+                .map(SettingsBean::getPrefix);
     }
 
     public Optional<Locale> getLocale() {
-        return Optional.ofNullable(this.getBean().getLocale())
+        return Optional.ofNullable(this.getBean())
+                .map(SettingsBean::getLocale)
                 .map(Locale::forLanguageTag);
     }
 
