@@ -10,6 +10,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
+
 @Deprecated
 public class MessageCreateListener implements EventListener<MessageCreateEvent> {
 
@@ -32,7 +34,9 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
                 })
                 .flatMap(dbGuild -> event.getMessage().getChannel()
                         .flatMap(channel -> DiscordUtil.sendMessage(Emoji.WARNING,
-                                I18nManager.localize(dbGuild.getLocale(), "warning.slash.commands"), channel)));
+                                I18nManager.localize(dbGuild.getLocale(), "warning.slash.commands"), channel))
+                        .doOnNext(message -> DEFAULT_LOGGER.info("{Guild ID: {}} Warning sent about message create event deprecation",
+                                message.getGuildId().orElseThrow())));
     }
 
     private static boolean isCommand(String prefix, String content) {
