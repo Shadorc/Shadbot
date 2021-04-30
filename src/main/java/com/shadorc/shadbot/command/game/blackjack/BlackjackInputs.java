@@ -5,6 +5,7 @@ import com.shadorc.shadbot.core.ratelimiter.RateLimitResponse;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.inputs.MessageInputs;
+import com.shadorc.shadbot.object.message.TemporaryMessage;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
@@ -13,6 +14,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.MessageChannel;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.Locale;
 import java.util.function.Consumer;
 
@@ -46,8 +48,8 @@ public class BlackjackInputs extends MessageInputs {
         final RateLimitResponse response = ratelimiter.isLimited(guildId, memberId);
         if (response.shouldBeWarned()) {
             final Locale locale = this.game.getContext().getLocale();
-            return event.getMessage().getChannel()
-                    .flatMap(channel -> DiscordUtil.sendMessage(Emoji.STOPWATCH, ratelimiter.formatRateLimitMessage(locale), channel))
+            return new TemporaryMessage(event.getClient(), event.getMessage().getChannelId(), Duration.ofSeconds(8))
+                    .send(Emoji.STOPWATCH, ratelimiter.formatRateLimitMessage(locale))
                     .thenReturn(!response.isLimited());
         }
         return Mono.just(!response.isLimited());

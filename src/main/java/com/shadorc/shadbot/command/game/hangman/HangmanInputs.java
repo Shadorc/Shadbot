@@ -4,13 +4,14 @@ import com.shadorc.shadbot.core.ratelimiter.RateLimitResponse;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.inputs.MessageInputs;
-import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.object.message.TemporaryMessage;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -58,9 +59,8 @@ public class HangmanInputs extends MessageInputs {
                     final RateLimitResponse response = rateLimiter.isLimited(guildId, memberId);
                     if (response.shouldBeWarned()) {
                         final Locale locale = this.game.getContext().getLocale();
-                        return event.getMessage().getChannel()
-                                .flatMap(channel -> DiscordUtil.sendMessage(Emoji.STOPWATCH,
-                                        rateLimiter.formatRateLimitMessage(locale), channel))
+                        return new TemporaryMessage(event.getClient(), event.getMessage().getChannelId(), Duration.ofSeconds(8))
+                                .send(Emoji.STOPWATCH, rateLimiter.formatRateLimitMessage(locale))
                                 .thenReturn(response.isLimited());
                     }
 
