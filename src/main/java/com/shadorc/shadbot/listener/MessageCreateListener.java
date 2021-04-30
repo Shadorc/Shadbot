@@ -37,7 +37,7 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
                         .flatMap(channel -> DiscordUtil.sendMessage(Emoji.WARNING,
                                 I18nManager.localize(dbGuild.getLocale(), "warning.slash.commands"), channel))
                         .doOnNext(message -> DEFAULT_LOGGER.info("{Guild ID: {}} Warning sent about message create event deprecation",
-                                message.getGuildId().orElseThrow())));
+                                event.getGuildId().orElseThrow()))); // TODO Bug: message.getGuildId returning empty?
     }
 
     private static boolean isCommand(String prefix, String content) {
