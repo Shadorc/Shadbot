@@ -20,7 +20,7 @@ public class I18nManager {
         for (final Locale locale : locales) {
             map.put(locale, ResourceBundle.getBundle("i18n/%s".formatted(bundleName), locale));
         }
-        DEFAULT_LOGGER.info("{} initialized with {} languages", bundleName, map.size());
+        DEFAULT_LOGGER.info("Resource bundle '{}' initialized with {} languages", bundleName, map.size());
         return Collections.unmodifiableMap(map);
     }
 

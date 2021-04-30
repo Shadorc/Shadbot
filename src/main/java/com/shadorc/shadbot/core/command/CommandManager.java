@@ -83,15 +83,14 @@ public class CommandManager {
                 .filter(cmd -> cmd.getCategory() != CommandCategory.OWNER)
                 .map(BaseCmd::asRequest)
                 .collectList()
-                .flatMapMany(requests -> /* TODO Release: applicationService.bulkOverwriteGlobalApplicationCommand(applicationId, requests) */
-                        applicationService
-                                .bulkOverwriteGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, requests))
+                .flatMapMany(requests -> applicationService
+                        .bulkOverwriteGlobalApplicationCommand(applicationId, requests))
                 .count()
                 .doOnNext(cmdCount -> DEFAULT_LOGGER.info("{} global commands registered", cmdCount))
                 .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err)));
 
-        return registerGuildCommands
-                .and(registerGlobalCommands);
+        return registerGlobalCommands
+                .and(registerGuildCommands);
     }
 
     public static Map<String, BaseCmd> getCommands() {
