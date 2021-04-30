@@ -64,7 +64,7 @@ public class CommandProcessor {
                         __ -> context.getDbGuild().getSettings().isCommandAllowed(command),
                         context.reply(Emoji.ACCESS_DENIED, context.localize("command.blacklisted"))))
                 // The user is not rate limited
-                // TODO: Do not acknowledge if rate limited
+                // TODO Improvement: Do not acknowledge if rate limited
                 .filterWhen(__ -> BooleanUtils.not(CommandProcessor.isRateLimited(context, command)))
                 .flatMap(__ -> command.execute(context))
                 .doOnSuccess(__ -> {

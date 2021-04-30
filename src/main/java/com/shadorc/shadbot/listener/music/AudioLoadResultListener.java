@@ -81,7 +81,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
             this.onNoMatches();
         }
         // If a track is specifically selected
-        // TODO: Do we want to load only one track?
+        // TODO Question: Do we want to load only one track?
         else if (audioPlaylist.getSelectedTrack() != null) {
             LOGGER.debug("{Guild ID: {}} Playlist loaded, track selected: {}", this.guildId.asString(), audioPlaylist.hashCode());
             this.trackLoaded(audioPlaylist.getSelectedTrack());
@@ -112,7 +112,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                             .map(avatarUrl -> this.formatResultsEmbed(playlist, avatarUrl, this.locale))
                             .flatMap(this.interaction::reply)
                             .flatMapMany(__ ->
-                                    // TODO: This looks bad
+                                    // TODO Clean-up: This looks bad
                                     AudioLoadResultMessageInputs.create(guildMusic.getGateway(), Duration.ofSeconds(30),
                                             guildMusic.getMessageChannelId(), this)
                                             .waitForInputs()

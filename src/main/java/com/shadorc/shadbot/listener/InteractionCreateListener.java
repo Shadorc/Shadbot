@@ -15,7 +15,7 @@ public class InteractionCreateListener implements EventListener<InteractionCreat
 
     @Override
     public Mono<?> execute(InteractionCreateEvent event) {
-        // TODO: Interactions from DM
+        // TODO Feature: Interactions from DM
         if (event.getInteraction().getGuildId().isEmpty()) {
             return Mono.empty();
         }

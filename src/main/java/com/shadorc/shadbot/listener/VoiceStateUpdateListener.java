@@ -38,7 +38,7 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
             }
             if (event.isLeaveEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel left", guildId.asString());
-                // TODO: It's possible that, on restart without previous shutdown, voice channel is left with the
+                // TODO Bug: It's possible that, on restart without previous shutdown, voice channel is left with the
                 //  gauge being 0 which will set it to a negative value
                 Telemetry.VOICE_COUNT_GAUGE.dec();
                 return MusicManager.destroyConnection(guildId);

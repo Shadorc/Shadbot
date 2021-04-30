@@ -65,7 +65,7 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return allowedVoiceChannelIds.contains(channelId);
     }
 
-    // TODO: Does not work with cmd groups
+    // TODO Bug: Does not work with cmd groups
     public boolean isCommandAllowedInChannel(BaseCmd cmd, Snowflake channelId) {
         final Map<Snowflake, Set<BaseCmd>> map = this.getRestrictedChannels();
         // If no permission has been set

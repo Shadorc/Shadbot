@@ -19,7 +19,6 @@ import java.util.function.Consumer;
 
 public class TranslateCmd extends BaseCmd {
 
-    // TODO
     private static final String DOC_URL = "https://cloud.google.com/translate/docs/languages";
 
     public TranslateCmd() {
@@ -40,14 +39,14 @@ public class TranslateCmd extends BaseCmd {
         return Mono.fromCallable(() -> new TranslateRequest(context.getLocale(), sourceLang, destLang, text))
                 .onErrorMap(IllegalArgumentException.class,
                         err -> new CommandException(context.localize("translate.exception.doc")
-                                .formatted(err.getMessage(), this.getName())))
+                                .formatted(err.getMessage(), DOC_URL)))
                 .flatMap(request -> context.reply(Emoji.HOURGLASS, context.localize("translate.loading"))
                         .then(TranslateCmd.getTranslation(request))
                         .flatMap(response -> context.editReply(
                                 TranslateCmd.formatEmbed(context, request, response)))
                         .onErrorMap(IllegalArgumentException.class,
                                 err -> new CommandException(context.localize("translate.exception.doc")
-                                        .formatted(err.getMessage(), this.getName()))));
+                                        .formatted(err.getMessage(), DOC_URL))));
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, TranslateRequest request,

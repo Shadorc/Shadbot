@@ -83,7 +83,7 @@ public class CommandManager {
                 .filter(cmd -> cmd.getCategory() != CommandCategory.OWNER)
                 .map(BaseCmd::asRequest)
                 .collectList()
-                .flatMapMany(requests -> /* TODO: Release applicationService.bulkOverwriteGlobalApplicationCommand(applicationId, requests) */
+                .flatMapMany(requests -> /* TODO Release: applicationService.bulkOverwriteGlobalApplicationCommand(applicationId, requests) */
                         applicationService
                                 .bulkOverwriteGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, requests))
                 .count()

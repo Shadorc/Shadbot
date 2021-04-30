@@ -26,6 +26,7 @@ public class ManageCoinsCmd extends BaseCmd {
 
     private static final int MIN_COINS = 1;
 
+    // TODO Improvement: Transform these actions as sub-commands
     private enum Action {
         ADD, REMOVE, RESET
     }
@@ -44,11 +45,11 @@ public class ManageCoinsCmd extends BaseCmd {
                 .type(ApplicationCommandOptionType.INTEGER.getValue())
                 .required(false));
         this.addOption(option -> option.name("user")
-                .description("todo") // TODO
+                .description("The user")
                 .type(ApplicationCommandOptionType.USER.getValue())
                 .required(false));
         this.addOption(option -> option.name("role")
-                .description("todo") // TODO
+                .description("The role")
                 .type(ApplicationCommandOptionType.ROLE.getValue())
                 .required(false));
     }
@@ -70,7 +71,7 @@ public class ManageCoinsCmd extends BaseCmd {
             }
         }
 
-        // TODO: If the guild is very large, isn't this gonna break everything?
+        // TODO Question: If the guild is very large, isn't this gonna break everything?
         return Mono.justOrEmpty(roleIdOpt)
                 .flatMapMany(roleId -> context.getGuild()
                         .flatMapMany(Guild::requestMembers)
@@ -86,7 +87,7 @@ public class ManageCoinsCmd extends BaseCmd {
                         return Mono.error(new CommandException(context.localize("managecoins.exception.user.role")));
                     }
 
-                    // TODO: Is it possible to mention @everyone ad a role? If so, do not mention everyone
+                    // TODO Question: Is it possible to mention @everyone as a role? If so, do not mention everyone
                     final String mentionsStr = FormatUtil.format(members, Tuple2::getT1, ", ");
                     return switch (action) {
                         case ADD -> Flux.fromIterable(members)
