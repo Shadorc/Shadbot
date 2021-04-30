@@ -3,6 +3,7 @@ package com.shadorc.shadbot.command.game.dice;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
+import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.NumberUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
@@ -77,7 +78,8 @@ public class DiceCmd extends GameCmd<DiceGame> {
                             context.getAuthorName(), bet, number);
                     if (game.addPlayerIfAbsent(player)) {
                         return player.bet()
-                                .then(game.show());
+                                .then(game.show())
+                                .then(context.reply(Emoji.CHECK_MARK, context.localize("dice.joined")));
                     } else {
                         return Mono.error(new CommandException(context.localize("dice.already.participating")));
                     }

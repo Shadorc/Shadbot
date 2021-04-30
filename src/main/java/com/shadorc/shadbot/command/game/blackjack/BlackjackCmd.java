@@ -39,6 +39,7 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
                             context.getAuthorName(), bet);
                     if (blackjackGame.addPlayerIfAbsent(player)) {
                         return player.bet()
+                                .then(context.reply(Emoji.CHECK_MARK, context.localize("blackjack.joined")))
                                 .then(Mono.defer(() -> {
                                     if (blackjackGame.areAllPlayersStanding()) {
                                         return blackjackGame.end();
