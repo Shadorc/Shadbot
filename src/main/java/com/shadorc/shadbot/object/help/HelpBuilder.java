@@ -30,10 +30,6 @@ public abstract class HelpBuilder {
     @Nullable
     private String description;
     @Nullable
-    private String usage;
-    @Nullable
-    private String example;
-    @Nullable
     private String source;
     @Nullable
     private String footer;
@@ -60,16 +56,6 @@ public abstract class HelpBuilder {
         return this;
     }
 
-    public HelpBuilder setFullUsage(String usage) {
-        this.usage = usage;
-        return this;
-    }
-
-    public HelpBuilder setExample(String example) {
-        this.example = example;
-        return this;
-    }
-
     public HelpBuilder setSource(String source) {
         this.source = source;
         return this;
@@ -90,7 +76,7 @@ public abstract class HelpBuilder {
             if (this.authorName != null && !this.authorName.isBlank()) {
                 embed.setAuthor(this.authorName, this.authorUrl, this.context.getAuthorAvatar());
             }
-            embed.addField("Usage", this.getUsage(), false);
+            embed.addField(this.context.localize("help.usage"), this.getUsage(), false);
 
             if (this.description != null && !this.description.isBlank()) {
                 embed.setDescription(this.description);
@@ -101,15 +87,11 @@ public abstract class HelpBuilder {
             }
 
             if (!this.getArguments().isEmpty()) {
-                embed.addField("Arguments", this.getArguments(), false);
-            }
-
-            if (this.example != null && !this.example.isBlank()) {
-                embed.addField("Example", this.example, false);
+                embed.addField(this.context.localize("help.arguments"), this.getArguments(), false);
             }
 
             if (this.source != null && !this.source.isBlank()) {
-                embed.addField("Source", this.source, false);
+                embed.addField(this.context.localize("help.source"), this.source, false);
             }
 
             for (final ImmutableEmbedFieldData field : this.fields) {
@@ -125,10 +107,6 @@ public abstract class HelpBuilder {
     protected abstract String getCommandName();
 
     private String getUsage() {
-        if (this.usage != null && !this.usage.isBlank()) {
-            return "`%s`".formatted(this.usage);
-        }
-
         if (this.options.isEmpty()) {
             return "`/%s`".formatted(this.getCommandName());
         }
@@ -142,7 +120,8 @@ public abstract class HelpBuilder {
     private String getArguments() {
         return this.options.stream()
                 .map(option -> "%n**%s** %s - %s"
-                        .formatted(option.name(), option.required().toOptional().orElse(false) ? "" : "[optional] ",
+                        .formatted(option.name(), option.required().toOptional().orElse(false) ?
+                                        "" : this.context.localize("help.optional"),
                                 option.description()))
                 .collect(Collectors.joining());
     }

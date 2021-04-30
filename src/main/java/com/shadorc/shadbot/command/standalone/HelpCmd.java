@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.command.standalone;
 
+import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.data.Config;
@@ -30,11 +31,13 @@ public class HelpCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        final Optional<String> cmdName = context.getOptionAsString("command");
-        if (cmdName.isPresent()) {
-            final BaseCmd cmd = CommandManager.getCommand(cmdName.orElseThrow());
+        final Optional<String> cmdNameOpt = context.getOptionAsString("command");
+        if (cmdNameOpt.isPresent()) {
+            final String cmdName = cmdNameOpt.orElseThrow();
+            final BaseCmd cmd = CommandManager.getCommand(cmdName);
             if (cmd == null) {
-                return Mono.empty();
+                return Mono.error(new CommandException(context.localize("help.cmd.not.found")
+                        .formatted(cmdName)));
             }
             return context.reply(cmd.getHelp(context));
         }

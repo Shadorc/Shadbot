@@ -145,19 +145,18 @@ public class DiscordUtil {
                     // If the user is in a voice channel but the bot is not allowed to join
                     if (userVoiceChannelId.isPresent()
                             && !settings.isVoiceChannelAllowed(userVoiceChannelId.get())) {
-                        throw new CommandException("I'm not allowed to join this voice channel.");
+                        throw new CommandException(context.localize("voice.channel.not.allowed"));
                     }
 
                     // If the user and the bot are not in a voice channel
                     if (botVoiceChannelId.isEmpty() && userVoiceChannelId.isEmpty()) {
-                        throw new CommandException("Join a voice channel before using this command.");
+                        throw new CommandException(context.localize("no.voice.channel"));
                     }
 
                     // If the user and the bot are not in the same voice channel
                     if (botVoiceChannelId.isPresent() && !userVoiceChannelId.map(botVoiceChannelId.orElseThrow()::equals).orElse(false)) {
-                        throw new CommandException(
-                                "I'm currently playing music in voice channel **<#%d>**, join me before using this command."
-                                        .formatted(botVoiceChannelId.map(Snowflake::asLong).get()));
+                        throw new CommandException(context.localize("different.voice.channel")
+                                .formatted(botVoiceChannelId.map(Snowflake::asLong).orElseThrow()));
                     }
 
                     return userVoiceChannelId.orElseThrow();

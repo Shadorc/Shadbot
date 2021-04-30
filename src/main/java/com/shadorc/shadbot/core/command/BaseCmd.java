@@ -69,7 +69,7 @@ public abstract class BaseCmd {
     public abstract Mono<?> execute(Context context);
 
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context).build();
+        return CommandHelpBuilder.create(context, this).build();
     }
 
     public CommandCategory getCategory() {
