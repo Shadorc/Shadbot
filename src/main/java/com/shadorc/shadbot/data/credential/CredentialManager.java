@@ -18,7 +18,7 @@ public class CredentialManager {
     private static final Properties PROPERTIES;
 
     static {
-        final File file = new File("credentials.PROPERTIES");
+        final File file = new File("credentials.properties");
         if (!file.exists()) {
             throw new RuntimeException("%s file is missing.".formatted(file.getName()));
         }
