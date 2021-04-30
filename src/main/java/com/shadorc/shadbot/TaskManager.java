@@ -47,11 +47,7 @@ public class TaskManager {
 
         final GatewayClientGroup group = gateway.getGatewayClientGroup();
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(15), DEFAULT_SCHEDULER)
-                .then(gateway.getGuilds().count()
-                        .timeout(Duration.ofSeconds(10))
-                        .doOnError(err -> LOGGER.debug("Error while getting guild count", err))
-                        .onErrorReturn(0L))
-                .doOnNext(guildCount -> {
+                .doOnNext(__ -> {
                     LOGGER.debug("Updating telemetry statistics");
                     Telemetry.UPTIME_GAUGE.set(SystemUtil.getUptime().toMillis());
                     Telemetry.PROCESS_CPU_USAGE_GAUGE.set(SystemUtil.getProcessCpuUsage());
@@ -66,7 +62,7 @@ public class TaskManager {
                     Telemetry.THREAD_COUNT_GAUGE.set(SystemUtil.getThreadCount());
                     Telemetry.DAEMON_THREAD_COUNT_GAUGE.set(SystemUtil.getDaemonThreadCount());
 
-                    Telemetry.GUILD_COUNT_GAUGE.set(guildCount);
+                    Telemetry.GUILD_COUNT_GAUGE.set(Telemetry.GUILD_IDS.size());
                     Telemetry.UNIQUE_INTERACTING_USERS.set(Telemetry.INTERACTING_USERS.size());
 
                     for (int i = 0; i < group.getShardCount(); ++i) {

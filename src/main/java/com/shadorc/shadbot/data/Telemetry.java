@@ -10,6 +10,7 @@ import java.util.Set;
 public class Telemetry {
 
     public static final Set<Long> INTERACTING_USERS = new HashSet<>();
+    public static final Set<Long> GUILD_IDS = new HashSet<>();
 
     private static final String SYSTEM_NAMESPACE = "system";
     private static final String SHARD_NAMESPACE = "shard";

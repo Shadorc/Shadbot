@@ -1,5 +1,6 @@
 package com.shadorc.shadbot.listener;
 
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.MusicManager;
@@ -18,6 +19,8 @@ public class GuildDeleteListener implements EventListener<GuildDeleteEvent> {
 
     @Override
     public Mono<?> execute(GuildDeleteEvent event) {
+        Telemetry.GUILD_IDS.remove(event.getGuildId().asLong());
+
         if (event.isUnavailable()) {
             return Mono.empty();
         }
