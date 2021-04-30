@@ -3,8 +3,6 @@ package com.shadorc.shadbot.command.currency;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.database.DatabaseManager;
-import com.shadorc.shadbot.database.guilds.entity.DBGuild;
 import com.shadorc.shadbot.database.guilds.entity.DBMember;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;

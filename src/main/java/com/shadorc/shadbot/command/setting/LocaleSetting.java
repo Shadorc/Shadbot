@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class LocaleSetting extends BaseCmd {
 
     public LocaleSetting() {
-        super(CommandCategory.GAME, "language", "Manage default server language");
+        super(CommandCategory.SETTING, "language", "Manage default server language");
 
         final List<String> locales = Arrays.stream(I18nManager.LOCALES)
                 .map(Locale::toLanguageTag)
