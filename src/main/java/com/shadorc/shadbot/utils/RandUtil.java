@@ -25,6 +25,7 @@ public class RandUtil {
      */
     @Nullable
     public static <T> T randValue(Collection<T> collection) {
+        //noinspection unchecked
         return RandUtil.randValue((T[]) collection.toArray());
     }
 

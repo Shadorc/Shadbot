@@ -5,6 +5,7 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import com.shadorc.shadbot.core.command.Setting;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.database.DatabaseEntity;
 import com.shadorc.shadbot.database.DatabaseManager;
@@ -52,8 +53,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
 
     public Locale getLocale() {
         return this.getSettings().getLocale()
-                .orElse(Locale.FRENCH);
-        // TODO: Release .orElse(Config.DEFAULT_LOCALE);
+                .orElse(Config.DEFAULT_LOCALE);
     }
 
     /**
