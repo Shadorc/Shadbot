@@ -21,4 +21,6 @@ public interface InteractionContext {
 
     Mono<Message> editReply(Consumer<EmbedCreateSpec> embed);
 
+    Mono<Message> editInitialReply(Consumer<EmbedCreateSpec> embed);
+
 }

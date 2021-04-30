@@ -282,4 +282,19 @@ public class Context implements InteractionContext, I18nContext {
                 .switchIfEmpty(this.reply(embed));
     }
 
+    @Override
+    public Mono<Message> editInitialReply(Consumer<EmbedCreateSpec> embed) {
+        return Mono.defer(() -> {
+            final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
+            embed.accept(mutatedSpec);
+            return this.event.getInteractionResponse()
+                    .editInitialResponse(ImmutableWebhookMessageEditRequest.builder()
+                            .content("")
+                            .embeds(List.of(mutatedSpec.asRequest()))
+                            .build())
+                    .map(data -> new Message(this.getClient(), data))
+                    .switchIfEmpty(this.reply(embed));
+        });
+    }
+
 }

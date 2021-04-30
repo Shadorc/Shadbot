@@ -81,7 +81,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                             .map(player -> player.format(this.context.getLocale()))
                             .forEach(field -> embed.addField(field.name(), field.value(), field.inline().get()));
                 }))
-                .flatMap(this.context::editReply);
+                .flatMap(this.context::editInitialReply);
     }
 
     @Override
@@ -90,6 +90,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                 .flatMap(player -> {
                     final int dealerValue = this.dealerHand.getValue();
                     final int playerValue = player.getHand().getValue();
+                    final String username = player.getUsername().orElseThrow();
 
                     switch (BlackjackGame.getResult(playerValue, dealerValue)) {
                         case 1:
@@ -98,16 +99,16 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                             return player.cancelBet()
                                     .then(player.win(coins))
                                     .thenReturn(this.context.localize("blackjack.gains")
-                                            .formatted(player.getUsername(), this.context.localize(coins)));
+                                            .formatted(username, this.context.localize(coins)));
                         case -1:
                             Telemetry.BLACKJACK_SUMMARY.labels("loss").observe(player.getBet());
                             return player.cancelBet()
                                     .then(player.lose(player.getBet()))
                                     .thenReturn(this.context.localize("blackjack.losses")
-                                            .formatted(player.getUsername(), this.context.localize(player.getBet())));
+                                            .formatted(username, this.context.localize(player.getBet())));
                         default:
                             return player.cancelBet()
-                                    .thenReturn(this.context.localize("blackjack.draw").formatted(player.getUsername()));
+                                    .thenReturn(this.context.localize("blackjack.draw").formatted(username));
                     }
                 })
                 .collectList()
