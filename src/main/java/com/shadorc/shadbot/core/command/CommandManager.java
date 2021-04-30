@@ -10,6 +10,7 @@ import com.shadorc.shadbot.command.fun.ThisDayCmd;
 import com.shadorc.shadbot.command.game.GameGroup;
 import com.shadorc.shadbot.command.gamestats.GameStatsGroup;
 import com.shadorc.shadbot.command.image.ImageGroup;
+import com.shadorc.shadbot.command.image.Rule34Cmd;
 import com.shadorc.shadbot.command.info.InfoGroup;
 import com.shadorc.shadbot.command.moderation.ModerationGroup;
 import com.shadorc.shadbot.command.music.*;
@@ -40,6 +41,8 @@ public class CommandManager {
                 new InfoGroup(), new ImageGroup(), new ModerationGroup(), new OwnerGroup(),
                 new GameStatsGroup(), new SettingGroup(),
                 new DonatorGroup(), new GameGroup(),
+                // Image
+                new Rule34Cmd(), // TODO Improvement: Add to Image group when Discord autocompletion is implemented
                 // Standalone
                 new PingCmd(), new HelpCmd(), new AchievementsCmd(), new FeedbackCmd(), new InviteCmd(),
                 // Music
