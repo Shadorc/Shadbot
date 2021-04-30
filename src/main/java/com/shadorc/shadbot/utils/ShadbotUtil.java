@@ -21,7 +21,6 @@ import java.util.function.Consumer;
 public class ShadbotUtil {
 
     public static final TextFile SPAMS = new TextFile("texts/spam.txt");
-    public static final TextFile TIPS = new TextFile("texts/tips.txt");
 
     /**
      * @param err The exception containing the error message to clean.
@@ -32,14 +31,6 @@ public class ShadbotUtil {
             return "Error not specified.";
         }
         return Jsoup.parse(StringUtil.remove(err.getMessage(), "Watch on YouTube")).text().trim();
-    }
-
-    /**
-     * @return A random client presence showing "Playing /help | {tip}"
-     */
-    public static ClientPresence getRandomStatus() {
-        final String presence = "/help | %s".formatted(TIPS.getRandomLineFormatted());
-        return ClientPresence.online(ClientActivity.playing(presence));
     }
 
     /**

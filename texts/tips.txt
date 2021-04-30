@@ -1,7 +1,0 @@
-/lottery
-/setting
-/invite
-/achievements
-/vote
-Feedback? /feedback
-Prefix lost? /prefix

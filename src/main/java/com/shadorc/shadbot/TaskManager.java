@@ -33,15 +33,6 @@ public class TaskManager {
         this.tasks = new ArrayList<>(4);
     }
 
-    public void schedulePresenceUpdates(GatewayDiscordClient gateway) {
-        LOGGER.info("Scheduling presence updates");
-        final Disposable task = Flux.interval(Duration.ofMinutes(15), Duration.ofMinutes(15), DEFAULT_SCHEDULER)
-                .map(__ -> ShadbotUtil.getRandomStatus())
-                .flatMap(gateway::updatePresence)
-                .subscribe(null, ExceptionHandler::handleUnknownError);
-        this.tasks.add(task);
-    }
-
     public void scheduleLottery(GatewayDiscordClient gateway) {
         LOGGER.info("Starting lottery (next draw in {})",
                 FormatUtil.formatDurationWords(Config.DEFAULT_LOCALE, LotteryCmd.getDelay()));

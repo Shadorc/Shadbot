@@ -17,6 +17,8 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
+import discord4j.core.object.presence.ClientActivity;
+import discord4j.core.object.presence.ClientPresence;
 import discord4j.core.retriever.EntityRetrievalStrategy;
 import discord4j.core.retriever.FallbackEntityRetriever;
 import discord4j.core.shard.MemberRequestFilter;
@@ -108,7 +110,7 @@ public class Shadbot {
                         Intent.GUILD_MESSAGES,
                         Intent.GUILD_MESSAGE_REACTIONS,
                         Intent.DIRECT_MESSAGES))
-                .setInitialPresence(__ -> ShadbotUtil.getRandomStatus())
+                .setInitialPresence(__ -> ClientPresence.online(ClientActivity.listening("/help")))
                 .setMemberRequestFilter(MemberRequestFilter.none())
                 .withGateway(gateway -> {
                     Shadbot.gateway = gateway;
@@ -116,7 +118,6 @@ public class Shadbot {
                     Shadbot.taskManager = new TaskManager();
                     Shadbot.taskManager.scheduleLottery(gateway);
                     Shadbot.taskManager.schedulePeriodicStats(gateway);
-                    Shadbot.taskManager.schedulePresenceUpdates(gateway);
 
                     if (!Config.IS_SNAPSHOT) {
                         DEFAULT_LOGGER.info("Initializing BotListStats");
