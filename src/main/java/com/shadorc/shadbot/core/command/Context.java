@@ -243,7 +243,7 @@ public class Context implements InteractionContext, I18nContext {
         return this.event.getInteractionResponse().createFollowupMessage(MultipartRequest.ofRequest(
                 WebhookExecuteRequest.builder()
                         .addEmbed(mutatedSpec.asRequest())
-                        .build()), true)
+                        .build()))
                 .map(data -> new Message(this.getClient(), data))
                 .doOnNext(message -> this.replyId.set(message.getId().asLong()));
     }
