@@ -9,6 +9,7 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.LogUtil;
 import com.shadorc.shadbot.utils.SystemUtil;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.gateway.GatewayClient;
 import discord4j.gateway.GatewayClientGroup;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
@@ -66,7 +67,10 @@ public class TaskManager {
                     Telemetry.UNIQUE_INTERACTING_USERS.set(Telemetry.INTERACTING_USERS.size());
 
                     for (int i = 0; i < group.getShardCount(); ++i) {
-                        final long responseTime = group.find(i).orElseThrow().getResponseTime().toMillis();
+                        final long responseTime = group.find(i)
+                                .map(GatewayClient::getResponseTime)
+                                .map(Duration::toMillis)
+                                .orElse(0L);
                         Telemetry.RESPONSE_TIME_GAUGE.labels(Integer.toString(i)).set(responseTime);
                     }
                     LOGGER.debug("Telemetry statistics updated");
