@@ -7,7 +7,6 @@ import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.LogUtil;
-import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.SystemUtil;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.gateway.GatewayClientGroup;

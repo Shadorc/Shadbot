@@ -2,7 +2,6 @@ package com.shadorc.shadbot.core.ratelimiter;
 
 import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.utils.FormatUtil;
-import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;
@@ -57,7 +56,7 @@ public class RateLimiter {
     }
 
     public String formatRateLimitMessage(Locale locale) {
-        final String message = ShadbotUtil.SPAMS.getRandomLine();
+        final String message = I18nManager.getRandomSpam(locale);
         final String duration = FormatUtil.formatDurationWords(locale,
                 Duration.ofNanos(this.bandwidth.getRefillPeriodNanos()));
         return I18nManager.localize(locale, "ratelimit.message")

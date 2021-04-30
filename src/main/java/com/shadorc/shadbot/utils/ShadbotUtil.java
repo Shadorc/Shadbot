@@ -4,12 +4,9 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.data.TextFile;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.guilds.entity.DBMember;
 import discord4j.common.util.Snowflake;
-import discord4j.core.object.presence.ClientActivity;
-import discord4j.core.object.presence.ClientPresence;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
@@ -19,8 +16,6 @@ import java.util.Locale;
 import java.util.function.Consumer;
 
 public class ShadbotUtil {
-
-    public static final TextFile SPAMS = new TextFile("texts/spam.txt");
 
     /**
      * @param err The exception containing the error message to clean.

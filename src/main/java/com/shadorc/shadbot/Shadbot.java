@@ -12,7 +12,6 @@ import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.LogUtil;
-import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
