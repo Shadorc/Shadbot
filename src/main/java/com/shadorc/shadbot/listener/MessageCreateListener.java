@@ -9,6 +9,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
@@ -41,7 +42,7 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
 
     private static boolean isCommand(String prefix, String content) {
         return content.startsWith(prefix)
-                && CommandManager.getCommand(content.replaceFirst(prefix, "").split(" ")[0]) != null;
+                && CommandManager.getCommand(content.replaceFirst(Pattern.quote(prefix), "").split(" ")[0]) != null;
     }
 
 }
