@@ -28,7 +28,7 @@ public class BlacklistSetting extends BaseCmd {
 
     public BlacklistSetting() {
         super(CommandCategory.SETTING, CommandPermission.ADMIN,
-                "blacklist", "Manage blacklisted command(s).");
+                "blacklist", "Manage blacklisted command(s)");
 
         this.addOption(option -> option.name("action")
                 .description("Whether to add or remove a command/category from the blacklisted ones")

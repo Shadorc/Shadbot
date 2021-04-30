@@ -19,7 +19,7 @@ public class NSFWSetting extends BaseCmd {
 
     public NSFWSetting() {
         super(CommandCategory.SETTING, CommandPermission.ADMIN,
-                "nsfw", "Manage current channel's NSFW state.");
+                "nsfw", "Manage current channel's NSFW state");
 
         this.addOption(option -> option.name("action")
                 .description("Change the NSFW state of the server")

@@ -3,7 +3,6 @@ package com.shadorc.shadbot.command.setting;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.NumberUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
@@ -16,7 +15,7 @@ public class VolumeSetting extends BaseCmd {
 
     public VolumeSetting() {
         super(CommandCategory.SETTING, CommandPermission.ADMIN,
-                "default_volume", "Manage music's default volume.");
+                "default_volume", "Manage music's default volume");
 
         this.addOption(option -> option.name("volume")
                 .description("New default volume (min:%d / max:%d / default:%d)"
@@ -34,11 +33,9 @@ public class VolumeSetting extends BaseCmd {
                     .formatted(MIN_VOLUME, MAX_VOLUME)));
         }
 
-        return DatabaseManager.getGuilds()
-                .getDBGuild(context.getGuildId())
-                .flatMap(dbGuild -> dbGuild.updateSetting(Setting.DEFAULT_VOLUME, volume))
-                .then(context.getChannel())
-                .flatMap(channel -> context.reply(Emoji.CHECK_MARK,
+        return context.getDbGuild()
+                .updateSetting(Setting.DEFAULT_VOLUME, volume)
+                .then(context.reply(Emoji.CHECK_MARK,
                         context.localize("setting.volume.message").formatted(volume)));
     }
 }

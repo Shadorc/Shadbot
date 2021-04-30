@@ -39,7 +39,7 @@ public class LotteryCmd extends BaseCmd {
 
     public LotteryCmd() {
         super(CommandCategory.GAME, "lottery",
-                "Buy a ticket for the lottery or display the current lottery status.");
+                "Buy a ticket for the lottery or display the current lottery status");
         this.addOption("number", "The number you bet on", false,
                 ApplicationCommandOptionType.INTEGER);
     }

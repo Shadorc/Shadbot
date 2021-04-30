@@ -5,8 +5,6 @@ import com.shadorc.shadbot.command.MissingPermissionException;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
-import com.shadorc.shadbot.database.DatabaseManager;
-import com.shadorc.shadbot.database.guilds.entity.DBGuild;
 import com.shadorc.shadbot.database.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.ExceptionHandler;
@@ -136,12 +134,10 @@ public class DiscordUtil {
                 .map(VoiceState::getChannelId)
                 .defaultIfEmpty(Optional.empty());
 
-        final Mono<Settings> getSetting = DatabaseManager.getGuilds()
-                .getDBGuild(context.getGuildId())
-                .map(DBGuild::getSettings);
+        return Mono.zip(getBotVoiceChannelId, getUserVoiceChannelId)
+                .map(TupleUtils.function((botVoiceChannelId, userVoiceChannelId) -> {
+                    final Settings settings = context.getDbGuild().getSettings();
 
-        return Mono.zip(getBotVoiceChannelId, getUserVoiceChannelId, getSetting)
-                .map(TupleUtils.function((botVoiceChannelId, userVoiceChannelId, settings) -> {
                     // If the user is in a voice channel but the bot is not allowed to join
                     if (userVoiceChannelId.isPresent()
                             && !settings.isVoiceChannelAllowed(userVoiceChannelId.get())) {

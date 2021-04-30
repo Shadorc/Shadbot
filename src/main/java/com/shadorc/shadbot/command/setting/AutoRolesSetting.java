@@ -24,7 +24,7 @@ public class AutoRolesSetting extends BaseCmd {
 
     public AutoRolesSetting() {
         super(CommandCategory.SETTING, CommandPermission.ADMIN,
-                "auto_roles", "Manage auto assigned role(s).");
+                "auto_roles", "Manage auto assigned role(s)");
 
         this.addOption("action", "Whether to add or remove a role from the auto ones", true,
                 ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Action.class));

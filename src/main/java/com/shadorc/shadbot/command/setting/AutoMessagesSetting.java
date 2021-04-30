@@ -24,7 +24,7 @@ public class AutoMessagesSetting extends BaseCmd {
 
     public AutoMessagesSetting() {
         super(CommandCategory.SETTING, CommandPermission.ADMIN,
-                "auto_messages", "Manage auto-message(s) on user join/leave.");
+                "auto_messages", "Manage auto-message(s) on user join/leave");
 
         this.addOption("action", "Whether to enable or disable automatic messages", true,
                 ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Action.class));

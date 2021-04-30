@@ -1,7 +1,6 @@
 package com.shadorc.shadbot.command.moderation;
 
 import com.shadorc.shadbot.core.command.*;
-import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.guilds.bean.setting.IamBean;
 import com.shadorc.shadbot.database.guilds.entity.setting.Iam;
 import com.shadorc.shadbot.utils.DiscordUtil;
@@ -15,7 +14,6 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +27,7 @@ public class IamCmd extends BaseCmd {
 
     public IamCmd() {
         super(CommandCategory.MODERATION, CommandPermission.ADMIN,
-                "iam", "A message with a reaction that gives corresponding roles");
+                "iam", "Create a message with a reaction that gives role(s)");
 
         this.addOption(option -> option.name("role1")
                 .description("The first role to grant")
@@ -81,8 +79,7 @@ public class IamCmd extends BaseCmd {
                             return context.reply(embedConsumer)
                                     .flatMap(message -> message.addReaction(REACTION)
                                             .thenReturn(message))
-                                    .zipWith(DatabaseManager.getGuilds().getDBGuild(context.getGuildId()))
-                                    .flatMap(TupleUtils.function((message, dbGuild) -> {
+                                    .flatMap(message -> {
                                         // Converts the new message to an IamBean
                                         final List<IamBean> iamList = roles.stream()
                                                 .map(Role::getId)
@@ -91,14 +88,15 @@ public class IamCmd extends BaseCmd {
                                                 .collect(Collectors.toList());
 
                                         // Add previous Iam to the new one
-                                        iamList.addAll(dbGuild.getSettings()
+                                        iamList.addAll(context.getDbGuild()
+                                                .getSettings()
                                                 .getIam()
                                                 .stream()
                                                 .map(Iam::getBean)
                                                 .collect(Collectors.toList()));
 
-                                        return dbGuild.updateSetting(Setting.IAM_MESSAGES, iamList);
-                                    }));
+                                        return context.getDbGuild().updateSetting(Setting.IAM_MESSAGES, iamList);
+                                    });
                         }));
     }
 

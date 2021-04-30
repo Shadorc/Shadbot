@@ -9,6 +9,7 @@ import com.shadorc.shadbot.database.guilds.entity.DBMember;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.object.entity.User;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
@@ -24,9 +25,7 @@ public class LeaderboardCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return DatabaseManager.getGuilds()
-                .getDBGuild(context.getGuildId())
-                .flatMapIterable(DBGuild::getMembers)
+        return Flux.fromIterable(context.getDbGuild().getMembers())
                 .filter(dbMember -> dbMember.getCoins() > 0)
                 .sort(Comparator.comparingLong(DBMember::getCoins).reversed())
                 .take(USER_COUNT)
