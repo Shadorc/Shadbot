@@ -75,7 +75,7 @@ public class CommandManager {
                 .flatMapMany(requests -> applicationService
                         .bulkOverwriteGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, requests))
                 .count()
-                .doOnNext(cmdCount -> DEFAULT_LOGGER.info("Guild (ID: {}) commands registered",
+                .doOnNext(cmdCount -> DEFAULT_LOGGER.info("{} guild commands registered (ID: {})",
                         cmdCount, Config.OWNER_GUILD_ID))
                 .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err)));
 
@@ -83,7 +83,7 @@ public class CommandManager {
                 .filter(cmd -> cmd.getCategory() != CommandCategory.OWNER)
                 .map(BaseCmd::asRequest)
                 .collectList()
-                .flatMapMany(requests -> /* TODO applicationService.bulkOverwriteGlobalApplicationCommand(applicationId, requests) */
+                .flatMapMany(requests -> /* TODO: Release applicationService.bulkOverwriteGlobalApplicationCommand(applicationId, requests) */
                         applicationService
                                 .bulkOverwriteGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, requests))
                 .count()

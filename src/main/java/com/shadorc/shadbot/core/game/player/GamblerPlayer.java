@@ -24,7 +24,7 @@ public class GamblerPlayer extends Player {
         return this.lose(this.bet);
     }
 
-    // TODO: Bet only when needed?
+    // TODO: Does any other game than Blackjack need this?
     public Mono<Void> cancelBet() {
         return this.win(this.bet);
     }

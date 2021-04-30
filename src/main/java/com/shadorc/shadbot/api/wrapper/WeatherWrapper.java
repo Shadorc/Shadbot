@@ -41,8 +41,8 @@ public class WeatherWrapper {
         return TimeUtil.toLocalDateTime(this.currentWeather.getDateTime().toInstant());
     }
 
+    // TODO: I18n
     public String getCloudsDescription() {
-        // TODO: I18n
         return this.weather.getDescription();
     }
 

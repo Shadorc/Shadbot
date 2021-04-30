@@ -112,7 +112,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                             .map(avatarUrl -> this.formatResultsEmbed(playlist, avatarUrl, this.locale))
                             .flatMap(this.interaction::reply)
                             .flatMapMany(__ ->
-                                    // TODO: This seems bad
+                                    // TODO: This looks bad
                                     AudioLoadResultMessageInputs.create(guildMusic.getGateway(), Duration.ofSeconds(30),
                                             guildMusic.getMessageChannelId(), this)
                                             .waitForInputs()

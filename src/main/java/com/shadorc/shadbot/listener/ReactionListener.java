@@ -111,6 +111,7 @@ public class ReactionListener {
                 // It wasn't the bot that reacted
                 .filter(selfId -> !userId.equals(selfId))
                 // If the bot is not the author of the message, this is not an Iam message
+                // TODO: Use Message#getAuthor once https://github.com/Discord4J/Discord4J/issues/911 is fixed
                 .filter(selfId -> message.getUserData().id().asLong() == selfId.asLong())
                 .flatMap(__ -> message.getGuild().flatMap(guild -> guild.getMemberById(userId)))
                 .flatMap(member -> ReactionListener.execute(message, member, action));

@@ -83,6 +83,7 @@ public class PruneCmd extends BaseCmd {
     }
 
     private static Predicate<Message> filterMessage(@Nullable Snowflake authorId, List<String> words) {
+        // TODO: Use Message#getAuthor once https://github.com/Discord4J/Discord4J/issues/911 is fixed
         return message -> (authorId == null || message.getUserData().id().asLong() == authorId.asLong())
                 && (words.isEmpty()
                 || words.stream().anyMatch(word -> message.getContent().contains(word) || PruneCmd.getEmbedContent(message).contains(word)));

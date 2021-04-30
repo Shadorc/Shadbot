@@ -18,7 +18,6 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.*;
-import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
 import discord4j.discordjson.json.ApplicationCommandOptionChoiceData;
 import discord4j.rest.http.client.ClientException;
@@ -37,6 +36,10 @@ import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class DiscordUtil {
 
+    public static Mono<Message> sendMessage(Emoji emoji, String message, MessageChannel channel) {
+        return DiscordUtil.sendMessage(emoji + " " + message, channel);
+    }
+
     /**
      * @param content The string to send.
      * @param channel The {@link MessageChannel} in which to send the message.
@@ -45,20 +48,6 @@ public class DiscordUtil {
      */
     public static Mono<Message> sendMessage(String content, MessageChannel channel) {
         return DiscordUtil.sendMessage(spec -> spec.setContent(content), channel, false);
-    }
-
-    public static Mono<Message> sendMessage(Emoji emoji, String message, MessageChannel channel) {
-        return DiscordUtil.sendMessage(emoji + " " + message, channel);
-    }
-
-    /**
-     * @param embed   The {@link EmbedCreateSpec} consumer used to attach rich content when creating a message.
-     * @param channel The {@link MessageChannel} in which to send the message.
-     * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
-     * it is emitted through the Mono.
-     */
-    public static Mono<Message> sendMessage(Consumer<EmbedCreateSpec> embed, MessageChannel channel) {
-        return DiscordUtil.sendMessage(spec -> spec.setEmbed(embed), channel, true);
     }
 
     /**
@@ -83,10 +72,9 @@ public class DiscordUtil {
                         DEFAULT_LOGGER.info("{Channel ID: {}} Missing permission: {}",
                                 channel.getId().asLong(), FormatUtil.capitalizeEnum(Permission.EMBED_LINKS));
                         // TODO: i18n
-                        return DiscordUtil.sendMessage(Emoji.ACCESS_DENIED, "I cannot send embed" +
-                                " links.%nPlease, check my permissions "
-                                + "and channel-specific ones to verify that **%s** is checked."
-                                .formatted(FormatUtil.capitalizeEnum(Permission.EMBED_LINKS)), channel);
+                        return DiscordUtil.sendMessage(Emoji.ACCESS_DENIED,
+                                "I cannot send embed links.\nPlease, check my permissions and channel-specific ones to verify that **%s** is checked."
+                                        .formatted(FormatUtil.capitalizeEnum(Permission.EMBED_LINKS)), channel);
                     }
 
                     return channel.createMessage(spec
