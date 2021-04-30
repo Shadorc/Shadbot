@@ -197,6 +197,11 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return Optional.ofNullable(this.getBean().getPrefix());
     }
 
+    public Optional<Locale> getLocale() {
+        return Optional.ofNullable(this.getBean().getLocale())
+                .map(Locale::forLanguageTag);
+    }
+
     private Set<Snowflake> toSnowflakeSet(Function<SettingsBean, List<String>> mapper) {
         return Optional.ofNullable(this.getBean())
                 .map(mapper)

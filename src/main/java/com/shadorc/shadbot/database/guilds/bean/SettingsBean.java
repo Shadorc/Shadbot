@@ -63,6 +63,9 @@ public class SettingsBean implements Bean {
     @Nullable
     @JsonProperty("auto_leave_message")
     private AutoMessageBean autoLeaveMessage;
+    @Nullable
+    @JsonProperty("locale")
+    private String locale;
 
     public SettingsBean() {
 
@@ -149,6 +152,11 @@ public class SettingsBean implements Bean {
         return this.autoLeaveMessage;
     }
 
+    @Nullable
+    public String getLocale() {
+        return this.locale;
+    }
+
     @Override
     public String toString() {
         return "SettingsBean{" +
@@ -167,6 +175,7 @@ public class SettingsBean implements Bean {
                 ", restrictedRoles=" + this.restrictedRoles +
                 ", autoJoinMessage=" + this.autoJoinMessage +
                 ", autoLeaveMessage=" + this.autoLeaveMessage +
+                ", locale=" + this.locale +
                 '}';
     }
 }

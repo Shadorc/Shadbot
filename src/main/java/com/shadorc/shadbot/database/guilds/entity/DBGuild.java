@@ -13,7 +13,10 @@ import com.shadorc.shadbot.database.guilds.bean.DBGuildBean;
 import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 import static com.shadorc.shadbot.database.guilds.GuildsCollection.LOGGER;
 
@@ -48,8 +51,7 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
     }
 
     public Locale getLocale() {
-        return Optional.ofNullable(this.getBean().getLocale())
-                .map(Locale::forLanguageTag)
+        return this.getSettings().getLocale()
                 .orElse(Locale.FRENCH);
         // TODO: Release .orElse(Config.DEFAULT_LOCALE);
     }

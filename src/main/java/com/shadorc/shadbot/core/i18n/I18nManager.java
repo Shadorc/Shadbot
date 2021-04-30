@@ -11,7 +11,8 @@ import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class I18nManager {
 
-    private static final Locale[] LOCALES = {Locale.ENGLISH, Locale.FRENCH};
+    public static final Locale[] LOCALES = {Locale.ENGLISH, Locale.FRENCH};
+
     private static final Map<Locale, ResourceBundle> GLOBAL_BUNDLES = I18nManager.initialize("i18n", LOCALES);
     private static final Map<Locale, ResourceBundle> SPAM_BUNDLES = I18nManager.initialize("spam", LOCALES);
 

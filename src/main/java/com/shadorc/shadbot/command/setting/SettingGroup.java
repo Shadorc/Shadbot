@@ -12,7 +12,7 @@ public class SettingGroup extends BaseCmdGroup {
         super(CommandCategory.SETTING, CommandPermission.ADMIN, "setting", "Configure Shadbot",
                 List.of(new SettingShow(), new NSFWSetting(), new VolumeSetting(), new AutoMessagesSetting(),
                         new AutoRolesSetting(), new AllowedRolesSetting(), new BlacklistSetting(),
-                        new RestrictedChannelsSetting(), new RestrictedRolesSetting()));
+                        new RestrictedChannelsSetting(), new RestrictedRolesSetting(), new LocaleSetting()));
     }
 
 }

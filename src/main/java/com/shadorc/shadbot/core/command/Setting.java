@@ -27,7 +27,8 @@ public enum Setting {
     RESTRICTED_CHANNELS,
     RESTRICTED_ROLES,
     AUTO_JOIN_MESSAGE,
-    AUTO_LEAVE_MESSAGE;
+    AUTO_LEAVE_MESSAGE,
+    LOCALE;
 
     @Override
     public String toString() {

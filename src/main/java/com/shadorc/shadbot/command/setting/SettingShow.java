@@ -14,10 +14,7 @@ import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 import reactor.util.function.Tuple2;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 public class SettingShow extends BaseCmd {
@@ -33,6 +30,7 @@ public class SettingShow extends BaseCmd {
 
         final Set<String> blacklistedCmds = settings.getBlacklistedCmds();
         final Optional<Integer> defaultVolume = settings.getDefaultVol();
+        final Optional<Locale> locale = settings.getLocale();
         final Mono<Optional<Tuple2<Channel, String>>> getAutoJoinMessage =
                 Mono.justOrEmpty(settings.getAutoJoinMessage())
                         .flatMap(autoMessage -> context.getClient().getChannelById(autoMessage.getChannelId())
@@ -82,6 +80,8 @@ public class SettingShow extends BaseCmd {
 
                             defaultVolume.ifPresent(volume ->
                                     embed.addField(context.localize("settings.volume"), "%d%%".formatted(volume), false));
+                            locale.ifPresent(lang ->
+                                    embed.addField("Language", lang.toLanguageTag(), false));
                             autoJoinMessage.ifPresent(it ->
                                     embed.addField(context.localize("settings.auto.join.message"), "%s\n%s"
                                             .formatted(it.getT1().getMention(), it.getT2()), false));
