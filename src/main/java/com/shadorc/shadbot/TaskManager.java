@@ -43,12 +43,16 @@ public class TaskManager {
     }
 
     public void schedulePeriodicStats(GatewayDiscordClient gateway) {
-        LOGGER.info("Scheduling periodic stats log");
+        LOGGER.info("Scheduling periodic telemetry statistics post");
 
         final GatewayClientGroup group = gateway.getGatewayClientGroup();
         final Disposable task = Flux.interval(Duration.ZERO, Duration.ofSeconds(15), DEFAULT_SCHEDULER)
-                .then(gateway.getGuilds().count())
+                .then(gateway.getGuilds().count()
+                        .timeout(Duration.ofSeconds(10))
+                        .doOnError(err -> LOGGER.debug("Error while getting guild count", err))
+                        .onErrorReturn(0L))
                 .doOnNext(guildCount -> {
+                    LOGGER.debug("Updating telemetry statistics");
                     Telemetry.UPTIME_GAUGE.set(SystemUtil.getUptime().toMillis());
                     Telemetry.PROCESS_CPU_USAGE_GAUGE.set(SystemUtil.getProcessCpuUsage());
                     Telemetry.SYSTEM_CPU_USAGE_GAUGE.set(SystemUtil.getSystemCpuUsage());
@@ -69,6 +73,7 @@ public class TaskManager {
                         final long responseTime = group.find(i).orElseThrow().getResponseTime().toMillis();
                         Telemetry.RESPONSE_TIME_GAUGE.labels(Integer.toString(i)).set(responseTime);
                     }
+                    LOGGER.debug("Telemetry statistics updated");
                 })
                 .subscribe(null, ExceptionHandler::handleUnknownError);
 
