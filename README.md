@@ -5,7 +5,7 @@
         <img align="right" src="https://i.imgur.com/ab9PUtE.png" height="220" width="220">
     </a>
     <h1>Shadbot</h1>
-    <p><b>A configurable multipurpose Discord bot providing music, gambling mini-games, stats about video games and more!</b></p>
+    <p><b>A configurable multipurpose bot bringing you music, multiplayer games, moderation commands and more!</b></p>
     <hr>
     <h2>Usage</h2>
     <a href="https://discordbots.org/bot/331146243596091403">
