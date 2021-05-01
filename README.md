@@ -35,7 +35,7 @@
     </ul>
     <hr>
     <h2>Getting Started</h2>
-    <br>1. Make sure Java 15 is installed.
+    <br>1. Make sure Java 16 is installed.
     <br>2. Fork the Shadbot repository: https://github.com/Shadorc/Shadbot/fork
     <br>3. Clone your forked repository, ie. <code>git clone http://github.com/&lt;YOUR-USERNAME&gt;/shadbot.git</code>
     <br>4. Read this: https://github.com/Shadorc/Shadbot/wiki/Build-&-Configure
@@ -44,7 +44,7 @@
     <br>7. Open command prompt and run <code>java -jar shadbot-&lt;VERSION&gt;.jar</code>.
     <br>8. You're done!
     <h2>Licence</h2>
-    <p>Copyright (C) 2020 <b>Shadorc</b>
+    <p>Copyright (C) 2021 <b>Shadorc</b>
         <pre>
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
