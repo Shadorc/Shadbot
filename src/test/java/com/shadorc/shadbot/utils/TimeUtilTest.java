@@ -30,6 +30,10 @@ public class TimeUtilTest {
 
     @Test
     public void testParseTime() {
+        assertThrows(IllegalArgumentException.class, () -> TimeUtil.parseTime("-123"));
+        assertThrows(IllegalArgumentException.class, () -> TimeUtil.parseTime("0"));
+        assertEquals(Duration.ofSeconds(123), TimeUtil.parseTime("123"));
+        assertThrows(IllegalArgumentException.class, () -> TimeUtil.parseTime("12345678910111213141516"));
         assertEquals(Duration.ofMinutes(1), TimeUtil.parseTime("1m"));
         assertEquals(Duration.ofMinutes(1), TimeUtil.parseTime("1m 00s"));
         assertEquals(Duration.ofSeconds(3600 + 10 * 60 + 6), TimeUtil.parseTime("01h10m6s"));
