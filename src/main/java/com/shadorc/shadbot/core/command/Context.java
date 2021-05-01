@@ -3,6 +3,7 @@ package com.shadorc.shadbot.core.command;
 import com.shadorc.shadbot.Shadbot;
 import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.core.i18n.I18nManager;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.database.guilds.entity.DBGuild;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.MusicManager;
@@ -228,7 +229,8 @@ public class Context implements InteractionContext, I18nContext {
         return this.event.getInteractionResponse()
                 .createFollowupMessage(str)
                 .map(data -> new Message(this.getClient(), data))
-                .doOnNext(message -> this.replyId.set(message.getId().asLong()));
+                .doOnNext(message -> this.replyId.set(message.getId().asLong()))
+                .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc());
     }
 
     @Override
@@ -245,7 +247,8 @@ public class Context implements InteractionContext, I18nContext {
                         .addEmbed(mutatedSpec.asRequest())
                         .build()))
                 .map(data -> new Message(this.getClient(), data))
-                .doOnNext(message -> this.replyId.set(message.getId().asLong()));
+                .doOnNext(message -> this.replyId.set(message.getId().asLong()))
+                .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc());
     }
 
     @Override
@@ -257,6 +260,7 @@ public class Context implements InteractionContext, I18nContext {
                                 .content(message)
                                 .build(), true))
                 .map(data -> new Message(this.getClient(), data))
+                .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc())
                 .switchIfEmpty(this.reply(message));
     }
 
@@ -279,6 +283,7 @@ public class Context implements InteractionContext, I18nContext {
                                     .build(), true);
                 })
                 .map(data -> new Message(this.getClient(), data))
+                .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc())
                 .switchIfEmpty(this.reply(embed));
     }
 
@@ -293,6 +298,7 @@ public class Context implements InteractionContext, I18nContext {
                             .embeds(List.of(mutatedSpec.asRequest()))
                             .build())
                     .map(data -> new Message(this.getClient(), data))
+                    .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc())
                     .switchIfEmpty(this.reply(embed));
         });
     }
