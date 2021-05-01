@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 public class BlackjackCmd extends GameCmd<BlackjackGame> {
 
     public BlackjackCmd() {
-        super("blackjack", "Start or join a blackjack game");
+        super("blackjack", "Start or join a Blackjack game");
 
         this.addOption(option -> option.name("bet")
                 .description("Your bet")

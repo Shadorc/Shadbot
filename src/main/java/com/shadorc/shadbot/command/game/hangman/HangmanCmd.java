@@ -27,12 +27,12 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
     private final WordsList hardWords;
 
     public HangmanCmd() {
-        super("hangman", "Create or join a Hangman game", ApplicationCommandOptionType.SUB_COMMAND_GROUP);
+        super("hangman", "Start or join a Hangman game", ApplicationCommandOptionType.SUB_COMMAND_GROUP);
         this.addOption(option -> option.name(JOIN_SUB_COMMAND)
-                .description("Join Hangman game")
+                .description("Join a Hangman game")
                 .type(ApplicationCommandOptionType.SUB_COMMAND.getValue()));
         this.addOption(option -> option.name(CREATE_SUB_COMMAND)
-                .description("Create Hangman game")
+                .description("Start a Hangman game")
                 .type(ApplicationCommandOptionType.SUB_COMMAND.getValue())
                 .addOption(ApplicationCommandOptionData.builder().name("difficulty")
                         .description("The difficulty of the word to find, easy by default")

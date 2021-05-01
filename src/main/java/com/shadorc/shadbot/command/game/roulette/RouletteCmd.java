@@ -16,7 +16,7 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
     }
 
     public RouletteCmd() {
-        super("roulette", "Play roulette");
+        super("roulette", "Start or join a Roulette game");
         this.addOption(option -> option.name("bet")
                 .description("Your bet")
                 .required(true)
