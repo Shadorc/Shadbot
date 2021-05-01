@@ -11,7 +11,7 @@
     <a href="https://discordbots.org/bot/331146243596091403">
         <img src="https://discordbots.org/api/widget/331146243596091403.svg">
     </a>
-    <p><b>Add Shadbot on your own server by clicking on this <a href="https://discord.com/oauth2/authorize?client_id=331146243596091403&scope=bot%20applications.commands&permissions=271674454">link</a> !</b></p>
+    <p><b>Add Shadbot on your own server by clicking on this <a href="https://discord.com/oauth2/authorize?client_id=331146243596091403&scope=bot%20applications.commands&permissions=271674454">link</a>!</b></p>
     <hr>
     <h2>Support</h2>
     <p><b><a href="https://discord.gg/CKnV4ff">Join</a> the support server if you have any questions, suggestions or if you just want to talk.</b></p>
@@ -31,6 +31,7 @@
         <li><a href="https://github.com/mongodb/mongo-java-driver">MongoDB-java</a>
         <li><a href="https://github.com/getsentry/sentry-java">Sentry</a></li>
         <li><a href="https://github.com/prometheus/client_java">Prometheus</a></li>
+        <li><a href="https://github.com/junit-team/junit5">JUnit5</a></li>
         <li>And <a href="pom.xml">many others...</a></li>
     </ul>
     <hr>
