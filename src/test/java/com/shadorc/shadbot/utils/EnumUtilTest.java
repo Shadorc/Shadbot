@@ -12,7 +12,7 @@ public class EnumUtilTest {
 
         @Override
         public String toString() {
-            return "This method should not be used for parsing";
+            return "toString() should not be used for parsing";
         }
     }
 

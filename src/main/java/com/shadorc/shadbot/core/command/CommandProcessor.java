@@ -17,7 +17,7 @@ public class CommandProcessor {
     public static Mono<?> processCommand(Context context) {
         return Mono.just(context.getAuthor())
                 // The role is allowed or the author is the guild's owner
-                .filterWhen(ReactorUtil.filterWhenSwitchIfFalse(
+                .filterWhen(ReactorUtil.filterWhenOrExecute(
                         member -> BooleanUtils.or(
                                 member.getRoles().collectList().map(context.getDbGuild().getSettings()::hasAllowedRole),
                                 member.getGuild().map(Guild::getOwnerId).map(member.getId()::equals)),
@@ -56,11 +56,11 @@ public class CommandProcessor {
         return context.getPermissions()
                 .collectList()
                 // The author has the permission to execute this command
-                .filterWhen(ReactorUtil.filterSwitchIfFalse(
+                .filterWhen(ReactorUtil.filterOrExecute(
                         userPerms -> userPerms.contains(command.getPermission()),
                         context.reply(Emoji.ACCESS_DENIED, context.localize("command.missing.permission"))))
                 // The command is allowed in the guild
-                .filterWhen(ReactorUtil.filterSwitchIfFalse(
+                .filterWhen(ReactorUtil.filterOrExecute(
                         __ -> context.getDbGuild().getSettings().isCommandAllowed(command),
                         context.reply(Emoji.ACCESS_DENIED, context.localize("command.blacklisted"))))
                 // The user is not rate limited

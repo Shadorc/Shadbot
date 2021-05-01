@@ -7,22 +7,52 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FormatUtilsTest {
 
-    private enum TestEnum {
+    private enum TestEnum1 {
         TEST_ONE, test_Two, testThree
+    }
+
+    private enum TestEnum2 {
+        Test;
+
+
+        @Override
+        public String toString() {
+            return "%s_toString".formatted(this.name());
+        }
     }
 
     @Test
     public void testCapitalizeEnum() {
-        assertEquals("Test one", FormatUtil.capitalizeEnum(TestEnum.TEST_ONE));
-        assertEquals("Test two", FormatUtil.capitalizeEnum(TestEnum.test_Two));
-        assertEquals("Testthree", FormatUtil.capitalizeEnum(TestEnum.testThree));
         assertNull(FormatUtil.capitalizeEnum(null));
+        assertEquals("Test one", FormatUtil.capitalizeEnum(TestEnum1.TEST_ONE));
+        assertEquals("Test two", FormatUtil.capitalizeEnum(TestEnum1.test_Two));
+        assertEquals("Testthree", FormatUtil.capitalizeEnum(TestEnum1.testThree));
+        assertEquals("Test_toString", FormatUtil.capitalizeEnum(TestEnum2.Test));
+    }
+
+    @Test
+    public void testCreateColumns() {
+        final Function<Integer, List<String>> createList = size -> IntStream.range(0, size)
+                .boxed()
+                .map(Object::toString)
+                .toList();
+
+        assertEquals(1, FormatUtil.createColumns(createList.apply(12), 20).size());
+        assertEquals(1, FormatUtil.createColumns(createList.apply(12), 12).size());
+        assertEquals(2, FormatUtil.createColumns(createList.apply(12), 10).size());
+        assertEquals(12, FormatUtil.createColumns(createList.apply(12), 1).size());
+        assertEquals(1, FormatUtil.createColumns(createList.apply(1), 1).size());
+        assertEquals(0, FormatUtil.createColumns(createList.apply(0), 1).size());
+        assertThrows(IllegalArgumentException.class, () -> FormatUtil.createColumns(createList.apply(12), 0));
     }
 
     @Test

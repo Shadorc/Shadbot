@@ -28,6 +28,11 @@ public class FormatUtil {
         return StringUtil.capitalize(enumeration.toString().toLowerCase().replace("_", " "));
     }
 
+    /**
+     * @param list    The list to create columns from.
+     * @param rowSize The number of row in each column.
+     * @return A list of {@link ImmutableEmbedFieldData}.
+     */
     public static List<ImmutableEmbedFieldData> createColumns(List<String> list, int rowSize) {
         return ListUtil.partition(list, rowSize)
                 .stream()

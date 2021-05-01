@@ -8,8 +8,8 @@ import java.util.function.Predicate;
 
 public class ReactorUtil {
 
-    public static <T> Function<T, Mono<Boolean>> filterWhenSwitchIfFalse(Function<? super T, ? extends Publisher<Boolean>> asyncPredicate,
-                                                                         Mono<?> switchMono) {
+    public static <T> Function<T, Mono<Boolean>> filterWhenOrExecute(Function<? super T, ? extends Publisher<Boolean>> asyncPredicate,
+                                                                     Mono<?> switchMono) {
         return value -> Mono.from(asyncPredicate.apply(value))
                 .flatMap(bool -> {
                     if (!bool) {
@@ -20,9 +20,9 @@ public class ReactorUtil {
                 });
     }
 
-    public static <T> Function<T, Mono<Boolean>> filterSwitchIfFalse(Predicate<? super T> tester,
-                                                                     Mono<?> switchMono) {
-        return filterWhenSwitchIfFalse(
+    public static <T> Function<T, Mono<Boolean>> filterOrExecute(Predicate<? super T> tester,
+                                                                 Mono<?> switchMono) {
+        return filterWhenOrExecute(
                 value -> Mono.just(tester.test(value)),
                 switchMono);
     }

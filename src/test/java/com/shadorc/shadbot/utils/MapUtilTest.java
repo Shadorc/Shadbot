@@ -24,10 +24,12 @@ public class MapUtilTest {
         final Map<String, Integer> expected = Map.of("1", 1, "2", 2, "3", 3);
         final Map<String, Integer> unsorted = Map.of("2", 2, "1", 1, "3", 3);
         final Map<String, Integer> singleton = Map.of("3", 3);
+        final Map<String, Integer> duplicate = Map.of("2", 3, "3", 3);
         final Map<String, Integer> empty = new HashMap<>();
         assertEquals(expected, MapUtil.sort(unsorted, Comparator.comparingInt(Map.Entry::getValue)));
         assertEquals(empty, MapUtil.sort(empty, Comparator.comparingInt(Map.Entry::getValue)));
         assertEquals(singleton, MapUtil.sort(singleton, Comparator.comparingInt(Map.Entry::getValue)));
+        assertEquals(duplicate, MapUtil.sort(duplicate, Comparator.comparingInt(Map.Entry::getValue)));
     }
 
 }
