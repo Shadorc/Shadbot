@@ -6,56 +6,65 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class XkcdCmd extends BaseCmd {
 
+    private enum Sort {
+        LATEST, RANDOM
+    }
+
     private static final String HOME_URL = "https://xkcd.com";
-    private static final String LAST_URL = HOME_URL + "/info.0.json";
+    private static final String LAST_URL = "%s/info.0.json".formatted(HOME_URL);
+
+    // Cache for the latest Xkcd ID
+    private final AtomicInteger latestId;
 
     public XkcdCmd() {
-        super(CommandCategory.IMAGE, List.of("xkcd"));
-        this.setDefaultRateLimiter();
+        super(CommandCategory.IMAGE, "xkcd", "Show random comic from XKCD");
+        this.latestId = new AtomicInteger();
+
+        this.addOption("sort", "Sorting option", true, ApplicationCommandOptionType.STRING,
+                DiscordUtil.toOptions(Sort.class));
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-
-        return updatableMsg.setContent(String.format(Emoji.HOURGLASS + " (**%s**) Loading XKCD comic...", context.getUsername()))
-                .send()
-                .then(XkcdCmd.getRandomXkcd())
-                .map(xkcd -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
-                        .andThen(embed -> embed.setAuthor(String.format("XKCD: %s", xkcd.getTitle()),
-                                String.format("%s/%d", HOME_URL, xkcd.getNum()), context.getAvatarUrl())
-                                .setImage(xkcd.getImg()))))
-                .flatMap(UpdatableMessage::send)
-                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
-                .then();
+    public Mono<?> execute(Context context) {
+        final Sort sort = context.getOptionAsEnum(Sort.class, "sort").orElseThrow();
+        final Mono<XkcdResponse> getResponse = sort == Sort.LATEST ? XkcdCmd.getLatestXkcd() : this.getRandomXkcd();
+        return context.reply(Emoji.HOURGLASS, context.localize("xkcd.loading"))
+                .then(getResponse)
+                .flatMap(xkcd -> context.editReply(XkcdCmd.formatEmbed(context.getAuthorAvatar(), xkcd)));
     }
 
-    private static Mono<XkcdResponse> getRandomXkcd() {
-        return RequestHelper.fromUrl(LAST_URL)
-                .to(XkcdResponse.class)
-                .map(XkcdResponse::getNum)
+    private static Consumer<EmbedCreateSpec> formatEmbed(String avatarUrl, XkcdResponse xkcd) {
+        return ShadbotUtil.getDefaultEmbed(embed ->
+                embed.setAuthor("XKCD: %s".formatted(xkcd.title()), "%s/%d".formatted(HOME_URL, xkcd.num()), avatarUrl)
+                        .setImage(xkcd.img()));
+    }
+
+    private Mono<XkcdResponse> getRandomXkcd() {
+        return Mono.fromCallable(this.latestId::get)
+                .filter(latestId -> latestId != 0)
+                .switchIfEmpty(XkcdCmd.getLatestXkcd()
+                        .map(XkcdResponse::num)
+                        .doOnNext(this.latestId::set))
                 .map(ThreadLocalRandom.current()::nextInt)
-                .flatMap(rand -> RequestHelper.fromUrl(String.format("%s/%d/info.0.json", HOME_URL, rand))
+                .flatMap(id -> RequestHelper.fromUrl("%s/%d/info.0.json".formatted(HOME_URL, id))
                         .to(XkcdResponse.class));
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show a random XKCD comic.")
-                .setSource(HOME_URL)
-                .build();
+    private static Mono<XkcdResponse> getLatestXkcd() {
+        return RequestHelper.fromUrl(LAST_URL)
+                .to(XkcdResponse.class);
     }
+
 }

@@ -1,104 +1,71 @@
 package com.shadorc.shadbot.command.game.trivia;
 
-import com.shadorc.shadbot.api.json.trivia.category.TriviaCategoriesResponse;
-import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.function.Consumer;
-
-import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TriviaCmd extends GameCmd<TriviaGame> {
 
-    private static final String CATEGORY_URL = "https://opentdb.com/api_category.php";
+    // https://opentdb.com/api_category.php <ID, Name>
+    private static final Map<String, Integer> CATEGORIES = new HashMap<>();
 
-    private TriviaCategoriesResponse categories;
+    static {
+        CATEGORIES.put("General Knowledge", 9);
+        CATEGORIES.put("Entertainment: Books", 10);
+        CATEGORIES.put("Entertainment: Film", 11);
+        CATEGORIES.put("Entertainment: Music", 12);
+        CATEGORIES.put("Entertainment: Musicals & Theatres", 13);
+        CATEGORIES.put("Entertainment: Television", 14);
+        CATEGORIES.put("Entertainment: Video Games", 15);
+        CATEGORIES.put("Entertainment: Board Games", 16);
+        CATEGORIES.put("Science & Nature", 17);
+        CATEGORIES.put("Science: Computers", 18);
+        CATEGORIES.put("Science: Mathematics", 19);
+        CATEGORIES.put("Mythology", 20);
+        CATEGORIES.put("Sports", 21);
+        CATEGORIES.put("Geography", 22);
+        CATEGORIES.put("History", 23);
+        CATEGORIES.put("Politics", 24);
+        CATEGORIES.put("Art", 25);
+        CATEGORIES.put("Celebrities", 26);
+        CATEGORIES.put("Animals", 27);
+        CATEGORIES.put("Vehicles", 28);
+        CATEGORIES.put("Entertainment: Comics", 29);
+        CATEGORIES.put("Science: Gadgets", 30);
+        CATEGORIES.put("Entertainment: Japanese Anime & Manga", 31);
+        CATEGORIES.put("Entertainment: Cartoon & Animations", 32);
+    }
 
     public TriviaCmd() {
-        super(List.of("trivia"));
-
-        this.categories = null;
+        super("trivia", "Start a Trivia game in which everyone can participate.");
+        this.addOption(option -> option.name("category")
+                .description("The category of the question")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(CATEGORIES.keySet())));
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        return this.getCategories()
-                .then(Mono.defer(() -> {
-                    final Integer categoryId = NumberUtils.toPositiveIntOrNull(context.getArg().orElse(""));
+    public Mono<?> execute(Context context) {
+        final Integer categoryId = context.getOptionAsString("category")
+                .map(CATEGORIES::get)
+                .orElse(null);
 
-                    if (context.getArg().isPresent()) {
-                        // Display a list of available categories
-                        if ("categories".equalsIgnoreCase(context.getArg().orElseThrow())) {
-                            final String ids = FormatUtils.format(this.categories.getIds(), Object::toString, "\n");
-                            final String names = String.join("\n", this.categories.getNames());
-                            final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
-                                    .andThen(embed -> embed.setAuthor("Trivia categories", null, context.getAvatarUrl())
-                                            .addField("ID", ids, true)
-                                            .addField("Name", names, true));
-
-                            return context.getChannel()
-                                    .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
-                                    .then();
-                        }
-
-                        // The user tries to access a category that does not exist
-                        else if (!this.categories.getIds().contains(categoryId)) {
-                            return Mono.error(new CommandException(
-                                    String.format("`%d` is not a valid ID. Use `%s%s categories` to see the "
-                                                    + "complete list of available categories.",
-                                            categoryId, context.getPrefix(), this.getName())));
-                        }
-                    }
-
-                    if (this.getManagers().containsKey(context.getChannelId())) {
-                        return context.getChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(String.format(
-                                        Emoji.INFO + " (**%s**) A Trivia game has already been started.",
-                                        context.getUsername()), channel))
-                                .then();
-                    } else {
-                        final TriviaGame triviaManager = new TriviaGame(this, context, categoryId);
-                        this.getManagers().put(context.getChannelId(), triviaManager);
-                        return triviaManager.start()
-                                .then(triviaManager.show())
-                                .doOnError(err -> this.getManagers().remove(context.getChannelId()));
-                    }
-                }));
+        if (this.isGameStarted(context.getChannelId())) {
+            return context.reply(Emoji.INFO, context.localize("trivia.already.started"));
+        } else {
+            final TriviaGame game = new TriviaGame(context, categoryId);
+            this.addGame(context.getChannelId(), game);
+            return game.start()
+                    .then(game.show())
+                    .doOnError(err -> game.destroy());
+        }
     }
 
-    private Mono<TriviaCategoriesResponse> getCategories() {
-        final Mono<TriviaCategoriesResponse> getCategories = RequestHelper.fromUrl(CATEGORY_URL)
-                .to(TriviaCategoriesResponse.class)
-                .doOnNext(categories -> {
-                    this.categories = categories;
-                    DEFAULT_LOGGER.info("Open Trivia DB categories obtained");
-                });
-
-        return Mono.justOrEmpty(this.categories)
-                .switchIfEmpty(getCategories);
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Start a Trivia game in which everyone can participate.")
-                .addArg("categoryID", "the category ID of the question", true)
-                .addField("Category", String.format("Use `%s%s categories` to see the list of categories",
-                        context.getPrefix(), this.getName()), false)
-                .addField("Gains", String.format("The winner gets **%s** plus a bonus (**%s max.**) depending " +
-                                "on his speed to answer.",
-                        FormatUtils.coins(Constants.MIN_GAINS), FormatUtils.coins(Constants.MAX_BONUS)), false)
-                .build();
-    }
 }

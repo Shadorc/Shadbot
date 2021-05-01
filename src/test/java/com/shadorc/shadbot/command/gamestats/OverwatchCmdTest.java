@@ -11,24 +11,24 @@ public class OverwatchCmdTest extends CmdTest<OverwatchCmd> {
 
     @Test
     public void testGetResponse() {
-        final OverwatchProfile result = this.invoke(
-                "getOverwatchProfile", "Shadorc#2503", OverwatchCmd.Platform.PC);
-        assertEquals(OverwatchCmd.Platform.PC, result.getPlatform());
-        assertNull(result.getProfile().getMessage().orElse(null));
-        assertFalse(result.getProfile().isPrivate());
-        assertNotNull(result.getProfile().getUsername());
-        assertNotNull(result.getProfile().getGames().getQuickplayWon());
-        assertNotNull(result.getProfile().getLevel());
-        assertNotNull(result.getProfile().getPortrait());
-        assertNotNull(result.getProfile().getQuickplayPlaytime());
-        assertNotNull(result.getQuickplay().getEliminationsPerLife());
-        assertNotNull(result.getQuickplay().getPlayed());
+        final String method = "getOverwatchProfile";
+        final OverwatchProfile result = this.invoke(method, "Shadorc#2503", OverwatchCmd.Platform.PC);
+        assertEquals(OverwatchCmd.Platform.PC, result.platform());
+        assertNull(result.profile().message().orElse(null));
+        assertFalse(result.profile().isPrivate());
+        assertFalse(result.profile().username().isBlank());
+        assertNotEquals(0, result.profile().games().getQuickplayWon());
+        assertNotEquals(0, result.profile().level());
+        assertFalse(result.profile().portrait().isBlank());
+        assertFalse(result.profile().getQuickplayPlaytime().isBlank());
+        assertFalse(result.getQuickplay().getEliminationsPerLife().isBlank());
+        assertFalse(result.getQuickplay().getPlayed().isBlank());
     }
 
     @Test
-    public void testGetResponseWrongBattletag() {
-        assertThrows(CommandException.class, () -> this.invoke(
-                "getOverwatchProfile", "&~#{([-|`_\"'\\^@)]=}°+¨^$£¤%* µ,?;.:/!§<>+-*/", OverwatchCmd.Platform.PC));
+    public void testGetResponseFuzzy() {
+        final String method = "getOverwatchProfile";
+        assertThrows(CommandException.class, () -> this.invoke(method, SPECIAL_CHARS, OverwatchCmd.Platform.PC));
     }
 
 }

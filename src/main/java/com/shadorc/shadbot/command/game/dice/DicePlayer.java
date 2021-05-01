@@ -7,8 +7,8 @@ public class DicePlayer extends GamblerPlayer {
 
     private final int number;
 
-    public DicePlayer(Snowflake guildId, Snowflake userId, long bet, int number) {
-        super(guildId, userId, bet);
+    public DicePlayer(Snowflake guildId, Snowflake userId, String username, long bet, int number) {
+        super(guildId, userId, username, bet);
         this.number = number;
     }
 

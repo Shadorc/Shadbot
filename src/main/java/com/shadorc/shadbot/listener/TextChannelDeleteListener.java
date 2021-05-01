@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.core.setting.Setting;
-import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.core.command.Setting;
+import com.shadorc.shadbot.database.DatabaseManager;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import reactor.core.publisher.Mono;
@@ -16,7 +16,7 @@ public class TextChannelDeleteListener implements EventListener<TextChannelDelet
     }
 
     @Override
-    public Mono<Void> execute(TextChannelDeleteEvent event) {
+    public Mono<?> execute(TextChannelDeleteEvent event) {
         return DatabaseManager.getGuilds()
                 .getDBGuild(event.getChannel().getGuildId())
                 .flatMap(dbGuild -> {
@@ -27,8 +27,7 @@ public class TextChannelDeleteListener implements EventListener<TextChannelDelet
                         return dbGuild.updateSetting(Setting.ALLOWED_TEXT_CHANNELS, allowedTextChannelIds);
                     }
                     return Mono.empty();
-                })
-                .then();
+                });
     }
 
 }

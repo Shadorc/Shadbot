@@ -1,24 +1,9 @@
 package com.shadorc.shadbot.api.json.gamestats.fortnite;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import reactor.util.annotation.Nullable;
-
 import java.util.Optional;
 
-public class FortniteResponse {
+public record FortniteResponse(Optional<String> error,
+                               Stats stats) {
 
-    @Nullable
-    @JsonProperty("error")
-    private String error;
-    @JsonProperty("stats")
-    private Stats stats;
-
-    public Optional<String> getError() {
-        return Optional.ofNullable(this.error);
-    }
-
-    public Stats getStats() {
-        return this.stats;
-    }
 
 }

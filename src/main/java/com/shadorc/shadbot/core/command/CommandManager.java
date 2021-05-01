@@ -1,39 +1,30 @@
 package com.shadorc.shadbot.core.command;
 
-import com.shadorc.shadbot.command.admin.IamCmd;
-import com.shadorc.shadbot.command.admin.ManageCoinsCmd;
-import com.shadorc.shadbot.command.admin.PruneCmd;
-import com.shadorc.shadbot.command.admin.SettingsCmd;
-import com.shadorc.shadbot.command.admin.member.BanCmd;
-import com.shadorc.shadbot.command.admin.member.KickCmd;
-import com.shadorc.shadbot.command.admin.member.SoftBanCmd;
 import com.shadorc.shadbot.command.currency.CoinsCmd;
 import com.shadorc.shadbot.command.currency.LeaderboardCmd;
 import com.shadorc.shadbot.command.currency.TransferCoinsCmd;
+import com.shadorc.shadbot.command.donator.DonatorGroup;
 import com.shadorc.shadbot.command.fun.ChatCmd;
-import com.shadorc.shadbot.command.fun.DtcCmd;
 import com.shadorc.shadbot.command.fun.JokeCmd;
 import com.shadorc.shadbot.command.fun.ThisDayCmd;
-import com.shadorc.shadbot.command.game.blackjack.BlackjackCmd;
-import com.shadorc.shadbot.command.game.dice.DiceCmd;
-import com.shadorc.shadbot.command.game.hangman.HangmanCmd;
-import com.shadorc.shadbot.command.game.lottery.LotteryCmd;
-import com.shadorc.shadbot.command.game.roulette.RouletteCmd;
-import com.shadorc.shadbot.command.game.rps.RpsCmd;
-import com.shadorc.shadbot.command.game.russianroulette.RussianRouletteCmd;
-import com.shadorc.shadbot.command.game.slotmachine.SlotMachineCmd;
-import com.shadorc.shadbot.command.game.trivia.TriviaCmd;
-import com.shadorc.shadbot.command.gamestats.CounterStrikeCmd;
-import com.shadorc.shadbot.command.gamestats.DiabloCmd;
-import com.shadorc.shadbot.command.gamestats.FortniteCmd;
-import com.shadorc.shadbot.command.gamestats.OverwatchCmd;
-import com.shadorc.shadbot.command.hidden.*;
-import com.shadorc.shadbot.command.image.*;
-import com.shadorc.shadbot.command.info.*;
+import com.shadorc.shadbot.command.game.GameGroup;
+import com.shadorc.shadbot.command.gamestats.GameStatsGroup;
+import com.shadorc.shadbot.command.image.ImageGroup;
+import com.shadorc.shadbot.command.image.Rule34Cmd;
+import com.shadorc.shadbot.command.info.InfoGroup;
+import com.shadorc.shadbot.command.moderation.ModerationGroup;
 import com.shadorc.shadbot.command.music.*;
-import com.shadorc.shadbot.command.owner.*;
-import com.shadorc.shadbot.command.utils.*;
-import com.shadorc.shadbot.command.utils.poll.PollCmd;
+import com.shadorc.shadbot.command.owner.OwnerGroup;
+import com.shadorc.shadbot.command.setting.SettingGroup;
+import com.shadorc.shadbot.command.standalone.*;
+import com.shadorc.shadbot.command.util.*;
+import com.shadorc.shadbot.command.util.poll.PollCmd;
+import com.shadorc.shadbot.command.util.translate.TranslateCmd;
+import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.object.ExceptionHandler;
+import discord4j.rest.service.ApplicationService;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -43,73 +34,83 @@ import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class CommandManager {
 
-    private static CommandManager instance;
+    private static final Map<String, BaseCmd> COMMANDS_MAP;
 
     static {
-        CommandManager.instance = new CommandManager();
-    }
-
-    private final Map<String, BaseCmd> commandsMap;
-
-    private CommandManager() {
-        this.commandsMap = CommandManager.initialize(
-                // Utility Commands
-                new WeatherCmd(), new MathCmd(), new TranslateCmd(), new WikipediaCmd(), new PollCmd(),
-                new UrbanCmd(), new LyricsCmd(),
-                // Fun Commands
-                new ChatCmd(), new ThisDayCmd(), new JokeCmd(), new DtcCmd(),
-                // Image Commands
-                new GifCmd(), new ImageCmd(), new WallpaperCmd(), new SuicideGirlsCmd(),
-                new Rule34Cmd(), new XkcdCmd(),
-                // Game Commands
-                new RpsCmd(), new HangmanCmd(), new TriviaCmd(), new RussianRouletteCmd(),
-                new SlotMachineCmd(), new RouletteCmd(), new BlackjackCmd(), new DiceCmd(),
-                new LotteryCmd(),
-                // Currency Commands
+        COMMANDS_MAP = CommandManager.initialize(
+                new InfoGroup(), new ImageGroup(), new ModerationGroup(), new OwnerGroup(),
+                new GameStatsGroup(), new SettingGroup(),
+                new DonatorGroup(), new GameGroup(),
+                // Image
+                new Rule34Cmd(), // TODO Improvement: Add to Image group when Discord autocompletion is implemented
+                // Standalone
+                new PingCmd(), new HelpCmd(), new AchievementsCmd(), new FeedbackCmd(), new InviteCmd(),
+                // Music
+                new BackwardCmd(), new BassBoostCmd(), new ClearCmd(), new ForwardCmd(), new NameCmd(),
+                new PauseCmd(), new PlaylistCmd(), new RepeatCmd(), new ShuffleCmd(), new SkipCmd(),
+                new StopCmd(), new VolumeCmd(), new PlayCmd(),
+                // Currency
                 new CoinsCmd(), new LeaderboardCmd(), new TransferCoinsCmd(),
-                // Music Commands
-                new PlayCmd(), new PauseCmd(), new StopCmd(), new SkipCmd(), new RepeatCmd(),
-                new BackwardCmd(), new ForwardCmd(), new VolumeCmd(), new NameCmd(),
-                new PlaylistCmd(), new ShuffleCmd(), new ClearCmd(), new BassBoostCmd(),
-                // Game Stats Commands
-                new FortniteCmd(), new DiabloCmd(), new CounterStrikeCmd(), new OverwatchCmd(),
-                // Info Commands
-                new PingCmd(), new InfoCmd(), new UserInfoCmd(), new ServerInfoCmd(),
-                new RolelistCmd(), new FeedbackCmd(), new InviteCmd(), new AchievementsCmd(),
-                new VoteCmd(),
-                // Admin Commands
-                new ManageCoinsCmd(), new PruneCmd(), new KickCmd(), new SoftBanCmd(), new BanCmd(),
-                new IamCmd(), new SettingsCmd(),
-                // Owner Commands
-                new LoggerCmd(), new LeaveGuildCmd(), new GenerateRelicCmd(), new SendMessageCmd(), new ShutdownCmd(),
-                new EnableCommandCmd(), new ManageAchievementsCmd(),
-                // Hidden Commands
-                new ActivateRelicCmd(), new HelpCmd(), new BaguetteCmd(), new RelicStatusCmd(), new PrefixCmd());
+                // Fun
+                new ChatCmd(), new JokeCmd(), new ThisDayCmd(),
+                // Util
+                new MathCmd(), new LyricsCmd(), new UrbanCmd(), new WeatherCmd(), new WikipediaCmd(),
+                new TranslateCmd(), new PollCmd());
     }
 
     private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {
-        final Map<String, BaseCmd> map = new LinkedHashMap<>();
+        final Map<String, BaseCmd> map = new LinkedHashMap<>(cmds.length);
         for (final BaseCmd cmd : cmds) {
-            for (final String name : cmd.getNames()) {
-                if (map.putIfAbsent(name, cmd) != null) {
-                    DEFAULT_LOGGER.error("Command name collision between {} and {}",
-                            name, map.get(name).getClass().getSimpleName());
-                }
+            if (map.putIfAbsent(cmd.getName(), cmd) != null) {
+                DEFAULT_LOGGER.error("Command name collision between {} and {}",
+                        cmd.getClass().getSimpleName(), map.get(cmd.getName()).getClass().getSimpleName());
             }
         }
-        DEFAULT_LOGGER.info("{} commands initialized", cmds.length);
+        DEFAULT_LOGGER.info("{} commands initialized", map.size());
         return Collections.unmodifiableMap(map);
     }
 
-    public Map<String, BaseCmd> getCommands() {
-        return this.commandsMap;
+    public static Mono<Void> register(ApplicationService applicationService, long applicationId) {
+        final Mono<Long> registerGuildCommands = Flux.fromIterable(COMMANDS_MAP.values())
+                .filter(cmd -> cmd.getCategory() == CommandCategory.OWNER)
+                .map(BaseCmd::asRequest)
+                .collectList()
+                .flatMapMany(requests -> applicationService
+                        .bulkOverwriteGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, requests))
+                .count()
+                .doOnNext(cmdCount -> DEFAULT_LOGGER.info("{} guild commands registered (ID: {})",
+                        cmdCount, Config.OWNER_GUILD_ID))
+                .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err)));
+
+        final Mono<Long> registerGlobalCommands = Flux.fromIterable(COMMANDS_MAP.values())
+                .filter(cmd -> cmd.getCategory() != CommandCategory.OWNER)
+                .map(BaseCmd::asRequest)
+                .collectList()
+                .flatMapMany(requests -> applicationService
+                        .bulkOverwriteGlobalApplicationCommand(applicationId, requests))
+                .count()
+                .doOnNext(cmdCount -> DEFAULT_LOGGER.info("{} global commands registered", cmdCount))
+                .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err)));
+
+        return registerGlobalCommands
+                .and(registerGuildCommands);
     }
 
-    public BaseCmd getCommand(String name) {
-        return this.commandsMap.get(name);
+    public static Map<String, BaseCmd> getCommands() {
+        return COMMANDS_MAP;
     }
 
-    public static CommandManager getInstance() {
-        return CommandManager.instance;
+    public static BaseCmd getCommand(String name) {
+        final BaseCmd cmd = COMMANDS_MAP.get(name);
+        if (cmd != null) {
+            return cmd;
+        }
+
+        return COMMANDS_MAP.values().stream()
+                .filter(it -> it instanceof BaseCmdGroup)
+                .flatMap(it -> ((BaseCmdGroup) it).getCommands().stream())
+                .filter(it -> it.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 }

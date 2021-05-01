@@ -11,17 +11,15 @@ public class Rule34CmdTest extends CmdTest<Rule34Cmd> {
     @Test
     public void testGetR34Post() {
         final R34Post result = this.invoke("getR34Post", "dab");
-        assertNotNull(result.getSource());
-        assertNotNull(result.getFileUrl());
-        assertNotNull(result.getTags());
-        assertTrue(result.getHeight() > 0);
-        assertTrue(result.getWidth() > 0);
+        assertFalse(result.fileUrl().isBlank());
+        assertFalse(result.getTags().isEmpty());
+        assertTrue(result.height() > 0);
+        assertTrue(result.width() > 0);
     }
 
     @Test
-    public void testGetR34PostSpecial() {
-        final R34Post result = this.invoke(
-                "getR34Post", "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/");
+    public void testGetR34PostFuzzy() {
+        final R34Post result = this.invoke("getR34Post", SPECIAL_CHARS);
         assertNull(result);
     }
 

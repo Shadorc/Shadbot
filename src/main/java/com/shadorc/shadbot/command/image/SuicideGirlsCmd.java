@@ -4,16 +4,14 @@ import com.shadorc.shadbot.api.html.suicidegirl.SuicideGirl;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.Setting;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.object.message.UpdatableMessage;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class SuicideGirlsCmd extends BaseCmd {
@@ -21,46 +19,35 @@ public class SuicideGirlsCmd extends BaseCmd {
     private static final String HOME_URL = "https://www.suicidegirls.com/photos/sg/recent/all/";
 
     public SuicideGirlsCmd() {
-        super(CommandCategory.IMAGE, List.of("suicide_girls"), "sg");
-        this.setDefaultRateLimiter();
+        super(CommandCategory.IMAGE, "suicidegirls", "Show random image from SuicideGirls");
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final UpdatableMessage updatableMsg = new UpdatableMessage(context.getClient(), context.getChannelId());
-
-        return updatableMsg.setContent(
-                String.format(Emoji.HOURGLASS + " (**%s**) Loading Suicide Girl picture...", context.getUsername()))
-                .send()
-                .then(context.isChannelNsfw())
+    public Mono<?> execute(Context context) {
+        return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return Mono.just(updatableMsg.setContent(ShadbotUtils.mustBeNsfw(context.getPrefix())));
+                        return context.reply(Emoji.GREY_EXCLAMATION,
+                                context.localize("must.be.nsfw").formatted(Setting.NSFW));
                     }
 
-                    return SuicideGirlsCmd.getRandomSuicideGirl()
-                            .map(girl -> updatableMsg.setEmbed(ShadbotUtils.getDefaultEmbed()
-                                    .andThen(embed -> embed.setAuthor("SuicideGirls", girl.getUrl(), context.getAvatarUrl())
-                                            .setDescription(String.format("Name: **%s**", girl.getName()))
-                                            .setImage(girl.getImageUrl()))));
-                })
-                .flatMap(UpdatableMessage::send)
-                .onErrorResume(err -> updatableMsg.deleteMessage().then(Mono.error(err)))
-                .then();
+                    return context.reply(Emoji.HOURGLASS, context.localize("suicidegirls.loading"))
+                            .then(SuicideGirlsCmd.getRandomSuicideGirl())
+                            .flatMap(post -> context.editReply(SuicideGirlsCmd.formatEmbed(context, post)));
+                });
+    }
+
+    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, SuicideGirl post) {
+        return ShadbotUtil.getDefaultEmbed(
+                embed -> embed.setAuthor("SuicideGirls", post.getUrl(), context.getAuthorAvatar())
+                        .setDescription(context.localize("suicidegirls.name").formatted(post.getName()))
+                        .setImage(post.getImageUrl()));
     }
 
     private static Mono<SuicideGirl> getRandomSuicideGirl() {
         return RequestHelper.request(HOME_URL)
                 .map(Jsoup::parse)
                 .map(SuicideGirl::new);
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show a random Suicide Girl image.")
-                .setSource("https://www.suicidegirls.com/")
-                .build();
     }
 
 }

@@ -3,6 +3,7 @@ package com.shadorc.shadbot.core.command;
 public enum CommandCategory {
 
     HIDDEN("Hidden"),
+    DONATOR("Donator"),
     UTILS("Utility"),
     FUN("Fun"),
     IMAGE("Image"),
@@ -12,7 +13,9 @@ public enum CommandCategory {
     GAMESTATS("Game Stats"),
     INFO("Info"),
     ADMIN("Admin"),
-    OWNER("Owner");
+    MODERATION("Moderation"),
+    OWNER("Owner"),
+    SETTING("Setting");
 
     private final String name;
 

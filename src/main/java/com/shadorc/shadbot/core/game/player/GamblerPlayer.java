@@ -7,9 +7,13 @@ public class GamblerPlayer extends Player {
 
     private final long bet;
 
-    public GamblerPlayer(Snowflake guildId, Snowflake userId, long bet) {
-        super(guildId, userId);
+    public GamblerPlayer(Snowflake guildId, Snowflake userId, String username, long bet) {
+        super(guildId, userId, username);
         this.bet = bet;
+    }
+
+    public GamblerPlayer(Snowflake guildId, Snowflake userId, long bet) {
+        this(guildId, userId, null, bet);
     }
 
     public long getBet() {
@@ -20,6 +24,7 @@ public class GamblerPlayer extends Player {
         return this.lose(this.bet);
     }
 
+    // TODO Question: Does any other game than Blackjack need this?
     public Mono<Void> cancelBet() {
         return this.win(this.bet);
     }

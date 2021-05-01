@@ -1,19 +1,24 @@
 package com.shadorc.shadbot.command.game.blackjack;
 
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
-import com.shadorc.shadbot.db.guilds.entity.Settings;
+import com.shadorc.shadbot.core.i18n.I18nManager;
+import com.shadorc.shadbot.core.ratelimiter.RateLimitResponse;
+import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.Inputs;
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.object.inputs.MessageInputs;
+import com.shadorc.shadbot.object.message.TemporaryMessage;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.channel.MessageChannel;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+import java.util.Locale;
 import java.util.function.Consumer;
 
-public class BlackjackInputs extends Inputs {
+public class BlackjackInputs extends MessageInputs {
 
     private final BlackjackGame game;
 
@@ -28,12 +33,26 @@ public class BlackjackInputs extends Inputs {
 
     @Override
     public Mono<Boolean> isValidEvent(MessageCreateEvent event) {
-        final Member member = event.getMember().orElseThrow();
+        final Snowflake memberId = event.getMember().orElseThrow().getId();
+        if (!this.game.getPlayers().containsKey(memberId)) {
+            return Mono.just(false);
+        }
+
         final String content = event.getMessage().getContent();
-        return this.game.isCancelMessage(event.getMessage())
-                .map(isCancelCmd -> isCancelCmd || this.game.getPlayers().containsKey(member.getId())
-                        && this.game.getActions().containsKey(content.toLowerCase())
-                        && !this.game.getRateLimiter().isLimitedAndWarn(event.getMessage().getChannelId(), member));
+        if (!this.game.getActions().containsKey(content.toLowerCase())) {
+            return Mono.just(false);
+        }
+
+        final RateLimiter ratelimiter = this.game.getRateLimiter();
+        final Snowflake guildId = event.getGuildId().orElseThrow();
+        final RateLimitResponse response = ratelimiter.isLimited(guildId, memberId);
+        if (response.shouldBeWarned()) {
+            final Locale locale = this.game.getContext().getLocale();
+            return new TemporaryMessage(event.getClient(), event.getMessage().getChannelId(), Duration.ofSeconds(8))
+                    .send(Emoji.STOPWATCH, ratelimiter.formatRateLimitMessage(locale))
+                    .thenReturn(!response.isLimited());
+        }
+        return Mono.just(!response.isLimited());
     }
 
     @Override
@@ -43,58 +62,47 @@ public class BlackjackInputs extends Inputs {
 
     @Override
     public Mono<Void> processEvent(MessageCreateEvent event) {
-        return this.game.isCancelMessage(event.getMessage())
-                .flatMap(isCancelMsg -> {
-                    final Member member = event.getMember().orElseThrow();
-                    if (isCancelMsg) {
-                        return event.getMessage().getChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(
-                                        String.format(Emoji.CHECK_MARK + " Blackjack game cancelled by **%s**.",
-                                                member.getUsername()), channel))
-                                .then(Mono.fromRunnable(this.game::stop));
-                    }
+        final Member member = event.getMember().orElseThrow();
+        final Mono<MessageChannel> getChannel = event.getMessage().getChannel();
+        final Locale locale = this.game.getContext().getLocale();
+        final Mono<Void> deleteMessage = event.getMessage().delete()
+                .onErrorResume(err -> Mono.empty());
 
-                    final BlackjackPlayer player = this.game.getPlayers().get(member.getId());
+        final BlackjackPlayer player = this.game.getPlayers().get(member.getId());
+        if (player.isStanding()) {
+            return getChannel
+                    .flatMap(channel -> DiscordUtil.sendMessage(Emoji.GREY_EXCLAMATION,
+                            I18nManager.localize(locale, "blackjack.exception.standing")
+                                    .formatted(member.getUsername()), channel))
+                    .then();
+        }
 
-                    if (player.isStanding()) {
-                        return this.game.getContext().getChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(
-                                        String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You're standing, you can't " +
-                                                "play anymore.", member.getUsername()), channel))
+        final String content = event.getMessage().getContent();
+        return Mono.
+                defer(() -> {
+                    if ("double down".equals(content) && player.getHand().count() != 2) {
+                        return getChannel
+                                .flatMap(channel -> DiscordUtil.sendMessage(Emoji.GREY_EXCLAMATION,
+                                        I18nManager.localize(locale, "blackjack.exception.double.down")
+                                                .formatted(member.getUsername()), channel))
                                 .then();
                     }
 
-                    return DatabaseManager.getGuilds()
-                            .getDBGuild(member.getGuildId())
-                            .map(DBGuild::getSettings)
-                            .map(Settings::getPrefix)
-                            .map(prefix -> event.getMessage().getContent()
-                                    .replace(prefix, "")
-                                    .toLowerCase()
-                                    .trim())
-                            .flatMap(content -> {
-                                if ("double down".equals(content) && player.getHand().count() != 2) {
-                                    return this.game.getContext().getChannel()
-                                            .flatMap(channel -> DiscordUtils.sendMessage(
-                                                    String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You must have a" +
-                                                                    " maximum of 2 cards to use `double down`.",
-                                                            member.getUsername()), channel))
-                                            .then();
-                                }
+                    final Consumer<BlackjackPlayer> action = this.game.getActions().get(content);
+                    if (action == null) {
+                        return Mono.empty();
+                    }
 
-                                final Consumer<BlackjackPlayer> action = this.game.getActions().get(content);
-                                if (action == null) {
-                                    return Mono.empty();
-                                }
+                    action.accept(player);
 
-                                action.accept(player);
-
-                                if (this.game.areAllPlayersStanding()) {
-                                    return this.game.end();
-                                }
-                                return this.game.show();
-                            });
-                });
+                    if (this.game.areAllPlayersStanding()) {
+                        return deleteMessage
+                                .then(this.game.end());
+                    }
+                    return deleteMessage
+                            .then(this.game.show());
+                })
+                .then();
     }
 
 }

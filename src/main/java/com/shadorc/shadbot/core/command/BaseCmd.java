@@ -1,7 +1,13 @@
 package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
+import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionChoiceData;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
+import discord4j.discordjson.json.ImmutableApplicationCommandOptionData;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
@@ -11,47 +17,60 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public abstract class BaseCmd {
 
+    protected static final Supplier<RateLimiter> DEFAULT_RATELIMITER = () ->
+            new RateLimiter(3, Duration.ofSeconds(5));
+    protected static final Supplier<RateLimiter> DEFAULT_GAME_RATELIMITER = () ->
+            new RateLimiter(1, Duration.ofSeconds(3));
+
     private final CommandCategory category;
     private final CommandPermission permission;
-    private final List<String> names;
+    private final String name;
+    private final String description;
+    private final List<ApplicationCommandOptionData> options;
     @Nullable
-    private final String alias;
+    private final ApplicationCommandOptionType type;
 
     @Nullable
     private RateLimiter rateLimiter;
     private boolean isEnabled;
 
-    protected BaseCmd(CommandCategory category, CommandPermission permission, List<String> names, @Nullable String alias) {
+    protected BaseCmd(CommandCategory category, CommandPermission permission, String name, String description,
+                      @Nullable ApplicationCommandOptionType type) {
         this.category = category;
         this.permission = permission;
-        this.names = new ArrayList<>(names);
-        this.alias = alias;
-        this.rateLimiter = null;
+        this.name = name;
+        this.description = description;
+        this.type = type;
+        this.options = new ArrayList<>();
+        this.rateLimiter = DEFAULT_RATELIMITER.get();
         this.isEnabled = true;
-
-        if (this.alias != null) {
-            this.names.add(this.alias);
-        }
     }
 
-    protected BaseCmd(CommandCategory category, CommandPermission permission, List<String> names) {
-        this(category, permission, names, null);
+    protected BaseCmd(CommandCategory category, CommandPermission permission, String name, String description) {
+        this(category, permission, name, description, null);
     }
 
-    protected BaseCmd(CommandCategory category, List<String> names, String alias) {
-        this(category, CommandPermission.USER, names, alias);
+    protected BaseCmd(CommandCategory category, String name, String description) {
+        this(category, CommandPermission.USER, name, description);
     }
 
-    protected BaseCmd(CommandCategory category, List<String> names) {
-        this(category, names, null);
+    public ApplicationCommandRequest asRequest() {
+        return ApplicationCommandRequest.builder()
+                .name(this.getName())
+                .description(this.getDescription())
+                .addAllOptions(this.getOptions())
+                .build();
     }
 
-    public abstract Mono<Void> execute(Context context);
+    public abstract Mono<?> execute(Context context);
 
-    public abstract Consumer<EmbedCreateSpec> getHelp(Context context);
+    public Consumer<EmbedCreateSpec> getHelp(Context context) {
+        return CommandHelpBuilder.create(context, this).build();
+    }
 
     public CommandCategory getCategory() {
         return this.category;
@@ -61,16 +80,20 @@ public abstract class BaseCmd {
         return this.permission;
     }
 
-    public List<String> getNames() {
-        return Collections.unmodifiableList(this.names);
-    }
-
     public String getName() {
-        return this.names.get(0);
+        return this.name;
     }
 
-    public Optional<String> getAlias() {
-        return Optional.ofNullable(this.alias);
+    public String getDescription() {
+        return this.description;
+    }
+
+    public List<ApplicationCommandOptionData> getOptions() {
+        return Collections.unmodifiableList(this.options);
+    }
+
+    public Optional<ApplicationCommandOptionType> getType() {
+        return Optional.ofNullable(this.type);
     }
 
     public Optional<RateLimiter> getRateLimiter() {
@@ -85,16 +108,30 @@ public abstract class BaseCmd {
         this.rateLimiter = rateLimiter;
     }
 
-    public void setDefaultRateLimiter() {
-        this.setRateLimiter(new RateLimiter(3, Duration.ofSeconds(5)));
-    }
-
     public void setGameRateLimiter() {
-        this.setRateLimiter(new RateLimiter(1, Duration.ofSeconds(3)));
+        this.setRateLimiter(DEFAULT_GAME_RATELIMITER.get());
     }
 
     public void setEnabled(boolean isEnabled) {
         this.isEnabled = isEnabled;
+    }
+
+    // TODO: Remove
+    public void addOption(String name, String description, boolean required, ApplicationCommandOptionType type) {
+        this.addOption(option -> option.name(name).description(description).required(required).type(type.getValue()));
+    }
+
+    // TODO: Remove
+    public void addOption(String name, String description, boolean required, ApplicationCommandOptionType type,
+                          List<ApplicationCommandOptionChoiceData> choices) {
+        this.addOption(option -> option.name(name).description(description)
+                .required(required).type(type.getValue()).choices(choices));
+    }
+
+    public void addOption(Consumer<ImmutableApplicationCommandOptionData.Builder> option) {
+        final ImmutableApplicationCommandOptionData.Builder mutatedOption = ApplicationCommandOptionData.builder();
+        option.accept(mutatedOption);
+        this.options.add(mutatedOption.build());
     }
 
 }

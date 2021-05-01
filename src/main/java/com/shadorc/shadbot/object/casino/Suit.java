@@ -22,10 +22,6 @@ public enum Suit {
         return this.color.equals(Color.RED);
     }
 
-    public boolean isBlack() {
-        return !this.isRed();
-    }
-
     public Emoji getEmoji() {
         return this.emoji;
     }

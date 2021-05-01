@@ -3,44 +3,43 @@ package com.shadorc.shadbot.command.game.blackjack;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.ShadbotUtil;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
-import reactor.util.function.Tuples;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class BlackjackCmd extends GameCmd<BlackjackGame> {
 
     public BlackjackCmd() {
-        super(List.of("blackjack"), "bj");
+        super("blackjack", "Start or join a blackjack game");
+
+        this.addOption(option -> option.name("bet")
+                .description("Your bet")
+                .type(ApplicationCommandOptionType.INTEGER.getValue())
+                .required(true));
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final String arg = context.requireArg();
+    public Mono<?> execute(Context context) {
+        final long bet = context.getOptionAsLong("bet").orElseThrow();
 
-        return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), arg)
-                .flatMap(bet -> {
-                    if (this.getManagers().containsKey(context.getChannelId())) {
-                        return Mono.just(Tuples.of(this.getManagers().get(context.getChannelId()), bet));
+        return ShadbotUtil.requireValidBet(context.getLocale(), context.getGuildId(), context.getAuthorId(), bet)
+                .flatMap(__ -> {
+                    if (this.isGameStarted(context.getChannelId())) {
+                        return Mono.just(this.getGame(context.getChannelId()));
                     } else {
-                        final BlackjackGame game = new BlackjackGame(this, context);
-                        this.getManagers().put(context.getChannelId(), game);
+                        final BlackjackGame game = new BlackjackGame(context);
+                        this.addGame(context.getChannelId(), game);
                         return game.start()
-                                .thenReturn(game)
-                                .zipWith(Mono.just(bet));
+                                .doOnError(err -> game.destroy())
+                                .thenReturn(game);
                     }
                 })
-                .flatMap(TupleUtils.function((blackjackGame, bet) -> {
-                    final BlackjackPlayer player = new BlackjackPlayer(context.getGuildId(), context.getAuthorId(), bet);
-                    // If the user was successfully added as a player
+                .flatMap(blackjackGame -> {
+                    final BlackjackPlayer player = new BlackjackPlayer(context.getGuildId(), context.getAuthorId(),
+                            context.getAuthorName(), bet);
                     if (blackjackGame.addPlayerIfAbsent(player)) {
                         return player.bet()
+                                .then(context.reply(Emoji.CHECK_MARK, context.localize("blackjack.joined")))
                                 .then(Mono.defer(() -> {
                                     if (blackjackGame.areAllPlayersStanding()) {
                                         return blackjackGame.end();
@@ -50,23 +49,8 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
                                 }));
                     }
 
-                    return context.getChannel()
-                            .flatMap(channel -> DiscordUtils.sendMessage(
-                                    String.format(Emoji.INFO + " (**%s**) You're already participating.",
-                                            context.getUsername()), channel))
-                            .then();
-                }));
+                    return context.reply(Emoji.INFO, context.localize("blackjack.already.participating"));
+                });
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Start or join a blackjack game.")
-                .addArg("bet", false)
-                .addField("Info", "**double down** - increase the initial bet by 100% in exchange for "
-                        + "committing to stand after receiving exactly one more card", false)
-                .addField("Rules", "This game follows the same rules as real Blackjack.", false)
-                .addField("Gains", String.format("Gains are multiplied by **%.1f** if you win.", Constants.WIN_MULTIPLICATOR), false)
-                .build();
-    }
 }

@@ -5,22 +5,15 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.users.entity.achievement.Achievement;
+import com.shadorc.shadbot.database.DatabaseManager;
+import com.shadorc.shadbot.database.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.EnumUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
-import discord4j.common.util.Snowflake;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.rest.http.client.ClientException;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class ManageAchievementsCmd extends BaseCmd {
 
@@ -29,28 +22,21 @@ public class ManageAchievementsCmd extends BaseCmd {
     }
 
     public ManageAchievementsCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER,
-                List.of("manage_achievements", "manage_achievement"));
+        super(CommandCategory.OWNER, CommandPermission.OWNER, "manage_achievements", "Manage user's achievements");
+        this.addOption("action", "Whether to add or remove an achievment", true, ApplicationCommandOptionType.STRING,
+                DiscordUtil.toOptions(Action.class));
+        this.addOption("achievement", "The achievement", true,
+                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Achievement.class));
+        this.addOption("user", "The user", true, ApplicationCommandOptionType.USER);
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final List<String> args = context.requireArgs(3);
+    public Mono<?> execute(Context context) {
+        final Action action = context.getOptionAsEnum(Action.class, "action").orElseThrow();
+        final Achievement achievement = context.getOptionAsEnum(Achievement.class, "achievement").orElseThrow();
 
-        final Action action = EnumUtils.parseEnum(Action.class, args.get(0),
-                new CommandException(String.format("`%s` is not a valid action. %s",
-                        args.get(0), FormatUtils.options(Action.class))));
-
-        final Achievement achievement = EnumUtils.parseEnum(Achievement.class, args.get(1),
-                new CommandException(String.format("`%s` is not a valid achievement. %s",
-                        args.get(1), FormatUtils.options(Achievement.class))));
-
-        final Long userId = NumberUtils.toPositiveLongOrNull(args.get(2));
-        if (userId == null) {
-            return Mono.error(new CommandException("Invalid user ID."));
-        }
-        return context.getClient()
-                .getUserById(Snowflake.of(userId))
+        return context.getOptionAsUser("user")
+                .switchIfEmpty(Mono.error(new CommandException("User not found.")))
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
                         err -> Mono.empty())
                 .flatMap(user -> DatabaseManager.getUsers().getDBUser(user.getId())
@@ -58,19 +44,9 @@ public class ManageAchievementsCmd extends BaseCmd {
                             case ADD -> dbUser.unlockAchievement(achievement);
                             case REMOVE -> dbUser.lockAchievement(achievement);
                         })
-                        .then(context.getChannel())
-                        .flatMap(channel -> DiscordUtils.sendMessage(String.format(Emoji.CHECK_MARK + " %s **%s** to **%s** done.",
-                                FormatUtils.capitalizeEnum(action), achievement.getTitle(), user.getTag()), channel)))
-                .switchIfEmpty(Mono.error(new CommandException("User not found.")))
-                .then();
+                        .then(context.reply(Emoji.CHECK_MARK, "%s achievement **%s** to **%s** done."
+                                .formatted(FormatUtil.capitalizeEnum(action), achievement.getTitle(context),
+                                        user.getTag()))));
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .addArg("action", FormatUtils.options(Action.class), false)
-                .addArg("achievement", FormatUtils.options(Achievement.class), false)
-                .addArg("userId", false)
-                .build();
-    }
 }

@@ -5,43 +5,28 @@ import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class PauseCmd extends BaseCmd {
 
     public PauseCmd() {
-        super(CommandCategory.MUSIC, List.of("pause", "unpause", "resume"));
-        this.setDefaultRateLimiter();
+        super(CommandCategory.MUSIC, "pause", "Toggle pause for current music");
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
+    public Mono<?> execute(Context context) {
         final AudioPlayer audioPlayer = context.requireGuildMusic().getTrackScheduler().getAudioPlayer();
 
-        return DiscordUtils.requireVoiceChannel(context)
-                .map(ignored -> {
+        return DiscordUtil.requireVoiceChannel(context)
+                .flatMap(__ -> {
                     audioPlayer.setPaused(!audioPlayer.isPaused());
                     if (audioPlayer.isPaused()) {
-                        return String.format(Emoji.PAUSE + " Music paused by **%s**.", context.getUsername());
+                        return context.reply(Emoji.PAUSE, context.localize("pause.paused"));
                     } else {
-                        return String.format(Emoji.PLAY + " Music resumed by **%s**.", context.getUsername());
+                        return context.reply(Emoji.PLAY, context.localize("pause.resumed"));
                     }
-                })
-                .flatMap(message -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(message, channel)))
-                .then();
+                });
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Pause current music. Use this command again to resume.")
-                .build();
-    }
 }

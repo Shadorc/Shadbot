@@ -1,18 +1,18 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.command.admin.IamCmd;
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
-import com.shadorc.shadbot.db.guilds.entity.Settings;
+import com.shadorc.shadbot.command.moderation.IamCmd;
+import com.shadorc.shadbot.core.i18n.I18nManager;
+import com.shadorc.shadbot.database.DatabaseManager;
+import com.shadorc.shadbot.database.guilds.entity.DBGuild;
+import com.shadorc.shadbot.database.guilds.entity.Settings;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.message.TemporaryMessage;
-import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.Permission;
@@ -24,6 +24,8 @@ import java.time.Duration;
 import java.util.Set;
 
 public class ReactionListener {
+
+    private static final Duration TMP_MESSAGE_DURATION = Duration.ofSeconds(8);
 
     private enum Action {
         ADD, REMOVE
@@ -37,7 +39,7 @@ public class ReactionListener {
         }
 
         @Override
-        public Mono<Void> execute(ReactionAddEvent event) {
+        public Mono<?> execute(ReactionAddEvent event) {
             return event.getMessage()
                     .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
                     .flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.ADD));
@@ -52,7 +54,7 @@ public class ReactionListener {
         }
 
         @Override
-        public Mono<Void> execute(ReactionRemoveEvent event) {
+        public Mono<?> execute(ReactionRemoveEvent event) {
             return event.getMessage()
                     .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())
                     .flatMap(message -> ReactionListener.iam(message, event.getUserId(), event.getEmoji(), Action.REMOVE));
@@ -61,26 +63,25 @@ public class ReactionListener {
 
     private static Mono<Boolean> canManageRole(Message message, Snowflake roleId) {
         return message.getGuild()
-                .flatMap(guild -> Mono.zip(guild.getMemberById(message.getClient().getSelfId()), guild.getRoleById(roleId)))
-                .flatMap(TupleUtils.function((selfMember, role) -> Mono.zip(
+                .flatMap(guild -> Mono.zip(
+                        guild.getSelfMember(),
+                        guild.getRoleById(roleId),
+                        DatabaseManager.getGuilds().getDBGuild(guild.getId()).map(DBGuild::getLocale)))
+                .flatMap(TupleUtils.function((selfMember, role, locale) -> Mono.zip(
                         selfMember.getBasePermissions().map(set -> set.contains(Permission.MANAGE_ROLES)),
                         selfMember.hasHigherRoles(Set.of(role.getId())))
                         .flatMap(TupleUtils.function((canManageRoles, hasHigherRoles) -> {
                             if (!canManageRoles) {
-                                return new TemporaryMessage(message.getClient(), message.getChannelId(), Duration.ofSeconds(15))
-                                        .send(String.format(Emoji.ACCESS_DENIED
-                                                        + " I can't add/remove a role due to a lack of permission."
-                                                        + "%nPlease, check my permissions to verify that %s is checked.",
-                                                String.format("**%s**", FormatUtils.capitalizeEnum(Permission.MANAGE_ROLES))))
+                                return new TemporaryMessage(message.getClient(), message.getChannelId(), TMP_MESSAGE_DURATION)
+                                        .send(Emoji.ACCESS_DENIED, I18nManager.localize(locale, "iam.exception.permission.lack")
+                                                .formatted(FormatUtil.capitalizeEnum(Permission.MANAGE_ROLES)))
                                         .thenReturn(false);
                             }
 
                             if (!hasHigherRoles) {
-                                return new TemporaryMessage(message.getClient(), message.getChannelId(), Duration.ofSeconds(15))
-                                        .send(String.format(Emoji.ACCESS_DENIED +
-                                                        " I can't add/remove role `%s` because I'm lower or " +
-                                                        "at the same level in the role hierarchy than this role.",
-                                                role.getName()))
+                                return new TemporaryMessage(message.getClient(), message.getChannelId(), TMP_MESSAGE_DURATION)
+                                        .send(Emoji.ACCESS_DENIED, I18nManager.localize(locale, "iam.exception.hierarchy")
+                                                .formatted(role.getName()))
                                         .thenReturn(false);
                             }
 
@@ -88,7 +89,7 @@ public class ReactionListener {
                         }))));
     }
 
-    private static Mono<Void> execute(Message message, Member member, Action action) {
+    private static Mono<?> execute(Message message, Member member, Action action) {
         return DatabaseManager.getGuilds()
                 .getDBGuild(member.getGuildId())
                 .map(DBGuild::getSettings)
@@ -100,7 +101,7 @@ public class ReactionListener {
                 .then();
     }
 
-    private static Mono<Void> iam(Message message, Snowflake userId, ReactionEmoji emoji, Action action) {
+    private static Mono<?> iam(Message message, Snowflake userId, ReactionEmoji emoji, Action action) {
         // If this is the correct reaction
         if (!emoji.equals(IamCmd.REACTION)) {
             return Mono.empty();
@@ -110,8 +111,9 @@ public class ReactionListener {
                 // It wasn't the bot that reacted
                 .filter(selfId -> !userId.equals(selfId))
                 // If the bot is not the author of the message, this is not an Iam message
-                .filter(selfId -> message.getAuthor().map(User::getId).map(selfId::equals).orElse(false))
-                .flatMap(ignored -> message.getGuild().flatMap(guild -> guild.getMemberById(userId)))
+                // TODO: Use Message#getAuthor once https://github.com/Discord4J/Discord4J/issues/911 is fixed
+                .filter(selfId -> message.getUserData().id().asLong() == selfId.asLong())
+                .flatMap(__ -> message.getGuild().flatMap(guild -> guild.getMemberById(userId)))
                 .flatMap(member -> ReactionListener.execute(message, member, action));
     }
 

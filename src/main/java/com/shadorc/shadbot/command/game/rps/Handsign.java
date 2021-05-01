@@ -1,22 +1,21 @@
 package com.shadorc.shadbot.command.game.rps;
 
+import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.object.Emoji;
 
 public enum Handsign {
-    ROCK("Rock", Emoji.GEM),
-    PAPER("Paper", Emoji.LEAF),
-    SCISSORS("Scissors", Emoji.SCISSORS);
+    ROCK(Emoji.GEM),
+    PAPER(Emoji.LEAF),
+    SCISSORS(Emoji.SCISSORS);
 
-    private final String handsign;
     private final Emoji emoji;
 
-    Handsign(String handsign, Emoji emoji) {
-        this.handsign = handsign;
+    Handsign(Emoji emoji) {
         this.emoji = emoji;
     }
 
-    public String getHandsign() {
-        return this.handsign;
+    public String getHandsign(I18nContext i18nContext) {
+        return i18nContext.localize("handsign.%s".formatted(this.name().toLowerCase()));
     }
 
     public Emoji getEmoji() {
@@ -28,5 +27,4 @@ public enum Handsign {
                 || this == Handsign.PAPER && other == Handsign.ROCK
                 || this == Handsign.SCISSORS && other == Handsign.PAPER;
     }
-
 }

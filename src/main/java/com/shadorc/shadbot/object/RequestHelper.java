@@ -6,9 +6,8 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.shadorc.shadbot.api.HeaderException;
 import com.shadorc.shadbot.api.ServerAccessException;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.utils.LogUtils;
-import com.shadorc.shadbot.utils.NetUtils;
-import io.netty.channel.unix.Errors;
+import com.shadorc.shadbot.utils.LogUtil;
+import com.shadorc.shadbot.utils.NetUtil;
 import io.netty.handler.codec.http.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,19 +16,16 @@ import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufMono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.http.client.HttpClientResponse;
-import reactor.netty.http.client.PrematureCloseException;
 import reactor.util.Logger;
-import reactor.util.retry.Retry;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 public class RequestHelper {
 
-    private static final Logger LOGGER = LogUtils.getLogger(RequestHelper.class);
+    private static final Logger LOGGER = LogUtil.getLogger(RequestHelper.class);
     private static final HttpClient HTTP_CLIENT = HttpClient.create().followRedirect(true);
 
     private final String url;
@@ -97,18 +93,19 @@ public class RequestHelper {
         }
 
         return byteBufMono.asString()
-                .flatMap(body -> Mono.<T>fromCallable(() -> {
-                    final String json = isXml ? XML.toJSONObject(body).toString() : body;
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("JSON deserialized from {}: {}",
-                                resp.fullPath(), new JSONObject(json).toString(2));
-                    }
-                    return NetUtils.MAPPER.readValue(json, type);
-                })
+                .flatMap(body -> Mono
+                        .<T>fromCallable(() -> {
+                            final String json = isXml ? XML.toJSONObject(body).toString() : body;
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.debug("JSON deserialized from {}:\n{}",
+                                        resp.resourceUrl(), new JSONObject(json).toString(2));
+                            }
+                            return NetUtil.MAPPER.readValue(json, type);
+                        })
                         .onErrorMap(err -> err instanceof JSONException || err instanceof JsonProcessingException,
                                 err -> new IOException(err.getMessage(),
-                                        new IOException(String.format("Invalid JSON received (response: %s): %s", resp, body)))))
-                .retryWhen(Retry.backoff(3, Duration.ofSeconds(1))
-                        .filter(err -> err instanceof PrematureCloseException || err instanceof Errors.NativeIoException));
+                                        new IOException("Invalid JSON received (response: %s): %s".formatted(resp, body)))))
+                .retryWhen(ExceptionHandler.RETRY_ON_INTERNET_FAILURES
+                        .apply("Retries exhausted while accessing %s".formatted(resp.resourceUrl())));
     }
 }

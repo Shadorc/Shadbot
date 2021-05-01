@@ -1,10 +1,10 @@
 package com.shadorc.shadbot.command.game.lottery;
 
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.db.lottery.entity.LotteryGambler;
-import com.shadorc.shadbot.db.lottery.entity.LotteryHistoric;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.database.lottery.entity.LotteryGambler;
+import com.shadorc.shadbot.database.lottery.entity.LotteryHistoric;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
 
 import java.util.List;
@@ -17,13 +17,13 @@ public class LotteryEmbedBuilder {
 
     private LotteryEmbedBuilder(Context context) {
         this.context = context;
-        this.embedConsumer = ShadbotUtils.getDefaultEmbed().andThen(embed ->
-                embed.setAuthor("Lottery", null, context.getAvatarUrl())
+        this.embedConsumer = ShadbotUtil.getDefaultEmbed(
+                embed -> embed.setAuthor(context.localize("lottery.embed.title"),
+                        null, context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/peLGtkS.png")
-                        .setDescription(String.format("The next draw will take place in **%s**%nTo " +
-                                        "participate, type: `%s%s %d-%d`",
-                                FormatUtils.formatDurationWords(LotteryCmd.getDelay()),
-                                context.getPrefix(), context.getCommandName(), Constants.MIN_NUM, Constants.MAX_NUM)));
+                        .setDescription(context.localize("lottery.embed.description")
+                                .formatted(FormatUtil.formatDurationWords(context.getLocale(), LotteryCmd.getDelay()),
+                                        context.getCommandName(), Constants.MIN_NUM, Constants.MAX_NUM)));
     }
 
     public static LotteryEmbedBuilder create(Context context) {
@@ -31,36 +31,42 @@ public class LotteryEmbedBuilder {
     }
 
     public LotteryEmbedBuilder withGamblers(List<LotteryGambler> gamblers) {
-        this.embedConsumer = this.embedConsumer.andThen(embed -> embed.addField("Number of participants",
-                Integer.toString(gamblers.size()), false));
+        this.embedConsumer = this.embedConsumer.andThen(
+                embed -> embed.addField(this.context.localize("lottery.embed.participants"),
+                        this.context.localize(gamblers.size()), false));
 
         gamblers.stream()
                 .filter(lotteryGambler -> lotteryGambler.getUserId().equals(this.context.getAuthorId()))
                 .findFirst()
-                .ifPresent(gambler -> this.embedConsumer = this.embedConsumer.andThen(embed -> embed.setFooter(
-                        String.format("You bet on number %d.", gambler.getNumber()),
-                        "https://i.imgur.com/btJAaAt.png")));
+                .ifPresent(gambler -> this.embedConsumer = this.embedConsumer.andThen(
+                        embed -> embed.setFooter(this.context.localize("lottery.embed.bet")
+                                        .formatted(gambler.getNumber()),
+                                "https://i.imgur.com/btJAaAt.png")));
 
         return this;
     }
 
     public LotteryEmbedBuilder withJackpot(long jackpot) {
-        this.embedConsumer = this.embedConsumer.andThen(embed -> embed.addField("Prize pool",
-                FormatUtils.coins(jackpot), false));
+        this.embedConsumer = this.embedConsumer.andThen(embed ->
+                embed.addField(this.context.localize("lottery.embed.pool.title"),
+                        this.context.localize("lottery.embed.pool.coins")
+                                .formatted(this.context.localize(jackpot)), false));
         return this;
     }
 
     public LotteryEmbedBuilder withHistoric(LotteryHistoric historic) {
         final String people = switch (historic.getWinnerCount()) {
-            case 0 -> "nobody";
-            case 1 -> "one person";
-            default -> historic.getWinnerCount() + " people";
+            case 0 -> this.context.localize("lottery.nobody");
+            case 1 -> this.context.localize("lottery.one.person");
+            default -> this.context.localize("lottery.people")
+                    .formatted(this.context.localize(historic.getWinnerCount()));
         };
 
-        this.embedConsumer = this.embedConsumer.andThen(embed -> embed.addField("Historic",
-                String.format("Last week, the prize pool contained **%s**, the winning " +
-                                "number was **%d** and **%s won**.",
-                        FormatUtils.coins(historic.getJackpot()), historic.getNumber(), people), false));
+        this.embedConsumer = this.embedConsumer.andThen(embed ->
+                embed.addField(this.context.localize("lottery.embed.historic.title"),
+                        this.context.localize("lottery.embed.historic.description")
+                                .formatted(this.context.localize(historic.getJackpot()), historic.getNumber(), people),
+                        false));
         return this;
     }
 

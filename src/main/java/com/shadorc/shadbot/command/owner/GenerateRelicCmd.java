@@ -1,52 +1,32 @@
 package com.shadorc.shadbot.command.owner;
 
-import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.db.premium.PremiumCollection;
-import com.shadorc.shadbot.db.premium.RelicType;
+import com.shadorc.shadbot.database.premium.PremiumCollection;
+import com.shadorc.shadbot.database.premium.RelicType;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.EnumUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.StringUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.StringUtil;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class GenerateRelicCmd extends BaseCmd {
 
     public GenerateRelicCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("generate_relic"));
+        super(CommandCategory.OWNER, CommandPermission.OWNER, "generate_relic", "Generate a relic");
+        this.addOption("type", "Relic type", true,
+                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(RelicType.class));
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final String arg = context.requireArg();
+    public Mono<?> execute(Context context) {
+        final RelicType type = context.getOptionAsEnum(RelicType.class, "type").orElseThrow();
 
-        final RelicType type = EnumUtils.parseEnum(RelicType.class, context.getArg().orElseThrow(),
-                new CommandException(String.format("`%s` in not a valid type. %s",
-                        arg, FormatUtils.options(RelicType.class))));
-
-        return PremiumCollection
-                .generateRelic(type)
-                .flatMap(relic -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(
-                                String.format(Emoji.CHECK_MARK + " %s relic generated: **%s**",
-                                        StringUtils.capitalize(type.toString()), relic.getId()), channel)))
-                .then();
+        return PremiumCollection.generateRelic(type)
+                .flatMap(relic -> context.reply(Emoji.CHECK_MARK, "%s relic generated: **%s**"
+                        .formatted(StringUtil.capitalize(type.name()), relic.getId())));
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Generate a relic.")
-                .addArg("type", FormatUtils.format(RelicType.class, "/"), false)
-                .build();
-    }
 }

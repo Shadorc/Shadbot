@@ -2,27 +2,47 @@ package com.shadorc.shadbot.core.game;
 
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
+import com.shadorc.shadbot.core.command.CommandPermission;
 import discord4j.common.util.Snowflake;
+import discord4j.rest.util.ApplicationCommandOptionType;
+import reactor.util.annotation.Nullable;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class GameCmd<T extends Game<?>> extends BaseCmd {
+public abstract class GameCmd<G extends Game> extends BaseCmd implements GameListener {
 
-    private final Map<Snowflake, T> managers;
+    private final Map<Snowflake, G> managers;
 
-    protected GameCmd(List<String> names, String alias) {
-        super(CommandCategory.GAME, names, alias);
+    protected GameCmd(String name, String description, @Nullable ApplicationCommandOptionType type) {
+        super(CommandCategory.GAME, CommandPermission.USER, name, description, type);
         this.setGameRateLimiter();
         this.managers = new ConcurrentHashMap<>();
     }
 
-    protected GameCmd(List<String> names) {
-        this(names, null);
+    protected GameCmd(String name, String description) {
+        this(name, description, null);
     }
 
-    public Map<Snowflake, T> getManagers() {
-        return this.managers;
+    public G getGame(Snowflake channelId) {
+        return this.managers.get(channelId);
+    }
+
+    public void addGame(Snowflake channelId, G game) {
+        this.managers.put(channelId, game);
+        game.addGameListener(this);
+    }
+
+    public void removeGame(Snowflake channelId) {
+        this.managers.remove(channelId);
+    }
+
+    public boolean isGameStarted(Snowflake channelId) {
+        return this.managers.containsKey(channelId);
+    }
+
+    @Override
+    public void onGameDestroy(Snowflake channelId) {
+        this.removeGame(channelId);
     }
 }

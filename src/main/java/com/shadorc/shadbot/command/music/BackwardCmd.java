@@ -6,58 +6,45 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
-import com.shadorc.shadbot.utils.TimeUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.TimeUtil;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
+import java.time.Duration;
 
 public class BackwardCmd extends BaseCmd {
 
     public BackwardCmd() {
-        super(CommandCategory.MUSIC, List.of("backward"));
-        this.setDefaultRateLimiter();
+        super(CommandCategory.MUSIC, "backward", "Fast backward current music a specified amount of time");
+        this.addOption(option -> option.name("time")
+                .description("Number of seconds or formatted time (e.g. 72 or 1m12s)")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
+    public Mono<?> execute(Context context) {
         final GuildMusic guildMusic = context.requireGuildMusic();
-        final String arg = context.requireArg();
 
-        return DiscordUtils.requireVoiceChannel(context)
-                .map(ignored -> {
-                    // If the argument is a number of seconds...
-                    Long num = NumberUtils.toPositiveLongOrNull(arg);
-                    if (num == null) {
-                        try {
-                            // ... else, try to parse it
-                            num = TimeUtils.parseTime(arg);
-                        } catch (final IllegalArgumentException err) {
-                            throw new CommandException(String.format("`%s` is not a valid number / time.", arg));
-                        }
+        return DiscordUtil.requireVoiceChannel(context)
+                .flatMap(__ -> {
+                    final String time = context.getOptionAsString("time").orElseThrow();
+
+                    final Duration duration;
+                    try {
+                        duration = TimeUtil.parseTime(time);
+                    } catch (final IllegalArgumentException err) {
+                        return Mono.error(new CommandException(context.localize("backward.invalid.time")
+                                .formatted(time)));
                     }
 
                     final long newPosition = guildMusic.getTrackScheduler()
-                            .changePosition(-TimeUnit.SECONDS.toMillis(num));
-                    return String.format(Emoji.CHECK_MARK + " New position set to **%s** by **%s**.",
-                            FormatUtils.formatDuration(newPosition), context.getUsername());
-                })
-                .flatMap(message -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(message, channel)))
-                .then();
+                            .changePosition(-duration.toMillis());
+                    return context.reply(Emoji.CHECK_MARK, context.localize("backward.message")
+                            .formatted(FormatUtil.formatDuration(newPosition)));
+                });
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Fast backward current song a specified amount of time.")
-                .addArg("time", "can be seconds or time (e.g. 72 or 1m12s)", false)
-                .build();
-    }
 }

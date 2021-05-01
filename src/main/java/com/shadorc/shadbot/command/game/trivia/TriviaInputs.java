@@ -1,15 +1,14 @@
 package com.shadorc.shadbot.command.game.trivia;
 
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.Inputs;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.NumberUtils;
+import com.shadorc.shadbot.object.inputs.MessageInputs;
+import com.shadorc.shadbot.utils.NumberUtil;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import reactor.core.publisher.Mono;
 
-public class TriviaInputs extends Inputs {
+public class TriviaInputs extends MessageInputs {
 
     private final TriviaGame game;
 
@@ -33,53 +32,38 @@ public class TriviaInputs extends Inputs {
     }
 
     @Override
-    public Mono<Void> processEvent(MessageCreateEvent event) {
-        return this.game.isCancelMessage(event.getMessage())
-                .flatMap(isCancelMsg -> {
-                    final Member member = event.getMember().orElseThrow();
-                    if (isCancelMsg) {
-                        return event.getMessage().getChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(
-                                        String.format(Emoji.CHECK_MARK + " Trivia game cancelled by **%s**.",
-                                                member.getUsername()), channel))
-                                .then(Mono.fromRunnable(this.game::stop));
-                    }
+    public Mono<?> processEvent(MessageCreateEvent event) {
+        // It's a number or a text
+        final String content = event.getMessage().getContent();
+        final Integer choice = NumberUtil.toIntBetweenOrNull(content, 1, this.game.getAnswers().size());
 
-                    // It's a number or a text
-                    final String content = event.getMessage().getContent();
-                    final Integer choice = NumberUtils.toIntBetweenOrNull(content, 1, this.game.getAnswers().size());
+        // Message is a text and doesn't match any answers, ignore it
+        if (choice == null && this.game.getAnswers().stream().noneMatch(content::equalsIgnoreCase)) {
+            return Mono.empty();
+        }
 
-                    // Message is a text and doesn't match any answers, ignore it
-                    if (choice == null && this.game.getAnswers().stream().noneMatch(content::equalsIgnoreCase)) {
-                        return Mono.empty();
-                    }
+        // If the user has already answered and has been warned, ignore him
+        final Member member = event.getMember().orElseThrow();
+        final TriviaPlayer player = this.game.getPlayers().get(member.getId());
+        if (player != null && player.hasAnswered()) {
+            return Mono.empty();
+        }
 
-                    // If the user has already answered and has been warned, ignore him
-                    if (this.game.getPlayers().containsKey(member.getId())
-                            && this.game.getPlayers().get(member.getId()).hasAnswered()) {
-                        return Mono.empty();
-                    }
+        this.game.hasAnswered(member.getId());
 
-                    final String answer = choice == null ? content : this.game.getAnswers().get(choice - 1);
-
-                    if (this.game.getPlayers().containsKey(member.getId())) {
-                        this.game.hasAnswered(member.getId());
-                        return event.getMessage().getChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(
-                                        String.format(Emoji.GREY_EXCLAMATION + " (**%s**) You can only answer once.",
-                                                member.getUsername()), channel))
-                                .then();
-                    } else if (answer.equalsIgnoreCase(this.game.getCorrectAnswer())) {
-                        return this.game.win(member).then();
-                    } else {
-                        this.game.hasAnswered(member.getId());
-                        return event.getMessage().getChannel()
-                                .flatMap(channel -> DiscordUtils.sendMessage(
-                                        String.format(Emoji.THUMBSDOWN + " (**%s**) Wrong answer.",
-                                                member.getUsername()), channel))
-                                .then();
-                    }
-                });
+        final String answer = choice == null ? content : this.game.getAnswers().get(choice - 1);
+        // The user was already a player, so they already guessed something, but was not yet warned
+        if (player != null) {
+            return this.game.getContext()
+                    .reply(Emoji.GREY_EXCLAMATION, this.game.getContext().localize("trivia.already.answered")
+                            .formatted(member.getUsername()));
+        } else if (answer.equalsIgnoreCase(this.game.getCorrectAnswer())) {
+            return this.game.win(member);
+        } else {
+            return this.game.getContext()
+                    .reply(Emoji.THUMBSDOWN, this.game.getContext().localize("trivia.wrong.answer")
+                            .formatted(member.getUsername()));
+        }
     }
 
 }

@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.object.casino;
 
-import com.shadorc.shadbot.utils.FormatUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,11 +40,11 @@ public class Hand {
 
         int value = 0;
         for (final Card card : this.cards) {
-            if (card.getValue() == Value.ACE) {
+            if (card.value() == Value.ACE) {
                 aceCount++;
             } else {
                 // King, Queen and Jack have a number superior to 10 but their value is 10
-                value += Math.min(10, card.getValue().getNumeric());
+                value += Math.min(10, card.value().getNumeric());
             }
         }
 
@@ -57,11 +57,12 @@ public class Hand {
     }
 
     public String format() {
-        return String.format("%s%nValue: %d",
-                FormatUtils.format(this.getCards(),
-                        card -> String.format("`%s` %s", card.getValue().getIdent(), card.getSuit().getEmoji()),
-                        " | "),
-                this.getValue());
+        return "%s%nValue: %d"
+                .formatted(
+                        FormatUtil.format(this.getCards(),
+                                card -> "`%s` %s".formatted(card.value().getIdent(), card.suit().getEmoji()),
+                                " | "),
+                        this.getValue());
     }
 
 }

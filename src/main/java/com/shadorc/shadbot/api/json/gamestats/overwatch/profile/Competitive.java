@@ -1,34 +1,7 @@
 package com.shadorc.shadbot.api.json.gamestats.overwatch.profile;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+public record Competitive(CompetitiveRank tank,
+                          CompetitiveRank damage,
+                          CompetitiveRank support) {
 
-public class Competitive {
-
-    @JsonProperty("tank")
-    private CompetitiveRank tank;
-    @JsonProperty("damage")
-    private CompetitiveRank damage;
-    @JsonProperty("support")
-    private CompetitiveRank support;
-
-    public CompetitiveRank getTank() {
-        return this.tank;
-    }
-
-    public CompetitiveRank getDamage() {
-        return this.damage;
-    }
-
-    public CompetitiveRank getSupport() {
-        return this.support;
-    }
-
-    @Override
-    public String toString() {
-        return "Competitive{" +
-                "tank=" + this.tank +
-                ", damage=" + this.damage +
-                ", support=" + this.support +
-                '}';
-    }
 }

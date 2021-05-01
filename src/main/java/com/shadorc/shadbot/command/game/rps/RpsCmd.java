@@ -1,91 +1,76 @@
 package com.shadorc.shadbot.command.game.rps;
 
-import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.EnumUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.RandUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import com.shadorc.shadbot.utils.RandUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 public class RpsCmd extends BaseCmd {
 
+    // Key is Guild ID, User ID
     private final Map<Tuple2<Snowflake, Snowflake>, RpsPlayer> players;
 
     public RpsCmd() {
-        super(CommandCategory.GAME, List.of("rps"));
+        super(CommandCategory.GAME, "rps", "Play a Rock–paper–scissors game, win-streak increases gains");
         this.setGameRateLimiter();
+
+        this.addOption(option -> option.name("handsign")
+                .description("Your next move")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Handsign.class)));
 
         this.players = new ConcurrentHashMap<>();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final String arg = context.requireArg();
+    public Mono<?> execute(Context context) {
+        final Handsign userHandsign = context.getOptionAsEnum(Handsign.class, "handsign").orElseThrow();
+        final Handsign botHandsign = RandUtil.randValue(Handsign.values());
 
-        final Handsign userHandsign = EnumUtils.parseEnum(Handsign.class, arg,
-                new CommandException(String.format("`%s` is not a valid handsign. %s.",
-                        arg, FormatUtils.options(Handsign.class))));
+        final StringBuilder strBuilder = new StringBuilder(context.localize("rps.result")
+                .formatted(context.getAuthorName(), userHandsign.getHandsign(context), userHandsign.getEmoji(),
+                        botHandsign.getEmoji(), botHandsign.getHandsign(context)));
 
-        final Handsign botHandsign = RandUtils.randValue(Handsign.values());
+        final RpsPlayer player = this.getPlayer(context.getGuildId(), context.getAuthorId());
+        if (userHandsign.isSuperior(botHandsign)) {
+            player.incrementWinStream();
+            final int winStreak = player.getWinStreak();
+            final long gains = Math.min((long) Constants.GAINS * winStreak, Config.MAX_COINS);
+            Telemetry.RPS_SUMMARY.labels("win").observe(gains);
+            return player.win(gains)
+                    .then(Mono.defer(() -> {
+                        strBuilder.append(Emoji.BANK + context.localize("rps.win")
+                                .formatted(context.getAuthorName(), context.localize(gains),
+                                        context.localize(player.getWinStreak())));
+                        return context.reply(strBuilder.toString());
+                    }));
+        } else if (userHandsign == botHandsign) {
+            player.resetWinStreak();
+            strBuilder.append(context.localize("rps.draw"));
+        } else {
+            player.resetWinStreak();
+            strBuilder.append(context.localize("rps.lose"));
+        }
 
-        final StringBuilder strBuilder = new StringBuilder(String.format("**%s**: %s %s **VS** %s %s :**Shadbot**%n",
-                context.getUsername(), userHandsign.getHandsign(), userHandsign.getEmoji(),
-                botHandsign.getEmoji(), botHandsign.getHandsign()));
-
-        return Mono.just(this.getPlayer(context.getGuildId(), context.getAuthorId()))
-                .flatMap(player -> {
-                    if (userHandsign.isSuperior(botHandsign)) {
-                        final int winStreak = player.getWinStreak().incrementAndGet();
-                        final long gains = Math.min((long) Constants.GAINS * winStreak, Config.MAX_COINS);
-                        Telemetry.RPS_SUMMARY.labels("win").observe(gains);
-                        return player.win(gains)
-                                .thenReturn(strBuilder.append(
-                                        String.format(Emoji.BANK + " (**%s**) Well done, you win **%s** (Win Streak x%d)!",
-                                                context.getUsername(), FormatUtils.coins(gains), player.getWinStreak().get())));
-                    } else if (userHandsign == botHandsign) {
-                        player.getWinStreak().set(0);
-                        strBuilder.append("It's a draw.");
-                    } else {
-                        player.getWinStreak().set(0);
-                        strBuilder.append("I win !");
-                    }
-                    return Mono.just(strBuilder);
-                })
-                .map(StringBuilder::toString)
-                .flatMap(text -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(text, channel)))
-                .then();
+        return context.reply(strBuilder.toString());
     }
 
     private RpsPlayer getPlayer(Snowflake guildId, Snowflake userId) {
         return this.players.computeIfAbsent(Tuples.of(guildId, userId), TupleUtils.function(RpsPlayer::new));
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Play a Rock–paper–scissors game.")
-                .addArg("handsign", FormatUtils.format(Handsign.values(), Handsign::getHandsign, ", "), false)
-                .addField("Gains", String.format("The winner gets **%s** multiplied by his win-streak.",
-                        FormatUtils.coins(Constants.GAINS)), false)
-                .build();
     }
 
 }

@@ -9,12 +9,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class MultiplayerGame<G extends GameCmd<?>, P extends Player> extends Game<G> {
+public abstract class MultiplayerGame<P extends Player> extends Game {
 
-    private final Map<Snowflake, P> players;
+    protected final Map<Snowflake, P> players;
 
-    protected MultiplayerGame(G gameCmd, Context context, Duration duration) {
-        super(gameCmd, context, duration);
+    protected MultiplayerGame(Context context, Duration duration) {
+        super(context, duration);
         this.players = new ConcurrentHashMap<>();
     }
 

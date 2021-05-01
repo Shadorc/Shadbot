@@ -6,56 +6,46 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.TrackScheduler;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
-import com.shadorc.shadbot.utils.StringUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class PlaylistCmd extends BaseCmd {
 
+    private static final int MAX_DESCRIPTION_LENGTH = 1800;
+
     public PlaylistCmd() {
-        super(CommandCategory.MUSIC, List.of("playlist"));
-        this.setDefaultRateLimiter();
+        super(CommandCategory.MUSIC, "playlist", "Current playlist");
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
+    public Mono<?> execute(Context context) {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
-        final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
-                .andThen(embed -> embed.setAuthor("Playlist", null, context.getAvatarUrl())
+        return context.reply(ShadbotUtil.getDefaultEmbed(
+                embed -> embed.setAuthor(context.localize("playlist.title"), null, context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
-                        .setDescription(PlaylistCmd.formatPlaylist(guildMusic.getTrackScheduler())));
-
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(embedConsumer, channel))
-                .then();
+                        .setDescription(PlaylistCmd.formatPlaylist(context, guildMusic.getTrackScheduler()))));
     }
 
-    private static String formatPlaylist(TrackScheduler trackScheduler) {
+    private static String formatPlaylist(Context context, TrackScheduler trackScheduler) {
         final AudioTrack currentTrack = trackScheduler.getAudioPlayer().getPlayingTrack();
         final int musicCount = trackScheduler.getPlaylist().size() + (currentTrack == null ? 0 : 1);
         if (musicCount == 0) {
-            return "**The playlist is empty.**";
+            return context.localize("playlist.empty");
         }
 
-        final StringBuilder playlistStr = new StringBuilder(String.format("**%s in the playlist:**%n",
-                StringUtils.pluralOf(musicCount, "music")));
+        final StringBuilder playlistStr = new StringBuilder(context.localize("playlist.music.count")
+                .formatted(musicCount));
 
-        playlistStr.append(String.format("%n\t**1.** [%s](%s)",
-                FormatUtils.trackName(currentTrack.getInfo()), currentTrack.getInfo().uri));
+        playlistStr.append("%n\t**1.** [%s](%s)"
+                .formatted(FormatUtil.trackName(context.getLocale(), currentTrack.getInfo()), currentTrack.getInfo().uri));
 
         int count = 2;
         for (final AudioTrack track : trackScheduler.getPlaylist()) {
-            final String name = String.format("%n\t**%d.** [%s](%s)",
-                    count, FormatUtils.trackName(track.getInfo()), track.getInfo().uri);
-            if (playlistStr.length() + name.length() < 1800) {
+            final String name = "%n\t**%d.** [%s](%s)"
+                    .formatted(count, FormatUtil.trackName(context.getLocale(), track.getInfo()), track.getInfo().uri);
+            if (playlistStr.length() + name.length() < MAX_DESCRIPTION_LENGTH) {
                 playlistStr.append(name);
             } else {
                 playlistStr.append("\n\t...");
@@ -66,10 +56,4 @@ public class PlaylistCmd extends BaseCmd {
         return playlistStr.toString();
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show current playlist.")
-                .build();
-    }
 }

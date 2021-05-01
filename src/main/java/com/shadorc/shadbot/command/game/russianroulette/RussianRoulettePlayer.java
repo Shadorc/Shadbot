@@ -1,14 +1,16 @@
 package com.shadorc.shadbot.command.game.russianroulette;
 
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
-import com.shadorc.shadbot.utils.TimeUtils;
+import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.common.util.Snowflake;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 
 public class RussianRoulettePlayer extends GamblerPlayer {
+
+    private static final int MAX_BULLETS = 6;
 
     private Instant lastTimePlayed;
     private Instant deadInstant;
@@ -23,7 +25,7 @@ public class RussianRoulettePlayer extends GamblerPlayer {
     private void init() {
         this.lastTimePlayed = null;
         this.deadInstant = null;
-        this.bulletIndex = ThreadLocalRandom.current().nextInt(1, 7);
+        this.bulletIndex = ThreadLocalRandom.current().nextInt(1, MAX_BULLETS + 1);
         this.index = 6;
     }
 
@@ -35,24 +37,28 @@ public class RussianRoulettePlayer extends GamblerPlayer {
         this.lastTimePlayed = Instant.now();
     }
 
-    public int getIndex() {
-        return this.index;
+    public int getRemaining() {
+        return MAX_BULLETS - this.index;
     }
 
-    public int getRemaining() {
-        return 6 - this.index;
+    public Duration getResetDuration() {
+        if (this.deadInstant == null) {
+            return Duration.ZERO;
+        }
+        return Duration.ofHours(Constants.RESET_HOURS)
+                .minus(TimeUtil.elapsed(this.deadInstant));
     }
 
     public boolean isAlive() {
-        // If the player has not played since one day, reset
+        // If the time is elapsed since the player last played, reset
         if (this.lastTimePlayed != null
-                && TimeUnit.MILLISECONDS.toHours(TimeUtils.getMillisUntil(this.lastTimePlayed)) >= Constants.RESET_HOURS) {
+                && TimeUtil.elapsed(this.lastTimePlayed).toHours() >= Constants.RESET_HOURS) {
             this.init();
         }
 
         // If the player has been dead for one day, reset
         if (this.deadInstant != null
-                && TimeUnit.MILLISECONDS.toHours(TimeUtils.getMillisUntil(this.deadInstant)) >= Constants.RESET_HOURS) {
+                && TimeUtil.elapsed(this.deadInstant).toHours() >= Constants.RESET_HOURS) {
             this.init();
             return true;
         }

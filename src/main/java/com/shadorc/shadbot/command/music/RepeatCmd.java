@@ -1,81 +1,64 @@
 package com.shadorc.shadbot.command.music;
 
-import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.music.GuildMusic;
 import com.shadorc.shadbot.music.TrackScheduler;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.EnumUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class RepeatCmd extends BaseCmd {
 
     public RepeatCmd() {
-        super(CommandCategory.MUSIC, List.of("repeat", "loop"));
-        this.setDefaultRateLimiter();
+        super(CommandCategory.MUSIC, "repeat", "Toggle song/playlist repetition");
+        this.addOption("mode", "none/song/playlist (disable repetition or repeat the current song/playlist)",
+                false, ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(TrackScheduler.RepeatMode.class));
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
+    public Mono<?> execute(Context context) {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
-        return DiscordUtils.requireVoiceChannel(context)
-                .map(ignored -> {
+        return DiscordUtil.requireVoiceChannel(context)
+                .flatMap(__ -> {
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
                     final TrackScheduler.RepeatMode oldMode = scheduler.getRepeatMode();
-                    final TrackScheduler.RepeatMode newMode = context.getArg()
-                            .map(str -> EnumUtils.parseEnum(TrackScheduler.RepeatMode.class, str,
-                                    new CommandException(String.format("`%s` is not a valid mode.", str))))
-                            .orElse(oldMode == TrackScheduler.RepeatMode.NONE ?
-                                    TrackScheduler.RepeatMode.SONG : TrackScheduler.RepeatMode.NONE);
+                    final TrackScheduler.RepeatMode newMode =
+                            context.getOptionAsEnum(TrackScheduler.RepeatMode.class, "mode")
+                                    .orElse(oldMode == TrackScheduler.RepeatMode.NONE ?
+                                            TrackScheduler.RepeatMode.SONG : TrackScheduler.RepeatMode.NONE);
 
                     if (oldMode == newMode) {
-                        return String.format(Emoji.INFO + " Repeat mode already set to %s.",
-                                oldMode.toString().toLowerCase());
+                        return context.reply(Emoji.INFO, context.localize("repeat.already.set")
+                                .formatted(oldMode.name().toLowerCase()));
                     }
 
                     scheduler.setRepeatMode(newMode);
 
                     if (newMode == TrackScheduler.RepeatMode.NONE) {
-                        return String.format(Emoji.PLAY + " Repetition disabled by **%s**.", context.getUsername());
+                        return context.reply(Emoji.PLAY, context.localize("repeat.disabled"));
                     }
 
                     final StringBuilder strBuilder = new StringBuilder(Emoji.REPEAT + " ");
                     if (oldMode == TrackScheduler.RepeatMode.PLAYLIST) {
-                        strBuilder.append("Playlist repetition disabled. ");
+                        strBuilder.append(context.localize("repeat.playlist.disabled"));
                     } else if (oldMode == TrackScheduler.RepeatMode.SONG) {
-                        strBuilder.append("Song repetition disabled. ");
+                        strBuilder.append(context.localize("repeat.song.disabled"));
                     }
+
+                    strBuilder.append(' ');
 
                     if (newMode == TrackScheduler.RepeatMode.PLAYLIST) {
-                        strBuilder.append("Playlist ");
+                        strBuilder.append(context.localize("repeat.playlist.enabled"));
                     } else if (newMode == TrackScheduler.RepeatMode.SONG) {
-                        strBuilder.append("Song ");
+                        strBuilder.append(context.localize("repeat.song.enabled"));
                     }
 
-                    return strBuilder.append(String.format("repetition enabled by **%s**.", context.getUsername()))
-                            .toString();
-                })
-                .flatMap(message -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(message, channel)))
-                .then();
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Toggle song/playlist repetition.")
-                .setUsage("[none/song/playlist]")
-                .addArg("none/song/playlist", "disable repetition or repeat the current song/playlist", true)
-                .build();
+                    return context.reply(strBuilder.toString());
+                });
     }
 
 }

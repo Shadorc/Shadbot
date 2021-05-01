@@ -1,8 +1,7 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
-import com.shadorc.shadbot.db.guilds.entity.DBMember;
+import com.shadorc.shadbot.database.DatabaseManager;
+import com.shadorc.shadbot.database.guilds.entity.DBMember;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.object.entity.Message;
 import reactor.core.publisher.Mono;
@@ -16,7 +15,7 @@ public class MemberLeaveListener implements EventListener<MemberLeaveEvent> {
     }
 
     @Override
-    public Mono<Void> execute(MemberLeaveEvent event) {
+    public Mono<?> execute(MemberLeaveEvent event) {
         // Delete the member from the database
         final Mono<Void> deleteMember = Mono.justOrEmpty(event.getMember())
                 .flatMap(member -> DatabaseManager.getGuilds()
@@ -24,16 +23,23 @@ public class MemberLeaveListener implements EventListener<MemberLeaveEvent> {
                 .flatMap(DBMember::delete);
 
         // Send an automatic leave message if one was configured
-        final Mono<Message> sendLeaveMessage = DatabaseManager.getGuilds()
-                .getDBGuild(event.getGuildId())
-                .map(DBGuild::getSettings)
+        @Deprecated final Mono<Message> sendLeaveMessageDeprecated = DatabaseManager.getGuilds()
+                .getSettings(event.getGuildId())
                 .flatMap(settings -> Mono.zip(
                         Mono.justOrEmpty(settings.getMessageChannelId()),
                         Mono.justOrEmpty(settings.getLeaveMessage())))
                 .flatMap(TupleUtils.function((channelId, leaveMessage) ->
-                        MemberJoinListener.sendAutoMessage(event.getClient(), event.getUser(),
-                                channelId, leaveMessage)));
+                        MemberJoinListener.sendAutoMessage(event.getClient(), event.getUser(), channelId, leaveMessage)));
 
-        return deleteMember.and(sendLeaveMessage);
+        final Mono<Message> sendLeaveMessage = DatabaseManager.getGuilds()
+                .getSettings(event.getGuildId())
+                .flatMap(settings -> Mono.justOrEmpty(settings.getAutoLeaveMessage()))
+                .flatMap(autoLeaveMessage ->
+                        MemberJoinListener.sendAutoMessage(event.getClient(), event.getUser(),
+                                autoLeaveMessage.getChannelId(), autoLeaveMessage.getMessage()));
+
+        return deleteMember
+                .and(sendLeaveMessageDeprecated)
+                .and(sendLeaveMessage);
     }
 }

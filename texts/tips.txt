@@ -1,7 +1,0 @@
-{default_prefix}lottery
-{default_prefix}setting
-{default_prefix}invite
-{default_prefix}achievements
-{default_prefix}vote
-Feedback? {default_prefix}feedback
-Prefix lost? {default_prefix}prefix

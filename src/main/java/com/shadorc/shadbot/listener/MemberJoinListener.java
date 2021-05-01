@@ -1,8 +1,7 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.db.DatabaseManager;
-import com.shadorc.shadbot.db.guilds.entity.DBGuild;
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.database.DatabaseManager;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
@@ -25,37 +24,43 @@ public class MemberJoinListener implements EventListener<MemberJoinEvent> {
     }
 
     @Override
-    public Mono<Void> execute(MemberJoinEvent event) {
+    public Mono<?> execute(MemberJoinEvent event) {
         // Send an automatic join message if one was configured
-        final Mono<Message> sendWelcomeMessage = DatabaseManager.getGuilds()
-                .getDBGuild(event.getGuildId())
-                .map(DBGuild::getSettings)
+        @Deprecated final Mono<Message> sendWelcomeMessageDeprecated = DatabaseManager.getGuilds()
+                .getSettings(event.getGuildId())
                 .flatMap(settings -> Mono.zip(
                         Mono.justOrEmpty(settings.getMessageChannelId()),
                         Mono.justOrEmpty(settings.getJoinMessage())))
                 .flatMap(TupleUtils.function((messageChannelId, joinMessage) ->
                         MemberJoinListener.sendAutoMessage(event.getClient(), event.getMember(), messageChannelId, joinMessage)));
 
+        final Mono<Message> sendWelcomeMessage = DatabaseManager.getGuilds()
+                .getSettings(event.getGuildId())
+                .flatMap(settings -> Mono.justOrEmpty(settings.getAutoJoinMessage()))
+                .flatMap(autoJoinMessage ->
+                        MemberJoinListener.sendAutoMessage(event.getClient(), event.getMember(),
+                                autoJoinMessage.getChannelId(), autoJoinMessage.getMessage()));
+
         // Add auto-roles when a user joins if they are configured
         final Flux<Void> addAutoRoles = event.getGuild()
                 .flatMap(Guild::getSelfMember)
                 .flatMapMany(self -> self.getBasePermissions()
                         .filter(permissions -> permissions.contains(Permission.MANAGE_ROLES))
-                        .flatMap(ignored -> DatabaseManager.getGuilds()
-                                .getDBGuild(event.getGuildId())
-                                .map(DBGuild::getSettings))
+                        .flatMap(__ -> DatabaseManager.getGuilds().getSettings(event.getGuildId()))
                         .flatMapMany(settings -> Flux.fromIterable(settings.getAutoRoleIds())
                                 .flatMap(roleId -> event.getClient().getRoleById(event.getGuildId(), roleId))
                                 .filterWhen(role -> self.hasHigherRoles(Set.of(role.getId())))
                                 .flatMap(role -> event.getMember().addRole(role.getId()))));
 
-        return sendWelcomeMessage.and(addAutoRoles);
+        return sendWelcomeMessageDeprecated
+                .and(sendWelcomeMessage)
+                .and(addAutoRoles);
     }
 
     public static Mono<Message> sendAutoMessage(GatewayDiscordClient gateway, User user, Snowflake channelId, String message) {
         return gateway.getChannelById(channelId)
                 .cast(MessageChannel.class)
-                .flatMap(channel -> DiscordUtils.sendMessage(message
+                .flatMap(channel -> DiscordUtil.sendMessage(message
                         .replace("{username}", user.getUsername())
                         .replace("{userId}", user.getId().asString())
                         .replace("{mention}", user.getMention()), channel));

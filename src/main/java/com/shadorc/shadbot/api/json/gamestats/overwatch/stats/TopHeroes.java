@@ -1,20 +1,5 @@
 package com.shadorc.shadbot.api.json.gamestats.overwatch.stats;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+public record TopHeroes(Quickplay quickplay) {
 
-public class TopHeroes {
-
-    @JsonProperty("quickplay")
-    private Quickplay quickplay;
-
-    public Quickplay getQuickplay() {
-        return this.quickplay;
-    }
-
-    @Override
-    public String toString() {
-        return "TopHeroes{" +
-                "quickplay=" + this.quickplay +
-                '}';
-    }
 }

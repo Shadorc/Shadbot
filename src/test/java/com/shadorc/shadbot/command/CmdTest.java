@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command;
 
-import com.shadorc.shadbot.utils.LogUtils;
+import com.shadorc.shadbot.utils.LogUtil;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 
@@ -10,6 +10,8 @@ import java.util.Arrays;
 
 public abstract class CmdTest<T> {
 
+    protected static final String SPECIAL_CHARS = "&~#{([-|`_\"'\\^@)]=}°+¨^ $£¤%*µ,?;.:/!§<>+-*/";
+
     private final Logger logger;
     private final Class<T> cmdClass;
     private final T cmd;
@@ -17,7 +19,7 @@ public abstract class CmdTest<T> {
     @SuppressWarnings("unchecked")
     public CmdTest() {
         this.cmdClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        this.logger = LogUtils.getLogger(this.cmdClass, LogUtils.Category.TEST);
+        this.logger = LogUtil.getLogger(this.cmdClass, LogUtil.Category.TEST);
         try {
             this.cmd = this.cmdClass.getConstructor().newInstance();
         } catch (final Exception err) {
@@ -34,16 +36,13 @@ public abstract class CmdTest<T> {
 
             final Object resultObj = method.invoke(this.cmd, args);
             final R result = resultObj instanceof Mono ? ((Mono<R>) resultObj).block() : (R) resultObj;
-            if (this.logger.isDebugEnabled()) {
-                this.logger.debug("{}: {}", this.cmdClass.getSimpleName(), result);
-            }
+            this.logger.info("{}#{}{} result:\n{}", this.cmdClass.getSimpleName(), name, Arrays.toString(args), result);
             return result;
         } catch (final RuntimeException err) {
             throw err;
         } catch (final Exception err) {
-            final Throwable cause = err.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
+            if (err.getCause() instanceof RuntimeException cause) {
+                throw cause;
             }
             throw new RuntimeException(err);
         }

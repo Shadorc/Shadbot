@@ -1,16 +1,22 @@
 package com.shadorc.shadbot.music;
 
+import com.shadorc.shadbot.core.i18n.I18nManager;
+import com.shadorc.shadbot.database.DatabaseManager;
+import com.shadorc.shadbot.database.guilds.entity.DBGuild;
 import com.shadorc.shadbot.listener.music.AudioLoadResultListener;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.ExceptionHandler;
-import com.shadorc.shadbot.utils.DiscordUtils;
+import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.voice.VoiceConnection;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.util.Map;
@@ -54,9 +60,9 @@ public class GuildMusic {
     public void scheduleLeave() {
         LOGGER.debug("{Guild ID: {}} Scheduling auto-leave", this.guildId);
         this.leavingTask.set(Mono.delay(LEAVE_DELAY, Schedulers.boundedElastic())
-                .filter(ignored -> this.isLeavingScheduled())
-                .map(ignored -> this.gateway.getVoiceConnectionRegistry())
-                .flatMap(registry -> registry.getVoiceConnection(Snowflake.of(this.guildId)))
+                .filter(__ -> this.isLeavingScheduled())
+                .map(__ -> this.gateway.getVoiceConnectionRegistry())
+                .flatMap(registry -> registry.getVoiceConnection(this.getGuildId()))
                 .flatMap(VoiceConnection::disconnect)
                 .subscribe(null, ExceptionHandler::handleUnknownError));
     }
@@ -68,32 +74,28 @@ public class GuildMusic {
         }
     }
 
-    public void addAudioLoadResultListener(AudioLoadResultListener listener, String identifier) {
+    public void addAudioLoadResultListener(AudioLoadResultListener listener) {
         LOGGER.debug("{Guild ID: {}} Adding audio load result listener: {}", this.guildId, listener.hashCode());
-        this.listeners.put(listener, MusicManager.getInstance().loadItemOrdered(this.guildId, identifier, listener));
+        this.listeners.put(listener, MusicManager.loadItemOrdered(this.guildId, listener));
     }
 
-    public Mono<Void> removeAudioLoadResultListener(AudioLoadResultListener listener) {
+    public void removeAudioLoadResultListener(AudioLoadResultListener listener) {
         LOGGER.debug("{Guild ID: {}} Removing audio load result listener: {}", this.guildId, listener.hashCode());
         this.listeners.remove(listener);
-        // If there is no music playing and nothing is loading, leave the voice channel
-        if (this.trackScheduler.isStopped() && this.listeners.values().stream().allMatch(Future::isDone)) {
-            return this.gateway.getVoiceConnectionRegistry()
-                    .getVoiceConnection(Snowflake.of(this.guildId))
-                    .flatMap(VoiceConnection::disconnect);
-        }
-        return Mono.empty();
     }
 
-    public Mono<Void> end() {
+    public Mono<Message> end() {
         LOGGER.debug("{Guild ID: {}} Ending guild music", this.guildId);
         return this.getGateway()
                 .getVoiceConnectionRegistry()
-                .getVoiceConnection(Snowflake.of(this.guildId))
+                .getVoiceConnection(this.getGuildId())
                 .flatMap(VoiceConnection::disconnect)
                 .then(this.getMessageChannel())
-                .flatMap(channel -> DiscordUtils.sendMessage(Emoji.INFO + " End of the playlist.", channel))
-                .then();
+                .zipWith(DatabaseManager.getGuilds().getDBGuild(this.getGuildId())
+                        .map(DBGuild::getLocale))
+                .flatMap(TupleUtils.function((channel, locale) -> DiscordUtil.sendMessage(Emoji.INFO,
+                        I18nManager.localize(locale, "music.playlist.end"),
+                        channel)));
     }
 
     public GatewayDiscordClient getGateway() {
@@ -121,12 +123,20 @@ public class GuildMusic {
         return Snowflake.of(this.djId.get());
     }
 
+    public Mono<User> getDj() {
+        return this.gateway.getUserById(this.getDjId());
+    }
+
     public boolean isWaitingForChoice() {
         return this.isWaitingForChoice.get();
     }
 
     public boolean isLeavingScheduled() {
         return this.leavingTask.get() != null && !this.leavingTask.get().isDisposed();
+    }
+
+    public boolean isWaitingForListeners() {
+        return !this.listeners.values().stream().allMatch(Future::isDone);
     }
 
     public void setWaitingForChoice(boolean isWaitingForChoice) {

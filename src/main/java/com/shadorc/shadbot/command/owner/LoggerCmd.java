@@ -8,15 +8,12 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import com.shadorc.shadbot.utils.DiscordUtil;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.function.Consumer;
+import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class LoggerCmd extends BaseCmd {
 
@@ -30,18 +27,25 @@ public class LoggerCmd extends BaseCmd {
     }
 
     public LoggerCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, List.of("logger"));
+        super(CommandCategory.OWNER, CommandPermission.OWNER, "logger", "Change the level of a logger");
+        this.addOption(option -> option.name("name")
+                .description("Can be 'root' to change root logger")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("level")
+                .description("The new logger level")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(LogLevel.class)));
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        final List<String> args = context.requireArgs(2);
-
-        final String name = args.get(0);
-        final Level level = Level.toLevel(args.get(1).toUpperCase(), null);
+    public Mono<?> execute(Context context) {
+        final String name = context.getOptionAsString("name").orElseThrow();
+        final LogLevel logLevel = context.getOptionAsEnum(LogLevel.class, "level").orElseThrow();
+        final Level level = Level.toLevel(logLevel.name(), null);
         if (level == null) {
-            return Mono.error(new CommandException(String.format("`%s` in not a valid level. %s",
-                    args.get(1), FormatUtils.options(LogLevel.class))));
+            return Mono.error(new CommandException("`%s` in not a valid level.".formatted(logLevel)));
         }
 
         final Logger logger;
@@ -53,19 +57,8 @@ public class LoggerCmd extends BaseCmd {
 
         logger.setLevel(level);
 
-        return context.getChannel()
-                .flatMap(channel -> DiscordUtils.sendMessage(
-                        String.format(Emoji.INFO + " Logger `%s` set to level `%s`.", name, level), channel))
-                .then();
-    }
-
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Change the level of a logger.")
-                .addArg("name", "can be `root` to change root logger", false)
-                .addArg("level", FormatUtils.format(LogLevel.class, ", "), false)
-                .build();
+        DEFAULT_LOGGER.info("Logger '{}' set to level {}", name, level);
+        return context.reply(Emoji.INFO, "Logger `%s` set to level `%s`.".formatted(name, level));
     }
 
 }

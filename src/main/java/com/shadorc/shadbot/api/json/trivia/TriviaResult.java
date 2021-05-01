@@ -5,34 +5,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class TriviaResult {
-
-    @JsonProperty("category")
-    private String category;
-    @JsonProperty("type")
-    private String type;
-    @JsonProperty("difficulty")
-    private String difficulty;
-    @JsonProperty("question")
-    private String question;
-    @JsonProperty("correct_answer")
-    private String correctAnswer;
-    @JsonProperty("incorrect_answers")
-    private List<String> incorrectAnswers;
-
-    public String getCategory() {
-        return this.category;
-    }
-
-    public String getType() {
-        return this.type;
-    }
-
-    public String getDifficulty() {
-        return this.difficulty;
-    }
+public record TriviaResult(String category,
+                           String type,
+                           String difficulty,
+                           String question,
+                           @JsonProperty("correct_answer") String correctAnswer,
+                           @JsonProperty("incorrect_answers") List<String> incorrectAnswers) {
 
     public String getQuestion() {
         return Jsoup.parse(this.question).text();
@@ -46,7 +25,7 @@ public class TriviaResult {
         return this.incorrectAnswers.stream()
                 .map(Jsoup::parse)
                 .map(Document::text)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 }

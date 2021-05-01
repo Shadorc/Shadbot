@@ -5,92 +5,73 @@ import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
-import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
 public class RussianRouletteCmd extends BaseCmd {
 
     private final Map<Tuple2<Snowflake, Snowflake>, RussianRoulettePlayer> players;
 
     public RussianRouletteCmd() {
-        super(CommandCategory.GAME, List.of("russian_roulette"), "rr");
+        super(CommandCategory.GAME, "russian_roulette", "Play russian roulette");
         this.setGameRateLimiter();
 
         this.players = new ConcurrentHashMap<>();
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        return ShadbotUtils.requireValidBet(context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
-                .map(ignored -> this.getPlayer(context.getGuildId(), context.getAuthorId()))
-                .filter(RussianRoulettePlayer::isAlive)
-                .switchIfEmpty(context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(
-                                String.format(Emoji.BROCKEN_HEART + " (**%s**) Dead people can't play the Russian Roulette... " +
-                                                "You will be able to play again in %d hours!",
-                                        context.getUsername(), Constants.RESET_HOURS), channel))
-                        .then(Mono.empty()))
-                .flatMap(player -> player.bet().thenReturn(player))
-                .flatMap(player -> {
+    public Mono<?> execute(Context context) {
+        final RussianRoulettePlayer player = this.getPlayer(context.getGuildId(), context.getAuthorId());
+        return ShadbotUtil.requireValidBet(context.getLocale(), context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
+                .then(Mono.defer(() -> {
+                    if (!player.isAlive()) {
+                        return context.reply(Emoji.BROKEN_HEART, context.localize("russianroulette.already.dead")
+                                .formatted(FormatUtil.formatDurationWords(context.getLocale(), player.getResetDuration())))
+                                .then(Mono.empty());
+                    }
+
                     player.fire();
 
-                    final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtils.getDefaultEmbed()
-                            .andThen(embed -> embed.setAuthor("Russian Roulette", null, context.getAvatarUrl())
-                                    .addField("Tries", String.format("%d/6", player.getRemaining()), false));
-
-                    final StringBuilder descBuilder = new StringBuilder("You break a sweat, you pull the trigger...");
-
+                    final StringBuilder descBuilder = new StringBuilder(context.localize("russianroulette.pull"));
                     if (player.isAlive()) {
                         final long coins = (long) ThreadLocalRandom.current()
                                 .nextInt(Constants.MIN_GAINS, Constants.MAX_GAINS + 1) * player.getRemaining();
 
-                        descBuilder.append(String.format("\n**\\*click\\*** ... Phew, you are still alive!%nYou get **%s**.",
-                                FormatUtils.coins(coins)));
+                        descBuilder.append(context.localize("russianroulette.win")
+                                .formatted(context.localize(coins)));
 
                         Telemetry.RUSSIAN_ROULETTE_SUMMARY.labels("win").observe(coins);
-                        return player.cancelBet()
-                                .then(player.win(coins))
-                                .thenReturn(embedConsumer.andThen(embed -> embed.setDescription(descBuilder.toString())));
-                    }
+                        return player.win(coins)
+                                .thenReturn(descBuilder);
+                    } else {
+                        descBuilder.append(context.localize("russianroulette.lose"));
 
-                    descBuilder.append("\n**\\*PAN\\*** ... Sorry, you died...");
-                    Telemetry.RUSSIAN_ROULETTE_SUMMARY.labels("loss").observe(player.getBet());
-                    return Mono.just(embedConsumer.andThen(embed -> embed.setDescription(descBuilder.toString())));
-                })
-                .flatMap(embed -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(embed, channel)))
-                .then();
+                        Telemetry.RUSSIAN_ROULETTE_SUMMARY.labels("loss").observe(player.getBet());
+                        return player.bet()
+                                .thenReturn(descBuilder);
+                    }
+                }))
+                .map(StringBuilder::toString)
+                .map(description -> ShadbotUtil.getDefaultEmbed(
+                        embed -> embed.setAuthor(context.localize("russianroulette.title"),
+                                null, context.getAuthorAvatar())
+                                .addField(context.localize("russianroulette.tries"),
+                                        "%d/6".formatted(player.getRemaining()), false)
+                                .setDescription(description)))
+                .flatMap(context::reply);
     }
 
     private RussianRoulettePlayer getPlayer(Snowflake guildId, Snowflake userId) {
         return this.players.computeIfAbsent(Tuples.of(guildId, userId), TupleUtils.function(RussianRoulettePlayer::new));
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Play russian roulette.")
-                .addField("Rules", String.format("You initially have 1/6 chance of dying and, the more you win, " +
-                        "the more you are likely to lose. " +
-                        "%nOnce dead, you will not be able to play for %d hours.", Constants.RESET_HOURS), false)
-                .addField("Cost", String.format("A game costs **%s**.", FormatUtils.coins(Constants.PAID_COST)), false)
-                .addField("Gains", String.format("Each time you win, you randomly get between **%s** and **%s** multiplied" +
-                                " by your number of tries.",
-                        FormatUtils.coins(Constants.MIN_GAINS), FormatUtils.coins(Constants.MAX_GAINS)), false)
-                .build();
-    }
 }

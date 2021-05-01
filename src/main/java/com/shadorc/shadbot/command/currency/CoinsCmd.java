@@ -3,49 +3,38 @@ package com.shadorc.shadbot.command.currency;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.db.DatabaseManager;
+import com.shadorc.shadbot.database.DatabaseManager;
+import com.shadorc.shadbot.database.guilds.entity.DBMember;
 import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import com.shadorc.shadbot.utils.DiscordUtils;
-import com.shadorc.shadbot.utils.FormatUtils;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
-
-import java.util.List;
-import java.util.function.Consumer;
 
 public class CoinsCmd extends BaseCmd {
 
     public CoinsCmd() {
-        super(CommandCategory.CURRENCY, List.of("coins", "coin"));
-        this.setDefaultRateLimiter();
+        super(CommandCategory.CURRENCY, "coins", "Show user's coins");
+        this.addOption(option -> option.name("user")
+                .description("If not specified, it will show your coins")
+                .required(false)
+                .type(ApplicationCommandOptionType.USER.getValue()));
     }
 
     @Override
-    public Mono<Void> execute(Context context) {
-        return context.getGuild()
-                .flatMap(guild -> DiscordUtils.extractMemberOrAuthor(guild, context.getMessage()))
-                .flatMap(user -> Mono.zip(Mono.just(user),
-                        DatabaseManager.getGuilds().getDBMember(context.getGuildId(), user.getId())))
-                .map(TupleUtils.function((user, dbMember) -> {
-                    final String coins = FormatUtils.coins(dbMember.getCoins());
-                    if (user.getId().equals(context.getAuthorId())) {
-                        return String.format("(**%s**) You have **%s**.", user.getUsername(), coins);
-                    } else {
-                        return String.format("**%s** has **%s**.", user.getUsername(), coins);
-                    }
-                }))
-                .flatMap(text -> context.getChannel()
-                        .flatMap(channel -> DiscordUtils.sendMessage(Emoji.PURSE + " " + text, channel)))
-                .then();
+    public Mono<?> execute(Context context) {
+        return context.getOptionAsMember("user")
+                .defaultIfEmpty(context.getAuthor())
+                .flatMap(user -> DatabaseManager.getGuilds()
+                        .getDBMember(context.getGuildId(), user.getId())
+                        .map(DBMember::getCoins)
+                        .flatMap(coins -> {
+                            if (user.getId().equals(context.getAuthorId())) {
+                                return context.reply(Emoji.PURSE, context.localize("coins.yours")
+                                        .formatted(context.localize(coins)));
+                            } else {
+                                return context.reply(Emoji.PURSE, context.localize("coins.user")
+                                        .formatted(user.getUsername(), context.localize(coins)));
+                            }
+                        }));
     }
 
-    @Override
-    public Consumer<EmbedCreateSpec> getHelp(Context context) {
-        return CommandHelpBuilder.create(this, context)
-                .setDescription("Show how many coins a user has.")
-                .addArg("@user", "if not specified, it will show your coins", true)
-                .build();
-    }
 }

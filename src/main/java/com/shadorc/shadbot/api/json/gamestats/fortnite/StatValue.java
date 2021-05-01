@@ -1,18 +1,6 @@
 package com.shadorc.shadbot.api.json.gamestats.fortnite;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class StatValue {
-
-    @JsonProperty("valueInt")
-    private final int valueInt;
-    @JsonProperty("valueDec")
-    private final double valueDec;
-
-    public StatValue() {
-        this.valueInt = 0;
-        this.valueDec = 0;
-    }
+public record StatValue(int valueInt, double valueDec) {
 
     @Override
     public String toString() {

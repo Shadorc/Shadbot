@@ -1,10 +1,10 @@
 package com.shadorc.shadbot.object.help;
 
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.utils.FormatUtils;
-import com.shadorc.shadbot.utils.ShadbotUtils;
+import com.shadorc.shadbot.utils.FormatUtil;
+import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
 import discord4j.discordjson.possible.Possible;
 import reactor.util.annotation.Nullable;
@@ -18,32 +18,26 @@ public abstract class HelpBuilder {
 
     protected final Context context;
 
-    private final List<Argument> args;
-    private final List<ImmutableEmbedFieldData> fields;
+    protected final List<ApplicationCommandOptionData> options;
+    protected final List<ImmutableEmbedFieldData> fields;
 
     @Nullable
     private String authorName;
     @Nullable
     private String authorUrl;
     @Nullable
-    private String thumbnail;
+    private String thumbnailUrl;
     @Nullable
     private String description;
-    @Nullable
-    private String usage;
-    @Nullable
-    private String example;
     @Nullable
     private String source;
     @Nullable
     private String footer;
-    private String delimiter;
 
     protected HelpBuilder(Context context) {
         this.context = context;
-        this.args = new ArrayList<>();
+        this.options = new ArrayList<>();
         this.fields = new ArrayList<>();
-        this.delimiter = Config.COMMAND_DELIMITER;
     }
 
     public HelpBuilder setAuthor(String authorName, String authorUrl) {
@@ -52,23 +46,13 @@ public abstract class HelpBuilder {
         return this;
     }
 
-    public HelpBuilder setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
+    public HelpBuilder setThumbnail(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
         return this;
     }
 
     public HelpBuilder setDescription(String description) {
-        this.description = String.format("**%s**", description);
-        return this;
-    }
-
-    public HelpBuilder setFullUsage(String usage) {
-        this.usage = usage;
-        return this;
-    }
-
-    public HelpBuilder setExample(String example) {
-        this.example = example;
+        this.description = "**%s**".formatted(description);
         return this;
     }
 
@@ -77,23 +61,9 @@ public abstract class HelpBuilder {
         return this;
     }
 
-    public HelpBuilder setDelimiter(String delimiter) {
-        this.delimiter = delimiter;
-        return this;
-    }
-
     public HelpBuilder setFooter(String footer) {
         this.footer = footer;
         return this;
-    }
-
-    public HelpBuilder addArg(String name, String desc, boolean isOptional) {
-        this.args.add(new Argument(name, desc, isOptional));
-        return this;
-    }
-
-    public HelpBuilder addArg(String name, boolean isOptional) {
-        return this.addArg(name, null, isOptional);
     }
 
     public HelpBuilder addField(String name, String value, boolean inline) {
@@ -102,63 +72,57 @@ public abstract class HelpBuilder {
     }
 
     public Consumer<EmbedCreateSpec> build() {
-        return ShadbotUtils.getDefaultEmbed()
-                .andThen(embed -> {
-                    if (this.authorName != null && !this.authorName.isBlank()) {
-                        embed.setAuthor(this.authorName, this.authorUrl, this.context.getAvatarUrl());
-                    }
-                    embed.addField("Usage", this.getUsage(), false);
+        return ShadbotUtil.getDefaultEmbed(embed -> {
+            if (this.authorName != null && !this.authorName.isBlank()) {
+                embed.setAuthor(this.authorName, this.authorUrl, this.context.getAuthorAvatar());
+            }
+            embed.addField(this.context.localize("help.usage"), this.getUsage(), false);
 
-                    if (this.description != null && !this.description.isBlank()) {
-                        embed.setDescription(this.description);
-                    }
+            if (this.description != null && !this.description.isBlank()) {
+                embed.setDescription(this.description);
+            }
 
-                    if (this.thumbnail != null && !this.thumbnail.isBlank()) {
-                        embed.setThumbnail(this.thumbnail);
-                    }
+            if (this.thumbnailUrl != null && !this.thumbnailUrl.isBlank()) {
+                embed.setThumbnail(this.thumbnailUrl);
+            }
 
-                    if (!this.getArguments().isEmpty()) {
-                        embed.addField("Arguments", this.getArguments(), false);
-                    }
+            if (!this.getArguments().isEmpty()) {
+                embed.addField(this.context.localize("help.arguments"), this.getArguments(), false);
+            }
 
-                    if (this.example != null && !this.example.isBlank()) {
-                        embed.addField("Example", this.example, false);
-                    }
+            if (this.source != null && !this.source.isBlank()) {
+                embed.addField(this.context.localize("help.source"), this.source, false);
+            }
 
-                    if (this.source != null && !this.source.isBlank()) {
-                        embed.addField("Source", this.source, false);
-                    }
+            for (final ImmutableEmbedFieldData field : this.fields) {
+                embed.addField(field.name(), field.value(), field.inline().get());
+            }
 
-                    for (final ImmutableEmbedFieldData field : this.fields) {
-                        embed.addField(field.name(), field.value(), field.inline().get());
-                    }
-
-                    if (this.footer != null && !this.footer.isBlank()) {
-                        embed.setFooter(this.footer, null);
-                    }
-                });
+            if (this.footer != null && !this.footer.isBlank()) {
+                embed.setFooter(this.footer, null);
+            }
+        });
     }
 
     protected abstract String getCommandName();
 
     private String getUsage() {
-        if (this.usage != null && !this.usage.isBlank()) {
-            return String.format("`%s`", this.usage);
+        if (this.options.isEmpty()) {
+            return "`/%s`".formatted(this.getCommandName());
         }
 
-        if (this.args.isEmpty()) {
-            return String.format("`%s%s`", this.context.getPrefix(), this.getCommandName());
-        }
-
-        return String.format("`%s%s %s`", this.context.getPrefix(), this.getCommandName(),
-                FormatUtils.format(this.args,
-                        arg -> String.format(arg.isOptional() ? "[<%s>]" : "<%s>", arg.getName()), this.delimiter));
+        return "`/%s %s`".formatted(this.getCommandName(),
+                FormatUtil.format(this.options,
+                        option -> String.format(option.required().toOptional().orElse(false) ? "<%s>" : "[<%s>]",
+                                option.name()), " "));
     }
 
     private String getArguments() {
-        return this.args.stream()
-                .filter(arg -> arg.getDescription() != null && !arg.getDescription().isBlank())
-                .map(arg -> String.format("%n**%s** %s - %s", arg.getName(), arg.isOptional() ? "[optional] " : "", arg.getDescription()))
+        return this.options.stream()
+                .map(option -> "%n**%s** %s - %s"
+                        .formatted(option.name(), option.required().toOptional().orElse(false) ?
+                                        "" : this.context.localize("help.optional"),
+                                option.description()))
                 .collect(Collectors.joining());
     }
 }
