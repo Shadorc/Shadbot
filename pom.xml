@@ -132,6 +132,11 @@
             <artifactId>discord4j-core</artifactId>
             <version>e73f429386c7bfd8286c096ae4ac82b0998113fe</version>
         </dependency>
+        <dependency>
+            <groupId>com.discord4j</groupId>
+            <artifactId>stores-caffeine</artifactId>
+            <version>3.2.0</version>
+        </dependency>
         <!-- lavaplayer -->
         <dependency>
             <groupId>com.sedmelluq</groupId>

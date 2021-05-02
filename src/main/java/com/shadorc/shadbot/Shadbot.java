@@ -11,6 +11,8 @@ import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.LogUtil;
+import discord4j.common.store.Store;
+import discord4j.common.store.legacy.LegacyStoreLayout;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -21,10 +23,14 @@ import discord4j.core.retriever.EntityRetrievalStrategy;
 import discord4j.core.retriever.FallbackEntityRetriever;
 import discord4j.core.shard.MemberRequestFilter;
 import discord4j.discordjson.json.ApplicationInfoData;
+import discord4j.discordjson.json.MessageData;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.response.ResponseFunction;
 import discord4j.rest.util.AllowedMentions;
+import discord4j.store.api.mapping.MappingStoreService;
+import discord4j.store.caffeine.CaffeineStoreService;
+import discord4j.store.jdk.JdkStoreService;
 import io.prometheus.client.exporter.HTTPServer;
 import io.sentry.Sentry;
 import reactor.core.publisher.Hooks;
@@ -99,6 +105,11 @@ public class Shadbot {
 
         DEFAULT_LOGGER.info("Connecting to Discord");
         client.gateway()
+                .setStore(Store.fromLayout(LegacyStoreLayout.of(MappingStoreService.create()
+                        // Stores messages during 15 minutes
+                        .setMapping(new CaffeineStoreService(
+                                builder -> builder.expireAfterWrite(Duration.ofMinutes(15))), MessageData.class)
+                        .setFallback(new JdkStoreService()))))
                 .setEntityRetrievalStrategy(gateway -> new FallbackEntityRetriever(
                         EntityRetrievalStrategy.STORE.apply(gateway), new SpyRestEntityRetriever(gateway)))
                 .setEnabledIntents(IntentSet.of(
