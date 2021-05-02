@@ -56,7 +56,6 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
             return VoiceStateUpdateListener.onUserEvent(event);
         }
 
-        LOGGER.error("{Guild ID: {}} Unknown event: {}", guildId.asString(), event);
         return Mono.empty();
     }
 
