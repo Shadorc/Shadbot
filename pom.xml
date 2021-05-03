@@ -116,8 +116,11 @@
         </repository>
         <!-- Discord4J -->
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <id>oss.sonatype.org-snapshot</id>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
     <dependencies>
@@ -128,14 +131,14 @@
             <version>3.4.5</version>
         </dependency>
         <dependency>
-            <groupId>com.discord4j.discord4j</groupId>
+            <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>e73f429386c7bfd8286c096ae4ac82b0998113fe</version>
+            <version>3.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>stores-caffeine</artifactId>
-            <version>3.2.0</version>
+            <version>3.2.1-SNAPSHOT</version>
         </dependency>
         <!-- lavaplayer -->
         <dependency>
