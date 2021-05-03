@@ -13,6 +13,7 @@ import discord4j.core.event.domain.message.ReactionAddEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.Permission;
@@ -111,8 +112,7 @@ public class ReactionListener {
                 // It wasn't the bot that reacted
                 .filter(selfId -> !userId.equals(selfId))
                 // If the bot is not the author of the message, this is not an Iam message
-                // TODO: Use Message#getAuthor once https://github.com/Discord4J/Discord4J/issues/911 is fixed
-                .filter(selfId -> message.getUserData().id().asLong() == selfId.asLong())
+                .filter(selfId -> message.getAuthor().map(User::getId).map(selfId::equals).orElse(false))
                 .flatMap(__ -> message.getGuild().flatMap(guild -> guild.getMemberById(userId)))
                 .flatMap(member -> ReactionListener.execute(message, member, action));
     }

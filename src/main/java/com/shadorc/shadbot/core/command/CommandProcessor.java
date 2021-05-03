@@ -67,7 +67,9 @@ public class CommandProcessor {
                         context.replyEphemeral(Emoji.ACCESS_DENIED, context.localize("command.blacklisted"))))
                 // The user is not rate limited
                 .filterWhen(__ -> BooleanUtils.not(CommandProcessor.isRateLimited(context, command)))
-                .flatMap(__ -> context.getEvent().acknowledge().thenReturn(__))
+                .flatMap(__ -> context.getEvent().acknowledge()
+                        // Without this, BaseCmd#execute errors would be silently discarded
+                        .thenReturn(__))
                 .flatMap(__ -> command.execute(context))
                 .doOnSuccess(__ -> Telemetry.COMMAND_USAGE_COUNTER.labels(command.getName()).inc())
                 .onErrorResume(err -> ExceptionHandler.handleCommandError(err, context)
