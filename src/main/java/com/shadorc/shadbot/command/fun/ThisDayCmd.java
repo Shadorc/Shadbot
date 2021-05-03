@@ -42,9 +42,9 @@ public class ThisDayCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return context.reply(Emoji.HOURGLASS, context.localize("thisday.loading"))
+        return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("thisday.loading"))
                 .then(this.getThisDay)
-                .flatMap(thisDay -> context.editReply(ThisDayCmd.formatEmbed(context, thisDay)));
+                .flatMap(thisDay -> context.editFollowupMessage(ThisDayCmd.formatEmbed(context, thisDay)));
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, ThisDay thisDay) {

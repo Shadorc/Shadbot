@@ -51,13 +51,13 @@ public class TransferCoinsCmd extends BaseCmd {
 
                                 final DBMember dbReceiver = dbMembers.get(receiverUser.getId());
                                 if (dbReceiver.getCoins() + coins >= Config.MAX_COINS) {
-                                    return context.reply(Emoji.BANK, context.localize("transfer.exception.exceeds")
+                                    return context.createFollowupMessage(Emoji.BANK, context.localize("transfer.exception.exceeds")
                                             .formatted(receiverUser.getUsername()));
                                 }
 
                                 return dbSender.addCoins(-coins)
                                         .and(dbReceiver.addCoins(coins))
-                                        .then(context.reply(Emoji.BANK, context.localize("transfer.message")
+                                        .then(context.createFollowupMessage(Emoji.BANK, context.localize("transfer.message")
                                                 .formatted(context.localize(coins), receiverUser.getUsername())));
                             });
                 });

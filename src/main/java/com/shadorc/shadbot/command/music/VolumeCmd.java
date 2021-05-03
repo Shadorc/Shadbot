@@ -35,7 +35,7 @@ public class VolumeCmd extends BaseCmd {
                     final Optional<Long> percentageOpt = context.getOptionAsLong("percentage");
                     final TrackScheduler scheduler = guildMusic.getTrackScheduler();
                     if (percentageOpt.isEmpty()) {
-                        return context.reply(Emoji.SOUND, context.localize("volume.current")
+                        return context.createFollowupMessage(Emoji.SOUND, context.localize("volume.current")
                                 .formatted(scheduler.getAudioPlayer().getVolume()));
                     }
 
@@ -46,7 +46,7 @@ public class VolumeCmd extends BaseCmd {
                     }
 
                     scheduler.setVolume((int) percentage);
-                    return context.reply(Emoji.SOUND, context.localize("volume.message")
+                    return context.createFollowupMessage(Emoji.SOUND, context.localize("volume.message")
                             .formatted(scheduler.getAudioPlayer().getVolume()));
                 });
     }

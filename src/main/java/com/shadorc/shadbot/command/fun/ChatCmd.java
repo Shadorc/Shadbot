@@ -57,7 +57,7 @@ public class ChatCmd extends BaseCmd {
         }
 
         return this.getResponse(context.getChannelId(), message)
-                .flatMap(response -> context.reply(Emoji.SPEECH, response))
+                .flatMap(response -> context.createFollowupMessage(Emoji.SPEECH, response))
                 .switchIfEmpty(Mono.error(new IOException("Bots are unreachable")));
     }
 

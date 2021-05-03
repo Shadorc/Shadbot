@@ -22,9 +22,9 @@ public class PauseCmd extends BaseCmd {
                 .flatMap(__ -> {
                     audioPlayer.setPaused(!audioPlayer.isPaused());
                     if (audioPlayer.isPaused()) {
-                        return context.reply(Emoji.PAUSE, context.localize("pause.paused"));
+                        return context.createFollowupMessage(Emoji.PAUSE, context.localize("pause.paused"));
                     } else {
-                        return context.reply(Emoji.PLAY, context.localize("pause.resumed"));
+                        return context.createFollowupMessage(Emoji.PLAY, context.localize("pause.resumed"));
                     }
                 });
     }

@@ -87,7 +87,7 @@ public class AllowedRolesSetting extends BaseCmd {
                     }
 
                     return dbGuild.updateSetting(Setting.ALLOWED_ROLES, allowedRoles)
-                            .then(context.reply(strBuilder.toString()));
+                            .then(context.createFollowupMessage(strBuilder.toString()));
                 });
     }
 

@@ -31,17 +31,17 @@ public class WikipediaCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final String word = context.getOptionAsString("word").orElseThrow();
 
-        return context.reply(Emoji.HOURGLASS, context.localize("wikipedia.loading"))
+        return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("wikipedia.loading"))
                 .then(WikipediaCmd.getWikipediaPage(context, word))
                 .flatMap(page -> {
                     if (page.extract().orElseThrow().endsWith("may refer to:")) {
-                        return context.editReply(Emoji.MAGNIFYING_GLASS,
+                        return context.editFollowupMessage(Emoji.MAGNIFYING_GLASS,
                                 context.localize("wikipedia.several.results"));
                     }
 
-                    return context.editReply(WikipediaCmd.formatEmbed(context, page));
+                    return context.editFollowupMessage(WikipediaCmd.formatEmbed(context, page));
                 })
-                .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("wikipedia.not.found")
+                .switchIfEmpty(context.editFollowupMessage(Emoji.MAGNIFYING_GLASS, context.localize("wikipedia.not.found")
                         .formatted(word)));
     }
 

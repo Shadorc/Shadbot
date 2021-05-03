@@ -79,8 +79,8 @@ public class RelicStatusCmd extends BaseCmd {
 
                             fields.forEach(field -> embed.addField(field.name(), field.value(), field.inline().get()));
                         }))
-                .flatMap(context::reply)
-                .switchIfEmpty(context.reply(Emoji.INFO, context.localize("relicstatus.not.donator")
+                .flatMap(context::createFollowupMessage)
+                .switchIfEmpty(context.createFollowupMessage(Emoji.INFO, context.localize("relicstatus.not.donator")
                         .formatted(Config.PATREON_URL, Emoji.HEARTS)));
     }
 

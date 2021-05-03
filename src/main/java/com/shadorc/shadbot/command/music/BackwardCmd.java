@@ -42,7 +42,7 @@ public class BackwardCmd extends BaseCmd {
 
                     final long newPosition = guildMusic.getTrackScheduler()
                             .changePosition(-duration.toMillis());
-                    return context.reply(Emoji.CHECK_MARK, context.localize("backward.message")
+                    return context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("backward.message")
                             .formatted(FormatUtil.formatDuration(newPosition)));
                 });
     }

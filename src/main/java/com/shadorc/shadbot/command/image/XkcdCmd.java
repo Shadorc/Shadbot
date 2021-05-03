@@ -40,9 +40,9 @@ public class XkcdCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final Sort sort = context.getOptionAsEnum(Sort.class, "sort").orElseThrow();
         final Mono<XkcdResponse> getResponse = sort == Sort.LATEST ? XkcdCmd.getLatestXkcd() : this.getRandomXkcd();
-        return context.reply(Emoji.HOURGLASS, context.localize("xkcd.loading"))
+        return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("xkcd.loading"))
                 .then(getResponse)
-                .flatMap(xkcd -> context.editReply(XkcdCmd.formatEmbed(context.getAuthorAvatar(), xkcd)));
+                .flatMap(xkcd -> context.editFollowupMessage(XkcdCmd.formatEmbed(context.getAuthorAvatar(), xkcd)));
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(String avatarUrl, XkcdResponse xkcd) {

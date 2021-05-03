@@ -70,7 +70,7 @@ public class LotteryCmd extends BaseCmd {
                     return dbMember.addCoins(-Constants.PAID_COST)
                             .thenReturn(new LotteryGambler(context.getGuildId(), context.getAuthorId(), (int) number))
                             .flatMap(LotteryGambler::insert)
-                            .then(context.reply(Emoji.TICKET, context.localize("lottery.message")
+                            .then(context.createFollowupMessage(Emoji.TICKET, context.localize("lottery.message")
                                     .formatted(number, FormatUtil.formatDurationWords(context.getLocale(), LotteryCmd.getDelay()))));
                 });
     }
@@ -98,7 +98,7 @@ public class LotteryCmd extends BaseCmd {
                             .orElse(builder)
                             .build();
                 }))
-                .flatMap(context::reply);
+                .flatMap(context::createFollowupMessage);
     }
 
     public static Duration getDelay() {

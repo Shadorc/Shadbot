@@ -55,7 +55,7 @@ public class SlotMachineCmd extends BaseCmd {
                     }
                 }))
                 .map(StringBuilder::toString)
-                .flatMap(context::reply);
+                .flatMap(context::createFollowupMessage);
     }
 
     private static List<SlotOptions> randSlots() {

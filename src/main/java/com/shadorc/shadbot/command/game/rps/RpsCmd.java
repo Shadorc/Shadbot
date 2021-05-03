@@ -56,7 +56,7 @@ public class RpsCmd extends BaseCmd {
                         strBuilder.append(Emoji.BANK + context.localize("rps.win")
                                 .formatted(context.getAuthorName(), context.localize(gains),
                                         context.localize(player.getWinStreak())));
-                        return context.reply(strBuilder.toString());
+                        return context.createFollowupMessage(strBuilder.toString());
                     }));
         } else if (userHandsign == botHandsign) {
             player.resetWinStreak();
@@ -66,7 +66,7 @@ public class RpsCmd extends BaseCmd {
             strBuilder.append(context.localize("rps.lose"));
         }
 
-        return context.reply(strBuilder.toString());
+        return context.createFollowupMessage(strBuilder.toString());
     }
 
     private RpsPlayer getPlayer(Snowflake guildId, Snowflake userId) {

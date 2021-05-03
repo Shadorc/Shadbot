@@ -93,17 +93,17 @@ public class ManageCoinsCmd extends BaseCmd {
                         case ADD -> Flux.fromIterable(members)
                                 .map(Tuple2::getT2)
                                 .flatMap(dbMember -> dbMember.addCoins(coinsOpt.orElseThrow()))
-                                .then(context.reply(Emoji.MONEY_BAG, context.localize("managecoins.add")
+                                .then(context.createFollowupMessage(Emoji.MONEY_BAG, context.localize("managecoins.add")
                                         .formatted(mentionsStr, context.localize(coinsOpt.orElseThrow()))));
                         case REMOVE -> Flux.fromIterable(members)
                                 .map(Tuple2::getT2)
                                 .flatMap(dbMember -> dbMember.addCoins(-coinsOpt.orElseThrow()))
-                                .then(context.reply(Emoji.MONEY_BAG, context.localize("managecoins.remove")
+                                .then(context.createFollowupMessage(Emoji.MONEY_BAG, context.localize("managecoins.remove")
                                         .formatted(mentionsStr, context.localize(coinsOpt.orElseThrow()))));
                         case RESET -> Flux.fromIterable(members)
                                 .map(Tuple2::getT2)
                                 .flatMap(DBMember::resetCoins)
-                                .then(context.reply(Emoji.MONEY_BAG, context.localize("managecoins.reset")
+                                .then(context.createFollowupMessage(Emoji.MONEY_BAG, context.localize("managecoins.reset")
                                         .formatted(mentionsStr)));
                     };
                 });

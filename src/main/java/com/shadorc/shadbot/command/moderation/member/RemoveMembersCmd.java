@@ -66,10 +66,10 @@ public abstract class RemoveMembersCmd extends BaseCmd {
                         .flatMap(user -> this.canInteract(context.getLocale(), self, context.getAuthor(), user)
                                 .then(this.sendMessage(context, guild, context.getAuthor(), user, reason))
                                 .then(this.action(user, reason))
-                                .then(context.reply(Emoji.INFO, context.localize("%s.message".formatted(this.keyword))
+                                .then(context.createFollowupMessage(Emoji.INFO, context.localize("%s.message".formatted(this.keyword))
                                         .formatted(context.getAuthorName(), user.getUsername(), reason)))
                                 .onErrorResume(CommandException.class,
-                                        err -> context.reply(Emoji.WARNING, err.getMessage())))))
+                                        err -> context.createFollowupMessage(Emoji.WARNING, err.getMessage())))))
                 .then()
                 .onErrorMap(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
                         err -> new MissingPermissionException(this.permission));

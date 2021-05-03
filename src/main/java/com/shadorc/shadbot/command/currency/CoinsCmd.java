@@ -28,10 +28,10 @@ public class CoinsCmd extends BaseCmd {
                         .map(DBMember::getCoins)
                         .flatMap(coins -> {
                             if (user.getId().equals(context.getAuthorId())) {
-                                return context.reply(Emoji.PURSE, context.localize("coins.yours")
+                                return context.createFollowupMessage(Emoji.PURSE, context.localize("coins.yours")
                                         .formatted(context.localize(coins)));
                             } else {
-                                return context.reply(Emoji.PURSE, context.localize("coins.user")
+                                return context.createFollowupMessage(Emoji.PURSE, context.localize("coins.user")
                                         .formatted(user.getUsername(), context.localize(coins)));
                             }
                         }));

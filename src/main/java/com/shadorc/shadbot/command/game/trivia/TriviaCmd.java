@@ -58,7 +58,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
                 .orElse(null);
 
         if (this.isGameStarted(context.getChannelId())) {
-            return context.reply(Emoji.INFO, context.localize("trivia.already.started"));
+            return context.createFollowupMessage(Emoji.INFO, context.localize("trivia.already.started"));
         } else {
             final TriviaGame game = new TriviaGame(context, categoryId);
             this.addGame(context.getChannelId(), game);

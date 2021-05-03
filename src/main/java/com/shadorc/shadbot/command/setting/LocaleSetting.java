@@ -36,7 +36,7 @@ public class LocaleSetting extends BaseCmd {
         final String locale = context.getOptionAsString("value").orElseThrow();
         return context.getDbGuild()
                 .updateSetting(Setting.LOCALE, locale)
-                .then(context.reply(Emoji.CHECK_MARK, context.localize("setting.locale.message")
+                .then(context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("setting.locale.message")
                         .formatted(locale)));
     }
 }

@@ -42,19 +42,19 @@ public class WallhavenCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final String query = context.getOptionAsString("query").orElse("");
 
-        return context.reply(Emoji.HOURGLASS, context.localize("wallhaven.loading"))
+        return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("wallhaven.loading"))
                 .then(Mono.zip(this.getWallpaper(query), context.isChannelNsfw()))
                 .flatMap(TupleUtils.function((wallpaper, isNsfw) -> {
                     if (!"sfw".equals(wallpaper.purity()) && !isNsfw) {
-                        return context.editReply(Emoji.GREY_EXCLAMATION,
+                        return context.editFollowupMessage(Emoji.GREY_EXCLAMATION,
                                 context.localize("must.be.nsfw").formatted(Setting.NSFW));
                     }
 
                     final String title = context.localize("wallhaven.title")
                             .formatted(query.isBlank() ? context.localize("wallhaven.random") : query);
-                    return context.editReply(WallhavenCmd.formatEmbed(context, title, wallpaper));
+                    return context.editFollowupMessage(WallhavenCmd.formatEmbed(context, title, wallpaper));
                 }))
-                .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
+                .switchIfEmpty(context.editFollowupMessage(Emoji.MAGNIFYING_GLASS,
                         context.localize("wallhaven.not.found").formatted(query)));
     }
 

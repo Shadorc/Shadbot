@@ -58,12 +58,12 @@ public class AutoMessagesSetting extends BaseCmd {
                         .switchIfEmpty(Mono.error(new CommandException(context.localize("automessage.exception.channel.type"))))
                         .flatMap(channel -> context.getDbGuild()
                                 .updateSetting(setting, new AutoMessageBean(message, channel.getId().asString()))
-                                .then(context.reply(Emoji.CHECK_MARK, context.localize("automessage." + typeStr + ".enabled")
+                                .then(context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("automessage." + typeStr + ".enabled")
                                         .formatted(message, channel.getMention()))));
 
             case DISABLE:
                 return context.getDbGuild().removeSetting(setting)
-                        .then(context.reply(Emoji.CHECK_MARK, context.localize("automessage." + typeStr + ".disabled")));
+                        .then(context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("automessage." + typeStr + ".disabled")));
 
             default:
                 return Mono.error(new IllegalStateException());

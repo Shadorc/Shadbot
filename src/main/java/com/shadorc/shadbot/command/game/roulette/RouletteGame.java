@@ -77,7 +77,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                         embed.setFooter(this.context.localize("roulette.footer.finished"), null);
                     }
                 }))
-                .flatMap(this.context::editReply);
+                .flatMap(this.context::editFollowupMessage);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                     final String color = RED_NUMS.contains(winningPlace)
                             ? this.context.localize("roulette.red")
                             : this.context.localize("roulette.black");
-                    return this.context.reply(Emoji.DICE, this.context.localize("roulette.results")
+                    return this.context.createFollowupMessage(Emoji.DICE, this.context.localize("roulette.results")
                             .formatted(winningPlace, color, text));
                 })
                 .then(Mono.fromRunnable(this::destroy));

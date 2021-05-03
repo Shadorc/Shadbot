@@ -71,7 +71,7 @@ public class RolelistCmd extends BaseCmd {
                             FormatUtil.createColumns(usernames, 25)
                                     .forEach(field -> embed.addField(field.name(), field.value(), true));
                         })))
-                .flatMap(context::reply);
+                .flatMap(context::createFollowupMessage);
     }
 
 }

@@ -45,19 +45,19 @@ public class ExceptionHandler {
     }
 
     private static Mono<?> onCommandException(CommandException err, Context context) {
-        return context.editReply(Emoji.GREY_EXCLAMATION, err.getMessage());
+        return context.editFollowupMessage(Emoji.GREY_EXCLAMATION, err.getMessage());
     }
 
     private static Mono<?> onMissingPermissionException(MissingPermissionException err, Context context) {
         final String missingPerm = FormatUtil.capitalizeEnum(err.getPermission());
         DEFAULT_LOGGER.info("{Guild ID: {}} Missing permission: {}", context.getGuildId().asString(), missingPerm);
 
-        return context.reply(Emoji.ACCESS_DENIED, context.localize("exception.permissions")
+        return context.createFollowupMessage(Emoji.ACCESS_DENIED, context.localize("exception.permissions")
                 .formatted(FormatUtil.capitalizeEnum(err.getPermission())));
     }
 
     private static Mono<?> onNoMusicException(Context context) {
-        return context.reply(Emoji.MUTE, context.localize("exception.no.music"));
+        return context.createFollowupMessage(Emoji.MUTE, context.localize("exception.no.music"));
     }
 
     private static Mono<?> onServerAccessError(Throwable err, Context context) {
@@ -69,7 +69,7 @@ public class ExceptionHandler {
                 cause.getMessage(),
                 context.getEvent().getInteraction().getData().data());
 
-        return context.reply(Emoji.RED_FLAG, context.localize("exception.server.access")
+        return context.createFollowupMessage(Emoji.RED_FLAG, context.localize("exception.server.access")
                 .formatted(context.getFullCommandName()));
     }
 
@@ -81,7 +81,7 @@ public class ExceptionHandler {
                                 context.getEvent().getInteraction().getData().data()),
                 err);
 
-        return context.reply(Emoji.RED_FLAG, context.localize("exception.unknown")
+        return context.createFollowupMessage(Emoji.RED_FLAG, context.localize("exception.unknown")
                 .formatted(context.getFullCommandName()));
     }
 

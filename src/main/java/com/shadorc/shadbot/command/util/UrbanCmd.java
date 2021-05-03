@@ -44,14 +44,14 @@ public class UrbanCmd extends BaseCmd {
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return context.reply(Emoji.GREY_EXCLAMATION,
+                        return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
                                 context.localize("must.be.nsfw").formatted(Setting.NSFW));
                     }
 
-                    return context.reply(Emoji.HOURGLASS, context.localize("urban.loading"))
+                    return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("urban.loading"))
                             .then(UrbanCmd.getUrbanDefinition(query))
-                            .flatMap(urbanDef -> context.editReply(UrbanCmd.formatEmbed(context, urbanDef)))
-                            .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
+                            .flatMap(urbanDef -> context.editFollowupMessage(UrbanCmd.formatEmbed(context, urbanDef)))
+                            .switchIfEmpty(context.editFollowupMessage(Emoji.MAGNIFYING_GLASS,
                                     context.localize("urban.not.found").formatted(query)));
                 });
     }

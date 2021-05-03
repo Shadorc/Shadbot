@@ -101,7 +101,7 @@ public class PlayCmd extends BaseCmd {
             if (identifier.startsWith(AudioLoadResultListener.YT_SEARCH) || identifier.startsWith(AudioLoadResultListener.SC_SEARCH)) {
                 return guildMusic.getDj()
                         .map(User::getUsername)
-                        .flatMap(username -> context.editReply(Emoji.HOURGLASS,
+                        .flatMap(username -> context.editFollowupMessage(Emoji.HOURGLASS,
                                 context.localize("play.other.selecting").formatted(username)));
             }
         }
@@ -116,7 +116,7 @@ public class PlayCmd extends BaseCmd {
                             context, context.getLocale(), context.getGuildId(), context.getAuthorId(), identifier, playFirst);
                     guildMusic.addAudioLoadResultListener(resultListener);
                 })
-                .switchIfEmpty(context.editReply(Emoji.LOCK,
+                .switchIfEmpty(context.editFollowupMessage(Emoji.LOCK,
                         context.localize("playlist.limit.reached")
                                 .formatted(Config.PLAYLIST_SIZE, Config.PATREON_URL))
                         .then(Mono.empty()));

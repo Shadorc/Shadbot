@@ -45,7 +45,7 @@ public class LeaderboardCmd extends BaseCmd {
                 .map(description -> ShadbotUtil.getDefaultEmbed(
                         embed -> embed.setAuthor(context.localize("leaderboard.title"), null, context.getAuthorAvatar())
                                 .setDescription(description)))
-                .flatMap(context::reply);
+                .flatMap(context::createFollowupMessage);
     }
 
 }

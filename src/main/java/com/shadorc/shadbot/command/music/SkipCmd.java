@@ -29,7 +29,7 @@ public class SkipCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
-        final Mono<Message> sendMessage = context.reply(Emoji.TRACK_NEXT, context.localize("skip.message"));
+        final Mono<Message> sendMessage = context.createFollowupMessage(Emoji.TRACK_NEXT, context.localize("skip.message"));
 
         final Optional<Long> indexOpt = context.getOptionAsLong("index");
         if (indexOpt.isPresent()) {

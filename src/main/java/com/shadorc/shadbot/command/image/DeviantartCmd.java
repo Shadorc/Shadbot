@@ -52,12 +52,12 @@ public class DeviantartCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final String query = context.getOptionAsString("query").orElseThrow();
 
-        return context.reply(Emoji.HOURGLASS, context.localize("deviantart.loading"))
+        return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("deviantart.loading"))
                 .then(this.token)
                 .map(TokenResponse::accessToken)
                 .flatMap(accessToken -> this.getPopularImage(accessToken, query))
-                .flatMap(image -> context.editReply(DeviantartCmd.formatEmbed(context, query, image)))
-                .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
+                .flatMap(image -> context.editFollowupMessage(DeviantartCmd.formatEmbed(context, query, image)))
+                .switchIfEmpty(context.editFollowupMessage(Emoji.MAGNIFYING_GLASS,
                         context.localize("deviantart.not.found").formatted(query)));
     }
 

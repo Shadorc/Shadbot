@@ -44,8 +44,8 @@ public class BotInfoCmd extends BaseCmd {
                 context.getClient().getGuilds().count())
                 .flatMap(TupleUtils.function((owner, channel, guildCount) -> {
                     final long start = System.currentTimeMillis();
-                    return context.reply(Emoji.GEAR, context.localize("testing.ping"))
-                            .then(context.editReply(BotInfoCmd.formatEmbed(context, start, owner, guildCount)));
+                    return context.createFollowupMessage(Emoji.GEAR, context.localize("testing.ping"))
+                            .then(context.editFollowupMessage(BotInfoCmd.formatEmbed(context, start, owner, guildCount)));
                 }));
     }
 

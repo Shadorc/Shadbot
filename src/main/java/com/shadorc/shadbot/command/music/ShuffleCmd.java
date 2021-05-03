@@ -21,7 +21,7 @@ public class ShuffleCmd extends BaseCmd {
         return DiscordUtil.requireVoiceChannel(context)
                 .flatMap(__ -> {
                     guildMusic.getTrackScheduler().shufflePlaylist();
-                    return context.reply(Emoji.CHECK_MARK, context.localize("shuffle.message"));
+                    return context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("shuffle.message"));
                 });
     }
 

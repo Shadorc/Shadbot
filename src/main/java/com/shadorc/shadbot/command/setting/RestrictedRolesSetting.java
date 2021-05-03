@@ -112,7 +112,7 @@ public class RestrictedRolesSetting extends BaseCmd {
                                             .collect(Collectors.toSet())));
 
                     return context.getDbGuild().updateSetting(Setting.RESTRICTED_ROLES, setting)
-                            .then(context.reply(Emoji.CHECK_MARK, strBuilder.toString()));
+                            .then(context.createFollowupMessage(Emoji.CHECK_MARK, strBuilder.toString()));
                 });
     }
 }

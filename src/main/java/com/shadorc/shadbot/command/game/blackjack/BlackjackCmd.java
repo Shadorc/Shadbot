@@ -39,7 +39,7 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
                             context.getAuthorName(), bet);
                     if (blackjackGame.addPlayerIfAbsent(player)) {
                         return player.bet()
-                                .then(context.reply(Emoji.CHECK_MARK, context.localize("blackjack.joined")))
+                                .then(context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("blackjack.joined")))
                                 .then(Mono.defer(() -> {
                                     if (blackjackGame.areAllPlayersStanding()) {
                                         return blackjackGame.end();
@@ -49,7 +49,7 @@ public class BlackjackCmd extends GameCmd<BlackjackGame> {
                                 }));
                     }
 
-                    return context.reply(Emoji.INFO, context.localize("blackjack.already.participating"));
+                    return context.createFollowupMessage(Emoji.INFO, context.localize("blackjack.already.participating"));
                 });
     }
 

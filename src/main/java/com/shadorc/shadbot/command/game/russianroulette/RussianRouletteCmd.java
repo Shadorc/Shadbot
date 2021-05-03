@@ -34,7 +34,7 @@ public class RussianRouletteCmd extends BaseCmd {
         return ShadbotUtil.requireValidBet(context.getLocale(), context.getGuildId(), context.getAuthorId(), Constants.PAID_COST)
                 .then(Mono.defer(() -> {
                     if (!player.isAlive()) {
-                        return context.reply(Emoji.BROKEN_HEART, context.localize("russianroulette.already.dead")
+                        return context.createFollowupMessage(Emoji.BROKEN_HEART, context.localize("russianroulette.already.dead")
                                 .formatted(FormatUtil.formatDurationWords(context.getLocale(), player.getResetDuration())))
                                 .then(Mono.empty());
                     }
@@ -67,7 +67,7 @@ public class RussianRouletteCmd extends BaseCmd {
                                 .addField(context.localize("russianroulette.tries"),
                                         "%d/6".formatted(player.getRemaining()), false)
                                 .setDescription(description)))
-                .flatMap(context::reply);
+                .flatMap(context::createFollowupMessage);
     }
 
     private RussianRoulettePlayer getPlayer(Snowflake guildId, Snowflake userId) {

@@ -73,7 +73,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 
     @Override
     public Mono<Void> end() {
-        return this.context.reply(Emoji.HOURGLASS, this.context.localize("trivia.time.elapsed")
+        return this.context.createFollowupMessage(Emoji.HOURGLASS, this.context.localize("trivia.time.elapsed")
                 .formatted(this.trivia.getCorrectAnswer()))
                 .then(Mono.fromRunnable(this::destroy));
     }
@@ -96,7 +96,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
                             .setFooter(this.context.localize("trivia.footer")
                                     .formatted(this.duration.toSeconds(), Emoji.RED_CROSS), null));
 
-            return this.context.reply(embedConsumer);
+            return this.context.createFollowupMessage(embedConsumer);
         });
     }
 
@@ -111,7 +111,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 
         return new Player(this.context.getGuildId(), member.getId())
                 .win(gains)
-                .then(this.context.reply(Emoji.CLAP, this.context.localize("trivia.win")
+                .then(this.context.createFollowupMessage(Emoji.CLAP, this.context.localize("trivia.win")
                         .formatted(this.context.localize(gains))));
     }
 

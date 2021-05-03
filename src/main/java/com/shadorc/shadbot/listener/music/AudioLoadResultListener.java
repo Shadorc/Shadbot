@@ -65,7 +65,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
         LOGGER.debug("{Guild ID: {}} Track loaded: {}", this.guildId.asString(), audioTrack.hashCode());
         Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId))
                 .filter(guildMusic -> !guildMusic.getTrackScheduler().startOrQueue(audioTrack, this.insertFirst))
-                .flatMap(guildMusic -> this.interaction.reply(Emoji.MUSICAL_NOTE,
+                .flatMap(guildMusic -> this.interaction.createFollowupMessage(Emoji.MUSICAL_NOTE,
                         I18nManager.localize(this.locale, "audioresult.track.loaded")
                                 .formatted(FormatUtil.trackName(this.locale, audioTrack.getInfo()))))
                 .then(this.terminate())
@@ -110,7 +110,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                     return guildMusic.getDj()
                             .map(User::getAvatarUrl)
                             .map(avatarUrl -> this.formatResultsEmbed(playlist, avatarUrl, this.locale))
-                            .flatMap(this.interaction::reply)
+                            .flatMap(this.interaction::createFollowupMessage)
                             .flatMapMany(__ ->
                                     // TODO Clean-up: This looks bad
                                     AudioLoadResultMessageInputs.create(guildMusic.getGateway(), Duration.ofSeconds(30),
@@ -152,7 +152,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                                     .formatted(musicsAdded))
                             .toString();
                 }))
-                .flatMap(this.interaction::reply)
+                .flatMap(this.interaction::createFollowupMessage)
                 .then(this.terminate())
                 .subscribeOn(DEFAULT_SCHEDULER)
                 .subscribe(null, ExceptionHandler::handleUnknownError);
@@ -181,7 +181,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
         LOGGER.debug("{Guild ID: {}} Load failed: {}", this.guildId.asString(), err);
         final String errMessage = ShadbotUtil.cleanLavaplayerErr(err).toLowerCase();
         LOGGER.info("{Guild ID: {}} Load failed: {}", this.guildId.asString(), errMessage);
-        this.interaction.reply(Emoji.RED_CROSS,
+        this.interaction.createFollowupMessage(Emoji.RED_CROSS,
                 I18nManager.localize(this.locale, "audioresult.load.failed")
                         .formatted(errMessage))
                 .then(this.terminate())
@@ -196,7 +196,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
     }
 
     private void onNoMatches() {
-        this.interaction.reply(Emoji.MAGNIFYING_GLASS,
+        this.interaction.createFollowupMessage(Emoji.MAGNIFYING_GLASS,
                 I18nManager.localize(this.locale, "audioresult.no.matches")
                         .formatted(StringUtil.remove(this.identifier, YT_SEARCH, SC_SEARCH)))
                 .then(this.terminate())

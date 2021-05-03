@@ -65,7 +65,7 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
                     .formatted(context.getCommandName(), context.getSubCommandGroupName().orElseThrow(), CREATE_SUB_COMMAND)));
         }
         if (game.addPlayerIfAbsent(new Player(context.getGuildId(), context.getAuthorId()))) {
-            return context.reply(Emoji.CHECK_MARK, context.localize("hangman.joined"));
+            return context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("hangman.joined"));
         }
         return Mono.error(new CommandException(context.localize("hangman.already.participating")));
     }

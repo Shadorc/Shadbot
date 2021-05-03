@@ -60,12 +60,12 @@ public class AutoRolesSetting extends BaseCmd {
                             return AutoRolesSetting.checkPermissions(context, roleIds)
                                     .doOnNext(__ -> autoRoleIds.addAll(roleIds))
                                     .then(context.getDbGuild().updateSetting(Setting.AUTO_ROLES, autoRoleIds))
-                                    .then(context.reply(Emoji.CHECK_MARK, context.localize("autoroles.added")
+                                    .then(context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("autoroles.added")
                                             .formatted(roleStr)));
                         case REMOVE:
                             autoRoleIds.removeAll(roleIds);
                             return context.getDbGuild().updateSetting(Setting.AUTO_ROLES, autoRoleIds)
-                                    .then(context.reply(Emoji.CHECK_MARK, context.localize("autoroles.removed")
+                                    .then(context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("autoroles.removed")
                                             .formatted(roleStr)));
                         default:
                             return Mono.error(new IllegalStateException());

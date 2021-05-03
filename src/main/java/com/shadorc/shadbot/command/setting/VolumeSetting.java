@@ -35,7 +35,7 @@ public class VolumeSetting extends BaseCmd {
 
         return context.getDbGuild()
                 .updateSetting(Setting.DEFAULT_VOLUME, volume)
-                .then(context.reply(Emoji.CHECK_MARK,
+                .then(context.createFollowupMessage(Emoji.CHECK_MARK,
                         context.localize("setting.volume.message").formatted(volume)));
     }
 }

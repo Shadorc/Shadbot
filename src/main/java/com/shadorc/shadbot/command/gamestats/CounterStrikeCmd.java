@@ -67,12 +67,12 @@ public class CounterStrikeCmd extends BaseCmd {
             throw new CommandException(context.localize("counterstrike.invalid.id"));
         }
 
-        return context.reply(Emoji.HOURGLASS, context.localize("cs.loading"))
+        return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("cs.loading"))
                 .then(this.steamIdCache.getOrCache(identificator, this.getSteamId(identificator)))
                 .flatMap(id -> this.playerSummaryCache.getOrCache(id, this.getPlayerSummary(id)))
                 .flatMap(player -> {
                     if (player.getCommunityVisibilityState() != PlayerSummary.CommunityVisibilityState.PUBLIC) {
-                        return context.editReply(Emoji.ACCESS_DENIED,
+                        return context.editFollowupMessage(Emoji.ACCESS_DENIED,
                                 context.localize("cs.profile.private").formatted(PRIVACY_HELP_URL));
                     }
 
@@ -84,7 +84,7 @@ public class CounterStrikeCmd extends BaseCmd {
                     return this.userStatsCache.getOrCache(userStatsUrl, RequestHelper.request(userStatsUrl))
                             .flatMap(body -> {
                                 if (body.contains("500 Internal Server Error")) {
-                                    return context.editReply(Emoji.ACCESS_DENIED,
+                                    return context.editFollowupMessage(Emoji.ACCESS_DENIED,
                                             context.localize("cs.games.private").formatted(PRIVACY_HELP_URL));
                                 }
 
@@ -92,13 +92,13 @@ public class CounterStrikeCmd extends BaseCmd {
                                         .map(userStats -> userStats.playerStats()
                                                 .flatMap(PlayerStats::stats))
                                         .flatMap(Mono::justOrEmpty)
-                                        .flatMap(stats -> context.editReply(
+                                        .flatMap(stats -> context.editFollowupMessage(
                                                 CounterStrikeCmd.formatEmbed(context, player, stats)))
-                                        .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
+                                        .switchIfEmpty(context.editFollowupMessage(Emoji.MAGNIFYING_GLASS,
                                                 context.localize("cs.not.playing")));
                             });
                 })
-                .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("cs.player.not.found")));
+                .switchIfEmpty(context.editFollowupMessage(Emoji.MAGNIFYING_GLASS, context.localize("cs.player.not.found")));
     }
 
     private static String getIdentificator(String arg) {

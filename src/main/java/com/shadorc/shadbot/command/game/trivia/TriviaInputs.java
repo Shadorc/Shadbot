@@ -55,13 +55,13 @@ public class TriviaInputs extends MessageInputs {
         // The user was already a player, so they already guessed something, but was not yet warned
         if (player != null) {
             return this.game.getContext()
-                    .reply(Emoji.GREY_EXCLAMATION, this.game.getContext().localize("trivia.already.answered")
+                    .createFollowupMessage(Emoji.GREY_EXCLAMATION, this.game.getContext().localize("trivia.already.answered")
                             .formatted(member.getUsername()));
         } else if (answer.equalsIgnoreCase(this.game.getCorrectAnswer())) {
             return this.game.win(member);
         } else {
             return this.game.getContext()
-                    .reply(Emoji.THUMBSDOWN, this.game.getContext().localize("trivia.wrong.answer")
+                    .createFollowupMessage(Emoji.THUMBSDOWN, this.game.getContext().localize("trivia.wrong.answer")
                             .formatted(member.getUsername()));
         }
     }

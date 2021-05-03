@@ -79,7 +79,7 @@ public class DiceCmd extends GameCmd<DiceGame> {
                     if (game.addPlayerIfAbsent(player)) {
                         return player.bet()
                                 .then(game.show())
-                                .then(context.reply(Emoji.CHECK_MARK, context.localize("dice.joined")));
+                                .then(context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("dice.joined")));
                     } else {
                         return Mono.error(new CommandException(context.localize("dice.already.participating")));
                     }

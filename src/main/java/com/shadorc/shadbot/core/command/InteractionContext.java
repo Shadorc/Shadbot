@@ -9,18 +9,22 @@ import java.util.function.Consumer;
 
 public interface InteractionContext {
 
-    Mono<Message> reply(String message);
+    Mono<Void> reply(Emoji emoji, String message);
 
-    Mono<Message> reply(Emoji emoji, String message);
+    Mono<Void> replyEphemeral(Emoji emoji, String message);
 
-    Mono<Message> reply(Consumer<EmbedCreateSpec> embed);
+    Mono<Message> createFollowupMessage(String message);
 
-    Mono<Message> editReply(String message);
+    Mono<Message> createFollowupMessage(Emoji emoji, String message);
 
-    Mono<Message> editReply(Emoji emoji, String message);
+    Mono<Message> createFollowupMessage(Consumer<EmbedCreateSpec> embed);
 
-    Mono<Message> editReply(Consumer<EmbedCreateSpec> embed);
+    Mono<Message> editFollowupMessage(String message);
 
-    Mono<Message> editInitialReply(Consumer<EmbedCreateSpec> embed);
+    Mono<Message> editFollowupMessage(Emoji emoji, String message);
+
+    Mono<Message> editFollowupMessage(Consumer<EmbedCreateSpec> embed);
+
+    Mono<Message> editInitialFollowupMessage(Consumer<EmbedCreateSpec> embed);
 
 }

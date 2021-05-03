@@ -93,7 +93,7 @@ public class HangmanGame extends MultiplayerGame<Player> {
                         embed.setImage(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failCount) - 1));
                     }
                 }))
-                .flatMap(this.context::editReply);
+                .flatMap(this.context::editFollowupMessage);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class HangmanGame extends MultiplayerGame<Player> {
         return Mono.
                 defer(() -> {
                     if (this.failCount == IMG_LIST.size()) {
-                        return this.context.reply(Emoji.THUMBSDOWN, this.context.localize("hangman.lose")
+                        return this.context.createFollowupMessage(Emoji.THUMBSDOWN, this.context.localize("hangman.lose")
                                 .formatted(this.word));
                     } else {
                         final float imagesRemaining = IMG_LIST.size() - this.failCount;
@@ -111,7 +111,7 @@ public class HangmanGame extends MultiplayerGame<Player> {
                         Telemetry.HANGMAN_SUMMARY.labels("win").observe(gains);
                         return Flux.fromIterable(this.players.values())
                                 .flatMap(player -> player.win(gains))
-                                .then(this.context.reply(Emoji.PURSE, this.context.localize("hangman.win")
+                                .then(this.context.createFollowupMessage(Emoji.PURSE, this.context.localize("hangman.win")
                                         .formatted(this.context.localize(gains))));
                     }
                 })

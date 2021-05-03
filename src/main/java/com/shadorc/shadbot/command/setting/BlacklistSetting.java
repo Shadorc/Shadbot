@@ -124,7 +124,7 @@ public class BlacklistSetting extends BaseCmd {
         }
 
         return context.getDbGuild().updateSetting(Setting.BLACKLIST, blacklist)
-                .then(context.reply(Emoji.CHECK_MARK, message
+                .then(context.createFollowupMessage(Emoji.CHECK_MARK, message
                         .formatted(FormatUtil.format(categoryNames, "`%s`"::formatted, ", "))));
     }
 
@@ -162,7 +162,7 @@ public class BlacklistSetting extends BaseCmd {
         }
 
         return context.getDbGuild().updateSetting(Setting.BLACKLIST, blacklist)
-                .then(context.reply(Emoji.CHECK_MARK, message
+                .then(context.createFollowupMessage(Emoji.CHECK_MARK, message
                         .formatted(FormatUtil.format(cmdNames, "`%s`"::formatted, ", "))));
     }
 

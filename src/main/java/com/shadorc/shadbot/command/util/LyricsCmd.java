@@ -56,10 +56,10 @@ public class LyricsCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         final String search = LyricsCmd.getSearch(context);
-        return context.reply(Emoji.HOURGLASS, context.localize("lyrics.loading"))
+        return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("lyrics.loading"))
                 .then(LyricsCmd.getMusixmatch(search))
-                .flatMap(musixmatch -> context.editReply(LyricsCmd.formatEmbed(context, musixmatch)))
-                .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
+                .flatMap(musixmatch -> context.editFollowupMessage(LyricsCmd.formatEmbed(context, musixmatch)))
+                .switchIfEmpty(context.editFollowupMessage(Emoji.MAGNIFYING_GLASS,
                         context.localize("lyrics.not.found").formatted(search)));
     }
 

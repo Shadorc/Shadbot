@@ -47,10 +47,10 @@ public class BassBoostCmd extends BaseCmd {
                             .bassBoost((int) percentage);
 
                     if (percentage == 0) {
-                        return context.reply(Emoji.CHECK_MARK, context.localize("bassboost.disabled"));
+                        return context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("bassboost.disabled"));
                     }
 
-                    return context.reply(Emoji.CHECK_MARK, context.localize("bassboost.message")
+                    return context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("bassboost.message")
                             .formatted(percentage));
                 });
     }

@@ -76,7 +76,7 @@ public class IamCmd extends BaseCmd {
                                             null, context.getAuthorAvatar())
                                             .setDescription(description));
 
-                            return context.reply(embedConsumer)
+                            return context.createFollowupMessage(embedConsumer)
                                     .flatMap(message -> message.addReaction(REACTION)
                                             .thenReturn(message))
                                     .flatMap(message -> {

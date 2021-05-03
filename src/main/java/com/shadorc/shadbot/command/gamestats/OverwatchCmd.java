@@ -65,13 +65,13 @@ public class OverwatchCmd extends BaseCmd {
         final Platform platform = context.getOptionAsEnum(Platform.class, "platform").orElseThrow();
         final String battletag = context.getOptionAsString("battletag").orElseThrow();
 
-        return context.reply(Emoji.HOURGLASS, context.localize("overwatch.loading"))
+        return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("overwatch.loading"))
                 .then(this.getOverwatchProfile(context, battletag, platform))
                 .flatMap(profile -> {
                     if (profile.profile().isPrivate()) {
-                        return context.editReply(Emoji.ACCESS_DENIED, context.localize("overwatch.private"));
+                        return context.editFollowupMessage(Emoji.ACCESS_DENIED, context.localize("overwatch.private"));
                     }
-                    return context.editReply(OverwatchCmd.formatEmbed(context, profile, platform));
+                    return context.editFollowupMessage(OverwatchCmd.formatEmbed(context, profile, platform));
                 });
     }
 

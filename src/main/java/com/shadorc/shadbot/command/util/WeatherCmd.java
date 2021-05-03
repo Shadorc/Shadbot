@@ -52,7 +52,7 @@ public class WeatherCmd extends BaseCmd {
         final String city = context.getOptionAsString("city").orElseThrow();
         final Optional<String> countryOpt = context.getOptionAsString("country");
 
-        return context.reply(Emoji.HOURGLASS, context.localize("weather.loading"))
+        return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("weather.loading"))
                 .then(Mono.fromCallable(() -> {
                     if (countryOpt.isPresent()) {
                         final String countryStr = countryOpt.get();
@@ -69,13 +69,13 @@ public class WeatherCmd extends BaseCmd {
                 }))
                 .map(WeatherWrapper::new)
                 .map(weather -> this.formatEmbed(context, weather))
-                .flatMap(context::editReply)
+                .flatMap(context::editFollowupMessage)
                 .onErrorResume(WeatherCmd.isNotFound(), err -> {
                     if (countryOpt.isPresent()) {
-                        return context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("weather.exception.country")
+                        return context.editFollowupMessage(Emoji.MAGNIFYING_GLASS, context.localize("weather.exception.country")
                                 .formatted(city, countryOpt.orElseThrow()));
                     }
-                    return context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("weather.exception.city")
+                    return context.editFollowupMessage(Emoji.MAGNIFYING_GLASS, context.localize("weather.exception.city")
                             .formatted(city));
                 })
                 .onErrorMap(APIException.class, IOException::new);

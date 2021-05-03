@@ -42,7 +42,7 @@ public class ServerInfoCmd extends BaseCmd {
                 getGuild.flatMap(Guild::getOwner),
                 getGuild.flatMap(Guild::getRegion))
                 .map(TupleUtils.function(this::formatEmbed))
-                .flatMap(context::reply);
+                .flatMap(context::createFollowupMessage);
     }
 
     private Consumer<EmbedCreateSpec> formatEmbed(Context context, Guild guild, List<GuildChannel> channels,

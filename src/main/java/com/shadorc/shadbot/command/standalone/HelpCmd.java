@@ -39,14 +39,14 @@ public class HelpCmd extends BaseCmd {
                 return Mono.error(new CommandException(context.localize("help.cmd.not.found")
                         .formatted(cmdName)));
             }
-            return context.reply(cmd.getHelp(context));
+            return context.createFollowupMessage(cmd.getHelp(context));
         }
 
         return context.getPermissions()
                 .collectList()
                 .flatMap(authorPermissions -> HelpCmd.getMultiMap(context, authorPermissions))
                 .map(map -> HelpCmd.formatEmbed(context, map, context.getAuthorAvatar()))
-                .flatMap(context::reply);
+                .flatMap(context::createFollowupMessage);
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(I18nContext context, Map<CommandCategory, Collection<String>> map, String avatarUrl) {

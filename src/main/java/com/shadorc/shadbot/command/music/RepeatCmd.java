@@ -32,14 +32,14 @@ public class RepeatCmd extends BaseCmd {
                                             TrackScheduler.RepeatMode.SONG : TrackScheduler.RepeatMode.NONE);
 
                     if (oldMode == newMode) {
-                        return context.reply(Emoji.INFO, context.localize("repeat.already.set")
+                        return context.createFollowupMessage(Emoji.INFO, context.localize("repeat.already.set")
                                 .formatted(oldMode.name().toLowerCase()));
                     }
 
                     scheduler.setRepeatMode(newMode);
 
                     if (newMode == TrackScheduler.RepeatMode.NONE) {
-                        return context.reply(Emoji.PLAY, context.localize("repeat.disabled"));
+                        return context.createFollowupMessage(Emoji.PLAY, context.localize("repeat.disabled"));
                     }
 
                     final StringBuilder strBuilder = new StringBuilder(Emoji.REPEAT + " ");
@@ -57,7 +57,7 @@ public class RepeatCmd extends BaseCmd {
                         strBuilder.append(context.localize("repeat.song.enabled"));
                     }
 
-                    return context.reply(strBuilder.toString());
+                    return context.createFollowupMessage(strBuilder.toString());
                 });
     }
 

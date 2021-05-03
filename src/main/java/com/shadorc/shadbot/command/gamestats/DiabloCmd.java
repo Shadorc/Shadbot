@@ -74,7 +74,7 @@ public class DiabloCmd extends BaseCmd {
         final Region region = context.getOptionAsEnum(Region.class, "region").orElseThrow();
         final String battletag = context.getOptionAsString("battletag").orElseThrow().replace("#", "-");
 
-        return context.reply(Emoji.HOURGLASS, context.localize("diablo3.loading"))
+        return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("diablo3.loading"))
                 .then(this.token)
                 .map(TokenResponse::accessToken)
                 .flatMap(token -> {
@@ -83,7 +83,7 @@ public class DiabloCmd extends BaseCmd {
                             .to(ProfileResponse.class))
                             .flatMap(profile -> {
                                 if ("NOTFOUND".equals(profile.code().orElse(""))) {
-                                    return context.editReply(Emoji.MAGNIFYING_GLASS,
+                                    return context.editFollowupMessage(Emoji.MAGNIFYING_GLASS,
                                             context.localize("diablo3.user.not.found"));
                                 }
 
@@ -100,10 +100,10 @@ public class DiabloCmd extends BaseCmd {
                                         .collectList()
                                         .flatMap(heroResponses -> {
                                             if (heroResponses.isEmpty()) {
-                                                return context.editReply(Emoji.MAGNIFYING_GLASS,
+                                                return context.editFollowupMessage(Emoji.MAGNIFYING_GLASS,
                                                         context.localize("diablo3.no.heroes"));
                                             }
-                                            return context.editReply(DiabloCmd.formatEmbed(context, profile, heroResponses));
+                                            return context.editFollowupMessage(DiabloCmd.formatEmbed(context, profile, heroResponses));
                                         });
                             });
                 });

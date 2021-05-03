@@ -81,7 +81,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                             .map(player -> player.format(this.context.getLocale()))
                             .forEach(field -> embed.addField(field.name(), field.value(), field.inline().get()));
                 }))
-                .flatMap(this.context::editInitialReply);
+                .flatMap(this.context::editInitialFollowupMessage);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                 })
                 .collectList()
                 .map(results -> String.join("\n", results))
-                .flatMap(text -> this.context.reply(Emoji.DICE, this.context.localize("blackjack.results")
+                .flatMap(text -> this.context.createFollowupMessage(Emoji.DICE, this.context.localize("blackjack.results")
                         .formatted(text)))
                 .then(this.show())
                 .then(Mono.fromRunnable(this::destroy));

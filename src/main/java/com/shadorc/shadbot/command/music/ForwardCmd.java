@@ -42,7 +42,7 @@ public class ForwardCmd extends BaseCmd {
 
                     final long newPosition = guildMusic.getTrackScheduler()
                             .changePosition(duration.toMillis());
-                    return context.reply(Emoji.CHECK_MARK, context.localize("forward.message")
+                    return context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("forward.message")
                             .formatted(FormatUtil.formatDuration(newPosition)));
                 });
     }

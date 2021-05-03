@@ -52,7 +52,7 @@ public class PruneCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return context.reply(Emoji.HOURGLASS, context.localize("prune.loading"))
+        return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("prune.loading"))
                 .then(context.getChannel())
                 .cast(GuildMessageChannel.class)
                 .flatMap(channel -> DiscordUtil.requirePermissions(channel,
@@ -78,7 +78,7 @@ public class PruneCmd extends BaseCmd {
                         .flatMap(messageIds -> channel.bulkDelete(Flux.fromIterable(messageIds))
                                 .count()
                                 .map(messagesNotDeleted -> Math.max(0, messageIds.size() - messagesNotDeleted - MESSAGES_OFFSET))))
-                .flatMap(messagesDeleted -> context.reply(Emoji.CHECK_MARK, context.localize("prune.messages.deleted")
+                .flatMap(messagesDeleted -> context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("prune.messages.deleted")
                         .formatted(messagesDeleted)));
     }
 

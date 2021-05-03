@@ -40,9 +40,9 @@ public class TranslateCmd extends BaseCmd {
                 .onErrorMap(IllegalArgumentException.class,
                         err -> new CommandException(context.localize("translate.exception.doc")
                                 .formatted(err.getMessage(), DOC_URL)))
-                .flatMap(request -> context.reply(Emoji.HOURGLASS, context.localize("translate.loading"))
+                .flatMap(request -> context.createFollowupMessage(Emoji.HOURGLASS, context.localize("translate.loading"))
                         .then(TranslateCmd.getTranslation(request))
-                        .flatMap(response -> context.editReply(
+                        .flatMap(response -> context.editFollowupMessage(
                                 TranslateCmd.formatEmbed(context, request, response)))
                         .onErrorMap(IllegalArgumentException.class,
                                 err -> new CommandException(context.localize("translate.exception.doc")

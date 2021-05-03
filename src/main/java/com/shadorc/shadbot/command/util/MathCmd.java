@@ -36,7 +36,7 @@ public class MathCmd extends BaseCmd {
 
         final DecimalFormat formatter = new DecimalFormat("#.##",
                 new DecimalFormatSymbols(context.getLocale()));
-        return context.reply(Emoji.TRIANGULAR_RULER, "%s = %s"
+        return context.createFollowupMessage(Emoji.TRIANGULAR_RULER, "%s = %s"
                 .formatted(arg.replace("*", "\\*"), formatter.format(result)));
     }
 

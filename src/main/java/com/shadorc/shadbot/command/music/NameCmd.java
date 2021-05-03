@@ -22,7 +22,7 @@ public class NameCmd extends BaseCmd {
                 .getPlayingTrack()
                 .getInfo();
 
-        return context.reply(Emoji.MUSICAL_NOTE, context.localize("name.message")
+        return context.createFollowupMessage(Emoji.MUSICAL_NOTE, context.localize("name.message")
                 .formatted(FormatUtil.trackName(context.getLocale(), trackInfo)));
     }
 }

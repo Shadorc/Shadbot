@@ -36,7 +36,7 @@ public class EnableCommandCmd extends BaseCmd {
         final String enabledStr = enabled ? "enabled" : "disabled";
         DEFAULT_LOGGER.info("Command {} {}", cmd.getName(), enabledStr);
 
-        return context.reply(Emoji.CHECK_MARK, "Command `%s` %s".formatted(commandName, enabledStr));
+        return context.createFollowupMessage(Emoji.CHECK_MARK, "Command `%s` %s".formatted(commandName, enabledStr));
     }
 
 }

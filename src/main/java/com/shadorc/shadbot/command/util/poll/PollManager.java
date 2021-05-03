@@ -52,7 +52,7 @@ public class PollManager {
                                         .formatted(FormatUtil.formatDuration(this.spec.duration()), Emoji.RED_CROSS),
                                 "https://i.imgur.com/jcrUDLY.png"));
 
-        return this.context.reply(embedConsumer)
+        return this.context.createFollowupMessage(embedConsumer)
                 .flatMap(message -> Flux.fromIterable(this.spec.choices().values())
                         .flatMap(message::addReaction)
                         .then(Mono.fromRunnable(() -> this.scheduleEnd(message.getId()))));
@@ -110,7 +110,7 @@ public class PollManager {
                         .setFooter(this.context.localize("poll.results.footer")
                                 .formatted(this.context.getAuthorName()), null));
 
-        return this.context.reply(embedConsumer);
+        return this.context.createFollowupMessage(embedConsumer);
     }
 
 }

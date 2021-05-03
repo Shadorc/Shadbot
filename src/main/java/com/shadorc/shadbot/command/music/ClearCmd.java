@@ -15,7 +15,7 @@ public class ClearCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         context.requireGuildMusic().getTrackScheduler().clearPlaylist();
-        return context.reply(Emoji.CHECK_MARK, context.localize("clear.message"));
+        return context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("clear.message"));
     }
 
 }

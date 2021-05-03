@@ -123,6 +123,6 @@ public class SettingShow extends BaseCmd {
                                 embed.setDescription(context.localize("settings.none"));
                             }
                         })))
-                .flatMap(context::reply);
+                .flatMap(context::createFollowupMessage);
     }
 }

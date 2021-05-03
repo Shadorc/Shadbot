@@ -54,7 +54,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                 })
                 .collectList()
                 .map(results -> String.join("\n", results))
-                .flatMap(text -> this.context.reply(Emoji.DICE, this.context.localize("dice.results")
+                .flatMap(text -> this.context.createFollowupMessage(Emoji.DICE, this.context.localize("dice.results")
                         .formatted(winningNum, text)))
                 .then(Mono.fromRunnable(this::destroy));
     }
@@ -81,7 +81,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
                         embed.setFooter(this.context.localize("dice.footer.finished"), null);
                     }
                 }))
-                .flatMap(this.context::editReply);
+                .flatMap(this.context::editFollowupMessage);
     }
 
     public long getBet() {

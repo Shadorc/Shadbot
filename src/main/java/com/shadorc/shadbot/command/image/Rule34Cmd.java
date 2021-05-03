@@ -36,21 +36,21 @@ public class Rule34Cmd extends BaseCmd {
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return context.reply(Emoji.GREY_EXCLAMATION,
+                        return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
                                 context.localize("must.be.nsfw").formatted(Setting.NSFW));
                     }
 
-                    return context.reply(Emoji.HOURGLASS, context.localize("rule34.loading"))
+                    return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("rule34.loading"))
                             .then(Rule34Cmd.getR34Post(query))
                             .flatMap(post -> {
                                 // Don't post images containing children
                                 if (Rule34Cmd.containsChildren(post, post.getTags())) {
-                                    return context.editReply(Emoji.WARNING, context.localize("rule34.children"));
+                                    return context.editFollowupMessage(Emoji.WARNING, context.localize("rule34.children"));
                                 }
 
-                                return context.editReply(Rule34Cmd.formatEmbed(context, post, query));
+                                return context.editFollowupMessage(Rule34Cmd.formatEmbed(context, post, query));
                             })
-                            .switchIfEmpty(context.editReply(Emoji.MAGNIFYING_GLASS,
+                            .switchIfEmpty(context.editFollowupMessage(Emoji.MAGNIFYING_GLASS,
                                     context.localize("rule34.not.found").formatted(query)));
                 });
     }

@@ -24,9 +24,9 @@ public class JokeCmd extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return context.reply(Emoji.HOURGLASS, context.localize("joke.loading"))
+        return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("joke.loading"))
                 .then(JokeCmd.getRandomJoke())
-                .flatMap(joke -> context.editReply(JokeCmd.formatEmbed(context, joke)));
+                .flatMap(joke -> context.editFollowupMessage(JokeCmd.formatEmbed(context, joke)));
     }
 
     private static Consumer<EmbedCreateSpec> formatEmbed(Context context, String joke) {

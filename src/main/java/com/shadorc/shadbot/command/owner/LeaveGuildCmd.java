@@ -38,7 +38,7 @@ public class LeaveGuildCmd extends BaseCmd {
                 .onErrorMap(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
                         err -> new CommandException("Guild not found."))
                 .flatMap(Guild::leave)
-                .then(context.reply(Emoji.CHECK_MARK, "Guild (ID: **%d**) left.".formatted(guildId)));
+                .then(context.createFollowupMessage(Emoji.CHECK_MARK, "Guild (ID: **%d**) left.".formatted(guildId)));
     }
 
 }

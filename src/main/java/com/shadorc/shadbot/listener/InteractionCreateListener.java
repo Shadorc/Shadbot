@@ -4,6 +4,7 @@ import com.shadorc.shadbot.core.command.CommandProcessor;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.data.Config;
+import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.database.DatabaseManager;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.object.entity.channel.TextChannel;
@@ -19,6 +20,8 @@ public class InteractionCreateListener implements EventListener<InteractionCreat
 
     @Override
     public Mono<?> execute(InteractionCreateEvent event) {
+        Telemetry.INTERACTING_USERS.add(event.getInteraction().getUser().getId().asLong());
+
         // TODO Feature: Interactions from DM
         if (event.getInteraction().getGuildId().isEmpty()) {
             return event.reply(I18nManager.localize(Config.DEFAULT_LOCALE, "interaction.dm"));
@@ -27,9 +30,8 @@ public class InteractionCreateListener implements EventListener<InteractionCreat
                 .cast(TextChannel.class)
                 .flatMap(channel -> channel.getEffectivePermissions(event.getClient().getSelfId()))
                 .filter(permissions -> permissions.contains(Permission.SEND_MESSAGES) && permissions.contains(Permission.VIEW_CHANNEL))
-                .flatMap(__ -> event.acknowledge()
-                        .then(Mono.justOrEmpty(event.getInteraction().getGuildId())
-                                .flatMap(guildId -> DatabaseManager.getGuilds().getDBGuild(guildId)))
+                .flatMap(__ -> Mono.justOrEmpty(event.getInteraction().getGuildId())
+                        .flatMap(guildId -> DatabaseManager.getGuilds().getDBGuild(guildId))
                         .map(dbGuild -> new Context(event, dbGuild))
                         .flatMap(CommandProcessor::processCommand));
     }

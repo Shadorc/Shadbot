@@ -27,13 +27,13 @@ public class SuicideGirlsCmd extends BaseCmd {
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return context.reply(Emoji.GREY_EXCLAMATION,
+                        return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
                                 context.localize("must.be.nsfw").formatted(Setting.NSFW));
                     }
 
-                    return context.reply(Emoji.HOURGLASS, context.localize("suicidegirls.loading"))
+                    return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("suicidegirls.loading"))
                             .then(SuicideGirlsCmd.getRandomSuicideGirl())
-                            .flatMap(post -> context.editReply(SuicideGirlsCmd.formatEmbed(context, post)));
+                            .flatMap(post -> context.editFollowupMessage(SuicideGirlsCmd.formatEmbed(context, post)));
                 });
     }
 

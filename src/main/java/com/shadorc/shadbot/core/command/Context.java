@@ -225,7 +225,19 @@ public class Context implements InteractionContext, I18nContext {
     /////////////////////////////////////////////
 
     @Override
-    public Mono<Message> reply(String str) {
+    public Mono<Void> reply(Emoji emoji, String message) {
+        return this.event.reply("%s %s".formatted(emoji, message))
+                .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc());
+    }
+
+    @Override
+    public Mono<Void> replyEphemeral(Emoji emoji, String message) {
+        return this.event.replyEphemeral("%s %s".formatted(emoji, message))
+                .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc());
+    }
+
+    @Override
+    public Mono<Message> createFollowupMessage(String str) {
         return this.event.getInteractionResponse()
                 .createFollowupMessage(str)
                 .map(data -> new Message(this.getClient(), data))
@@ -234,12 +246,12 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     @Override
-    public Mono<Message> reply(Emoji emoji, String str) {
-        return this.reply("%s %s".formatted(emoji, str));
+    public Mono<Message> createFollowupMessage(Emoji emoji, String str) {
+        return this.createFollowupMessage("%s %s".formatted(emoji, str));
     }
 
     @Override
-    public Mono<Message> reply(Consumer<EmbedCreateSpec> embed) {
+    public Mono<Message> createFollowupMessage(Consumer<EmbedCreateSpec> embed) {
         final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
         embed.accept(mutatedSpec);
         return this.event.getInteractionResponse().createFollowupMessage(MultipartRequest.ofRequest(
@@ -252,7 +264,7 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     @Override
-    public Mono<Message> editReply(String message) {
+    public Mono<Message> editFollowupMessage(String message) {
         return Mono.fromCallable(this.replyId::get)
                 .filter(messageId -> messageId > 0)
                 .flatMap(messageId -> this.event.getInteractionResponse()
@@ -261,16 +273,16 @@ public class Context implements InteractionContext, I18nContext {
                                 .build(), true))
                 .map(data -> new Message(this.getClient(), data))
                 .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc())
-                .switchIfEmpty(this.reply(message));
+                .switchIfEmpty(this.createFollowupMessage(message));
     }
 
     @Override
-    public Mono<Message> editReply(Emoji emoji, String message) {
-        return this.editReply("%s %s".formatted(emoji, message));
+    public Mono<Message> editFollowupMessage(Emoji emoji, String message) {
+        return this.editFollowupMessage("%s %s".formatted(emoji, message));
     }
 
     @Override
-    public Mono<Message> editReply(Consumer<EmbedCreateSpec> embed) {
+    public Mono<Message> editFollowupMessage(Consumer<EmbedCreateSpec> embed) {
         return Mono.fromCallable(this.replyId::get)
                 .filter(messageId -> messageId > 0)
                 .flatMap(messageId -> {
@@ -284,11 +296,11 @@ public class Context implements InteractionContext, I18nContext {
                 })
                 .map(data -> new Message(this.getClient(), data))
                 .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc())
-                .switchIfEmpty(this.reply(embed));
+                .switchIfEmpty(this.createFollowupMessage(embed));
     }
 
     @Override
-    public Mono<Message> editInitialReply(Consumer<EmbedCreateSpec> embed) {
+    public Mono<Message> editInitialFollowupMessage(Consumer<EmbedCreateSpec> embed) {
         return Mono.defer(() -> {
             final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
             embed.accept(mutatedSpec);
@@ -299,7 +311,7 @@ public class Context implements InteractionContext, I18nContext {
                             .build())
                     .map(data -> new Message(this.getClient(), data))
                     .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc())
-                    .switchIfEmpty(this.reply(embed));
+                    .switchIfEmpty(this.createFollowupMessage(embed));
         });
     }
 

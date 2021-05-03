@@ -40,7 +40,7 @@ public class UserInfoCmd extends BaseCmd {
 
         return Mono.zip(getUser, getUser.flatMapMany(Member::getRoles).collectList())
                 .map(TupleUtils.function((user, roles) -> this.formatEmbed(context, user, roles)))
-                .flatMap(context::reply);
+                .flatMap(context::createFollowupMessage);
     }
 
     private Consumer<EmbedCreateSpec> formatEmbed(Context context, Member member, List<Role> roles) {

@@ -26,11 +26,11 @@ public class ActivateRelicCmd extends BaseCmd {
         final String arg = context.getOptionAsString("relic").orElseThrow();
 
         return DatabaseManager.getPremium().getRelicById(arg)
-                .switchIfEmpty(context.reply(Emoji.GREY_EXCLAMATION, context.localize("activaterelic.not.found"))
+                .switchIfEmpty(context.createFollowupMessage(Emoji.GREY_EXCLAMATION, context.localize("activaterelic.not.found"))
                         .then(Mono.empty()))
                 .flatMap(relic -> {
                     if (relic.getActivation().isPresent()) {
-                        return context.reply(Emoji.GREY_EXCLAMATION, context.localize("activaterelic.already.activated"));
+                        return context.createFollowupMessage(Emoji.GREY_EXCLAMATION, context.localize("activaterelic.already.activated"));
                     }
 
                     DEFAULT_LOGGER.info("{User ID: {}} Relic (ID: {}) activated.", context.getAuthorId().asString(), arg);
@@ -38,7 +38,7 @@ public class ActivateRelicCmd extends BaseCmd {
                     final Optional<Snowflake> guildId = Optional.of(context.getGuildId())
                             .filter(__ -> relic.getType() == RelicType.GUILD);
                     return relic.activate(context.getAuthorId(), guildId.orElse(null))
-                            .then(context.reply(Emoji.CHECK_MARK, context.localize("activaterelic.message")));
+                            .then(context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("activaterelic.message")));
                 });
     }
 

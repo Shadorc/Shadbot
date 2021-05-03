@@ -42,7 +42,7 @@ public class SendMessageCmd extends BaseCmd {
                             .flatMap(privateChannel -> DiscordUtil.sendMessage(message, privateChannel))
                             .onErrorMap(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
                                     err -> new CommandException("I'm not allowed to send a private message to this user."))
-                            .then(context.reply(Emoji.CHECK_MARK, "Message \"%s\" sent to **%s** (%s)."
+                            .then(context.createFollowupMessage(Emoji.CHECK_MARK, "Message \"%s\" sent to **%s** (%s)."
                                     .formatted(message, user.getUsername(), user.getId().asString())));
                 });
     }

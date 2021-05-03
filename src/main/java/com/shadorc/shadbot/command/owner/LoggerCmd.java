@@ -58,7 +58,7 @@ public class LoggerCmd extends BaseCmd {
         logger.setLevel(level);
 
         DEFAULT_LOGGER.info("Logger '{}' set to level {}", name, level);
-        return context.reply(Emoji.INFO, "Logger `%s` set to level `%s`.".formatted(name, level));
+        return context.createFollowupMessage(Emoji.INFO, "Logger `%s` set to level `%s`.".formatted(name, level));
     }
 
 }

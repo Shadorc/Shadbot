@@ -53,7 +53,7 @@ public class FortniteCmd extends BaseCmd {
         final String encodedUsername = NetUtil.encode(username.replace(" ", "%20"));
         final String url = FortniteCmd.buildApiUrl(platform, encodedUsername);
 
-        return context.reply(Emoji.HOURGLASS, context.localize("fortnite.loading"))
+        return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("fortnite.loading"))
                 .then(this.cachedValues.getOrCache(url, RequestHelper.fromUrl(url)
                         .addHeaders("TRN-Api-Key", this.apiKey)
                         .to(FortniteResponse.class)))
@@ -64,10 +64,10 @@ public class FortniteCmd extends BaseCmd {
 
                     final String profileUrl = FortniteCmd.buildProfileUrl(platform, encodedUsername);
                     final String description = FortniteCmd.formatDescription(context, fortnite.stats(), username);
-                    return context.editReply(FortniteCmd.formatEmbed(context, profileUrl, description));
+                    return context.editFollowupMessage(FortniteCmd.formatEmbed(context, profileUrl, description));
                 })
                 .onErrorResume(FortniteCmd::isNotFound,
-                        err -> context.editReply(Emoji.MAGNIFYING_GLASS, context.localize("fortnite.user.not.found")));
+                        err -> context.editFollowupMessage(Emoji.MAGNIFYING_GLASS, context.localize("fortnite.user.not.found")));
     }
 
     private static boolean isNotFound(Throwable err) {
