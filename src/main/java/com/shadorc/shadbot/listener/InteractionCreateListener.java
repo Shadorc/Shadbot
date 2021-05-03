@@ -30,10 +30,10 @@ public class InteractionCreateListener implements EventListener<InteractionCreat
                 .cast(TextChannel.class)
                 .flatMap(channel -> channel.getEffectivePermissions(event.getClient().getSelfId()))
                 .filter(permissions -> permissions.contains(Permission.SEND_MESSAGES) && permissions.contains(Permission.VIEW_CHANNEL))
-                .flatMap(__ -> Mono.justOrEmpty(event.getInteraction().getGuildId())
-                        .flatMap(guildId -> DatabaseManager.getGuilds().getDBGuild(guildId))
-                        .map(dbGuild -> new Context(event, dbGuild))
-                        .flatMap(CommandProcessor::processCommand));
+                .flatMap(__ -> Mono.justOrEmpty(event.getInteraction().getGuildId()))
+                .flatMap(guildId -> DatabaseManager.getGuilds().getDBGuild(guildId))
+                .map(dbGuild -> new Context(event, dbGuild))
+                .flatMap(CommandProcessor::processCommand);
     }
 
 }
