@@ -6,6 +6,7 @@ import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Member;
 import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
@@ -27,6 +28,10 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
 
     @Override
     public Mono<?> execute(MessageCreateEvent event) {
+        if(event.getMember().map(Member::isBot).orElse(true)) {
+            return Mono.empty();
+        }
+
         return Mono.justOrEmpty(event.getGuildId())
                 .filter(guildId -> !WARNED_GUILDS.contains(guildId.asLong()))
                 .flatMap(guildId -> DatabaseManager.getGuilds().getDBGuild(guildId)
