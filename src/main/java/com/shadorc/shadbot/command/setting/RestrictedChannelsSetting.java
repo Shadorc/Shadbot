@@ -55,7 +55,8 @@ public class RestrictedChannelsSetting extends BaseCmd {
         final Action action = context.getOptionAsEnum(Action.class, "action").orElseThrow();
         final Type type = context.getOptionAsEnum(Type.class, "type").orElseThrow();
         final String name = context.getOptionAsString("name").orElseThrow();
-        final Mono<TextChannel> getChannel = context.getOptionAsChannel("channel").cast(TextChannel.class);
+        final Mono<TextChannel> getChannel = context.getOptionAsChannel("channel")
+                .ofType(TextChannel.class);
 
         final Set<BaseCmd> commands = new HashSet<>();
         switch (type) {
@@ -79,6 +80,7 @@ public class RestrictedChannelsSetting extends BaseCmd {
         }
 
         return getChannel
+                .switchIfEmpty(Mono.error(new CommandException(context.localize("restrictedchannels.exception.category"))))
                 .flatMap(channel -> {
                     final StringBuilder strBuilder = new StringBuilder();
                     final Map<Snowflake, Set<BaseCmd>> restrictedCategories = context.getDbGuild().getSettings()
