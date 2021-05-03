@@ -28,7 +28,7 @@ public class MessageCreateListener implements EventListener<MessageCreateEvent> 
 
     @Override
     public Mono<?> execute(MessageCreateEvent event) {
-        if(event.getMember().map(Member::isBot).orElse(true)) {
+        if (event.getMember().map(Member::isBot).orElse(true)) {
             return Mono.empty();
         }
 
