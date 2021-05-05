@@ -116,8 +116,8 @@ public class Shadbot {
                         Intent.GUILDS,
                         Intent.GUILD_MEMBERS,
                         Intent.GUILD_VOICE_STATES,
-                        Intent.GUILD_MESSAGES,
                         Intent.GUILD_MESSAGE_REACTIONS,
+                        Intent.GUILD_MESSAGES,
                         Intent.DIRECT_MESSAGES))
                 .setInitialPresence(__ -> ClientPresence.online(ClientActivity.listening("/help")))
                 .setMemberRequestFilter(MemberRequestFilter.none())
@@ -135,14 +135,18 @@ public class Shadbot {
                     }
 
                     DEFAULT_LOGGER.info("Registering listeners");
-                    Shadbot.register(gateway, new ChannelDeleteListener.TextChannelDeleteListener());
-                    Shadbot.register(gateway, new ChannelDeleteListener.VoiceChannelDeleteListener());
-                    Shadbot.register(gateway, new RoleDeleteListener());
+                    /* Intent.GUILDS */
                     Shadbot.register(gateway, new GuildCreateListener());
                     Shadbot.register(gateway, new GuildDeleteListener());
+                    Shadbot.register(gateway, new RoleDeleteListener());
+                    Shadbot.register(gateway, new ChannelDeleteListener.TextChannelDeleteListener());
+                    Shadbot.register(gateway, new ChannelDeleteListener.VoiceChannelDeleteListener());
+                    /* Intent.GUILD_MEMBERS */
                     Shadbot.register(gateway, new MemberJoinListener());
                     Shadbot.register(gateway, new MemberLeaveListener());
+                    /* Intent.GUILD_VOICE_STATES */
                     Shadbot.register(gateway, new VoiceStateUpdateListener());
+                    /* Intent.GUILD_MESSAGE_REACTIONS */
                     Shadbot.register(gateway, new ReactionListener.ReactionAddListener());
                     Shadbot.register(gateway, new ReactionListener.ReactionRemoveListener());
                     Shadbot.register(gateway, new InteractionCreateListener());
