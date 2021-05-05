@@ -2,16 +2,16 @@ package com.shadorc.shadbot.core.command;
 
 public enum Setting {
 
+    // TODO Clean-up: Deprecated
+
     @Deprecated
     PREFIX, // Removed
     DEFAULT_VOLUME,
     NSFW,
     @Deprecated
     ALLOWED_CHANNELS, // Removed
-    @Deprecated
-    ALLOWED_TEXT_CHANNELS,  // Removed
-    @Deprecated
-    ALLOWED_VOICE_CHANNELS, // Removed
+    ALLOWED_TEXT_CHANNELS,
+    ALLOWED_VOICE_CHANNELS,
     ALLOWED_ROLES,
     BLACKLIST,
     @Deprecated

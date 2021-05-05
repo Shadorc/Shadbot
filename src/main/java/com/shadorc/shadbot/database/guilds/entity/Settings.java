@@ -45,7 +45,6 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return !blacklistedCmds.contains(cmd.getName());
     }
 
-    @Deprecated
     public boolean isTextChannelAllowed(Snowflake channelId) {
         final Set<Snowflake> allowedTextChannelIds = this.getAllowedTextChannelIds();
         // If no permission has been set
@@ -55,7 +54,6 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return allowedTextChannelIds.contains(channelId);
     }
 
-    @Deprecated
     public boolean isVoiceChannelAllowed(Snowflake channelId) {
         final Set<Snowflake> allowedVoiceChannelIds = this.getAllowedVoiceChannelIds();
         // If no permission has been set
@@ -95,12 +93,10 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return map.values().stream().noneMatch(set -> set.contains(cmd));
     }
 
-    @Deprecated
     public Set<Snowflake> getAllowedTextChannelIds() {
         return this.toSnowflakeSet(SettingsBean::getAllowedTextChannelIds);
     }
 
-    @Deprecated
     public Set<Snowflake> getAllowedVoiceChannelIds() {
         return this.toSnowflakeSet(SettingsBean::getAllowedVoiceChannelIds);
     }

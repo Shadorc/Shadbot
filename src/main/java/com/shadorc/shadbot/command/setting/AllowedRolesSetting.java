@@ -66,27 +66,27 @@ public class AllowedRolesSetting extends BaseCmd {
                 .collectList()
                 .flatMap(mentionedRoles -> {
                     final DBGuild dbGuild = context.getDbGuild();
-                    final Set<Snowflake> allowedRoles = dbGuild.getSettings().getAllowedRoleIds();
+                    final Set<Snowflake> allowedRoleIds = dbGuild.getSettings().getAllowedRoleIds();
                     final Set<Snowflake> mentionedRoleIds = mentionedRoles.stream()
                             .map(Role::getId)
                             .collect(Collectors.toUnmodifiableSet());
 
                     final StringBuilder strBuilder = new StringBuilder();
                     if (action == Action.ADD) {
-                        allowedRoles.addAll(mentionedRoleIds);
+                        allowedRoleIds.addAll(mentionedRoleIds);
                         strBuilder.append(Emoji.CHECK_MARK + context.localize("allowedroles.added")
                                 .formatted(FormatUtil.format(mentionedRoles, role -> "`@%s`".formatted(role.getName()), ", ")));
                     } else {
-                        allowedRoles.removeAll(mentionedRoleIds);
+                        allowedRoleIds.removeAll(mentionedRoleIds);
                         strBuilder.append(Emoji.CHECK_MARK + context.localize("allowedroles.removed")
                                 .formatted(FormatUtil.format(mentionedRoles, role -> "`@%s`".formatted(role.getName()), ", ")));
 
-                        if (allowedRoles.isEmpty()) {
+                        if (allowedRoleIds.isEmpty()) {
                             strBuilder.append("\n" + Emoji.INFO + context.localize("allowedroles.reset"));
                         }
                     }
 
-                    return dbGuild.updateSetting(Setting.ALLOWED_ROLES, allowedRoles)
+                    return dbGuild.updateSetting(Setting.ALLOWED_ROLES, allowedRoleIds)
                             .then(context.createFollowupMessage(strBuilder.toString()));
                 });
     }

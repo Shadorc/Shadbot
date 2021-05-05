@@ -13,11 +13,9 @@ import java.util.Set;
 public class SettingsBean implements Bean {
 
     @Nullable
-    @Deprecated
     @JsonProperty("allowed_text_channels")
     private List<String> allowedTextChannelIds;
     @Nullable
-    @Deprecated
     @JsonProperty("allowed_voice_channels")
     private List<String> allowedVoiceChannelIds;
     @Nullable
@@ -72,13 +70,11 @@ public class SettingsBean implements Bean {
     }
 
     @Nullable
-    @Deprecated
     public List<String> getAllowedTextChannelIds() {
         return this.allowedTextChannelIds;
     }
 
     @Nullable
-    @Deprecated
     public List<String> getAllowedVoiceChannelIds() {
         return this.allowedVoiceChannelIds;
     }
