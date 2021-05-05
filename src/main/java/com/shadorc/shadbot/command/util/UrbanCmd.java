@@ -44,8 +44,7 @@ public class UrbanCmd extends BaseCmd {
         return context.isChannelNsfw()
                 .flatMap(isNsfw -> {
                     if (!isNsfw) {
-                        return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
-                                context.localize("must.be.nsfw").formatted(Setting.NSFW));
+                        return context.createFollowupMessage(Emoji.GREY_EXCLAMATION, context.localize("must.be.nsfw"));
                     }
 
                     return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("urban.loading"))

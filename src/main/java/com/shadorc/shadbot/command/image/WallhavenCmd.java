@@ -46,8 +46,7 @@ public class WallhavenCmd extends BaseCmd {
                 .then(Mono.zip(this.getWallpaper(query), context.isChannelNsfw()))
                 .flatMap(TupleUtils.function((wallpaper, isNsfw) -> {
                     if (!"sfw".equals(wallpaper.purity()) && !isNsfw) {
-                        return context.editFollowupMessage(Emoji.GREY_EXCLAMATION,
-                                context.localize("must.be.nsfw").formatted(Setting.NSFW));
+                        return context.editFollowupMessage(Emoji.GREY_EXCLAMATION, context.localize("must.be.nsfw"));
                     }
 
                     final String title = context.localize("wallhaven.title")

@@ -76,7 +76,7 @@ public class AllowedChannelsSetting extends BaseCmd {
                             .map(Channel::getId)
                             .collect(Collectors.toUnmodifiableSet());
 
-                    if(mentionedTextChannelIds.isEmpty() && mentionedVoiceChannelIds.isEmpty()) {
+                    if (mentionedTextChannelIds.isEmpty() && mentionedVoiceChannelIds.isEmpty()) {
                         return Mono.error(new CommandException(context.localize("allowedchannels.missing.channels")));
                     }
 
