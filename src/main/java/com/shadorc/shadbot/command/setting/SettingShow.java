@@ -9,6 +9,8 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.channel.Channel;
+import discord4j.core.object.entity.channel.TextChannel;
+import discord4j.core.object.entity.channel.VoiceChannel;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -47,6 +49,16 @@ public class SettingShow extends BaseCmd {
                 Flux.fromIterable(settings.getAllowedRoleIds())
                         .flatMap(id -> context.getClient().getRoleById(context.getGuildId(), id))
                         .collectList();
+        final Mono<List<TextChannel>> getAllowedTextChannels =
+                Flux.fromIterable(settings.getAllowedTextChannelIds())
+                        .flatMap(id -> context.getClient().getChannelById(id)
+                                .ofType(TextChannel.class))
+                        .collectList();
+        final Mono<List<VoiceChannel>> getAllowedVoiceChannels =
+                Flux.fromIterable(settings.getAllowedVoiceChannelIds())
+                        .flatMap(id -> context.getClient().getChannelById(id)
+                                .ofType(VoiceChannel.class))
+                        .collectList();
         final Mono<List<Role>> getAutoRoles =
                 Flux.fromIterable(settings.getAutoRoleIds())
                         .flatMap(id -> context.getClient().getRoleById(context.getGuildId(), id))
@@ -64,14 +76,10 @@ public class SettingShow extends BaseCmd {
                         .filter(tuple -> !tuple.getT2().isEmpty())
                         .collectMap(Tuple2::getT1, Tuple2::getT2);
 
-        return Mono.zip(
-                getAllowedRoles,
-                getAutoRoles,
-                getRestrictedChannels,
-                getRestrictedRoles,
-                getAutoJoinMessage,
-                getAutoLeaveMessage)
-                .map(TupleUtils.function((allowedRoles, autoRoles, restrictedChannels, restrictedRoles, autoJoinMessage, autoLeaveMessage) ->
+        return Mono.zip(getAllowedRoles, getAutoRoles, getRestrictedChannels, getRestrictedRoles,
+                getAutoJoinMessage, getAutoLeaveMessage, getAllowedTextChannels, getAllowedVoiceChannels)
+                .map(TupleUtils.function((allowedRoles, autoRoles, restrictedChannels, restrictedRoles,
+                                          autoJoinMessage, autoLeaveMessage, allowedTextChannels, allowedVoiceChannels) ->
                         ShadbotUtil.getDefaultEmbed(embed -> {
                             embed.setAuthor(context.localize("settings.title"),
                                     "https://github.com/Shadorc/Shadbot/wiki/Settings",
@@ -95,6 +103,14 @@ public class SettingShow extends BaseCmd {
                             if (!allowedRoles.isEmpty()) {
                                 embed.addField(context.localize("settings.allowed.roles"),
                                         FormatUtil.format(allowedRoles, Role::getMention, "\n"), false);
+                            }
+                            if (!allowedTextChannels.isEmpty()) {
+                                embed.addField(context.localize("settings.allowed.text.channels"),
+                                        FormatUtil.format(allowedTextChannels, Channel::getMention, "\n"), false);
+                            }
+                            if (!allowedVoiceChannels.isEmpty()) {
+                                embed.addField(context.localize("settings.allowed.voice.channels"),
+                                        FormatUtil.format(allowedVoiceChannels, Channel::getMention, "\n"), false);
                             }
                             if (!autoRoles.isEmpty()) {
                                 embed.addField(context.localize("settings.auto.roles"),
