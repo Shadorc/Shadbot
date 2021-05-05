@@ -43,7 +43,7 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
     }
 
     public TriviaCmd() {
-        super("trivia", "Start a Trivia game in which everyone can participate.");
+        super("trivia", "Start a Trivia game in which everyone can participate");
         this.addOption(option -> option.name("category")
                 .description("The category of the question")
                 .required(false)

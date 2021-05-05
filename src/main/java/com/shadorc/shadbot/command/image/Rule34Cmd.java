@@ -25,7 +25,7 @@ public class Rule34Cmd extends BaseCmd {
     private static final int MAX_TAGS_CHAR = 300;
 
     public Rule34Cmd() {
-        super(CommandCategory.IMAGE, "rule34", "Show random image from Rule34");
+        super(CommandCategory.IMAGE, "rule34", "Search random image from Rule34");
         this.addOption("query", "Search for a Rule34 image", true, ApplicationCommandOptionType.STRING);
     }
 

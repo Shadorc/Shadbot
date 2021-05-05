@@ -26,7 +26,7 @@ public class ThisDayCmd extends BaseCmd {
     private final SingleValueCache<ThisDay> getThisDay;
 
     public ThisDayCmd() {
-        super(CommandCategory.FUN, "this_day", "Significant events of the day");
+        super(CommandCategory.FUN, "this_day", "Significant events on this day");
         this.getThisDay = SingleValueCache.Builder
                 .create(ThisDayCmd.getThisDay())
                 .withTtlForValue(__ -> ThisDayCmd.getNextUpdate())
