@@ -38,13 +38,28 @@ public class SystemUtiltest {
     }
 
     @Test
-    public void testGetTotalMemory() {
-        assertTrue(SystemUtil.getTotalMemory() > 0);
+    public void testGetSystemTotalMemory() {
+        assertTrue(SystemUtil.getSystemTotalMemory() > 0);
     }
 
     @Test
-    public void testGetFreeMemory() {
-        assertTrue(SystemUtil.getFreeMemory() > 0);
+    public void testGetSystemFreeMemory() {
+        assertTrue(SystemUtil.getSystemFreeMemory() > 0);
+    }
+
+    @Test
+    public void testGetProcessTotalMemory() {
+        assertTrue(SystemUtil.getProcessTotalMemory() > 0);
+    }
+
+    @Test
+    public void testGetProcessMaxMemory() {
+        assertTrue(SystemUtil.getProcessMaxMemory() > 0);
+    }
+
+    @Test
+    public void testGetProcessFreeMemory() {
+        assertTrue(SystemUtil.getProcessFreeMemory() > 0);
     }
 
     @Test

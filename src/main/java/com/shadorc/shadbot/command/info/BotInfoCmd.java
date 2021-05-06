@@ -75,8 +75,8 @@ public class BotInfoCmd extends BaseCmd {
 
         final String performanceTitle = Emoji.GEAR + " " + context.localize("botinfo.title.performance");
         final String performanceField = context.localize("botinfo.field.performance")
-                .formatted(context.localize(SystemUtil.getTotalMemory() - SystemUtil.getFreeMemory()),
-                        context.localize(SystemUtil.getTotalMemory()),
+                .formatted(context.localize(SystemUtil.getProcessTotalMemory() - SystemUtil.getProcessFreeMemory()),
+                        context.localize(SystemUtil.getProcessTotalMemory()),
                         SystemUtil.getProcessCpuUsage(),
                         context.localize(SystemUtil.getThreadCount()));
 

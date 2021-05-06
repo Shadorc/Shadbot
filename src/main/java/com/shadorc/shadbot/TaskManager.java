@@ -56,12 +56,16 @@ public class TaskManager {
                     Telemetry.MAX_HEAP_MEMORY_GAUGE.set(SystemUtil.getMaxHeapMemory());
                     Telemetry.TOTAL_HEAP_MEMORY_GAUGE.set(SystemUtil.getTotalHeapMemory());
                     Telemetry.USED_HEAP_MEMORY_GAUGE.set(SystemUtil.getUsedHeapMemory());
-                    Telemetry.TOTAL_MEMORY_GAUGE.set(SystemUtil.getTotalMemory());
-                    Telemetry.FREE_MEMORY_GAUGE.set(SystemUtil.getFreeMemory());
+                    Telemetry.SYSTEM_TOTAL_MEMORY_GAUGE.set(SystemUtil.getSystemTotalMemory());
+                    Telemetry.SYSTEM_FREE_MEMORY_GAUGE.set(SystemUtil.getSystemFreeMemory());
                     Telemetry.GC_COUNT_GAUGE.set(SystemUtil.getGCCount());
                     Telemetry.GC_TIME_GAUGE.set(SystemUtil.getGCTime().toMillis());
                     Telemetry.THREAD_COUNT_GAUGE.set(SystemUtil.getThreadCount());
                     Telemetry.DAEMON_THREAD_COUNT_GAUGE.set(SystemUtil.getDaemonThreadCount());
+
+                    Telemetry.PROCESS_TOTAL_MEMORY.set(SystemUtil.getProcessTotalMemory());
+                    Telemetry.PROCESS_FREE_MEMORY.set(SystemUtil.getProcessFreeMemory());
+                    Telemetry.PROCESS_MAX_MEMORY.set(SystemUtil.getProcessMaxMemory());
 
                     Telemetry.GUILD_COUNT_GAUGE.set(Telemetry.GUILD_IDS.size());
                     Telemetry.UNIQUE_INTERACTING_USERS.set(Telemetry.INTERACTING_USERS.size());

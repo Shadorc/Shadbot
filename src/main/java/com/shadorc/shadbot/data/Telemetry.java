@@ -19,6 +19,7 @@ public class Telemetry {
     private static final String DISCORD_NAMESPACE = "discord";
     private static final String MUSIC_NAMESPACE = "music";
     private static final String GAME_NAMESPACE = "game";
+    private static final String PROCESS_NAMESPACE = "process";
 
     public static final Gauge UPTIME_GAUGE = Gauge.build("uptime", "Uptime in ms")
             .namespace(SYSTEM_NAMESPACE).register();
@@ -32,9 +33,9 @@ public class Telemetry {
             .namespace(SYSTEM_NAMESPACE).register();
     public static final Gauge USED_HEAP_MEMORY_GAUGE = Gauge.build("used_heap_memory", "Used Heap memory")
             .namespace(SYSTEM_NAMESPACE).register();
-    public static final Gauge TOTAL_MEMORY_GAUGE = Gauge.build("total_memory", "Total memory")
+    public static final Gauge SYSTEM_TOTAL_MEMORY_GAUGE = Gauge.build("total_memory", "Total memory")
             .namespace(SYSTEM_NAMESPACE).register();
-    public static final Gauge FREE_MEMORY_GAUGE = Gauge.build("free_memory", "Free memory")
+    public static final Gauge SYSTEM_FREE_MEMORY_GAUGE = Gauge.build("free_memory", "Free memory")
             .namespace(SYSTEM_NAMESPACE).register();
     public static final Gauge GC_COUNT_GAUGE = Gauge.build("gc_count", "Garbage collector count")
             .namespace(SYSTEM_NAMESPACE).register();
@@ -53,6 +54,13 @@ public class Telemetry {
             .namespace(SHADBOT_NAMESPACE).register();
     public static final Gauge UNIQUE_INTERACTING_USERS = Gauge.build("unique_interacting_users",
             "Unique interacting users count").namespace(SHADBOT_NAMESPACE).register();
+
+    public static final Gauge PROCESS_TOTAL_MEMORY = Gauge.build("total_memory", "Total memory")
+            .namespace(PROCESS_NAMESPACE).register();
+    public static final Gauge PROCESS_FREE_MEMORY = Gauge.build("free_memory", "Free memory")
+            .namespace(PROCESS_NAMESPACE).register();
+    public static final Gauge PROCESS_MAX_MEMORY = Gauge.build("max_memory", "Max memory")
+            .namespace(PROCESS_NAMESPACE).register();
 
     public static final Counter EVENT_COUNTER = Counter.build("event_count", "Discord event count")
             .namespace(DISCORD_NAMESPACE).labelNames("type").register();
