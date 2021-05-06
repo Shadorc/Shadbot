@@ -8,7 +8,6 @@ import discord4j.core.event.domain.channel.TextChannelDeleteEvent;
 import discord4j.core.event.domain.channel.VoiceChannelDeleteEvent;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 

@@ -140,7 +140,7 @@ public class FormatUtil {
     }
 
     public static <T> String format(Class<T> enumClass, Function<T, String> mapper, CharSequence delimiter) {
-        return FormatUtil.format(Arrays.stream(enumClass.getEnumConstants()), mapper, delimiter);
+        return FormatUtil.format(enumClass.getEnumConstants(), mapper, delimiter);
     }
 
     public static <T> String format(T[] array, Function<T, String> mapper, CharSequence delimiter) {
