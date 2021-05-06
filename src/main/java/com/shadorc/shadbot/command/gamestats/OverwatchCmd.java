@@ -9,6 +9,7 @@ import com.shadorc.shadbot.core.cache.MultiValueCache;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.function.Consumer;
 
 public class OverwatchCmd extends BaseCmd {
@@ -66,7 +68,7 @@ public class OverwatchCmd extends BaseCmd {
         final String battletag = context.getOptionAsString("battletag").orElseThrow();
 
         return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("overwatch.loading"))
-                .then(this.getOverwatchProfile(context, battletag, platform))
+                .then(this.getOverwatchProfile(context.getLocale(), battletag, platform))
                 .flatMap(profile -> {
                     if (profile.profile().isPrivate()) {
                         return context.editFollowupMessage(Emoji.ACCESS_DENIED, context.localize("overwatch.private"));
@@ -113,14 +115,14 @@ public class OverwatchCmd extends BaseCmd {
         return strBuilder.isEmpty() ? context.localize("overwatch.not.ranked") : strBuilder.toString();
     }
 
-    private Mono<OverwatchProfile> getOverwatchProfile(Context context, String battletag, Platform platform) {
+    private Mono<OverwatchProfile> getOverwatchProfile(Locale locale, String battletag, Platform platform) {
         final String username = NetUtil.encode(battletag.replace("#", "-"));
 
         final String profileUrl = OverwatchCmd.buildUrl(PROFILE_API_URL, platform, username);
         final Mono<ProfileResponse> getProfile = RequestHelper.fromUrl(profileUrl)
                 .to(ProfileResponse.class)
                 .filter(profile -> !"Error: Profile not found".equals(profile.message().orElse("")))
-                .switchIfEmpty(Mono.error(new CommandException(context.localize("overwatch.not.found"))));
+                .switchIfEmpty(Mono.error(new CommandException(I18nManager.localize(locale, "overwatch.not.found"))));
 
         final String statsUrl = OverwatchCmd.buildUrl(STATS_API_URL, platform, username);
         final Mono<StatsResponse> getStats = RequestHelper.fromUrl(statsUrl)

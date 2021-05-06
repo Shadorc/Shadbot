@@ -3,6 +3,7 @@ package com.shadorc.shadbot.command.gamestats;
 import com.shadorc.shadbot.api.json.gamestats.overwatch.OverwatchProfile;
 import com.shadorc.shadbot.command.CmdTest;
 import com.shadorc.shadbot.command.CommandException;
+import com.shadorc.shadbot.data.Config;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,7 +13,8 @@ public class OverwatchCmdTest extends CmdTest<OverwatchCmd> {
     @Test
     public void testGetResponse() {
         final String method = "getOverwatchProfile";
-        final OverwatchProfile result = this.invoke(method, "Shadorc#2503", OverwatchCmd.Platform.PC);
+        final OverwatchProfile result = this.invoke(method,
+                Config.DEFAULT_LOCALE, "Shadorc#2503", OverwatchCmd.Platform.PC);
         assertEquals(OverwatchCmd.Platform.PC, result.platform());
         assertNull(result.profile().message().orElse(null));
         assertFalse(result.profile().isPrivate());
@@ -28,7 +30,8 @@ public class OverwatchCmdTest extends CmdTest<OverwatchCmd> {
     @Test
     public void testGetResponseFuzzy() {
         final String method = "getOverwatchProfile";
-        assertThrows(CommandException.class, () -> this.invoke(method, SPECIAL_CHARS, OverwatchCmd.Platform.PC));
+        assertThrows(CommandException.class, () -> this.invoke(method,
+                Config.DEFAULT_LOCALE, SPECIAL_CHARS, OverwatchCmd.Platform.PC));
     }
 
 }

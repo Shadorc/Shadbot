@@ -6,7 +6,6 @@ import com.shadorc.shadbot.api.json.wikipedia.WikipediaResponse;
 import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.NetUtil;
@@ -17,6 +16,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -32,7 +32,7 @@ public class WikipediaCmd extends BaseCmd {
         final String word = context.getOptionAsString("word").orElseThrow();
 
         return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("wikipedia.loading"))
-                .then(WikipediaCmd.getWikipediaPage(context, word))
+                .then(WikipediaCmd.getWikipediaPage(context.getLocale(), word))
                 .flatMap(page -> {
                     if (page.extract().orElseThrow().endsWith("may refer to:")) {
                         return context.editFollowupMessage(Emoji.MAGNIFYING_GLASS,
@@ -56,9 +56,9 @@ public class WikipediaCmd extends BaseCmd {
                         .setDescription(extract));
     }
 
-    private static Mono<WikipediaPage> getWikipediaPage(I18nContext context, String search) {
+    private static Mono<WikipediaPage> getWikipediaPage(Locale locale, String search) {
         // Wiki api doc https://en.wikipedia.org/w/api.php?action=help&modules=query%2Bextracts
-        final String url = "https://%s.wikipedia.org/w/api.php?".formatted(context.getLocale().getLanguage())
+        final String url = "https://%s.wikipedia.org/w/api.php?".formatted(locale.getLanguage())
                 + "format=json"
                 + "&action=query"
                 + "&titles=%s".formatted(NetUtil.encode(search))
