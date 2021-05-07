@@ -50,7 +50,7 @@ public class TimeUtil {
 
         final String normalizedText = str.replace(" ", "").toLowerCase();
 
-        final Pattern pattern = Pattern.compile("[0-9]+[a-z]");
+        final Pattern pattern = Pattern.compile("[0-9]+[a-z]?");
         final Matcher matcher = pattern.matcher(normalizedText);
 
         final List<String> matches = new ArrayList<>();
@@ -66,7 +66,10 @@ public class TimeUtil {
 
         for (final String match : matches) {
             final long time = Long.parseLong(LETTER_PATTERN.matcher(match).replaceAll(""));
-            final String unit = NUMBER_PATTERN.matcher(match).replaceAll("");
+            String unit = NUMBER_PATTERN.matcher(match).replaceAll("");
+            if(unit.isBlank()) {
+                unit = "s";
+            }
             switch (unit) {
                 case "s" -> seconds += TimeUnit.SECONDS.toSeconds(time);
                 case "m" -> seconds += TimeUnit.MINUTES.toSeconds(time);
