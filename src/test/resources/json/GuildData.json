@@ -1,0 +1,95 @@
+{
+  "id": "339318275320184833",
+  "name": "Shadbot Test",
+  "icon": "9925f5064b3059d305ab3eb8405a93f6",
+  "description": null,
+  "splash": null,
+  "discovery_splash": null,
+  "features": [],
+  "emojis": [],
+  "banner": null,
+  "owner_id": "275616469906358273",
+  "application_id": null,
+  "region": "europe",
+  "afk_channel_id": null,
+  "afk_timeout": 300,
+  "system_channel_id": null,
+  "widget_enabled": false,
+  "widget_channel_id": null,
+  "verification_level": 0,
+  "roles": [
+    {
+      "id": "339318275320184833",
+      "name": "@everyone",
+      "permissions": "4294970944",
+      "position": 0,
+      "color": 0,
+      "hoist": false,
+      "managed": false,
+      "mentionable": false
+    },
+    {
+      "id": "609370233916096514",
+      "name": "can_interact",
+      "permissions": "6442454528",
+      "position": 3,
+      "color": 3066993,
+      "hoist": true,
+      "managed": false,
+      "mentionable": true
+    },
+    {
+      "id": "609370281089433600",
+      "name": "cannot_interact",
+      "permissions": "4294970880",
+      "position": 4,
+      "color": 10038562,
+      "hoist": false,
+      "managed": false,
+      "mentionable": false
+    },
+    {
+      "id": "838737429459501088",
+      "name": "Shadbot",
+      "permissions": "271674454",
+      "position": 2,
+      "color": 0,
+      "hoist": false,
+      "managed": true,
+      "mentionable": false,
+      "tags": {
+        "bot_id": "331146243596091403"
+      }
+    },
+    {
+      "id": "838753105600053301",
+      "name": "Shadbot-Bêta",
+      "permissions": "271674454",
+      "position": 1,
+      "color": 0,
+      "hoist": false,
+      "managed": true,
+      "mentionable": false,
+      "tags": {
+        "bot_id": "352205866889641984"
+      }
+    }
+  ],
+  "default_message_notifications": 0,
+  "mfa_level": 0,
+  "explicit_content_filter": 0,
+  "max_presences": null,
+  "max_members": 100000,
+  "max_video_channel_users": 25,
+  "vanity_url_code": null,
+  "premium_tier": 0,
+  "premium_subscription_count": 0,
+  "system_channel_flags": 0,
+  "preferred_locale": "en-US",
+  "rules_channel_id": null,
+  "public_updates_channel_id": null,
+  "nsfw": false,
+  "large": false,
+  "joined_at": "2017-07-25T08:09:41.111000+00:00",
+  "member_count": 5
+}

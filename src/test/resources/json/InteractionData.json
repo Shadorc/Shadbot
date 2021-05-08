@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "type": 2,
+  "token": "hunter2",
+  "member": {
+    "user": {
+      "username": "Shadorc",
+      "public_flags": 131072,
+      "id": "275616469906358273",
+      "discriminator": "8423",
+      "avatar": "98a5d76eb4384bb5918ceeab009e4c11"
+    },
+    "roles": [
+      "609370233916096514"
+    ],
+    "premium_since": null,
+    "permissions": "17179869183",
+    "pending": false,
+    "nick": null,
+    "mute": false,
+    "joined_at": "2017-07-25T08:09:41.111000+00:00",
+    "is_pending": false,
+    "deaf": false
+  },
+  "id": "840704882621153340",
+  "guild_id": "339318275320184833",
+  "data": {
+    "name": "test",
+    "id": "840704865353465877"
+  },
+  "channel_id": "342074301840752640",
+  "application_id": "352205866889641984"
+}

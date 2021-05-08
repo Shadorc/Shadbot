@@ -1,0 +1,18 @@
+{
+  "roles": [
+    "609370233916096514"
+  ],
+  "nick": null,
+  "premium_since": null,
+  "joined_at": "2017-07-25T08:09:41.111000+00:00",
+  "pending": false,
+  "user": {
+    "id": "275616469906358273",
+    "username": "Shadorc",
+    "avatar": "98a5d76eb4384bb5918ceeab009e4c11",
+    "discriminator": "8423",
+    "public_flags": 131072
+  },
+  "mute": false,
+  "deaf": false
+}
