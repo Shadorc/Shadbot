@@ -1,10 +1,6 @@
 package com.shadorc.shadbot.command.standalone;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.FakeMessageData;
 import com.shadorc.shadbot.database.guilds.entity.DBGuild;
@@ -19,7 +15,6 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.TextChannel;
-import discord4j.discordjson.Id;
 import discord4j.discordjson.json.*;
 import discord4j.discordjson.possible.Possible;
 import discord4j.gateway.ShardInfo;
@@ -54,16 +49,6 @@ public class StandaloneCmdsTest {
         mapper = JacksonResources.INITIALIZER
                 .andThen(JacksonResources.HANDLE_UNKNOWN_PROPERTIES)
                 .apply(new ObjectMapper());
-
-        // TODO: This should be automatically resolved
-        final SimpleModule module = new SimpleModule();
-        module.addDeserializer(Id.class, new JsonDeserializer<>() {
-            @Override
-            public Id deserialize(JsonParser p, DeserializationContext ctxt) {
-                return Id.of(1234);
-            }
-        });
-        mapper.registerModule(module);
 
         final DBGuild mockedDbGuild = mock(DBGuild.class);
         when(mockedDbGuild.getLocale()).thenReturn(Locale.FRENCH);
