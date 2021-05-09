@@ -1,10 +1,9 @@
 package com.shadorc.shadbot.command.standalone;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.data.FakeMessageData;
 import com.shadorc.shadbot.database.guilds.entity.DBGuild;
-import discord4j.common.JacksonResources;
+import com.shadorc.shadbot.discord4j.data.FakeMessageData;
+import com.shadorc.shadbot.discord4j.data.SerializationUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -30,6 +29,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,15 +41,10 @@ public class StandaloneCmdsTest {
 
     private static final Logger LOGGER = Loggers.getLogger(StandaloneCmdsTest.class);
 
-    private static ObjectMapper mapper;
     private static Context mockedContext;
 
     @BeforeAll
     public static void setup() throws IOException {
-        mapper = JacksonResources.INITIALIZER
-                .andThen(JacksonResources.HANDLE_UNKNOWN_PROPERTIES)
-                .apply(new ObjectMapper());
-
         final DBGuild mockedDbGuild = mock(DBGuild.class);
         when(mockedDbGuild.getLocale()).thenReturn(Locale.FRENCH);
 
@@ -57,17 +52,17 @@ public class StandaloneCmdsTest {
         final DiscordClient mockedClient = mock(DiscordClient.class);
         when(mockedGateway.rest()).thenReturn(mockedClient);
 
-        final GuildData guildData = read("json/GuildData.json", GuildData.class);
+        final GuildData guildData = SerializationUtil.read("json/GuildData.json", GuildData.class);
         final Guild guild = new Guild(mockedGateway, guildData);
         when(mockedGateway.getGuildById(any(Snowflake.class)))
                 .thenReturn(Mono.just(guild));
 
-        final ChannelData channelData = read("json/ChannelData.json", ChannelData.class);
+        final ChannelData channelData = SerializationUtil.read("json/ChannelData.json", ChannelData.class);
         final TextChannel channel = new TextChannel(mockedGateway, channelData);
         when(mockedGateway.getChannelById(any(Snowflake.class)))
                 .thenReturn(Mono.just(channel));
 
-        final MemberData memberData = read("json/MemberData.json", MemberData.class);
+        final MemberData memberData = SerializationUtil.read("json/MemberData.json", MemberData.class);
         final Member member = new Member(mockedGateway, memberData, guild.getId().asLong());
         when(mockedGateway.getMemberById(any(Snowflake.class), any(Snowflake.class)))
                 .thenReturn(Mono.just(member));
@@ -78,8 +73,7 @@ public class StandaloneCmdsTest {
         when(mockedWebhookService.executeWebhook(anyLong(), anyString(), anyBoolean(), any()))
                 .thenAnswer(invocation -> {
                     final WebhookExecuteRequest request = invocation.<MultipartRequest<WebhookExecuteRequest>>getArgument(3).getJsonPayload();
-                    assert request != null;
-                    final String content = request.content().toOptional().orElse("");
+                    final String content = Objects.requireNonNull(request).content().toOptional().orElse("");
                     final List<EmbedData> embeds = request.embeds().toOptional().orElse(Collections.emptyList());
                     return Mono.just(new FakeMessageData(content, embeds));
                 });
@@ -92,7 +86,7 @@ public class StandaloneCmdsTest {
                 });
 
         final ShardInfo shardInfo = ShardInfo.create(3, 11);
-        final InteractionData interactionData = read("json/InteractionData.json", InteractionData.class);
+        final InteractionData interactionData = SerializationUtil.read("json/InteractionData.json", InteractionData.class);
         final Interaction interaction = new Interaction(mockedGateway, interactionData);
         final InteractionCreateEvent mockedEvent = new InteractionCreateEvent(mockedGateway, shardInfo, interaction);
         mockedContext = new Context(mockedEvent, mockedDbGuild);
@@ -103,7 +97,7 @@ public class StandaloneCmdsTest {
         final PingCmd cmd = new PingCmd();
         final Message message = cmd.execute(mockedContext).cast(Message.class).block();
         assertNotNull(message);
-        logMessage(message);
+        logMessage(cmd.getName(), message);
         assertFalse(message.getContent().isBlank());
     }
 
@@ -112,7 +106,7 @@ public class StandaloneCmdsTest {
         final HelpCmd cmd = new HelpCmd();
         final Message message = cmd.execute(mockedContext).cast(Message.class).block();
         assertNotNull(message);
-        logMessage(message);
+        logMessage(cmd.getName(), message);
         assertFalse(message.getEmbeds().isEmpty());
     }
 
@@ -121,26 +115,23 @@ public class StandaloneCmdsTest {
         final InviteCmd cmd = new InviteCmd();
         final Message message = cmd.execute(mockedContext).cast(Message.class).block();
         assertNotNull(message);
-        logMessage(message);
+        logMessage(cmd.getName(), message);
         assertFalse(message.getEmbeds().isEmpty());
     }
 
-    private static <T> T read(String from, Class<T> into) throws IOException {
-        return mapper.readValue(StandaloneCmdsTest.class.getClassLoader().getResourceAsStream(from), into);
-    }
-
-    private static void logMessage(Message message) {
+    private static void logMessage(String cmdName, Message message) {
         if (!message.getContent().isBlank()) {
-            LOGGER.info(message.getContent());
+            LOGGER.info("{} content output:\n{}", cmdName, message.getContent());
         }
         if (!message.getEmbeds().isEmpty()) {
+            final StringBuilder strBuilder = new StringBuilder();
             for (final Embed embed : message.getEmbeds()) {
                 for (final Embed.Field field : embed.getFields()) {
-                    LOGGER.info("{}", field.getName());
-                    LOGGER.info("\t{}", field.getValue());
+                    strBuilder.append(field.getName());
+                    strBuilder.append("\n\t").append(field.getValue()).append("\n");
                 }
             }
+            LOGGER.info("{} embed output:\n{}", cmdName, strBuilder);
         }
     }
-
 }

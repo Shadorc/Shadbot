@@ -1,4 +1,4 @@
-package com.shadorc.shadbot.data;
+package com.shadorc.shadbot.discord4j.data;
 
 import discord4j.discordjson.Id;
 import discord4j.discordjson.json.*;
