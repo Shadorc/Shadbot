@@ -13,7 +13,8 @@ import java.time.Duration;
 public class ShutdownCmd extends BaseCmd {
 
     public ShutdownCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, "shutdown", "Shutdown the bot");
+        super(CommandCategory.OWNER, CommandPermission.OWNER,
+                "shutdown", "Shutdown the bot");
     }
 
     @Override
