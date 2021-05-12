@@ -73,8 +73,9 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 
     @Override
     public Mono<Void> end() {
-        return this.context.createFollowupMessage(Emoji.HOURGLASS, this.context.localize("trivia.time.elapsed")
-                .formatted(this.trivia.getCorrectAnswer()))
+        return Mono.fromRunnable(() -> Telemetry.TRIVIA_SUMMARY.labels("loss").observe(0))
+                .then(this.context.createFollowupMessage(Emoji.HOURGLASS, this.context.localize("trivia.time.elapsed")
+                        .formatted(this.trivia.getCorrectAnswer())))
                 .then(Mono.fromRunnable(this::destroy));
     }
 
