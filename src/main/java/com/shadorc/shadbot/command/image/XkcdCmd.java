@@ -32,13 +32,13 @@ public class XkcdCmd extends BaseCmd {
         super(CommandCategory.IMAGE, "xkcd", "Show random comic from XKCD");
         this.latestId = new AtomicInteger();
 
-        this.addOption("sort", "Sorting option", true, ApplicationCommandOptionType.STRING,
-                DiscordUtil.toOptions(Sort.class));
+        this.addOption("sort", "Sorting option, random by default", false,
+                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Sort.class));
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final Sort sort = context.getOptionAsEnum(Sort.class, "sort").orElseThrow();
+        final Sort sort = context.getOptionAsEnum(Sort.class, "sort").orElse(Sort.RANDOM);
         final Mono<XkcdResponse> getResponse = sort == Sort.LATEST ? XkcdCmd.getLatestXkcd() : this.getRandomXkcd();
         return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("xkcd.loading"))
                 .then(getResponse)
