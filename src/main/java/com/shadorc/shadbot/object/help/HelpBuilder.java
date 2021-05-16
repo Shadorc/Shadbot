@@ -3,6 +3,7 @@ package com.shadorc.shadbot.object.help;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
+import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
@@ -73,16 +74,16 @@ public abstract class HelpBuilder {
 
     public Consumer<EmbedCreateSpec> build() {
         return ShadbotUtil.getDefaultEmbed(embed -> {
-            if (this.authorName != null && !this.authorName.isBlank()) {
+            if (!StringUtil.isBlank(this.authorName)) {
                 embed.setAuthor(this.authorName, this.authorUrl, this.context.getAuthorAvatar());
             }
             embed.addField(this.context.localize("help.usage"), this.getUsage(), false);
 
-            if (this.description != null && !this.description.isBlank()) {
+            if (!StringUtil.isBlank(this.description)) {
                 embed.setDescription(this.description);
             }
 
-            if (this.thumbnailUrl != null && !this.thumbnailUrl.isBlank()) {
+            if (!StringUtil.isBlank(this.thumbnailUrl)) {
                 embed.setThumbnail(this.thumbnailUrl);
             }
 
@@ -90,7 +91,7 @@ public abstract class HelpBuilder {
                 embed.addField(this.context.localize("help.arguments"), this.getArguments(), false);
             }
 
-            if (this.source != null && !this.source.isBlank()) {
+            if (!StringUtil.isBlank(this.source)) {
                 embed.addField(this.context.localize("help.source"), this.source, false);
             }
 
@@ -98,7 +99,7 @@ public abstract class HelpBuilder {
                 embed.addField(field.name(), field.value(), field.inline().get());
             }
 
-            if (this.footer != null && !this.footer.isBlank()) {
+            if (!StringUtil.isBlank(this.footer)) {
                 embed.setFooter(this.footer, null);
             }
         });

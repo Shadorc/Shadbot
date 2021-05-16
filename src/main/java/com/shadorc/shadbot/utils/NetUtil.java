@@ -42,7 +42,7 @@ public class NetUtil {
      */
     @Nullable
     public static String cleanWithLinebreaks(@Nullable String html) {
-        if (html == null || html.isBlank()) {
+        if (StringUtil.isBlank(html)) {
             return html;
         }
         final Document document = Jsoup.parse(html);

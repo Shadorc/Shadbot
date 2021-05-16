@@ -39,7 +39,7 @@ public class StringUtil {
      */
     @Nullable
     public static String capitalize(@Nullable String str) {
-        if (str == null || str.isBlank()) {
+        if (StringUtil.isBlank(str)) {
             return str;
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
