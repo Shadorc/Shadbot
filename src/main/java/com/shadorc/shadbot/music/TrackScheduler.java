@@ -153,6 +153,10 @@ public class TrackScheduler {
         return this.repeatMode;
     }
 
+    public int getBassBoostPercentage() {
+        return this.boostPercentage;
+    }
+
     public boolean isPlaying() {
         return this.audioPlayer.getPlayingTrack() != null;
     }
