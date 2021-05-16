@@ -18,27 +18,18 @@ import java.util.stream.Collectors;
 public abstract class HelpBuilder {
 
     protected final Context context;
-
     protected final List<ApplicationCommandOptionData> options;
-    protected final List<ImmutableEmbedFieldData> fields;
 
     @Nullable
     private String authorName;
     @Nullable
     private String authorUrl;
     @Nullable
-    private String thumbnailUrl;
-    @Nullable
     private String description;
-    @Nullable
-    private String source;
-    @Nullable
-    private String footer;
 
     protected HelpBuilder(Context context) {
         this.context = context;
         this.options = new ArrayList<>();
-        this.fields = new ArrayList<>();
     }
 
     public HelpBuilder setAuthor(String authorName, String authorUrl) {
@@ -47,28 +38,8 @@ public abstract class HelpBuilder {
         return this;
     }
 
-    public HelpBuilder setThumbnail(String thumbnailUrl) {
-        this.thumbnailUrl = thumbnailUrl;
-        return this;
-    }
-
     public HelpBuilder setDescription(String description) {
         this.description = "**%s**".formatted(description);
-        return this;
-    }
-
-    public HelpBuilder setSource(String source) {
-        this.source = source;
-        return this;
-    }
-
-    public HelpBuilder setFooter(String footer) {
-        this.footer = footer;
-        return this;
-    }
-
-    public HelpBuilder addField(String name, String value, boolean inline) {
-        this.fields.add(ImmutableEmbedFieldData.of(name, value, Possible.of(inline)));
         return this;
     }
 
@@ -83,24 +54,9 @@ public abstract class HelpBuilder {
                 embed.setDescription(this.description);
             }
 
-            if (!StringUtil.isBlank(this.thumbnailUrl)) {
-                embed.setThumbnail(this.thumbnailUrl);
-            }
-
-            if (!this.getArguments().isEmpty()) {
-                embed.addField(this.context.localize("help.arguments"), this.getArguments(), false);
-            }
-
-            if (!StringUtil.isBlank(this.source)) {
-                embed.addField(this.context.localize("help.source"), this.source, false);
-            }
-
-            for (final ImmutableEmbedFieldData field : this.fields) {
-                embed.addField(field.name(), field.value(), field.inline().get());
-            }
-
-            if (!StringUtil.isBlank(this.footer)) {
-                embed.setFooter(this.footer, null);
+            final String args = this.getArguments();
+            if (!StringUtil.isBlank(args)) {
+                embed.addField(this.context.localize("help.arguments"), args, false);
             }
         });
     }

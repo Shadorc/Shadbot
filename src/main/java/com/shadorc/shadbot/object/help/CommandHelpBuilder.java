@@ -5,14 +5,14 @@ import com.shadorc.shadbot.core.command.Context;
 
 public class CommandHelpBuilder extends HelpBuilder {
 
-    private final BaseCmd cmd;
+    private final String cmdName;
 
     private CommandHelpBuilder(Context context, BaseCmd cmd) {
         super(context);
-        this.cmd = cmd;
+        this.cmdName = cmd.getName();
         this.options.addAll(cmd.getOptions());
 
-        this.setAuthor(context.localize("help.cmd.title").formatted(this.cmd.getName()),
+        this.setAuthor(context.localize("help.cmd.title").formatted(this.cmdName),
                 "https://github.com/Shadorc/Shadbot/wiki/Commands");
         this.setDescription(cmd.getDescription());
     }
@@ -23,7 +23,7 @@ public class CommandHelpBuilder extends HelpBuilder {
 
     @Override
     public String getCommandName() {
-        return this.cmd.getName();
+        return this.cmdName;
     }
 
 }
