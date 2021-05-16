@@ -1,32 +1,22 @@
 package com.shadorc.shadbot.api;
 
-import com.shadorc.shadbot.api.json.dbl.TopGgWebhookResponse;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
-import com.shadorc.shadbot.database.DatabaseManager;
-import com.shadorc.shadbot.database.users.entity.achievement.Achievement;
-import com.shadorc.shadbot.object.ExceptionHandler;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.LogUtil;
-import com.shadorc.shadbot.utils.NetUtil;
-import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.netty.DisposableServer;
-import reactor.netty.http.server.HttpServer;
 import reactor.util.Logger;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
@@ -45,57 +35,27 @@ public class BotListStats {
     private static final String DISCORDEXTREMELIST_DOT_XYZ = "https://discordextremelist.xyz";
 
     private final GatewayDiscordClient gateway;
-    private final AtomicReference<DisposableServer> webhookServer;
+    private final long selfId;
 
     public BotListStats(GatewayDiscordClient gateway) {
         this.gateway = gateway;
-        this.webhookServer = new AtomicReference<>();
-
-        this.setupTopGgWebhook();
-    }
-
-    private void setupTopGgWebhook() {
-        final String authorization = CredentialManager.get(Credential.TOP_DOT_GG_WEBHOOK_AUTHORIZATION);
-        final String port = CredentialManager.get(Credential.TOP_DOT_GG_WEBHOOK_PORT);
-        if (authorization != null && port != null) {
-            LOGGER.info("Initializing top.gg WebHook server");
-            HttpServer.create()
-                    .port(Integer.parseInt(port))
-                    .route(routes -> routes.post("/webhook",
-                            (request, response) -> {
-                                if (authorization.equals(request.requestHeaders().get(HttpHeaderNames.AUTHORIZATION))) {
-                                    return request.receive()
-                                            .asString()
-                                            .doOnNext(content -> LOGGER.debug("Webhook event received: {}", content))
-                                            .flatMap(content -> Mono.fromCallable(() ->
-                                                    NetUtil.MAPPER.readValue(content, TopGgWebhookResponse.class)))
-                                            .map(TopGgWebhookResponse::userId)
-                                            .map(Snowflake::of)
-                                            .flatMap(DatabaseManager.getUsers()::getDBUser)
-                                            .flatMap(dbUser -> dbUser.unlockAchievement(Achievement.VOTER))
-                                            .then(response.status(HttpResponseStatus.OK).send());
-                                }
-                                return response.status(HttpResponseStatus.FORBIDDEN).send();
-                            }))
-                    .bind()
-                    .doOnNext(this.webhookServer::set)
-                    .subscribe(null, ExceptionHandler::handleUnknownError);
-        }
+        this.selfId = gateway.getSelfId().asLong();
     }
 
     public Mono<Void> postStats() {
         LOGGER.info("Posting statistics");
         final int shardCount = this.gateway.getGatewayClientGroup().getShardCount();
         return this.gateway.getGuilds().count()
-                .flatMap(guildCount -> this.postOnBotlistDotSpace(guildCount)
-                        .and(this.postOnBotsOndiscordDotXyz(guildCount))
-                        .and(this.postOnDiscordbotlistDotCom(shardCount, guildCount))
-                        .and(this.postOnWonderbotlistDotCom(shardCount, guildCount))
-                        .and(this.postOnBotsfordiscordDotCom(guildCount))
-                        .and(this.postOnDiscordDotBoats(guildCount))
-                        .and(this.postOnDiscordextremelistDotXyz(guildCount))
-                        .and(this.postOnDiscordBotsDotGg(shardCount, guildCount))
-                        .and(this.postOnTopDotGg(shardCount, guildCount)))
+                .flatMap(guildCount -> Mono.when(
+                        this.postOnBotlistDotSpace(guildCount),
+                        this.postOnBotsOndiscordDotXyz(guildCount),
+                        this.postOnDiscordbotlistDotCom(shardCount, guildCount),
+                        this.postOnWonderbotlistDotCom(shardCount, guildCount),
+                        this.postOnBotsfordiscordDotCom(guildCount),
+                        this.postOnDiscordDotBoats(guildCount),
+                        this.postOnDiscordextremelistDotXyz(guildCount),
+                        this.postOnDiscordBotsDotGg(shardCount, guildCount),
+                        this.postOnTopDotGg(shardCount, guildCount)))
                 .doOnSuccess(__ -> LOGGER.info("Statistics posted"));
     }
 
@@ -105,7 +65,7 @@ public class BotListStats {
     private Mono<String> postOnBotlistDotSpace(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
-        final String url = "https://api.botlist.space/v1/bots/%d".formatted(this.gateway.getSelfId().asLong());
+        final String url = "https://api.botlist.space/v1/bots/%d".formatted(this.selfId);
         return BotListStats.post(url, CredentialManager.get(Credential.BOTLIST_DOT_SPACE_TOKEN), content)
                 .onErrorResume(BotListStats.handleError(BOTLIST_DOT_SPACE));
     }
@@ -116,7 +76,7 @@ public class BotListStats {
     private Mono<String> postOnBotsOndiscordDotXyz(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("guildCount", guildCount);
-        final String url = "https://bots.ondiscord.xyz/bot-api/bots/%d/guilds".formatted(this.gateway.getSelfId().asLong());
+        final String url = "https://bots.ondiscord.xyz/bot-api/bots/%d/guilds".formatted(this.selfId);
         return BotListStats.post(url, CredentialManager.get(Credential.BOTS_ONDISCORD_DOT_XYZ_TOKEN), content)
                 .onErrorResume(BotListStats.handleError(BOTS_ONDISCORD_DOT_XYZ));
     }
@@ -128,7 +88,7 @@ public class BotListStats {
         final JSONObject content = new JSONObject()
                 .put("serveurs", guildCount)
                 .put("shards", shardCount);
-        final String url = "https://api.wonderbotlist.com/v1/bot/%d".formatted(this.gateway.getSelfId().asLong());
+        final String url = "https://api.wonderbotlist.com/v1/bot/%d".formatted(this.selfId);
         return BotListStats.post(url, CredentialManager.get(Credential.WONDERBOTLIST_DOT_COM_TOKEN), content)
                 .onErrorResume(BotListStats.handleError(WONDERBOTLIST_DOT_COM));
     }
@@ -139,7 +99,7 @@ public class BotListStats {
     private Mono<String> postOnDiscordDotBoats(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
-        final String url = "https://discord.boats/api/bot/%d".formatted(this.gateway.getSelfId().asLong());
+        final String url = "https://discord.boats/api/bot/%d".formatted(this.selfId);
         return BotListStats.post(url, CredentialManager.get(Credential.DISCORD_DOT_BOATS), content)
                 .onErrorResume(BotListStats.handleError(DISCORD_DOT_BOATS));
     }
@@ -150,7 +110,7 @@ public class BotListStats {
     private Mono<String> postOnDiscordextremelistDotXyz(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("guildCount", guildCount);
-        final String url = "https://api.discordextremelist.xyz/v2/bot/%d/stats".formatted(this.gateway.getSelfId().asLong());
+        final String url = "https://api.discordextremelist.xyz/v2/bot/%d/stats".formatted(this.selfId);
         return BotListStats.post(url, CredentialManager.get(Credential.DISCORDEXTREMELIST_DOT_XYZ), content)
                 .onErrorResume(BotListStats.handleError(DISCORDEXTREMELIST_DOT_XYZ));
     }
@@ -161,7 +121,7 @@ public class BotListStats {
     private Mono<String> postOnBotsfordiscordDotCom(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
-        final String url = "https://botsfordiscord.com/api/bot/%d".formatted(this.gateway.getSelfId().asLong());
+        final String url = "https://botsfordiscord.com/api/bot/%d".formatted(this.selfId);
         return BotListStats.post(url, CredentialManager.get(Credential.BOTSFORDISCORD_DOT_COM), content)
                 .onErrorResume(BotListStats.handleError(BOTSFORDISCORD_DOT_COM));
     }
@@ -176,7 +136,7 @@ public class BotListStats {
                             .put("shard_id", shardId)
                             .put("guilds ", guildCount / shardCount);
                     final String url = "https://discordbotlist.com/api/bots/%d/stats"
-                            .formatted(this.gateway.getSelfId().asLong());
+                            .formatted(this.selfId);
                     return BotListStats.post(url, "Bot %s"
                             .formatted(CredentialManager.get(Credential.DISCORDBOTLIST_DOT_COM_TOKEN)), content);
                 })
@@ -193,7 +153,7 @@ public class BotListStats {
                             .put("shardId", shardId)
                             .put("shardCount", shardCount)
                             .put("guildCount", guildCount / shardCount);
-                    final String url = "https://discord.bots.gg/api/v1/bots/%d/stats".formatted(this.gateway.getSelfId().asLong());
+                    final String url = "https://discord.bots.gg/api/v1/bots/%d/stats".formatted(this.selfId);
                     return BotListStats.post(url, CredentialManager.get(Credential.DISCORD_BOTS_DOT_GG_TOKEN), content);
                 })
                 .onErrorResume(BotListStats.handleError(DISCORD_BOTS_DOT_GG));
@@ -209,16 +169,10 @@ public class BotListStats {
                             .put("shard_id", shardId)
                             .put("shard_count", shardCount)
                             .put("server_count", guildCount / shardCount);
-                    final String url = "https://top.gg/api/bots/%d/stats".formatted(this.gateway.getSelfId().asLong());
+                    final String url = "https://top.gg/api/bots/%d/stats".formatted(this.selfId);
                     return BotListStats.post(url, CredentialManager.get(Credential.TOP_DOT_GG_TOKEN), content);
                 })
                 .onErrorResume(BotListStats.handleError(TOP_DOT_GG));
-    }
-
-    public void stop() {
-        if (this.webhookServer.get() != null) {
-            this.webhookServer.get().disposeNow();
-        }
     }
 
     private static Mono<String> post(String url, String authorization, JSONObject content) {

@@ -1,6 +1,5 @@
 package com.shadorc.shadbot;
 
-import com.shadorc.shadbot.api.BotListStats;
 import com.shadorc.shadbot.core.retriever.SpyRestEntityRetriever;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
@@ -9,6 +8,8 @@ import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.listener.*;
 import com.shadorc.shadbot.object.ExceptionHandler;
+import com.shadorc.shadbot.service.ServiceManager;
+import com.shadorc.shadbot.service.TaskService;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.LogUtil;
 import discord4j.common.store.Store;
@@ -31,13 +32,10 @@ import discord4j.rest.util.AllowedMentions;
 import discord4j.store.api.mapping.MappingStoreService;
 import discord4j.store.caffeine.CaffeineStoreService;
 import discord4j.store.jdk.JdkStoreService;
-import io.prometheus.client.exporter.HTTPServer;
-import io.sentry.Sentry;
 import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Objects;
@@ -51,36 +49,15 @@ public class Shadbot {
     private static final AtomicLong OWNER_ID = new AtomicLong();
 
     private static GatewayDiscordClient gateway;
-    private static TaskManager taskManager;
-    private static HTTPServer prometheusServer;
-    private static BotListStats botListStats;
+    private static ServiceManager serviceManager;
 
     public static void main(String[] args) {
         Locale.setDefault(Config.DEFAULT_LOCALE);
 
-        final String sentryDsn = CredentialManager.get(Credential.SENTRY_DSN);
-        if (sentryDsn != null && !Config.IS_SNAPSHOT) {
-            DEFAULT_LOGGER.info("Initializing Sentry");
-            Sentry.init(options -> {
-                options.setDsn(sentryDsn);
-                options.setRelease(Config.VERSION);
-                // Ignore events coming from lavaplayer
-                options.setBeforeSend(
-                        (sentryEvent, obj) -> sentryEvent.getLogger().startsWith("com.sedmelluq") ? null : sentryEvent);
-            });
-        }
-
         DEFAULT_LOGGER.info("Starting Shadbot V{}", Config.VERSION);
 
-        final String prometheusPort = CredentialManager.get(Credential.PROMETHEUS_PORT);
-        if (prometheusPort != null && !Config.IS_SNAPSHOT) {
-            DEFAULT_LOGGER.info("Initializing Prometheus on port {}", prometheusPort);
-            try {
-                Shadbot.prometheusServer = new HTTPServer(Integer.parseInt(prometheusPort));
-            } catch (final IOException err) {
-                DEFAULT_LOGGER.error("An error occurred while initializing Prometheus", err);
-            }
-        }
+        Shadbot.serviceManager = new ServiceManager();
+        Shadbot.serviceManager.start();
 
         if (Config.IS_SNAPSHOT) {
             DEFAULT_LOGGER.info("[SNAPSHOT] Enabling Reactor operator stack recorder");
@@ -106,7 +83,7 @@ public class Shadbot {
         DEFAULT_LOGGER.info("Connecting to Discord");
         client.gateway()
                 .setStore(Store.fromLayout(LegacyStoreLayout.of(MappingStoreService.create()
-                        // Stores messages during 15 minutes
+                        // Store messages during 15 minutes
                         .setMapping(new CaffeineStoreService(
                                 builder -> builder.expireAfterWrite(Duration.ofMinutes(15))), MessageData.class)
                         .setFallback(new JdkStoreService()))))
@@ -119,20 +96,15 @@ public class Shadbot {
                         Intent.GUILD_MESSAGE_REACTIONS,
                         Intent.GUILD_MESSAGES,
                         Intent.DIRECT_MESSAGES))
-                .setInitialPresence(__ -> ClientPresence.online(ClientActivity.listening("/help")))
+                .setInitialPresence(__ -> ClientPresence.online(ClientActivity
+                        .listening("/help | Slash commands available!")))
                 .setMemberRequestFilter(MemberRequestFilter.none())
                 .withGateway(gateway -> {
                     Shadbot.gateway = gateway;
 
-                    Shadbot.taskManager = new TaskManager();
-                    Shadbot.taskManager.scheduleLottery(gateway);
-                    Shadbot.taskManager.schedulePeriodicStats(gateway);
-
-                    if (!Config.IS_SNAPSHOT) {
-                        DEFAULT_LOGGER.info("Initializing BotListStats");
-                        Shadbot.botListStats = new BotListStats(gateway);
-                        Shadbot.taskManager.schedulePostStats(Shadbot.botListStats);
-                    }
+                    final TaskService taskService = new TaskService(gateway);
+                    Shadbot.serviceManager.addService(taskService);
+                    taskService.start();
 
                     DEFAULT_LOGGER.info("Registering listeners");
                     /* Intent.GUILDS */
@@ -181,16 +153,12 @@ public class Shadbot {
         return Mono.defer(() -> {
             DEFAULT_LOGGER.info("Shutdown request received");
 
-            if (Shadbot.prometheusServer != null) {
-                Shadbot.prometheusServer.stop();
-            }
-            if (Shadbot.taskManager != null) {
-                Shadbot.taskManager.stop();
-            }
-            if (Shadbot.botListStats != null) {
-                Shadbot.botListStats.stop();
+            if (Shadbot.serviceManager != null) {
+                DEFAULT_LOGGER.info("Stopping services");
+                Shadbot.serviceManager.stop();
             }
 
+            DEFAULT_LOGGER.info("Closing gateway discord client");
             return Shadbot.gateway.logout()
                     .then(Mono.fromRunnable(DatabaseManager::close));
         });

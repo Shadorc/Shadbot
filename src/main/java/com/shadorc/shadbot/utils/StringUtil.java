@@ -122,4 +122,12 @@ public class StringUtil {
         return StringUtil.split(str, -1, delimiter);
     }
 
+    /**
+     * @param str The string to check, may be {@code null}.
+     * @return Whether the string is null or blank.
+     */
+    public static boolean isBlank(@Nullable String str) {
+        return str == null || str.isBlank();
+    }
+
 }
