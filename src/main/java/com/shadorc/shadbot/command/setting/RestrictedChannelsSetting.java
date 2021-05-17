@@ -88,15 +88,19 @@ public class RestrictedChannelsSetting extends BaseCmd {
 
                     switch (action) {
                         case ADD -> {
-                            restrictedCategories.computeIfAbsent(channel.getId(), __ -> new HashSet<>())
-                                    .addAll(commands);
+                            if (!restrictedCategories.computeIfAbsent(channel.getId(), __ -> new HashSet<>()).addAll(commands)) {
+                                return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                        context.localize("restrictedchannels.already.added"));
+                            }
                             strBuilder.append(context.localize("restrictedchannels.added")
                                     .formatted(FormatUtil.format(commands, cmd -> "`%s`".formatted(cmd.getName()), " "),
                                             channel.getMention()));
                         }
                         case REMOVE -> {
-                            if (restrictedCategories.containsKey(channel.getId())) {
-                                restrictedCategories.get(channel.getId()).removeAll(commands);
+                            if (!restrictedCategories.containsKey(channel.getId())
+                                    || !restrictedCategories.get(channel.getId()).removeAll(commands)) {
+                                return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                        context.localize("restrictedchannels.already.removed"));
                             }
                             strBuilder.append(context.localize("restrictedchannels.removed")
                                     .formatted(FormatUtil.format(commands, cmd -> "`%s`".formatted(cmd.getName()), " ")));

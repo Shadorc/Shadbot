@@ -111,11 +111,17 @@ public class BlacklistSetting extends BaseCmd {
         final String message;
         switch (action) {
             case ADD -> {
-                blacklist.addAll(cmdNames);
+                if(!blacklist.addAll(cmdNames)) {
+                    return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                            context.localize("blacklist.category.already.added"));
+                }
                 message = context.localize("blacklist.category.added");
             }
             case REMOVE -> {
-                cmdNames.forEach(blacklist::remove);
+                if(!cmdNames.removeAll(blacklist)) {
+                    return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                            context.localize("blacklist.category.already.removed"));
+                }
                 message = context.localize("blacklist.category.removed");
             }
             default -> {
@@ -149,12 +155,18 @@ public class BlacklistSetting extends BaseCmd {
         final String message;
         switch (action) {
             case ADD -> {
-                blacklist.addAll(cmdNames);
-                message = context.localize("blacklist.command.removed");
+                if(!blacklist.addAll(cmdNames)) {
+                    return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                            context.localize("blacklist.command.already.added"));
+                }
+                message = context.localize("blacklist.command.added");
             }
             case REMOVE -> {
-                cmdNames.forEach(blacklist::remove);
-                message = context.localize("blacklist.command.added");
+                if(!cmdNames.removeAll(blacklist)) {
+                    return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                            context.localize("blacklist.command.already.removed"));
+                }
+                message = context.localize("blacklist.command.removed");
             }
             default -> {
                 return Mono.error(new IllegalStateException("Unexpected value: %s".formatted(action)));

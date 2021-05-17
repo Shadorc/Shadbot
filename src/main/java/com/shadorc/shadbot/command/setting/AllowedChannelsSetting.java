@@ -87,20 +87,24 @@ public class AllowedChannelsSetting extends BaseCmd {
                             strBuilder.append(Emoji.WARNING + context.localize("allowedchannels.warning"));
                         }
 
-                        for (final Channel channel : mentionedChannels) {
-                            final Snowflake channelId = channel.getId();
-                            switch (channel.getType()) {
-                                case GUILD_TEXT -> allowedTextChannelIds.add(channelId);
-                                case GUILD_VOICE -> allowedVoiceChannelIds.add(channelId);
-                            }
+                        final boolean textChannelsUpdated = allowedTextChannelIds.addAll(mentionedTextChannelIds);
+                        final boolean voiceChannelsUpdated = allowedVoiceChannelIds.addAll(mentionedVoiceChannelIds);
+                        if (!textChannelsUpdated && !voiceChannelsUpdated) {
+                            return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                    context.localize("allowedchannels.already.added"));
                         }
 
                         strBuilder.append(Emoji.CHECK_MARK + context.localize("allowedchannels.added")
                                 .formatted(FormatUtil.format(mentionedChannels, Channel::getMention, ", ")));
 
                     } else {
-                        allowedTextChannelIds.removeAll(mentionedTextChannelIds);
-                        allowedVoiceChannelIds.removeAll(mentionedVoiceChannelIds);
+                        final boolean textChannelsUpdated = allowedTextChannelIds.removeAll(mentionedTextChannelIds);
+                        final boolean voiceChannelsUpdated = allowedVoiceChannelIds.removeAll(mentionedVoiceChannelIds);
+                        if (!textChannelsUpdated && !voiceChannelsUpdated) {
+                            return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                    context.localize("allowedchannels.already.removed"));
+                        }
+
                         strBuilder.append(Emoji.CHECK_MARK + context.localize("allowedchannels.removed")
                                 .formatted(FormatUtil.format(mentionedChannels, Channel::getMention, ", ")));
 

@@ -87,15 +87,19 @@ public class RestrictedRolesSetting extends BaseCmd {
 
                     switch (action) {
                         case ADD -> {
-                            restrictedRoles.computeIfAbsent(role.getId(), __ -> new HashSet<>())
-                                    .addAll(commands);
+                            if (!restrictedRoles.computeIfAbsent(role.getId(), __ -> new HashSet<>()).addAll(commands)) {
+                                return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                        context.localize("restrictedroles.already.added"));
+                            }
                             strBuilder.append(context.localize("restrictedroles.added")
                                     .formatted(FormatUtil.format(commands, cmd -> "`%s`".formatted(cmd.getName()), " "),
                                             role.getName()));
                         }
                         case REMOVE -> {
-                            if (restrictedRoles.containsKey(role.getId())) {
-                                restrictedRoles.get(role.getId()).removeAll(commands);
+                            if (!restrictedRoles.containsKey(role.getId())
+                                    || !restrictedRoles.get(role.getId()).removeAll(commands)) {
+                                return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                        context.localize("restrictedroles.already.removed"));
                             }
                             strBuilder.append(context.localize("restrictedroles.removed")
                                     .formatted(FormatUtil.format(commands, cmd -> "`%s`".formatted(cmd.getName()), " ")));
