@@ -92,9 +92,9 @@ public class BlacklistSetting extends BaseCmd {
                 .map(category -> EnumUtil.parseEnum(CommandCategory.class, category))
                 .collect(Collectors.toSet());
 
-        // Do not allow to blacklist admin category
-        if (categories.contains(CommandCategory.ADMIN)) {
-            return Mono.error(new CommandException(context.localize("blacklist.exception.remove.admin")));
+        // Do not allow to blacklist setting category
+        if (categories.contains(CommandCategory.SETTING)) {
+            return Mono.error(new CommandException(context.localize("blacklist.exception.category.setting")));
         }
 
         final Set<String> blacklist = context.getDbGuild().getSettings().getBlacklistedCmds();
@@ -146,7 +146,7 @@ public class BlacklistSetting extends BaseCmd {
 
         // Do not allow to blacklist setting command
         if (cmdNames.contains(context.getCommandName())) {
-            return Mono.error(new CommandException(context.localize("blacklist.exception.remove.setting")
+            return Mono.error(new CommandException(context.localize("blacklist.exception.command.setting")
                     .formatted(context.getCommandName())));
         }
 
