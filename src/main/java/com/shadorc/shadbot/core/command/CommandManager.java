@@ -107,8 +107,7 @@ public class CommandManager {
         }
 
         return COMMANDS_MAP.values().stream()
-                .filter(it -> it instanceof BaseCmdGroup)
-                .flatMap(it -> ((BaseCmdGroup) it).getCommands().stream())
+                .flatMap(it -> it.getCommands().stream())
                 .filter(it -> it.getName().equals(name))
                 .findFirst()
                 .orElse(null);

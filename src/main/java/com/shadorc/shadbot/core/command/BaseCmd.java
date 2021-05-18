@@ -72,6 +72,10 @@ public abstract class BaseCmd {
         return CommandHelpBuilder.create(context, this).build();
     }
 
+    public List<BaseCmd> getCommands() {
+        return List.of(this);
+    }
+
     public CommandCategory getCategory() {
         return this.category;
     }

@@ -4,7 +4,10 @@ import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -26,8 +29,9 @@ public abstract class BaseCmdGroup extends BaseCmd {
         return cmds.stream().collect(Collectors.toUnmodifiableMap(BaseCmd::getName, Function.identity()));
     }
 
-    public Collection<BaseCmd> getCommands() {
-        return this.cmds.values();
+    @Override
+    public List<BaseCmd> getCommands() {
+        return new ArrayList<>(this.cmds.values());
     }
 
     @Override
