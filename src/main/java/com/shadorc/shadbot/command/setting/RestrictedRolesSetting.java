@@ -61,11 +61,12 @@ public class RestrictedRolesSetting extends BaseCmd {
         switch (type) {
             case COMMAND -> {
                 final BaseCmd command = CommandManager.getCommand(name);
-                if (command == null) {
+                if (command == null || command instanceof BaseCmdGroup) {
                     return Mono.error(new CommandException(context.localize("restrictedroles.invalid.command")
                             .formatted(name)));
                 }
-                commands.add(command);
+
+                commands.addAll(command.getCommands());
             }
             case CATEGORY -> {
                 final CommandCategory category = EnumUtil.parseEnum(CommandCategory.class, name);
@@ -75,6 +76,7 @@ public class RestrictedRolesSetting extends BaseCmd {
                 }
                 commands.addAll(CommandManager.getCommands().values().stream()
                         .filter(cmd -> cmd.getCategory() == category)
+                        .flatMap(cmd -> cmd.getCommands().stream())
                         .collect(Collectors.toSet()));
             }
         }

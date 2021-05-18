@@ -62,10 +62,12 @@ public class RestrictedChannelsSetting extends BaseCmd {
         switch (type) {
             case COMMAND -> {
                 final BaseCmd command = CommandManager.getCommand(name);
-                if (command == null) {
-                    return Mono.error(new CommandException(context.localize("restrictedchannels.invalid.command").formatted(name)));
+                if (command == null || command instanceof BaseCmdGroup) {
+                    return Mono.error(new CommandException(context.localize("restrictedchannels.invalid.command")
+                            .formatted(name)));
                 }
-                commands.add(command);
+
+                commands.addAll(command.getCommands());
             }
             case CATEGORY -> {
                 final CommandCategory category = EnumUtil.parseEnum(CommandCategory.class, name);
@@ -75,6 +77,7 @@ public class RestrictedChannelsSetting extends BaseCmd {
                 }
                 commands.addAll(CommandManager.getCommands().values().stream()
                         .filter(cmd -> cmd.getCategory() == category)
+                        .flatMap(cmd -> cmd.getCommands().stream())
                         .collect(Collectors.toSet()));
             }
         }
