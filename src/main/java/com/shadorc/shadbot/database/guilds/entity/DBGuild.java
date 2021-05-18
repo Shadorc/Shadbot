@@ -90,6 +90,21 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
                 .doOnTerminate(() -> DatabaseManager.getGuilds().invalidateCache(this.getId()));
     }
 
+    public Mono<UpdateResult> resetSettings() {
+        return Mono.from(DatabaseManager.getGuilds()
+                .getCollection()
+                .updateOne(
+                        Filters.eq("_id", this.getId().asString()),
+                        Updates.unset("settings")))
+                .doOnSubscribe(__ -> {
+                    LOGGER.debug("[DBGuild {}] Settings reset", this.getId().asString());
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
+                })
+                .doOnNext(result -> LOGGER.trace("[DBGuild {}] Settings reset result: {}",
+                        this.getId().asString(), result))
+                .doOnTerminate(() -> DatabaseManager.getGuilds().invalidateCache(this.getId()));
+    }
+
     @Override
     public Mono<Void> insert() {
         return Mono.from(DatabaseManager.getGuilds()

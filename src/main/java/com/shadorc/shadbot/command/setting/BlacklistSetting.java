@@ -111,14 +111,14 @@ public class BlacklistSetting extends BaseCmd {
         final String message;
         switch (action) {
             case ADD -> {
-                if(!blacklist.addAll(cmdNames)) {
+                if (!blacklist.addAll(cmdNames)) {
                     return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
                             context.localize("blacklist.category.already.added"));
                 }
                 message = context.localize("blacklist.category.added");
             }
             case REMOVE -> {
-                if(!cmdNames.removeAll(blacklist)) {
+                if (!cmdNames.removeAll(blacklist)) {
                     return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
                             context.localize("blacklist.category.already.removed"));
                 }
@@ -155,14 +155,14 @@ public class BlacklistSetting extends BaseCmd {
         final String message;
         switch (action) {
             case ADD -> {
-                if(!blacklist.addAll(cmdNames)) {
+                if (!blacklist.addAll(cmdNames)) {
                     return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
                             context.localize("blacklist.command.already.added"));
                 }
                 message = context.localize("blacklist.command.added");
             }
             case REMOVE -> {
-                if(!cmdNames.removeAll(blacklist)) {
+                if (!cmdNames.removeAll(blacklist)) {
                     return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
                             context.localize("blacklist.command.already.removed"));
                 }

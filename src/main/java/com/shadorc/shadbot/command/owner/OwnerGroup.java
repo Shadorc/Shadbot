@@ -1,6 +1,5 @@
 package com.shadorc.shadbot.command.owner;
 
-import com.shadorc.shadbot.command.owner.shutdown.ShutdownCmd;
 import com.shadorc.shadbot.core.command.BaseCmdGroup;
 import com.shadorc.shadbot.core.command.CommandCategory;
 
