@@ -52,6 +52,7 @@ public class BassBoostCmd extends BaseCmd {
                     }
 
                     trackScheduler.bassBoost((int) percentage);
+                    trackScheduler.clearBuffer(); // Instantly apply change
 
                     if (percentage == 0) {
                         return context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("bassboost.disabled"));
