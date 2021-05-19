@@ -1,14 +1,14 @@
-package com.shadorc.shadbot.listener;
+package com.locibot.locibot.listener;
 
-import com.shadorc.shadbot.core.command.CommandProcessor;
-import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.i18n.I18nManager;
-import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.data.Telemetry;
-import com.shadorc.shadbot.database.DatabaseManager;
-import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.utils.ReactorUtil;
+import com.locibot.locibot.core.command.*;
+import com.locibot.locibot.database.DatabaseManager;
+import com.locibot.locibot.core.i18n.I18nManager;
+import com.locibot.locibot.data.Config;
+import com.locibot.locibot.data.Telemetry;
+import com.locibot.locibot.object.Emoji;
+import com.locibot.locibot.utils.ReactorUtil;
 import discord4j.core.event.domain.InteractionCreateEvent;
+import discord4j.core.object.entity.channel.PrivateChannel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
@@ -26,7 +26,9 @@ public class InteractionCreateListener implements EventListener<InteractionCreat
 
         // TODO Feature: Interactions from DM
         if (event.getInteraction().getGuildId().isEmpty()) {
-            return event.reply(I18nManager.localize(Config.DEFAULT_LOCALE, "interaction.dm"));
+            //return event.getInteraction().getChannel().ofType(PrivateChannel.class).flatMap(privateChannel -> CommandProcessor.processCommand(new PrivateContext(event))); //TODO: Parse with CommandProcessor
+            final BaseCmd command = CommandManager.getCommand(event.getCommandName());
+            return event.acknowledge().then(command.execute(new PrivateContext(event)));
         }
 
         return event.getInteraction().getChannel()

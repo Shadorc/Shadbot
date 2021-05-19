@@ -1,20 +1,22 @@
-package com.shadorc.shadbot.core.command;
+package com.locibot.locibot.core.command;
 
-import com.shadorc.shadbot.core.ratelimiter.RateLimitResponse;
-import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.data.Telemetry;
-import com.shadorc.shadbot.object.Emoji;
-import com.shadorc.shadbot.object.ExceptionHandler;
-import com.shadorc.shadbot.utils.ReactorUtil;
+import com.locibot.locibot.LociBot;
+import com.locibot.locibot.core.ratelimiter.RateLimitResponse;
+import com.locibot.locibot.data.Config;
+import com.locibot.locibot.data.Telemetry;
+import com.locibot.locibot.object.Emoji;
+import com.locibot.locibot.object.ExceptionHandler;
+import com.locibot.locibot.utils.ReactorUtil;
 import discord4j.core.object.entity.Guild;
 import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Mono;
 
-import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
-
 public class CommandProcessor {
 
     public static Mono<?> processCommand(Context context) {
+        if (context.isPrivate()){
+            return Mono.just(CommandProcessor.executePrivateCommand(context)).log();
+        }
         return Mono.just(context.getAuthor())
                 // The role is allowed or the author is the guild's owner
                 .filterWhen(ReactorUtil.filterWhenOrExecute(
@@ -30,11 +32,16 @@ public class CommandProcessor {
                 .flatMap(__ -> CommandProcessor.executeCommand(context));
     }
 
+    private static Mono<?> executePrivateCommand(Context context) {
+        final BaseCmd command = CommandManager.getCommand(context.getLastCommandName());
+        return context.getEvent().acknowledge().thenReturn(command.execute(context));
+    }
+
     private static Mono<?> executeCommand(Context context) {
         final BaseCmd command = CommandManager.getCommand(context.getLastCommandName());
         // The command does not exist
         if (command == null) {
-            DEFAULT_LOGGER.error("{Guild ID: {}} Command {} not found",
+            LociBot.DEFAULT_LOGGER.error("{Guild ID: {}} Command {} not found",
                     context.getGuildId().asString(), context.getFullCommandName());
             return Mono.error(new RuntimeException("Command %s not found".formatted(context.getFullCommandName())));
         }
