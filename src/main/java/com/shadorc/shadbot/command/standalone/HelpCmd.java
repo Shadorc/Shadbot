@@ -33,11 +33,17 @@ public class HelpCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final Optional<String> cmdNameOpt = context.getOptionAsString("command");
         if (cmdNameOpt.isPresent()) {
-            final String cmdName = cmdNameOpt.orElseThrow();
+            String cmdName = cmdNameOpt.orElseThrow();
+            if (cmdName.contains(" ")) {
+                cmdName = cmdName.split(" ")[1];
+            }
             final BaseCmd cmd = CommandManager.getCommand(cmdName);
             if (cmd == null) {
                 return Mono.error(new CommandException(context.localize("help.cmd.not.found")
                         .formatted(cmdName)));
+            }
+            if (cmd instanceof BaseCmdGroup) {
+                return Mono.error(new CommandException(context.localize("help.category")));
             }
             return context.createFollowupMessage(cmd.getHelp(context));
         }
