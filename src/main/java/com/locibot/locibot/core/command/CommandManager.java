@@ -8,6 +8,7 @@ import com.locibot.locibot.command.donator.DonatorGroup;
 import com.locibot.locibot.command.fun.Hello;
 import com.locibot.locibot.command.game.GameGroup;
 import com.locibot.locibot.command.gamestats.GameStatsGroup;
+import com.locibot.locibot.command.group.GroupGroup;
 import com.locibot.locibot.command.image.ImageGroup;
 import com.locibot.locibot.command.image.Rule34Cmd;
 import com.locibot.locibot.command.info.InfoGroup;
@@ -58,7 +59,8 @@ public class CommandManager {
                 new ChatCmd(), new JokeCmd(), new ThisDayCmd(), new Hello(),
                 // Util
                 new MathCmd(), new LyricsCmd(), new UrbanCmd(), new WeatherCmd(), new WikipediaCmd(),
-                new TranslateCmd(), new PollCmd());
+                new TranslateCmd(), new PollCmd(),
+                new GroupGroup());
     }
 
     private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {
