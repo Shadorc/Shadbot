@@ -7,28 +7,32 @@ import com.locibot.locibot.database.SerializableEntity;
 import com.locibot.locibot.database.groups.GroupsCollection;
 import com.locibot.locibot.database.groups.bean.DBGroupBean;
 import com.locibot.locibot.database.guilds.GuildsCollection;
-import com.locibot.locibot.database.guilds.bean.DBGuildBean;
-import com.locibot.locibot.database.guilds.entity.DBMember;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 
 public class DBGroup extends SerializableEntity<DBGroupBean> implements DatabaseEntity {
 
-    public DBGroup (DBGroupBean groupBean){
+    public DBGroup(DBGroupBean groupBean) {
         super(groupBean);
     }
 
-    public DBGroup (String groupName){
+    public DBGroup(String groupName) {
         super(new DBGroupBean(groupName));
     }
 
-    public DBGroup (String groupName, int groupType){
+    public DBGroup(String groupName, int groupType) {
         super(new DBGroupBean(groupName, groupType));
     }
 
-    public String getGroupName(){
+    public String getGroupName() {
         return this.getBean().getGroupName();
     }
 
@@ -42,6 +46,32 @@ public class DBGroup extends SerializableEntity<DBGroupBean> implements Database
                 .stream()
                 .map(memberBean -> new DBGroupMember(memberBean, getGroupName()))
                 .toList();
+    }
+
+    public DBGroupMember getOwner() {
+        for (DBGroupMember member : getMembers()) {
+            if (member.getBean().isOwner()) {
+                return member;
+            }
+        }
+        return getMembers().get(0);
+    }
+
+    public Mono<UpdateResult> updateSchedules(LocalDate localDate, LocalTime localTime) {
+        return Mono.from(DatabaseManager.getGroups()
+                .getCollection()
+                .updateOne(
+                        Filters.eq("_id", this.getGroupName()),
+                        List.of(Updates.set("scheduledDate", localDate.toString()),
+                                Updates.set("scheduledTime", localTime.toString())),
+                        new UpdateOptions().upsert(true)))
+                .doOnSubscribe(__ -> {
+                    GuildsCollection.LOGGER.debug("[DBGroup {}] Group update: {}", this.getGroupName(), localDate.toString() + " " + localTime.toString());
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getUsers().getName()).inc();
+                })
+                .doOnNext(result -> GuildsCollection.LOGGER.trace("[DBGroup {}] Group update result: {}",
+                        this.getGroupName(), result))
+                .doOnTerminate(() -> DatabaseManager.getGroups().invalidateCache(this.getGroupName()));
     }
 
     @Override

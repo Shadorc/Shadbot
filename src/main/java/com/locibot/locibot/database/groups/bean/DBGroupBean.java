@@ -4,17 +4,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.locibot.locibot.database.Bean;
 import reactor.util.annotation.Nullable;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DBGroupBean implements Bean {
     @JsonProperty("_id")
     private String groupName;
     @Nullable
-    @JsonProperty("members")
-    private List<DBGroupMemberBean> members;
-    @Nullable
     @JsonProperty("creationDate")
     private String creationDate;
+    @Nullable
+    @JsonProperty("members")
+    private List<DBGroupMemberBean> members;
     @Nullable
     @JsonProperty("scheduledDate")
     private String scheduledDate;
@@ -26,24 +29,25 @@ public class DBGroupBean implements Bean {
     private int teamType;
 
 
-    public DBGroupBean(String groupName, @Nullable List<DBGroupMemberBean> members, @Nullable String creationDate, @Nullable String scheduledDate, @Nullable String scheduledTime, int teamType) {
+    public DBGroupBean(String groupName, @Nullable List<DBGroupMemberBean> members, @Nullable String scheduledDate, @Nullable String scheduledTime, int teamType) {
         this.groupName = groupName;
         this.members = members;
-        this.creationDate = creationDate;
+        this.creationDate = LocalDate.now().toString();
         this.scheduledDate = scheduledDate;
         this.scheduledTime = scheduledTime;
         this.teamType = teamType;
     }
 
     public DBGroupBean(String groupName, int teamType) {
-        this(groupName, null, null, null, null, teamType);
+        this(groupName, null, "", "", teamType);
     }
 
     public DBGroupBean(String groupName) {
-        this(groupName, null, null, null, null, 0);
+        this(groupName, null, "", "", 0);
     }
 
     public DBGroupBean() {
+        this.creationDate = LocalDate.now().toString();
     }
 
     public String getGroupName() {
@@ -77,17 +81,9 @@ public class DBGroupBean implements Bean {
         return scheduledDate;
     }
 
-    public void setScheduledDate(@Nullable String scheduledDate) {
-        this.scheduledDate = scheduledDate;
-    }
-
     @Nullable
     public String getScheduledTime() {
         return scheduledTime;
-    }
-
-    public void setScheduledTime(@Nullable String scheduledTime) {
-        this.scheduledTime = scheduledTime;
     }
 
     public int getTeamType() {
