@@ -4,13 +4,10 @@ import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.guilds.entity.Settings;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
-import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -68,27 +65,13 @@ public class HelpCmd extends Cmd {
     }
 
     private static Mono<Map<CommandCategory, Collection<String>>> getMultiMap(Context context, List<CommandPermission> authorPermissions) {
-        final Mono<Boolean> getIsDm = context.getChannel()
-                .map(Channel::getType)
-                .map(Channel.Type.DM::equals)
-                .cache();
-
-        final Mono<Settings> getSettings = DatabaseManager.getGuilds()
-                .getSettings(context.getGuildId())
-                .cache();
-
-        // Iterates over all commands...
+        final Settings settings = context.getDbGuild().getSettings();
         return Flux.fromIterable(CommandManager.getCommands())
-                // ... and removes duplicate ...
-                .distinct()
-                // ... and removes commands that the author cannot use ...
+                // Removes commands that the author cannot use
                 .filter(cmd -> authorPermissions.contains(cmd.getPermission()))
-                // ... and removes commands that are not allowed by the guild
-                .filterWhen(cmd -> BooleanUtils.or(getIsDm,
-                        getSettings.map(settings ->
-                                settings.isCommandAllowed(cmd)
-                                        && settings.isCommandAllowedInChannel(cmd, context.getChannelId()))
-                                .defaultIfEmpty(true)))
+                // Removes commands that are not allowed by the guild
+                .filter(cmd -> settings.isCommandAllowed(cmd)
+                        && settings.isCommandAllowedInChannel(cmd, context.getChannelId()))
                 .map(cmd -> Tuples.of(cmd.getCategory(), cmd instanceof SubCmd subCmd ? subCmd.getFullName() : cmd.getName()))
                 .collectMultimap(Tuple2::getT1, tuples -> "`/%s`".formatted(tuples.getT2()));
     }
