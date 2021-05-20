@@ -61,7 +61,7 @@ public class RestrictedRolesSetting extends SubCmd {
         switch (type) {
             case COMMAND -> {
                 final Cmd command = CommandManager.getCommand(name);
-                if (command == null || command instanceof GroupCmd) {
+                if (command == null) {
                     return Mono.error(new CommandException(context.localize("restrictedroles.invalid.command")
                             .formatted(name)));
                 }
