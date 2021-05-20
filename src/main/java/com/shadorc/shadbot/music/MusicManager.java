@@ -130,10 +130,15 @@ public class MusicManager {
         }
 
         return Mono.justOrEmpty(guildMusic)
+                .doOnEach(it -> LOGGER.info("{Guild ID: {}} justOrEmpty: {}", guildId.asString(), it))
                 .map(GuildMusic::getGateway)
+                .doOnEach(it -> LOGGER.info("{Guild ID: {}} getGateway: {}", guildId.asString(), it))
                 .map(GatewayDiscordClient::getVoiceConnectionRegistry)
+                .doOnEach(it -> LOGGER.info("{Guild ID: {}} getVoiceConnectionRegistry: {}" , guildId.asString(), it))
                 .flatMap(registry -> registry.getVoiceConnection(guildId))
-                .flatMap(VoiceConnection::disconnect);
+                .doOnEach(it -> LOGGER.info("{Guild ID: {}} getVoiceConnection: {}" , guildId.asString(), it))
+                .flatMap(VoiceConnection::disconnect)
+                .log("%s:destroyConnection".formatted(guildId.asString()));
     }
 
     public static Optional<GuildMusic> getGuildMusic(Snowflake guildId) {
