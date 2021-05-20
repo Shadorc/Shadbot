@@ -30,7 +30,7 @@
         <minimumEventLevel>WARN</minimumEventLevel>
     </appender>
 
-    <root level="Trace">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="ASYNC"/>
         <appender-ref ref="SENTRY"/>
