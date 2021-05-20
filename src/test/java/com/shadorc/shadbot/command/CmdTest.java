@@ -1,5 +1,7 @@
 package com.shadorc.shadbot.command;
 
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.utils.LogUtil;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
@@ -7,6 +9,8 @@ import reactor.util.Logger;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
+
+import static org.mockito.Mockito.mock;
 
 public abstract class CmdTest<T> {
 
@@ -21,7 +25,11 @@ public abstract class CmdTest<T> {
         this.cmdClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         this.logger = LogUtil.getLogger(this.cmdClass, LogUtil.Category.TEST);
         try {
-            this.cmd = this.cmdClass.getConstructor().newInstance();
+            if (SubCmd.class.isAssignableFrom(this.cmdClass)) {
+                this.cmd = this.cmdClass.getDeclaredConstructor(GroupCmd.class).newInstance(mock(GroupCmd.class));
+            } else {
+                this.cmd = this.cmdClass.getConstructor().newInstance();
+            }
         } catch (final Exception err) {
             throw new RuntimeException(err);
         }
