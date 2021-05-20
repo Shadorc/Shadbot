@@ -8,7 +8,7 @@ import java.util.List;
 public class ImageGroup extends BaseCmdGroup {
 
     public ImageGroup() {
-        super(CommandCategory.IMAGE, "image", "Search random image from different sources",
+        super(CommandCategory.IMAGE, "Search random image from different sources",
                 List.of(new DeviantartCmd(), new SuicideGirlsCmd(), new WallhavenCmd(), new XkcdCmd()));
     }
 

@@ -8,7 +8,7 @@ import java.util.List;
 public class OwnerGroup extends BaseCmdGroup {
 
     public OwnerGroup() {
-        super(CommandCategory.OWNER, "owner", "Owner commands",
+        super(CommandCategory.OWNER, "Owner commands",
                 List.of(new ShutdownCmd(), new EnableCommandCmd(), new LeaveGuildCmd(), new LoggerCmd(),
                         new ManageAchievementsCmd(), new GenerateRelicCmd(), new SendMessageCmd()));
     }

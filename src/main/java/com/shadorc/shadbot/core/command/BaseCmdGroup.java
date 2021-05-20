@@ -15,13 +15,13 @@ public abstract class BaseCmdGroup extends BaseCmd {
 
     private final Map<String, BaseCmd> cmds;
 
-    public BaseCmdGroup(CommandCategory category, CommandPermission permission, String name, String description, List<BaseCmd> cmds) {
-        super(category, permission, name, description);
+    public BaseCmdGroup(CommandCategory category, CommandPermission permission, String description, List<BaseCmd> cmds) {
+        super(category, permission, category.name().toLowerCase(), description);
         this.cmds = BaseCmdGroup.buildCmdsMap(cmds);
     }
 
-    public BaseCmdGroup(CommandCategory category, String name, String description, List<BaseCmd> cmds) {
-        super(category, name, description);
+    public BaseCmdGroup(CommandCategory category, String description, List<BaseCmd> cmds) {
+        super(category, category.name().toLowerCase(), description);
         this.cmds = BaseCmdGroup.buildCmdsMap(cmds);
     }
 

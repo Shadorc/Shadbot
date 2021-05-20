@@ -8,7 +8,7 @@ import java.util.List;
 public class DonatorGroup extends BaseCmdGroup {
 
     public DonatorGroup() {
-        super(CommandCategory.DONATOR, "donator", "Donator commands",
+        super(CommandCategory.DONATOR, "Donator commands",
                 List.of(new ActivateRelicCmd(), new RelicStatusCmd()));
     }
 

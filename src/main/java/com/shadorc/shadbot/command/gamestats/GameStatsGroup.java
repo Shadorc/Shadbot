@@ -8,7 +8,7 @@ import java.util.List;
 public class GameStatsGroup extends BaseCmdGroup {
 
     public GameStatsGroup() {
-        super(CommandCategory.GAMESTATS, "gamestats", "Search game stats for different games",
+        super(CommandCategory.GAMESTATS, "Search game stats for different games",
                 List.of(new OverwatchCmd(), new FortniteCmd(), new DiabloCmd(), new CounterStrikeCmd()));
     }
 

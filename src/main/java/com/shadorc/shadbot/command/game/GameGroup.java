@@ -17,7 +17,7 @@ import java.util.List;
 public class GameGroup extends BaseCmdGroup {
 
     public GameGroup() {
-        super(CommandCategory.GAME, "game", "Game commands",
+        super(CommandCategory.GAME, "Game commands",
                 List.of(new RpsCmd(), new RussianRouletteCmd(), new SlotMachineCmd(), new TriviaCmd(),
                         new HangmanCmd(), new RouletteCmd(), new BlackjackCmd(), new DiceCmd(), new LotteryCmd()));
     }
