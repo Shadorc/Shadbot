@@ -2,7 +2,7 @@ package com.shadorc.shadbot.command.util;
 
 import com.shadorc.shadbot.api.wrapper.WeatherWrapper;
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.credential.Credential;
@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class WeatherCmd extends BaseCmd {
+public class WeatherCmd extends Cmd {
 
     private final DateTimeFormatter dateFormatter;
     private final OWM owm;

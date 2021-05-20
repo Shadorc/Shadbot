@@ -9,8 +9,6 @@ import java.util.function.Consumer;
 
 public interface InteractionContext {
 
-    Mono<Void> reply(Emoji emoji, String message);
-
     Mono<Void> replyEphemeral(Emoji emoji, String message);
 
     Mono<Message> createFollowupMessage(String message);

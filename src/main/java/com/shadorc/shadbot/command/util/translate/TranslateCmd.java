@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.util.translate;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.i18n.I18nManager;
@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
 
-public class TranslateCmd extends BaseCmd {
+public class TranslateCmd extends Cmd {
 
     private static final String DOC_URL = "https://cloud.google.com/translate/docs/languages";
 

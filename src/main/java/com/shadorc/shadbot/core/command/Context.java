@@ -225,12 +225,6 @@ public class Context implements InteractionContext, I18nContext {
     /////////////////////////////////////////////
 
     @Override
-    public Mono<Void> reply(Emoji emoji, String message) {
-        return this.event.reply("%s %s".formatted(emoji, message))
-                .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc());
-    }
-
-    @Override
     public Mono<Void> replyEphemeral(Emoji emoji, String message) {
         return this.event.replyEphemeral("%s %s".formatted(emoji, message))
                 .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc());

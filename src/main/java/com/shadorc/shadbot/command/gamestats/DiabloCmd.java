@@ -7,9 +7,10 @@ import com.shadorc.shadbot.api.json.gamestats.diablo.profile.HeroId;
 import com.shadorc.shadbot.api.json.gamestats.diablo.profile.ProfileResponse;
 import com.shadorc.shadbot.core.cache.MultiValueCache;
 import com.shadorc.shadbot.core.cache.SingleValueCache;
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
@@ -34,7 +35,7 @@ import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
-public class DiabloCmd extends BaseCmd {
+public class DiabloCmd extends SubCmd {
 
     private static final String ACCESS_TOKEN_URL = "https://us.battle.net/oauth/token?grant_type=client_credentials";
 
@@ -48,8 +49,8 @@ public class DiabloCmd extends BaseCmd {
     private final MultiValueCache<String, ProfileResponse> profileCache;
     private final MultiValueCache<String, HeroResponse> heroCache;
 
-    public DiabloCmd() {
-        super(CommandCategory.GAMESTATS, "diablo", "Search for Diablo 3 statistics");
+    public DiabloCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.GAMESTATS, "diablo", "Search for Diablo 3 statistics");
         this.addOption(option -> option.name("region")
                 .description("User's region")
                 .required(true)

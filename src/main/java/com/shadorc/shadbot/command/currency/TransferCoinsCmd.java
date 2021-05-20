@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.currency;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
@@ -12,7 +12,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-public class TransferCoinsCmd extends BaseCmd {
+public class TransferCoinsCmd extends Cmd {
 
     public TransferCoinsCmd() {
         super(CommandCategory.CURRENCY, "transfer", "Transfer coins to a user");

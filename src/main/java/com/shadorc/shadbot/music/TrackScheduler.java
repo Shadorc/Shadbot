@@ -99,6 +99,11 @@ public class TrackScheduler {
         this.queue.clear();
     }
 
+    public void clearBuffer() {
+        final AudioTrack track = this.getAudioPlayer().getPlayingTrack();
+        track.setPosition(track.getPosition());
+    }
+
     public void bassBoost(int percentage) {
         final int previousPercentage = this.boostPercentage;
         this.boostPercentage = percentage;
@@ -151,6 +156,10 @@ public class TrackScheduler {
 
     public RepeatMode getRepeatMode() {
         return this.repeatMode;
+    }
+
+    public int getBassBoostPercentage() {
+        return this.boostPercentage;
     }
 
     public boolean isPlaying() {

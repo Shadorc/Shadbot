@@ -1,10 +1,7 @@
 package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandPermission;
-import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
@@ -15,14 +12,15 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 
-public class ManageAchievementsCmd extends BaseCmd {
+public class ManageAchievementsCmd extends SubCmd {
 
     private enum Action {
         ADD, REMOVE
     }
 
-    public ManageAchievementsCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, "manage_achievements", "Manage user's achievements");
+    public ManageAchievementsCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.OWNER, CommandPermission.OWNER, "manage_achievements",
+                "Manage user's achievements");
         this.addOption("action", "Whether to add or remove an achievment", true, ApplicationCommandOptionType.STRING,
                 DiscordUtil.toOptions(Action.class));
         this.addOption("achievement", "The achievement", true,

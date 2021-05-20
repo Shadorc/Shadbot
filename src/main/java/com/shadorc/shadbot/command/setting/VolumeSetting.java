@@ -8,13 +8,13 @@ import com.shadorc.shadbot.utils.NumberUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-public class VolumeSetting extends BaseCmd {
+public class VolumeSetting extends SubCmd {
 
     private static final int MIN_VOLUME = 1;
     private static final int MAX_VOLUME = 75;
 
-    public VolumeSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public VolumeSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "default_volume", "Manage music's default volume");
 
         this.addOption(option -> option.name("volume")

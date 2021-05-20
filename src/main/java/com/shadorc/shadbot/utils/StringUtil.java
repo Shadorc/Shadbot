@@ -39,7 +39,7 @@ public class StringUtil {
      */
     @Nullable
     public static String capitalize(@Nullable String str) {
-        if (str == null || str.isBlank()) {
+        if (StringUtil.isBlank(str)) {
             return str;
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
@@ -120,6 +120,14 @@ public class StringUtil {
      */
     public static List<String> split(@Nullable String str, @NonNull String delimiter) {
         return StringUtil.split(str, -1, delimiter);
+    }
+
+    /**
+     * @param str The string to check, may be {@code null}.
+     * @return Whether the string is null or blank.
+     */
+    public static boolean isBlank(@Nullable String str) {
+        return str == null || str.isBlank();
     }
 
 }

@@ -3,9 +3,10 @@ package com.shadorc.shadbot.command.gamestats;
 import com.shadorc.shadbot.api.json.gamestats.fortnite.FortniteResponse;
 import com.shadorc.shadbot.api.json.gamestats.fortnite.Stats;
 import com.shadorc.shadbot.core.cache.MultiValueCache;
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
@@ -22,7 +23,7 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-public class FortniteCmd extends BaseCmd {
+public class FortniteCmd extends SubCmd {
 
     private enum Platform {
         PC, XBL, PSN
@@ -33,8 +34,8 @@ public class FortniteCmd extends BaseCmd {
     private final MultiValueCache<String, FortniteResponse> cachedValues;
     private final String apiKey;
 
-    public FortniteCmd() {
-        super(CommandCategory.GAMESTATS, "fortnite", "Search for Fortnite statistics");
+    public FortniteCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.GAMESTATS, "fortnite", "Search for Fortnite statistics");
         this.addOption("platform", "User's platform", true, ApplicationCommandOptionType.STRING,
                 DiscordUtil.toOptions(Platform.class));
         this.addOption("username", "Epic nickname", true, ApplicationCommandOptionType.STRING);

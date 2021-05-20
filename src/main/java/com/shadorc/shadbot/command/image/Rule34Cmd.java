@@ -3,7 +3,7 @@ package com.shadorc.shadbot.command.image;
 import com.shadorc.shadbot.api.json.image.r34.R34Post;
 import com.shadorc.shadbot.api.json.image.r34.R34Posts;
 import com.shadorc.shadbot.api.json.image.r34.R34Response;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class Rule34Cmd extends BaseCmd {
+public class Rule34Cmd extends Cmd {
 
     private static final String HOME_URL = "https://rule34.xxx/index.php";
     private static final int MAX_TAGS_CHAR = 300;

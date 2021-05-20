@@ -2,7 +2,7 @@ package com.shadorc.shadbot.command.util;
 
 import com.fathzer.soft.javaluator.DoubleEvaluator;
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
-public class MathCmd extends BaseCmd {
+public class MathCmd extends Cmd {
 
     private final DoubleEvaluator evaluator;
 

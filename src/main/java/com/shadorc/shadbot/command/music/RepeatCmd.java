@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.music;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.music.GuildMusic;
@@ -10,7 +10,7 @@ import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-public class RepeatCmd extends BaseCmd {
+public class RepeatCmd extends Cmd {
 
     public RepeatCmd() {
         super(CommandCategory.MUSIC, "repeat", "Toggle song/playlist repetition");

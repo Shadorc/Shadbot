@@ -1,8 +1,9 @@
 package com.shadorc.shadbot.command.info;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
@@ -24,12 +25,12 @@ import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class ServerInfoCmd extends BaseCmd {
+public class ServerInfoCmd extends SubCmd {
 
     private final DateTimeFormatter dateFormatter;
 
-    public ServerInfoCmd() {
-        super(CommandCategory.INFO, "server", "Show server info");
+    public ServerInfoCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.INFO, "server", "Show server info");
         this.dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.MEDIUM);
     }
 

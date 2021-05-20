@@ -1,8 +1,9 @@
 package com.shadorc.shadbot.command.game.russianroulette;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
@@ -17,12 +18,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class RussianRouletteCmd extends BaseCmd {
+public class RussianRouletteCmd extends SubCmd {
 
     private final Map<Tuple2<Snowflake, Snowflake>, RussianRoulettePlayer> players;
 
-    public RussianRouletteCmd() {
-        super(CommandCategory.GAME, "russian_roulette", "Play russian roulette");
+    public RussianRouletteCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.GAME, "russian_roulette", "Play russian roulette");
         this.setGameRateLimiter();
 
         this.players = new ConcurrentHashMap<>();

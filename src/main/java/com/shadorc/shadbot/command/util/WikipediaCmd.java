@@ -3,7 +3,7 @@ package com.shadorc.shadbot.command.util;
 import com.shadorc.shadbot.api.json.wikipedia.WikipediaPage;
 import com.shadorc.shadbot.api.json.wikipedia.WikipediaQuery;
 import com.shadorc.shadbot.api.json.wikipedia.WikipediaResponse;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
@@ -20,7 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class WikipediaCmd extends BaseCmd {
+public class WikipediaCmd extends Cmd {
 
     public WikipediaCmd() {
         super(CommandCategory.UTILS, "wikipedia", "Search for Wikipedia article");

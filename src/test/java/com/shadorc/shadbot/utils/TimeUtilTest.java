@@ -9,7 +9,6 @@ import java.time.ZoneId;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TimeUtilTest {
 

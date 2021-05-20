@@ -16,28 +16,23 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class AutoRolesSetting extends BaseCmd {
+public class AutoRolesSetting extends SubCmd {
 
     private enum Action {
         ADD, REMOVE
     }
 
-    public AutoRolesSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public AutoRolesSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "auto_roles", "Manage auto assigned role(s)");
 
         this.addOption("action", "Whether to add or remove a role from the auto ones", true,
                 ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Action.class));
-        this.addOption("role1", "The first role", true,
-                ApplicationCommandOptionType.ROLE);
-        this.addOption("role2", "The second role", false,
-                ApplicationCommandOptionType.ROLE);
-        this.addOption("role3", "The third role", false,
-                ApplicationCommandOptionType.ROLE);
-        this.addOption("role4", "The fourth role", false,
-                ApplicationCommandOptionType.ROLE);
-        this.addOption("role5", "The fifth role", false,
-                ApplicationCommandOptionType.ROLE);
+        this.addOption("role1", "The first role", true, ApplicationCommandOptionType.ROLE);
+        this.addOption("role2", "The second role", false, ApplicationCommandOptionType.ROLE);
+        this.addOption("role3", "The third role", false, ApplicationCommandOptionType.ROLE);
+        this.addOption("role4", "The fourth role", false, ApplicationCommandOptionType.ROLE);
+        this.addOption("role5", "The fifth role", false, ApplicationCommandOptionType.ROLE);
     }
 
     @Override
@@ -55,30 +50,37 @@ public class AutoRolesSetting extends BaseCmd {
                     final String roleStr = FormatUtil.format(mentionedRoles,
                             role -> "`@%s`".formatted(role.getName()), ", ");
 
-                    switch (action) {
-                        case ADD:
-                            return AutoRolesSetting.checkPermissions(context, roleIds)
-                                    .doOnNext(__ -> autoRoleIds.addAll(roleIds))
-                                    .then(context.getDbGuild().updateSetting(Setting.AUTO_ROLES, autoRoleIds))
-                                    .then(context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("autoroles.added")
-                                            .formatted(roleStr)));
-                        case REMOVE:
-                            autoRoleIds.removeAll(roleIds);
+                    return switch (action) {
+                        case ADD -> AutoRolesSetting.checkPermissions(context, roleIds)
+                                .then(Mono.defer(() -> {
+                                    if (!autoRoleIds.addAll(roleIds)) {
+                                        return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                                context.localize("autoroles.already.added"));
+                                    }
+                                    return context.getDbGuild().updateSetting(Setting.AUTO_ROLES, autoRoleIds)
+                                            .then(context.createFollowupMessage(Emoji.CHECK_MARK,
+                                                    context.localize("autoroles.added").formatted(roleStr)));
+                                }));
+                        case REMOVE -> Mono.defer(() -> {
+                            if (!autoRoleIds.removeAll(roleIds)) {
+                                return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                        context.localize("autoroles.already.removed"));
+                            }
                             return context.getDbGuild().updateSetting(Setting.AUTO_ROLES, autoRoleIds)
-                                    .then(context.createFollowupMessage(Emoji.CHECK_MARK, context.localize("autoroles.removed")
-                                            .formatted(roleStr)));
-                        default:
-                            return Mono.error(new IllegalStateException());
-                    }
+                                    .then(context.createFollowupMessage(Emoji.CHECK_MARK,
+                                            context.localize("autoroles.removed").formatted(roleStr)));
+                        });
+                    };
                 });
     }
 
-    private static Mono<?> checkPermissions(Context context, Set<Snowflake> roleIds) {
+    private static Mono<Void> checkPermissions(Context context, Set<Snowflake> roleIds) {
         return context.getChannel()
                 .flatMap(channel -> DiscordUtil.requirePermissions(channel, Permission.MANAGE_ROLES))
                 .then(context.getClient().getSelfMember(context.getGuildId()))
                 .filterWhen(self -> self.hasHigherRoles(roleIds))
-                .switchIfEmpty(Mono.error(new CommandException(context.localize("autoroles.exception.higher"))));
+                .switchIfEmpty(Mono.error(new CommandException(context.localize("autoroles.exception.higher"))))
+                .then();
     }
 
 }

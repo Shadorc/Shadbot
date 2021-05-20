@@ -67,7 +67,7 @@ public class TimeUtil {
         for (final String match : matches) {
             final long time = Long.parseLong(LETTER_PATTERN.matcher(match).replaceAll(""));
             String unit = NUMBER_PATTERN.matcher(match).replaceAll("");
-            if(unit.isBlank()) {
+            if (unit.isBlank()) {
                 unit = "s";
             }
             switch (unit) {

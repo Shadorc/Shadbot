@@ -2,9 +2,10 @@ package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.image.wallhaven.WallhavenResponse;
 import com.shadorc.shadbot.api.json.image.wallhaven.Wallpaper;
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -23,15 +24,15 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-public class WallhavenCmd extends BaseCmd {
+public class WallhavenCmd extends SubCmd {
 
     private static final String HOME_URL = "https://wallhaven.cc/api/v1/search";
     private static final Pattern COMPILE = Pattern.compile("[, ]");
 
     private final String apiKey;
 
-    public WallhavenCmd() {
-        super(CommandCategory.IMAGE, "wallhaven", "Search random wallpaper from Wallhaven");
+    public WallhavenCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.IMAGE, "wallhaven", "Search random wallpaper from Wallhaven");
         this.addOption("query", "Search for a wallpaper", false, ApplicationCommandOptionType.STRING);
 
         this.apiKey = CredentialManager.get(Credential.WALLHAVEN_API_KEY);

@@ -1,9 +1,6 @@
 package com.shadorc.shadbot.command.setting;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.Context;
-import com.shadorc.shadbot.core.command.Setting;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
@@ -15,10 +12,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class LocaleSetting extends BaseCmd {
+public class LocaleSetting extends SubCmd {
 
-    public LocaleSetting() {
-        super(CommandCategory.SETTING, "language", "Manage default server language");
+    public LocaleSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, "language", "Manage default server language");
 
         final List<String> locales = Arrays.stream(I18nManager.LOCALES)
                 .map(Locale::toLanguageTag)

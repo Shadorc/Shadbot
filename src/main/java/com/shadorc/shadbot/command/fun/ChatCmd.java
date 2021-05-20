@@ -3,7 +3,7 @@ package com.shadorc.shadbot.command.fun;
 import com.shadorc.shadbot.api.json.pandorabots.ChatBotResponse;
 import com.shadorc.shadbot.api.json.pandorabots.ChatBotResult;
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-public class ChatCmd extends BaseCmd {
+public class ChatCmd extends Cmd {
 
     private static final Logger LOGGER = LogUtil.getLogger(ChatCmd.class, LogUtil.Category.COMMAND);
     private static final String HOME_URl = "https://www.pandorabots.com/pandora/talk-xml";

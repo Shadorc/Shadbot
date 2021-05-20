@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
-public class VolumeCmd extends BaseCmd {
+public class VolumeCmd extends Cmd {
 
     public VolumeCmd() {
         super(CommandCategory.MUSIC, "volume", "Show or set current volume level");
@@ -33,10 +33,10 @@ public class VolumeCmd extends BaseCmd {
         return DiscordUtil.requireVoiceChannel(context)
                 .flatMap(__ -> {
                     final Optional<Long> percentageOpt = context.getOptionAsLong("percentage");
-                    final TrackScheduler scheduler = guildMusic.getTrackScheduler();
+                    final TrackScheduler trackScheduler = guildMusic.getTrackScheduler();
                     if (percentageOpt.isEmpty()) {
                         return context.createFollowupMessage(Emoji.SOUND, context.localize("volume.current")
-                                .formatted(scheduler.getAudioPlayer().getVolume()));
+                                .formatted(trackScheduler.getAudioPlayer().getVolume()));
                     }
 
                     final long percentage = percentageOpt.orElseThrow();
@@ -45,9 +45,10 @@ public class VolumeCmd extends BaseCmd {
                                 .formatted(Config.VOLUME_MIN, Config.VOLUME_MAX)));
                     }
 
-                    scheduler.setVolume((int) percentage);
+                    trackScheduler.setVolume((int) percentage);
+                    trackScheduler.clearBuffer(); // Instantly apply change
                     return context.createFollowupMessage(Emoji.SOUND, context.localize("volume.message")
-                            .formatted(scheduler.getAudioPlayer().getVolume()));
+                            .formatted(trackScheduler.getAudioPlayer().getVolume()));
                 });
     }
 

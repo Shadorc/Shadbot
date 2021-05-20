@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RestrictedChannelsSetting extends BaseCmd {
+public class RestrictedChannelsSetting extends SubCmd {
 
     private enum Action {
         ADD, REMOVE
@@ -26,8 +26,8 @@ public class RestrictedChannelsSetting extends BaseCmd {
         COMMAND, CATEGORY
     }
 
-    public RestrictedChannelsSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public RestrictedChannelsSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "restricted_channels", "Restrict commands to specific channels");
 
         this.addOption(option -> option.name("action")
@@ -58,13 +58,15 @@ public class RestrictedChannelsSetting extends BaseCmd {
         final Mono<TextChannel> getChannel = context.getOptionAsChannel("channel")
                 .ofType(TextChannel.class);
 
-        final Set<BaseCmd> commands = new HashSet<>();
+        final Set<Cmd> commands = new HashSet<>();
         switch (type) {
             case COMMAND -> {
-                final BaseCmd command = CommandManager.getCommand(name);
+                final Cmd command = CommandManager.getCommand(name);
                 if (command == null) {
-                    return Mono.error(new CommandException(context.localize("restrictedchannels.invalid.command").formatted(name)));
+                    return Mono.error(new CommandException(context.localize("restrictedchannels.invalid.command")
+                            .formatted(name)));
                 }
+
                 commands.add(command);
             }
             case CATEGORY -> {
@@ -73,9 +75,7 @@ public class RestrictedChannelsSetting extends BaseCmd {
                     return Mono.error(new CommandException(context.localize("restrictedchannels.invalid.category")
                             .formatted(name, FormatUtil.format(CommandCategory.class, FormatUtil::capitalizeEnum, ", "))));
                 }
-                commands.addAll(CommandManager.getCommands().values().stream()
-                        .filter(cmd -> cmd.getCategory() == category)
-                        .collect(Collectors.toSet()));
+                commands.addAll(CommandManager.getCommands(category));
             }
         }
 
@@ -83,20 +83,24 @@ public class RestrictedChannelsSetting extends BaseCmd {
                 .switchIfEmpty(Mono.error(new CommandException(context.localize("restrictedchannels.exception.category"))))
                 .flatMap(channel -> {
                     final StringBuilder strBuilder = new StringBuilder();
-                    final Map<Snowflake, Set<BaseCmd>> restrictedCategories = context.getDbGuild().getSettings()
+                    final Map<Snowflake, Set<Cmd>> restrictedCategories = context.getDbGuild().getSettings()
                             .getRestrictedChannels();
 
                     switch (action) {
                         case ADD -> {
-                            restrictedCategories.computeIfAbsent(channel.getId(), __ -> new HashSet<>())
-                                    .addAll(commands);
+                            if (!restrictedCategories.computeIfAbsent(channel.getId(), __ -> new HashSet<>()).addAll(commands)) {
+                                return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                        context.localize("restrictedchannels.already.added"));
+                            }
                             strBuilder.append(context.localize("restrictedchannels.added")
                                     .formatted(FormatUtil.format(commands, cmd -> "`%s`".formatted(cmd.getName()), " "),
                                             channel.getMention()));
                         }
                         case REMOVE -> {
-                            if (restrictedCategories.containsKey(channel.getId())) {
-                                restrictedCategories.get(channel.getId()).removeAll(commands);
+                            if (!restrictedCategories.containsKey(channel.getId())
+                                    || !restrictedCategories.get(channel.getId()).removeAll(commands)) {
+                                return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                        context.localize("restrictedchannels.already.removed"));
                             }
                             strBuilder.append(context.localize("restrictedchannels.removed")
                                     .formatted(FormatUtil.format(commands, cmd -> "`%s`".formatted(cmd.getName()), " ")));
@@ -109,7 +113,7 @@ public class RestrictedChannelsSetting extends BaseCmd {
                             .collect(Collectors.toMap(
                                     entry -> entry.getKey().asString(),
                                     entry -> entry.getValue().stream()
-                                            .map(BaseCmd::getName)
+                                            .map(Cmd::getName)
                                             .collect(Collectors.toSet())));
 
                     return context.getDbGuild().updateSetting(Setting.RESTRICTED_CHANNELS, setting)

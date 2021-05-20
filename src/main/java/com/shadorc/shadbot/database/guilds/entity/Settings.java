@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.database.guilds.entity;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.database.SerializableEntity;
 import com.shadorc.shadbot.database.guilds.bean.SettingsBean;
@@ -36,7 +36,7 @@ public class Settings extends SerializableEntity<SettingsBean> {
                         || allowedRoleIds.contains(role.getId()));
     }
 
-    public boolean isCommandAllowed(BaseCmd cmd) {
+    public boolean isCommandAllowed(Cmd cmd) {
         final Set<String> blacklistedCmds = this.getBlacklistedCmds();
         // If no blacklisted command has been set
         if (blacklistedCmds.isEmpty()) {
@@ -63,8 +63,8 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return allowedVoiceChannelIds.contains(channelId);
     }
 
-    public boolean isCommandAllowedInChannel(BaseCmd cmd, Snowflake channelId) {
-        final Map<Snowflake, Set<BaseCmd>> map = this.getRestrictedChannels();
+    public boolean isCommandAllowedInChannel(Cmd cmd, Snowflake channelId) {
+        final Map<Snowflake, Set<Cmd>> map = this.getRestrictedChannels();
         // If no permission has been set
         if (map.isEmpty()) {
             return true;
@@ -76,8 +76,8 @@ public class Settings extends SerializableEntity<SettingsBean> {
         return map.values().stream().noneMatch(set -> set.contains(cmd));
     }
 
-    public boolean isCommandAllowedToRole(BaseCmd cmd, Set<Snowflake> roleIds) {
-        final Map<Snowflake, Set<BaseCmd>> map = this.getRestrictedRoles();
+    public boolean isCommandAllowedToRole(Cmd cmd, Set<Snowflake> roleIds) {
+        final Map<Snowflake, Set<Cmd>> map = this.getRestrictedRoles();
         // If no permission has been set
         if (map.isEmpty()) {
             return true;
@@ -149,7 +149,7 @@ public class Settings extends SerializableEntity<SettingsBean> {
                 .map(Snowflake::of);
     }
 
-    public Map<Snowflake, Set<BaseCmd>> getRestrictedChannels() {
+    public Map<Snowflake, Set<Cmd>> getRestrictedChannels() {
         return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getRestrictedChannels)
                 .orElse(new HashMap<>())
@@ -162,7 +162,7 @@ public class Settings extends SerializableEntity<SettingsBean> {
                                 .collect(Collectors.toSet())));
     }
 
-    public Map<Snowflake, Set<BaseCmd>> getRestrictedRoles() {
+    public Map<Snowflake, Set<Cmd>> getRestrictedRoles() {
         return Optional.ofNullable(this.getBean())
                 .map(SettingsBean::getRestrictedRoles)
                 .orElse(new HashMap<>())

@@ -10,9 +10,10 @@ import com.shadorc.shadbot.api.json.gamestats.steam.stats.Stats;
 import com.shadorc.shadbot.api.json.gamestats.steam.stats.UserStatsForGameResponse;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.cache.MultiValueCache;
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
@@ -31,7 +32,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class CounterStrikeCmd extends BaseCmd {
+public class CounterStrikeCmd extends SubCmd {
 
     private static final String PRIVACY_HELP_URL = "https://support.steampowered.com/kb_article.php?ref=4113-YUDH-6401";
 
@@ -44,8 +45,8 @@ public class CounterStrikeCmd extends BaseCmd {
     private final MultiValueCache<String, PlayerSummary> playerSummaryCache;
     private final MultiValueCache<String, String> userStatsCache;
 
-    public CounterStrikeCmd() {
-        super(CommandCategory.GAMESTATS, "csgo", "Search for Counter-Strike: Global Offensive statistics");
+    public CounterStrikeCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.GAMESTATS, "csgo", "Search for Counter-Strike: Global Offensive statistics");
         this.addOption(option -> option.name("steamid")
                 .description("Steam ID, custom ID or profile URL")
                 .required(true)

@@ -1,8 +1,9 @@
 package com.shadorc.shadbot.command.game.rps;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
@@ -18,13 +19,13 @@ import reactor.util.function.Tuples;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class RpsCmd extends BaseCmd {
+public class RpsCmd extends SubCmd {
 
     // Key is Guild ID, User ID
     private final Map<Tuple2<Snowflake, Snowflake>, RpsPlayer> players;
 
-    public RpsCmd() {
-        super(CommandCategory.GAME, "rps", "Play a Rock–paper–scissors game, win-streak increases gains");
+    public RpsCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.GAME, "rps", "Play a Rock–paper–scissors game, win-streak increases gains");
         this.setGameRateLimiter();
 
         this.addOption(option -> option.name("handsign")

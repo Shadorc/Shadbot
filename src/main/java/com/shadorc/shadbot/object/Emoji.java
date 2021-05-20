@@ -66,7 +66,8 @@ public enum Emoji {
     APPLE("apple"),
     CHERRIES("cherries"),
     BELL("bell"),
-    GIFT("gift");
+    GIFT("gift"),
+    LOUD_SOUND("loud_sound");
 
     private final String discordNotation;
 

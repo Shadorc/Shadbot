@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
-public class AutoMessagesSetting extends BaseCmd {
+public class AutoMessagesSetting extends SubCmd {
 
     private enum Action {
         ENABLE, DISABLE
@@ -22,8 +22,8 @@ public class AutoMessagesSetting extends BaseCmd {
         JOIN_MESSAGE, LEAVE_MESSAGE
     }
 
-    public AutoMessagesSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public AutoMessagesSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "auto_messages", "Manage auto-message(s) on user join/leave");
 
         this.addOption("action", "Whether to enable or disable automatic messages", true,

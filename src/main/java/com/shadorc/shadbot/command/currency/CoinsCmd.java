@@ -1,15 +1,16 @@
 package com.shadorc.shadbot.command.currency;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.guilds.entity.DBMember;
 import com.shadorc.shadbot.object.Emoji;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-public class CoinsCmd extends BaseCmd {
+public class CoinsCmd extends Cmd {
 
     public CoinsCmd() {
         super(CommandCategory.CURRENCY, "coins", "Show user's coins");
@@ -27,13 +28,19 @@ public class CoinsCmd extends BaseCmd {
                         .getDBMember(context.getGuildId(), user.getId())
                         .map(DBMember::getCoins)
                         .flatMap(coins -> {
+                            final StringBuilder stringBuilder = new StringBuilder();
                             if (user.getId().equals(context.getAuthorId())) {
-                                return context.createFollowupMessage(Emoji.PURSE, context.localize("coins.yours")
+                                stringBuilder.append(context.localize("coins.yours")
                                         .formatted(context.localize(coins)));
                             } else {
-                                return context.createFollowupMessage(Emoji.PURSE, context.localize("coins.user")
+                                stringBuilder.append(context.localize("coins.user")
                                         .formatted(user.getUsername(), context.localize(coins)));
                             }
+                            if (coins == Config.MAX_COINS) {
+                                stringBuilder.append(" ")
+                                        .append(context.localize("coins.max.reached"));
+                            }
+                            return context.createFollowupMessage(Emoji.PURSE, stringBuilder.toString());
                         }));
     }
 

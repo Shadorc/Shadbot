@@ -31,27 +31,27 @@ public class CommandProcessor {
     }
 
     private static Mono<?> executeCommand(Context context) {
-        final BaseCmd command = CommandManager.getCommand(context.getLastCommandName());
+        final Cmd cmd = CommandManager.getCommand(context.getLastCommandName());
         // The command does not exist
-        if (command == null) {
+        if (cmd == null) {
             DEFAULT_LOGGER.error("{Guild ID: {}} Command {} not found",
                     context.getGuildId().asString(), context.getFullCommandName());
             return Mono.error(new RuntimeException("Command %s not found".formatted(context.getFullCommandName())));
         }
 
         // The command has been disabled
-        if (!command.isEnabled()) {
+        if (!cmd.isEnabled()) {
             return context.replyEphemeral(Emoji.ACCESS_DENIED, context.localize("command.disabled")
                     .formatted(Config.SUPPORT_SERVER_URL));
         }
 
         // This category is not allowed in this channel
-        if (!context.getDbGuild().getSettings().isCommandAllowedInChannel(command, context.getChannelId())) {
+        if (!context.getDbGuild().getSettings().isCommandAllowedInChannel(cmd, context.getChannelId())) {
             return context.replyEphemeral(Emoji.ACCESS_DENIED, context.localize("command.channel.not.allowed"));
         }
 
         // This command is not allowed to this role
-        if (!context.getDbGuild().getSettings().isCommandAllowedToRole(command, context.getAuthor().getRoleIds())) {
+        if (!context.getDbGuild().getSettings().isCommandAllowedToRole(cmd, context.getAuthor().getRoleIds())) {
             return context.replyEphemeral(Emoji.ACCESS_DENIED, context.localize("command.role.not.allowed"));
         }
 
@@ -59,24 +59,24 @@ public class CommandProcessor {
                 .collectList()
                 // The author has the permission to execute this command
                 .filterWhen(ReactorUtil.filterOrExecute(
-                        userPerms -> userPerms.contains(command.getPermission()),
+                        userPerms -> userPerms.contains(cmd.getPermission()),
                         context.replyEphemeral(Emoji.ACCESS_DENIED, context.localize("command.missing.permission"))))
                 // The command is allowed in the guild
                 .filterWhen(ReactorUtil.filterOrExecute(
-                        __ -> context.getDbGuild().getSettings().isCommandAllowed(command),
+                        __ -> context.getDbGuild().getSettings().isCommandAllowed(cmd),
                         context.replyEphemeral(Emoji.ACCESS_DENIED, context.localize("command.blacklisted"))))
                 // The user is not rate limited
-                .filterWhen(__ -> BooleanUtils.not(CommandProcessor.isRateLimited(context, command)))
+                .filterWhen(__ -> BooleanUtils.not(CommandProcessor.isRateLimited(context, cmd)))
                 .flatMap(__ -> context.getEvent().acknowledge()
                         // Without this, BaseCmd#execute errors would be silently discarded
                         .thenReturn(__))
-                .flatMap(__ -> command.execute(context))
-                .doOnSuccess(__ -> Telemetry.COMMAND_USAGE_COUNTER.labels(command.getName()).inc())
+                .flatMap(__ -> cmd.execute(context))
+                .doOnSuccess(__ -> Telemetry.COMMAND_USAGE_COUNTER.labels(cmd.getName()).inc())
                 .onErrorResume(err -> ExceptionHandler.handleCommandError(err, context)
                         .then(Mono.empty()));
     }
 
-    private static Mono<Boolean> isRateLimited(Context context, BaseCmd cmd) {
+    private static Mono<Boolean> isRateLimited(Context context, Cmd cmd) {
         return Mono.justOrEmpty(cmd.getRateLimiter())
                 .flatMap(ratelimiter -> {
                     final RateLimitResponse response = ratelimiter.isLimited(context.getGuildId(), context.getAuthorId());

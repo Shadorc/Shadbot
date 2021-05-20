@@ -1,10 +1,7 @@
 package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandPermission;
-import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.NumberUtil;
 import discord4j.common.util.Snowflake;
@@ -14,11 +11,11 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 
-public class LeaveGuildCmd extends BaseCmd {
+public class LeaveGuildCmd extends SubCmd {
 
-    public LeaveGuildCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, "leave_guild", "Leave a guild");
-        this.addOption(option -> option.name("guildId")
+    public LeaveGuildCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.OWNER, CommandPermission.OWNER, "leave_guild", "Leave a guild");
+        this.addOption(option -> option.name("guild_id")
                 .description("The ID of the guild to leave")
                 .required(true)
                 .type(ApplicationCommandOptionType.STRING.getValue()));

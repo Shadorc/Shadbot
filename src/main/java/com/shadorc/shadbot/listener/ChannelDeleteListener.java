@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.listener;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.Setting;
 import com.shadorc.shadbot.database.DatabaseManager;
 import discord4j.common.util.Snowflake;
@@ -61,7 +61,7 @@ public class ChannelDeleteListener {
                                     .collect(Collectors.toUnmodifiableMap(
                                             entry -> entry.getKey().asString(),
                                             entry -> entry.getValue().stream()
-                                                    .map(BaseCmd::getName)
+                                                    .map(Cmd::getName)
                                                     .collect(Collectors.toUnmodifiableSet())));
 
                             request = request

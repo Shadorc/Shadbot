@@ -2,7 +2,7 @@ package com.shadorc.shadbot.command.fun;
 
 import com.shadorc.shadbot.api.html.thisday.ThisDay;
 import com.shadorc.shadbot.core.cache.SingleValueCache;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
@@ -19,7 +19,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.function.Consumer;
 
-public class ThisDayCmd extends BaseCmd {
+public class ThisDayCmd extends Cmd {
 
     private static final String HOME_URL = "https://www.onthisday.com/";
 

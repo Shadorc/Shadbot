@@ -15,14 +15,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class AllowedRolesSetting extends BaseCmd {
+public class AllowedRolesSetting extends SubCmd {
 
     private enum Action {
         ADD, REMOVE
     }
 
-    public AllowedRolesSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public AllowedRolesSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "allowed_roles", "Manage role(s) that can interact with Shadbot");
 
         this.addOption(option -> option.name("action")
@@ -73,11 +73,17 @@ public class AllowedRolesSetting extends BaseCmd {
 
                     final StringBuilder strBuilder = new StringBuilder();
                     if (action == Action.ADD) {
-                        allowedRoleIds.addAll(mentionedRoleIds);
+                        if (!allowedRoleIds.addAll(mentionedRoleIds)) {
+                            return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                    context.localize("allowedroles.already.added"));
+                        }
                         strBuilder.append(Emoji.CHECK_MARK + context.localize("allowedroles.added")
                                 .formatted(FormatUtil.format(mentionedRoles, role -> "`@%s`".formatted(role.getName()), ", ")));
                     } else {
-                        allowedRoleIds.removeAll(mentionedRoleIds);
+                        if (!allowedRoleIds.removeAll(mentionedRoleIds)) {
+                            return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                    context.localize("allowedroles.already.removed"));
+                        }
                         strBuilder.append(Emoji.CHECK_MARK + context.localize("allowedroles.removed")
                                 .formatted(FormatUtil.format(mentionedRoles, role -> "`@%s`".formatted(role.getName()), ", ")));
 

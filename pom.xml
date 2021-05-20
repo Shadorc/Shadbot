@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.shadorc.shadbot</groupId>
     <artifactId>shadbot</artifactId>
-    <version>4.0.14-SNAPSHOT</version>
+    <version>4.0.17-SNAPSHOT</version>
     <name>Shadbot</name>
     <url>https://github.com/Shadorc/Shadbot</url>
     <description>
@@ -128,7 +128,7 @@
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
-            <version>3.4.5</version>
+            <version>3.4.6</version>
         </dependency>
         <dependency>
             <groupId>com.discord4j</groupId>

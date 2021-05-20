@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.data.credential;
 
 import com.shadorc.shadbot.utils.LogUtil;
+import com.shadorc.shadbot.utils.StringUtil;
 import reactor.util.Logger;
 import reactor.util.annotation.Nullable;
 
@@ -42,7 +43,7 @@ public class CredentialManager {
     public static String get(Credential key) {
         Objects.requireNonNull(key);
         final String property = PROPERTIES.getProperty(key.toString());
-        if (property == null || property.isBlank()) {
+        if (StringUtil.isBlank(property)) {
             return null;
         }
         return property;

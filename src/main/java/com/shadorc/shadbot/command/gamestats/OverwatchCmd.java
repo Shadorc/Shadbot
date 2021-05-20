@@ -6,9 +6,10 @@ import com.shadorc.shadbot.api.json.gamestats.overwatch.profile.ProfileResponse;
 import com.shadorc.shadbot.api.json.gamestats.overwatch.stats.StatsResponse;
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.cache.MultiValueCache;
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.object.Emoji;
@@ -25,7 +26,7 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-public class OverwatchCmd extends BaseCmd {
+public class OverwatchCmd extends SubCmd {
 
     private static final String HOME_URL = "https://owapi.io";
     private static final String PROFILE_API_URL = "%s/profile".formatted(HOME_URL);
@@ -50,8 +51,8 @@ public class OverwatchCmd extends BaseCmd {
 
     private final MultiValueCache<String, OverwatchProfile> cachedValues;
 
-    public OverwatchCmd() {
-        super(CommandCategory.GAMESTATS, "overwatch", "Search for Overwatch statistics");
+    public OverwatchCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.GAMESTATS, "overwatch", "Search for Overwatch statistics");
         this.addOption("platform", "User's platform", true, ApplicationCommandOptionType.STRING,
                 DiscordUtil.toOptions(Platform.class));
         this.addOption("battletag", "User's battletag, case sensitive", true,

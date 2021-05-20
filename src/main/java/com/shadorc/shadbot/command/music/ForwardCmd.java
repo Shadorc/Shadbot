@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.music.GuildMusic;
@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
-public class ForwardCmd extends BaseCmd {
+public class ForwardCmd extends Cmd {
 
     public ForwardCmd() {
         super(CommandCategory.MUSIC, "forward", "Fast forward the current music a specified amount of time");

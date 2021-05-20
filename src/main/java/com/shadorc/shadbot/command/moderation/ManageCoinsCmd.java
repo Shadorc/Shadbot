@@ -1,10 +1,7 @@
 package com.shadorc.shadbot.command.moderation;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandPermission;
-import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.guilds.entity.DBMember;
@@ -22,7 +19,7 @@ import reactor.util.function.Tuple2;
 
 import java.util.Optional;
 
-public class ManageCoinsCmd extends BaseCmd {
+public class ManageCoinsCmd extends SubCmd {
 
     private static final int MIN_COINS = 1;
 
@@ -31,8 +28,8 @@ public class ManageCoinsCmd extends BaseCmd {
         ADD, REMOVE, RESET
     }
 
-    public ManageCoinsCmd() {
-        super(CommandCategory.MODERATION, CommandPermission.ADMIN,
+    public ManageCoinsCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.MODERATION, CommandPermission.ADMIN,
                 "manage_coins", "Manage users coins");
 
         this.addOption(option -> option.name("action")
@@ -58,8 +55,6 @@ public class ManageCoinsCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final Action action = context.getOptionAsEnum(Action.class, "action").orElseThrow();
         final Optional<Long> coinsOpt = context.getOptionAsLong("coins");
-        final Mono<Member> user = context.getOptionAsMember("user");
-        final Optional<Snowflake> roleIdOpt = context.getOptionAsSnowflake("role");
 
         if (action != Action.RESET) {
             if (coinsOpt.isEmpty()) {
@@ -71,11 +66,14 @@ public class ManageCoinsCmd extends BaseCmd {
             }
         }
 
-        // TODO Question: If the guild is very large, isn't this gonna break everything?
+        final Mono<Member> user = context.getOptionAsMember("user");
+        final Optional<Snowflake> roleIdOpt = context.getOptionAsSnowflake("role");
+        final boolean isMentioningEveryone = roleIdOpt.map(context.getGuildId()::equals).orElse(false);
+
         return Mono.justOrEmpty(roleIdOpt)
                 .flatMapMany(roleId -> context.getGuild()
                         .flatMapMany(Guild::requestMembers)
-                        .filter(member -> member.getRoleIds().contains(roleId)))
+                        .filter(member -> isMentioningEveryone || member.getRoleIds().contains(roleId)))
                 .mergeWith(user)
                 .flatMap(member -> Mono.zip(
                         Mono.just(member.getUsername()),
@@ -87,8 +85,13 @@ public class ManageCoinsCmd extends BaseCmd {
                         return Mono.error(new CommandException(context.localize("managecoins.exception.user.role")));
                     }
 
-                    // TODO Question: Is it possible to mention @everyone as a role? If so, do not mention everyone
-                    final String mentionsStr = FormatUtil.format(members, Tuple2::getT1, ", ");
+                    final String mentionsStr;
+                    if (isMentioningEveryone) {
+                        mentionsStr = "everyone";
+                    } else {
+                        mentionsStr = FormatUtil.format(members, Tuple2::getT1, ", ");
+                    }
+
                     return switch (action) {
                         case ADD -> Flux.fromIterable(members)
                                 .map(Tuple2::getT2)

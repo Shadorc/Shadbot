@@ -1,10 +1,7 @@
 package com.shadorc.shadbot.command.moderation;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandPermission;
-import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
@@ -26,14 +23,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class PruneCmd extends BaseCmd {
+public class PruneCmd extends SubCmd {
 
     private static final long MIN_MESSAGES = 1;
     private static final long MAX_MESSAGES = 100;
     private static final int MESSAGES_OFFSET = 1;
 
-    public PruneCmd() {
-        super(CommandCategory.MODERATION, CommandPermission.ADMIN,
+    public PruneCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.MODERATION, CommandPermission.ADMIN,
                 "prune", "Delete messages (include embeds)");
 
         this.addOption(option -> option.name("author")

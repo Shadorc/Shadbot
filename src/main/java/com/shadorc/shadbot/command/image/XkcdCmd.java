@@ -1,9 +1,10 @@
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.json.xkcd.XkcdResponse;
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.DiscordUtil;
@@ -16,7 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public class XkcdCmd extends BaseCmd {
+public class XkcdCmd extends SubCmd {
 
     private enum Sort {
         LATEST, RANDOM
@@ -28,17 +29,17 @@ public class XkcdCmd extends BaseCmd {
     // Cache for the latest Xkcd ID
     private final AtomicInteger latestId;
 
-    public XkcdCmd() {
-        super(CommandCategory.IMAGE, "xkcd", "Show random comic from XKCD");
+    public XkcdCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.IMAGE, "xkcd", "Show random comic from XKCD");
         this.latestId = new AtomicInteger();
 
-        this.addOption("sort", "Sorting option", true, ApplicationCommandOptionType.STRING,
-                DiscordUtil.toOptions(Sort.class));
+        this.addOption("sort", "Sorting option, random by default", false,
+                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Sort.class));
     }
 
     @Override
     public Mono<?> execute(Context context) {
-        final Sort sort = context.getOptionAsEnum(Sort.class, "sort").orElseThrow();
+        final Sort sort = context.getOptionAsEnum(Sort.class, "sort").orElse(Sort.RANDOM);
         final Mono<XkcdResponse> getResponse = sort == Sort.LATEST ? XkcdCmd.getLatestXkcd() : this.getRandomXkcd();
         return context.createFollowupMessage(Emoji.HOURGLASS, context.localize("xkcd.loading"))
                 .then(getResponse)

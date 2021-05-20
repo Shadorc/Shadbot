@@ -1,8 +1,9 @@
 package com.shadorc.shadbot.command.donator;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.premium.RelicType;
 import com.shadorc.shadbot.object.Emoji;
@@ -14,10 +15,10 @@ import java.util.Optional;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
-public class ActivateRelicCmd extends BaseCmd {
+public class ActivateRelicCmd extends SubCmd {
 
-    public ActivateRelicCmd() {
-        super(CommandCategory.DONATOR, "activate_relic", "Activate a relic");
+    public ActivateRelicCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.DONATOR, "activate_relic", "Activate a relic");
         this.addOption("relic", "The relic to activate", true, ApplicationCommandOptionType.STRING);
     }
 

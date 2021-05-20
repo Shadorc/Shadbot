@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.standalone;
 
 import com.shadorc.shadbot.Shadbot;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
-public class FeedbackCmd extends BaseCmd {
+public class FeedbackCmd extends Cmd {
 
     public FeedbackCmd() {
         super(CommandCategory.INFO, "feedback", "Send a feedback");

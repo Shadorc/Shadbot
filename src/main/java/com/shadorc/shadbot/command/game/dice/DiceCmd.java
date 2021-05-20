@@ -2,6 +2,7 @@ package com.shadorc.shadbot.command.game.dice;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.NumberUtil;
@@ -15,8 +16,8 @@ public class DiceCmd extends GameCmd<DiceGame> {
     protected static final String JOIN_SUB_COMMAND = "join";
     protected static final String CREATE_SUB_COMMAND = "create";
 
-    public DiceCmd() {
-        super("dice", "Start or join a Dice game with a common bet",
+    public DiceCmd(final GroupCmd groupCmd) {
+        super(groupCmd, "dice", "Start or join a Dice game with a common bet",
                 ApplicationCommandOptionType.SUB_COMMAND_GROUP);
 
         final ApplicationCommandOptionData numberOption = ApplicationCommandOptionData.builder()

@@ -16,14 +16,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class AllowedChannelsSetting extends BaseCmd {
+public class AllowedChannelsSetting extends SubCmd {
 
     private enum Action {
         ADD, REMOVE
     }
 
-    public AllowedChannelsSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public AllowedChannelsSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "allowed_channels", "Manage channel(s) in which Shadbot can interact");
 
         this.addOption(option -> option.name("action")
@@ -87,20 +87,24 @@ public class AllowedChannelsSetting extends BaseCmd {
                             strBuilder.append(Emoji.WARNING + context.localize("allowedchannels.warning"));
                         }
 
-                        for (final Channel channel : mentionedChannels) {
-                            final Snowflake channelId = channel.getId();
-                            switch (channel.getType()) {
-                                case GUILD_TEXT -> allowedTextChannelIds.add(channelId);
-                                case GUILD_VOICE -> allowedVoiceChannelIds.add(channelId);
-                            }
+                        final boolean textChannelsUpdated = allowedTextChannelIds.addAll(mentionedTextChannelIds);
+                        final boolean voiceChannelsUpdated = allowedVoiceChannelIds.addAll(mentionedVoiceChannelIds);
+                        if (!textChannelsUpdated && !voiceChannelsUpdated) {
+                            return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                    context.localize("allowedchannels.already.added"));
                         }
 
                         strBuilder.append(Emoji.CHECK_MARK + context.localize("allowedchannels.added")
                                 .formatted(FormatUtil.format(mentionedChannels, Channel::getMention, ", ")));
 
                     } else {
-                        allowedTextChannelIds.removeAll(mentionedTextChannelIds);
-                        allowedVoiceChannelIds.removeAll(mentionedVoiceChannelIds);
+                        final boolean textChannelsUpdated = allowedTextChannelIds.removeAll(mentionedTextChannelIds);
+                        final boolean voiceChannelsUpdated = allowedVoiceChannelIds.removeAll(mentionedVoiceChannelIds);
+                        if (!textChannelsUpdated && !voiceChannelsUpdated) {
+                            return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                                    context.localize("allowedchannels.already.removed"));
+                        }
+
                         strBuilder.append(Emoji.CHECK_MARK + context.localize("allowedchannels.removed")
                                 .formatted(FormatUtil.format(mentionedChannels, Channel::getMention, ", ")));
 

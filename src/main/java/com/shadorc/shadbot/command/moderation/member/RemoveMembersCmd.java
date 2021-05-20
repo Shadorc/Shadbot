@@ -2,10 +2,7 @@ package com.shadorc.shadbot.command.moderation.member;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.command.MissingPermissionException;
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandPermission;
-import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -25,13 +22,13 @@ import reactor.function.TupleUtils;
 import java.util.Locale;
 import java.util.stream.IntStream;
 
-public abstract class RemoveMembersCmd extends BaseCmd {
+public abstract class RemoveMembersCmd extends SubCmd {
 
     private final Permission permission;
     private final String keyword;
 
-    public RemoveMembersCmd(Permission permission, String keyword, String description) {
-        super(CommandCategory.MODERATION, CommandPermission.ADMIN, keyword, description);
+    public RemoveMembersCmd(GroupCmd groupCmd, Permission permission, String keyword, String description) {
+        super(groupCmd, CommandCategory.MODERATION, CommandPermission.ADMIN, keyword, description);
         this.permission = permission;
         this.keyword = keyword;
 

@@ -9,14 +9,13 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class BlacklistSetting extends BaseCmd {
+public class BlacklistSetting extends SubCmd {
 
     private enum Action {
         ADD, REMOVE
@@ -26,8 +25,8 @@ public class BlacklistSetting extends BaseCmd {
         COMMAND, CATEGORY
     }
 
-    public BlacklistSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public BlacklistSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "blacklist", "Manage blacklisted command(s)");
 
         this.addOption(option -> option.name("action")
@@ -92,45 +91,43 @@ public class BlacklistSetting extends BaseCmd {
                 .map(category -> EnumUtil.parseEnum(CommandCategory.class, category))
                 .collect(Collectors.toSet());
 
-        // Do not allow to blacklist admin category
-        if (categories.contains(CommandCategory.ADMIN)) {
-            return Mono.error(new CommandException(context.localize("blacklist.exception.remove.admin")));
+        // Do not allow to blacklist setting category
+        if (categories.contains(CommandCategory.SETTING)) {
+            return Mono.error(new CommandException(context.localize("blacklist.exception.category.setting")));
         }
 
         final Set<String> blacklist = context.getDbGuild().getSettings().getBlacklistedCmds();
 
-        final Set<String> cmdNames = new HashSet<>();
-        for (final CommandCategory category : categories) {
-            for (final BaseCmd cmd : CommandManager.getCommands().values()) {
-                if (cmd.getCategory() == category) {
-                    cmdNames.add(cmd.getName());
-                }
-            }
-        }
+        final Set<String> cmdNames = categories.stream()
+                .flatMap(category -> CommandManager.getCommands(category).stream())
+                .map(Cmd::getName)
+                .collect(Collectors.toSet());
 
-        final String message;
+        final StringBuilder stringBuilder = new StringBuilder();
         switch (action) {
             case ADD -> {
-                blacklist.addAll(cmdNames);
-                message = context.localize("blacklist.category.added");
+                if (!blacklist.addAll(cmdNames)) {
+                    return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                            context.localize("blacklist.category.already.added"));
+                }
+                stringBuilder.append(context.localize("blacklist.category.added"));
             }
             case REMOVE -> {
-                cmdNames.forEach(blacklist::remove);
-                message = context.localize("blacklist.category.removed");
-            }
-            default -> {
-                return Mono.error(new IllegalStateException("Unexpected value: %s".formatted(action)));
+                if (!cmdNames.removeAll(blacklist)) {
+                    return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                            context.localize("blacklist.category.already.removed"));
+                }
+                stringBuilder.append(context.localize("blacklist.category.removed"));
             }
         }
-
         return context.getDbGuild().updateSetting(Setting.BLACKLIST, blacklist)
-                .then(context.createFollowupMessage(Emoji.CHECK_MARK, message
+                .then(context.createFollowupMessage(Emoji.CHECK_MARK, stringBuilder.toString()
                         .formatted(FormatUtil.format(categoryNames, "`%s`"::formatted, ", "))));
     }
 
     private Mono<?> blacklistCommands(Context context, Action action, List<String> cmdNames) {
         final Set<String> unknownCmds = cmdNames.stream()
-                .filter(cmd -> CommandManager.getCommand(cmd) == null)
+                .filter(cmdName -> CommandManager.getCommand(cmdName) == null)
                 .collect(Collectors.toUnmodifiableSet());
 
         if (!unknownCmds.isEmpty()) {
@@ -140,29 +137,32 @@ public class BlacklistSetting extends BaseCmd {
 
         // Do not allow to blacklist setting command
         if (cmdNames.contains(context.getCommandName())) {
-            return Mono.error(new CommandException(context.localize("blacklist.exception.remove.setting")
+            return Mono.error(new CommandException(context.localize("blacklist.exception.command.setting")
                     .formatted(context.getCommandName())));
         }
 
         final Set<String> blacklist = context.getDbGuild().getSettings().getBlacklistedCmds();
 
-        final String message;
+        final StringBuilder stringBuilder = new StringBuilder();
         switch (action) {
             case ADD -> {
-                blacklist.addAll(cmdNames);
-                message = context.localize("blacklist.command.removed");
+                if (!blacklist.addAll(cmdNames)) {
+                    return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                            context.localize("blacklist.command.already.added"));
+                }
+                stringBuilder.append(context.localize("blacklist.command.added"));
             }
             case REMOVE -> {
-                cmdNames.forEach(blacklist::remove);
-                message = context.localize("blacklist.command.added");
-            }
-            default -> {
-                return Mono.error(new IllegalStateException("Unexpected value: %s".formatted(action)));
+                if (!cmdNames.removeAll(blacklist)) {
+                    return context.createFollowupMessage(Emoji.GREY_EXCLAMATION,
+                            context.localize("blacklist.command.already.removed"));
+                }
+                stringBuilder.append(context.localize("blacklist.command.removed"));
             }
         }
 
         return context.getDbGuild().updateSetting(Setting.BLACKLIST, blacklist)
-                .then(context.createFollowupMessage(Emoji.CHECK_MARK, message
+                .then(context.createFollowupMessage(Emoji.CHECK_MARK, stringBuilder.toString()
                         .formatted(FormatUtil.format(cmdNames, "`%s`"::formatted, ", "))));
     }
 

@@ -4,13 +4,10 @@ import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.data.Config;
-import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.guilds.entity.Settings;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
-import reactor.bool.BooleanUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -22,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class HelpCmd extends BaseCmd {
+public class HelpCmd extends Cmd {
 
     public HelpCmd() {
         super(CommandCategory.INFO, "help", "Show the list of available commands");
@@ -34,7 +31,7 @@ public class HelpCmd extends BaseCmd {
         final Optional<String> cmdNameOpt = context.getOptionAsString("command");
         if (cmdNameOpt.isPresent()) {
             final String cmdName = cmdNameOpt.orElseThrow();
-            final BaseCmd cmd = CommandManager.getCommand(cmdName);
+            final Cmd cmd = CommandManager.getCommand(cmdName);
             if (cmd == null) {
                 return Mono.error(new CommandException(context.localize("help.cmd.not.found")
                         .formatted(cmdName)));
@@ -68,35 +65,14 @@ public class HelpCmd extends BaseCmd {
     }
 
     private static Mono<Map<CommandCategory, Collection<String>>> getMultiMap(Context context, List<CommandPermission> authorPermissions) {
-        final Mono<Boolean> getIsDm = context.getChannel()
-                .map(Channel::getType)
-                .map(Channel.Type.DM::equals)
-                .cache();
-
-        final Mono<Settings> getSettings = DatabaseManager.getGuilds()
-                .getSettings(context.getGuildId())
-                .cache();
-
-        // Iterates over all commands...
-        return Flux.fromIterable(CommandManager.getCommands().values())
-                // ... and removes duplicate ...
-                .distinct()
-                // ... and removes commands that the author cannot use ...
+        final Settings settings = context.getDbGuild().getSettings();
+        return Flux.fromIterable(CommandManager.getCommands())
+                // Removes commands that the author cannot use
                 .filter(cmd -> authorPermissions.contains(cmd.getPermission()))
-                // ... and removes commands that are not allowed by the guild
-                .filterWhen(cmd -> BooleanUtils.or(getIsDm,
-                        getSettings.map(settings ->
-                                settings.isCommandAllowed(cmd)
-                                        && settings.isCommandAllowedInChannel(cmd, context.getChannelId()))
-                                .defaultIfEmpty(true)))
-                .flatMapIterable(cmd -> {
-                    if (cmd instanceof BaseCmdGroup group) {
-                        return group.getCommands().stream()
-                                .map(it -> Tuples.of(it.getCategory(), "%s %s".formatted(cmd.getName(), it.getName())))
-                                .toList();
-                    }
-                    return List.of(Tuples.of(cmd.getCategory(), cmd.getName()));
-                })
+                // Removes commands that are not allowed by the guild
+                .filter(cmd -> settings.isCommandAllowed(cmd)
+                        && settings.isCommandAllowedInChannel(cmd, context.getChannelId()))
+                .map(cmd -> Tuples.of(cmd.getCategory(), cmd instanceof SubCmd subCmd ? subCmd.getFullName() : cmd.getName()))
                 .collectMultimap(Tuple2::getT1, tuples -> "`/%s`".formatted(tuples.getT2()));
     }
 

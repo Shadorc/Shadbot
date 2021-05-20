@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.command.game.trivia;
 
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
@@ -42,8 +43,8 @@ public class TriviaCmd extends GameCmd<TriviaGame> {
         CATEGORIES.put("Entertainment: Cartoon & Animations", 32);
     }
 
-    public TriviaCmd() {
-        super("trivia", "Start a Trivia game in which everyone can participate");
+    public TriviaCmd(final GroupCmd groupCmd) {
+        super(groupCmd, "trivia", "Start a Trivia game in which everyone can participate");
         this.addOption(option -> option.name("category")
                 .description("The category of the question")
                 .required(false)

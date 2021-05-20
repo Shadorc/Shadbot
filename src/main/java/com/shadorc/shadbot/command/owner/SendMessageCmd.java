@@ -1,10 +1,7 @@
 package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandPermission;
-import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.core.object.entity.channel.MessageChannel;
@@ -13,10 +10,11 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
 
-public class SendMessageCmd extends BaseCmd {
+public class SendMessageCmd extends SubCmd {
 
-    public SendMessageCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, "send_message", "Send a private message to a user");
+    public SendMessageCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.OWNER, CommandPermission.OWNER, "send_message",
+                "Send a private message to a user");
         this.addOption(option -> option.name("user")
                 .description("The user to send a message to")
                 .required(true)
