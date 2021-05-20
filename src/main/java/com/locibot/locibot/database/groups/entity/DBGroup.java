@@ -24,6 +24,10 @@ public class DBGroup extends SerializableEntity<DBGroupBean> implements Database
         super(new DBGroupBean(groupName));
     }
 
+    public DBGroup (String groupName, int groupType){
+        super(new DBGroupBean(groupName, groupType));
+    }
+
     public String getGroupName(){
         return this.getBean().getGroupName();
     }

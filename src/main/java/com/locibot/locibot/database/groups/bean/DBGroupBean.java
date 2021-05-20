@@ -35,6 +35,10 @@ public class DBGroupBean implements Bean {
         this.teamType = teamType;
     }
 
+    public DBGroupBean(String groupName, int teamType) {
+        this(groupName, null, null, null, null, teamType);
+    }
+
     public DBGroupBean(String groupName) {
         this(groupName, null, null, null, null, 0);
     }

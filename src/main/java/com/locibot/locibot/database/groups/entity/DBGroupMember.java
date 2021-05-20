@@ -28,8 +28,8 @@ public class DBGroupMember extends SerializableEntity<DBGroupMemberBean> impleme
         this.groupName = groupName;
     }
 
-    public DBGroupMember(Long id, @Nullable String groupName, boolean optional, boolean invited, int accepted, boolean owner){
-        super(new DBGroupMemberBean(id, groupName, optional, invited, accepted, owner));
+    public DBGroupMember(Snowflake id, @Nullable String groupName, boolean optional, boolean invited, int accepted, boolean owner){
+        super(new DBGroupMemberBean(id.asLong(), groupName, optional, invited, accepted, owner));
         this.groupName = groupName;
     }
 
