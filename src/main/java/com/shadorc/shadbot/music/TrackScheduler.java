@@ -130,9 +130,6 @@ public class TrackScheduler {
     }
 
     public void destroy() {
-        if (this.currentTrack != null && this.currentTrack.getState() == AudioTrackState.PLAYING) {
-            this.currentTrack.stop();
-        }
         this.audioPlayer.destroy();
         this.clearPlaylist();
     }
