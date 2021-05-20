@@ -3,6 +3,7 @@ package com.locibot.locibot.database;
 import com.locibot.locibot.database.codec.IamCodec;
 import com.locibot.locibot.database.codec.LongCodec;
 import com.locibot.locibot.database.codec.SnowflakeCodec;
+import com.locibot.locibot.database.groups.GroupsCollection;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.reactivestreams.client.MongoClient;
@@ -30,6 +31,7 @@ public class DatabaseManager {
     private static final GuildsCollection GUILDS_COLLECTION;
     private static final LotteryCollection LOTTERY_COLLECTION;
     private static final UsersCollection USERS_COLLECTION;
+    private static final GroupsCollection GROUPS_COLLECTION;
 
     static {
         final MongoClientSettings.Builder settingsBuilder = MongoClientSettings.builder()
@@ -54,6 +56,7 @@ public class DatabaseManager {
         GUILDS_COLLECTION = new GuildsCollection(database);
         LOTTERY_COLLECTION = new LotteryCollection(database);
         USERS_COLLECTION = new UsersCollection(database);
+        GROUPS_COLLECTION = new GroupsCollection(database);
     }
 
     public static PremiumCollection getPremium() {
@@ -70,6 +73,10 @@ public class DatabaseManager {
 
     public static UsersCollection getUsers() {
         return USERS_COLLECTION;
+    }
+
+    public static GroupsCollection getGroups() {
+        return GROUPS_COLLECTION;
     }
 
     public static void close() {
