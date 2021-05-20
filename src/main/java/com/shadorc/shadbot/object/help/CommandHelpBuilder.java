@@ -7,7 +7,7 @@ public class CommandHelpBuilder extends HelpBuilder {
 
     private final String cmdName;
 
-    private CommandHelpBuilder(Context context, BaseCmd cmd) {
+    public CommandHelpBuilder(Context context, BaseCmd cmd) {
         super(context);
         this.cmdName = cmd.getName();
         this.options.addAll(cmd.getOptions());
@@ -15,10 +15,6 @@ public class CommandHelpBuilder extends HelpBuilder {
         this.setAuthor(context.localize("help.cmd.title").formatted(this.cmdName),
                 "https://github.com/Shadorc/Shadbot/wiki/Commands");
         this.setDescription(cmd.getDescription());
-    }
-
-    public static CommandHelpBuilder create(Context context, BaseCmd cmd) {
-        return new CommandHelpBuilder(context, cmd);
     }
 
     @Override

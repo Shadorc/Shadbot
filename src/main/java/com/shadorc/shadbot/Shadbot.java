@@ -1,6 +1,5 @@
 package com.shadorc.shadbot;
 
-import com.shadorc.shadbot.core.command.CommandManager;
 import com.shadorc.shadbot.core.retriever.SpyRestEntityRetriever;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
