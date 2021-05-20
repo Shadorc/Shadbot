@@ -36,7 +36,6 @@ public class Create extends BaseCmd {
 
         String groupName = context.getOptionAsString("team_name").get();
         DBGroup group = new DBGroup(groupName);
-        GroupsCollection groupsCollection = DatabaseManager.getGroups();
         Snowflake member1 = context.getOptionAsUser("member1").block().getId();
         DBGroupMember groupMember = new DBGroupMember(member1 ,groupName);
         return context.createFollowupMessage("Created").then(group.insert().then(groupMember.insert()));
