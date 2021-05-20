@@ -1,20 +1,17 @@
 package com.shadorc.shadbot.command.owner;
 
 import com.shadorc.shadbot.Shadbot;
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandPermission;
-import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.inputs.ConfirmMessageInputs;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
-public class ShutdownCmd extends BaseCmd {
+public class ShutdownCmd extends SubCmd {
 
-    public ShutdownCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, "shutdown", "Shutdown the bot");
+    public ShutdownCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.OWNER, CommandPermission.OWNER, "shutdown", "Shutdown the bot");
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.music.GuildMusic;
@@ -10,7 +10,7 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import reactor.core.publisher.Mono;
 
-public class PlaylistCmd extends BaseCmd {
+public class PlaylistCmd extends Cmd {
 
     private static final int MAX_DESCRIPTION_LENGTH = 1800;
 

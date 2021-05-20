@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RestrictedRolesSetting extends BaseCmd {
+public class RestrictedRolesSetting extends SubCmd {
 
     private enum Action {
         ADD, REMOVE
@@ -26,8 +26,8 @@ public class RestrictedRolesSetting extends BaseCmd {
         COMMAND, CATEGORY
     }
 
-    public RestrictedRolesSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public RestrictedRolesSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "restricted_roles", "Restrict commands to specific roles");
 
         this.addOption(option -> option.name("action")
@@ -57,16 +57,16 @@ public class RestrictedRolesSetting extends BaseCmd {
         final String name = context.getOptionAsString("name").orElseThrow();
         final Mono<Role> getRole = context.getOptionAsRole("role");
 
-        final Set<BaseCmd> commands = new HashSet<>();
+        final Set<Cmd> commands = new HashSet<>();
         switch (type) {
             case COMMAND -> {
-                final BaseCmd command = CommandManager.getCommand(name);
-                if (command == null || command instanceof BaseCmdGroup) {
+                final Cmd command = CommandManager.getCommand(name);
+                if (command == null || command instanceof GroupCmd) {
                     return Mono.error(new CommandException(context.localize("restrictedroles.invalid.command")
                             .formatted(name)));
                 }
 
-                commands.addAll(command.getCommands());
+                commands.add(command);
             }
             case CATEGORY -> {
                 final CommandCategory category = EnumUtil.parseEnum(CommandCategory.class, name);
@@ -74,17 +74,14 @@ public class RestrictedRolesSetting extends BaseCmd {
                     return Mono.error(new CommandException(context.localize("restrictedroles.invalid.category")
                             .formatted(name, FormatUtil.format(CommandCategory.class, FormatUtil::capitalizeEnum, ", "))));
                 }
-                commands.addAll(CommandManager.getCommands().values().stream()
-                        .filter(cmd -> cmd.getCategory() == category)
-                        .flatMap(cmd -> cmd.getCommands().stream())
-                        .collect(Collectors.toSet()));
+                commands.addAll(CommandManager.getCommands(category));
             }
         }
 
         return getRole
                 .flatMap(role -> {
                     final StringBuilder strBuilder = new StringBuilder();
-                    final Map<Snowflake, Set<BaseCmd>> restrictedRoles = context.getDbGuild().getSettings()
+                    final Map<Snowflake, Set<Cmd>> restrictedRoles = context.getDbGuild().getSettings()
                             .getRestrictedRoles();
 
                     switch (action) {
@@ -114,7 +111,7 @@ public class RestrictedRolesSetting extends BaseCmd {
                             .collect(Collectors.toMap(
                                     entry -> entry.getKey().asString(),
                                     entry -> entry.getValue().stream()
-                                            .map(BaseCmd::getName)
+                                            .map(Cmd::getName)
                                             .collect(Collectors.toSet())));
 
                     return context.getDbGuild().updateSetting(Setting.RESTRICTED_ROLES, setting)

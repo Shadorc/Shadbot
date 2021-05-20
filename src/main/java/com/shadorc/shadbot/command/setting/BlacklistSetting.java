@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class BlacklistSetting extends BaseCmd {
+public class BlacklistSetting extends SubCmd {
 
     private enum Action {
         ADD, REMOVE
@@ -25,8 +25,8 @@ public class BlacklistSetting extends BaseCmd {
         COMMAND, CATEGORY
     }
 
-    public BlacklistSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public BlacklistSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "blacklist", "Manage blacklisted command(s)");
 
         this.addOption(option -> option.name("action")
@@ -98,11 +98,9 @@ public class BlacklistSetting extends BaseCmd {
 
         final Set<String> blacklist = context.getDbGuild().getSettings().getBlacklistedCmds();
 
-        final Set<String> cmdNames = CommandManager.getCommands().values()
-                .stream()
-                .filter(cmd -> categories.contains(cmd.getCategory()))
-                .flatMap(cmd -> cmd.getCommands().stream())
-                .map(BaseCmd::getName)
+        final Set<String> cmdNames = categories.stream()
+                .flatMap(category -> CommandManager.getCommands(category).stream())
+                .map(Cmd::getName)
                 .collect(Collectors.toSet());
 
         final StringBuilder stringBuilder = new StringBuilder();
@@ -129,10 +127,7 @@ public class BlacklistSetting extends BaseCmd {
 
     private Mono<?> blacklistCommands(Context context, Action action, List<String> cmdNames) {
         final Set<String> unknownCmds = cmdNames.stream()
-                .filter(cmdName -> {
-                    final BaseCmd cmd = CommandManager.getCommand(cmdName);
-                    return cmd == null || cmd instanceof BaseCmdGroup;
-                })
+                .filter(cmdName -> CommandManager.getCommand(cmdName) == null)
                 .collect(Collectors.toUnmodifiableSet());
 
         if (!unknownCmds.isEmpty()) {

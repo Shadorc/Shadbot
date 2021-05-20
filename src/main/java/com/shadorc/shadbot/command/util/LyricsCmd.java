@@ -5,7 +5,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.shadorc.shadbot.api.ServerAccessException;
 import com.shadorc.shadbot.api.html.musixmatch.Musixmatch;
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-public class LyricsCmd extends BaseCmd {
+public class LyricsCmd extends Cmd {
 
     private static final int MAX_LYRICS_LENGTH = Embed.MAX_DESCRIPTION_LENGTH / 3;
     private static final int MAX_TITLE_LENGTH = Embed.MAX_TITLE_LENGTH / 3;

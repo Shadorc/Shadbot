@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.music.GuildMusic;
@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
-public class BackwardCmd extends BaseCmd {
+public class BackwardCmd extends Cmd {
 
     public BackwardCmd() {
         super(CommandCategory.MUSIC, "backward", "Fast backward current music a specified amount of time");

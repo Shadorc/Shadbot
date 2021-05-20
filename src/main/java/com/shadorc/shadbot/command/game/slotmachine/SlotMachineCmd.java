@@ -1,8 +1,9 @@
 package com.shadorc.shadbot.command.game.slotmachine;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.core.game.player.GamblerPlayer;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
@@ -16,10 +17,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class SlotMachineCmd extends BaseCmd {
+public class SlotMachineCmd extends SubCmd {
 
-    public SlotMachineCmd() {
-        super(CommandCategory.GAME, "slot_machine", "Play slot machine");
+    public SlotMachineCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.GAME, "slot_machine", "Play slot machine");
         this.setGameRateLimiter();
     }
 

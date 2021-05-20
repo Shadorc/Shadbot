@@ -1,8 +1,9 @@
 package com.shadorc.shadbot.command.moderation;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
@@ -19,15 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class RolelistCmd extends BaseCmd {
-
-    public RolelistCmd() {
-        super(CommandCategory.MODERATION, "rolelist", "Show a list of members with specific role(s)");
-
-        this.addOption("role1", "The first role to have", true, ApplicationCommandOptionType.ROLE);
-        this.addOption("role2", "The second role to have", false, ApplicationCommandOptionType.ROLE);
-        this.addOption("role3", "The third role to have", false, ApplicationCommandOptionType.ROLE);
-    }
+public class RolelistCmd extends SubCmd {
 
     @Override
     public Mono<?> execute(Context context) {
@@ -72,6 +65,14 @@ public class RolelistCmd extends BaseCmd {
                                     .forEach(field -> embed.addField(field.name(), field.value(), true));
                         })))
                 .flatMap(context::createFollowupMessage);
+    }
+
+    public RolelistCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.MODERATION, "rolelist", "Show a list of members with specific role(s)");
+
+        this.addOption("role1", "The first role to have", true, ApplicationCommandOptionType.ROLE);
+        this.addOption("role2", "The second role to have", false, ApplicationCommandOptionType.ROLE);
+        this.addOption("role3", "The third role to have", false, ApplicationCommandOptionType.ROLE);
     }
 
 }

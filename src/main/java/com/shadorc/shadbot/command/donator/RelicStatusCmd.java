@@ -1,8 +1,9 @@
 package com.shadorc.shadbot.command.donator;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.premium.RelicType;
@@ -23,10 +24,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class RelicStatusCmd extends BaseCmd {
+public class RelicStatusCmd extends SubCmd {
 
-    public RelicStatusCmd() {
-        super(CommandCategory.DONATOR, "relic_status", "Your donator status");
+    public RelicStatusCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.DONATOR, "relic_status", "Your donator status");
     }
 
     @Override

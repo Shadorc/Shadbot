@@ -8,10 +8,11 @@ import reactor.core.publisher.Mono;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
-public class EnableCommandCmd extends BaseCmd {
+public class EnableCommandCmd extends SubCmd {
 
-    public EnableCommandCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, "enable_command", "Enable/disable a command");
+    public EnableCommandCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.OWNER, CommandPermission.OWNER, "enable_command",
+                "Enable/disable a command");
         this.addOption(option -> option.name("command")
                 .description("The command to enable/disable")
                 .required(true)
@@ -25,7 +26,7 @@ public class EnableCommandCmd extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         final String commandName = context.getOptionAsString("command").orElseThrow();
-        final BaseCmd cmd = CommandManager.getCommand(commandName);
+        final Cmd cmd = CommandManager.getCommand(commandName);
         if (cmd == null) {
             return Mono.error(new CommandException("Command `%s` not found.".formatted(commandName)));
         }

@@ -15,14 +15,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class AllowedRolesSetting extends BaseCmd {
+public class AllowedRolesSetting extends SubCmd {
 
     private enum Action {
         ADD, REMOVE
     }
 
-    public AllowedRolesSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public AllowedRolesSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "allowed_roles", "Manage role(s) that can interact with Shadbot");
 
         this.addOption(option -> option.name("action")

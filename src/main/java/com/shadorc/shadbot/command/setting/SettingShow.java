@@ -1,9 +1,6 @@
 package com.shadorc.shadbot.command.setting;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandPermission;
-import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.database.guilds.entity.Settings;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
@@ -19,10 +16,10 @@ import reactor.util.function.Tuple2;
 import java.util.*;
 import java.util.function.Function;
 
-public class SettingShow extends BaseCmd {
+public class SettingShow extends SubCmd {
 
-    public SettingShow() {
-        super(CommandCategory.SETTING, CommandPermission.USER,
+    public SettingShow(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.USER,
                 "show", "Show current settings");
     }
 
@@ -63,13 +60,13 @@ public class SettingShow extends BaseCmd {
                 Flux.fromIterable(settings.getAutoRoleIds())
                         .flatMap(id -> context.getClient().getRoleById(context.getGuildId(), id))
                         .collectList();
-        final Mono<Map<Channel, Set<BaseCmd>>> getRestrictedChannels =
+        final Mono<Map<Channel, Set<Cmd>>> getRestrictedChannels =
                 Flux.fromIterable(settings.getRestrictedChannels().entrySet())
                         .flatMap(entry -> context.getClient().getChannelById(entry.getKey())
                                 .zipWith(Mono.just(entry.getValue())))
                         .filter(tuple -> !tuple.getT2().isEmpty())
                         .collectMap(Tuple2::getT1, Tuple2::getT2);
-        final Mono<Map<Role, Set<BaseCmd>>> getRestrictedRoles =
+        final Mono<Map<Role, Set<Cmd>>> getRestrictedRoles =
                 Flux.fromIterable(settings.getRestrictedRoles().entrySet())
                         .flatMap(entry -> context.getClient().getRoleById(context.getGuildId(), entry.getKey())
                                 .zipWith(Mono.just(entry.getValue())))
@@ -121,7 +118,7 @@ public class SettingShow extends BaseCmd {
                                         FormatUtil.format(restrictedChannels.entrySet(),
                                                 entry -> "%s\n - %s".formatted(
                                                         entry.getKey().getMention(),
-                                                        FormatUtil.format(entry.getValue(), BaseCmd::getName, "\n - ")),
+                                                        FormatUtil.format(entry.getValue(), Cmd::getName, "\n - ")),
                                                 "\n"),
                                         false);
                             }
@@ -130,7 +127,7 @@ public class SettingShow extends BaseCmd {
                                         FormatUtil.format(restrictedRoles.entrySet(),
                                                 entry -> "%s\n - %s".formatted(
                                                         entry.getKey().getMention(),
-                                                        FormatUtil.format(entry.getValue(), BaseCmd::getName, "\n - ")),
+                                                        FormatUtil.format(entry.getValue(), Cmd::getName, "\n - ")),
                                                 "\n"),
                                         false);
                             }

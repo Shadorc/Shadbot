@@ -3,10 +3,7 @@ package com.shadorc.shadbot.command.owner;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandPermission;
-import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.rest.util.ApplicationCommandOptionType;
@@ -15,7 +12,7 @@ import reactor.core.publisher.Mono;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
-public class LoggerCmd extends BaseCmd {
+public class LoggerCmd extends SubCmd {
 
     private enum LogLevel {
         OFF,
@@ -26,8 +23,9 @@ public class LoggerCmd extends BaseCmd {
         ERROR
     }
 
-    public LoggerCmd() {
-        super(CommandCategory.OWNER, CommandPermission.OWNER, "logger", "Change the level of a logger");
+    public LoggerCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.OWNER, CommandPermission.OWNER, "logger",
+                "Change the level of a logger");
         this.addOption(option -> option.name("name")
                 .description("Can be 'root' to change root logger")
                 .required(true)

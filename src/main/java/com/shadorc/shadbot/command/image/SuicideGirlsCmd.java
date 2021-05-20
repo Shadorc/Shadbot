@@ -1,9 +1,10 @@
 package com.shadorc.shadbot.command.image;
 
 import com.shadorc.shadbot.api.html.suicidegirl.SuicideGirl;
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.ShadbotUtil;
@@ -13,12 +14,12 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
 
-public class SuicideGirlsCmd extends BaseCmd {
+public class SuicideGirlsCmd extends SubCmd {
 
     private static final String HOME_URL = "https://www.suicidegirls.com/photos/sg/recent/all/";
 
-    public SuicideGirlsCmd() {
-        super(CommandCategory.IMAGE, "suicidegirls", "Show random image from SuicideGirls");
+    public SuicideGirlsCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.IMAGE, "suicidegirls", "Show random image from SuicideGirls");
     }
 
     @Override

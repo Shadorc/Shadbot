@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class HelpCmd extends BaseCmd {
+public class HelpCmd extends Cmd {
 
     public HelpCmd() {
         super(CommandCategory.INFO, "help", "Show the list of available commands");
@@ -33,17 +33,11 @@ public class HelpCmd extends BaseCmd {
     public Mono<?> execute(Context context) {
         final Optional<String> cmdNameOpt = context.getOptionAsString("command");
         if (cmdNameOpt.isPresent()) {
-            String cmdName = cmdNameOpt.orElseThrow();
-            if (cmdName.contains(" ")) {
-                cmdName = cmdName.split(" ")[1];
-            }
-            final BaseCmd cmd = CommandManager.getCommand(cmdName);
+            final String cmdName = cmdNameOpt.orElseThrow();
+            final Cmd cmd = CommandManager.getCommand(cmdName);
             if (cmd == null) {
                 return Mono.error(new CommandException(context.localize("help.cmd.not.found")
                         .formatted(cmdName)));
-            }
-            if (cmd instanceof BaseCmdGroup) {
-                return Mono.error(new CommandException(context.localize("help.category")));
             }
             return context.createFollowupMessage(cmd.getHelp(context));
         }
@@ -84,7 +78,7 @@ public class HelpCmd extends BaseCmd {
                 .cache();
 
         // Iterates over all commands...
-        return Flux.fromIterable(CommandManager.getCommands().values())
+        return Flux.fromIterable(CommandManager.getCommands())
                 // ... and removes duplicate ...
                 .distinct()
                 // ... and removes commands that the author cannot use ...
@@ -95,14 +89,7 @@ public class HelpCmd extends BaseCmd {
                                 settings.isCommandAllowed(cmd)
                                         && settings.isCommandAllowedInChannel(cmd, context.getChannelId()))
                                 .defaultIfEmpty(true)))
-                .flatMapIterable(cmd -> {
-                    if (cmd instanceof BaseCmdGroup group) {
-                        return group.getCommands().stream()
-                                .map(it -> Tuples.of(it.getCategory(), "%s %s".formatted(cmd.getName(), it.getName())))
-                                .toList();
-                    }
-                    return List.of(Tuples.of(cmd.getCategory(), cmd.getName()));
-                })
+                .map(cmd -> Tuples.of(cmd.getCategory(), cmd instanceof SubCmd subCmd ? subCmd.getFullName() : cmd.getName()))
                 .collectMultimap(Tuple2::getT1, tuples -> "`/%s`".formatted(tuples.getT2()));
     }
 

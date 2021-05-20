@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
-public class BassBoostCmd extends BaseCmd {
+public class BassBoostCmd extends Cmd {
 
     private static final int BASSBOOST_MIN = 0;
     private static final int BASSBOOST_MAX = 200;

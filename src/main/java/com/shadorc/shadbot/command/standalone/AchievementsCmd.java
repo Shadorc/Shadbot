@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.standalone;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.core.i18n.I18nContext;
@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 import java.util.EnumSet;
 import java.util.function.Consumer;
 
-public class AchievementsCmd extends BaseCmd {
+public class AchievementsCmd extends Cmd {
 
     public AchievementsCmd() {
         super(CommandCategory.INFO, "achievements", "Show user's achievements");

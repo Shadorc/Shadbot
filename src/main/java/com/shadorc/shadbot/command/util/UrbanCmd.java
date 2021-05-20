@@ -3,7 +3,7 @@ package com.shadorc.shadbot.command.util;
 import com.shadorc.shadbot.api.ServerAccessException;
 import com.shadorc.shadbot.api.json.urbandictionary.UrbanDefinition;
 import com.shadorc.shadbot.api.json.urbandictionary.UrbanDictionaryResponse;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
@@ -24,7 +24,7 @@ import java.time.Duration;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
-public class UrbanCmd extends BaseCmd {
+public class UrbanCmd extends Cmd {
 
     private static final String HOME_URL = "http://api.urbandictionary.com/v0/define";
 

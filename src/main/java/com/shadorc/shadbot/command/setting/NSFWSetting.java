@@ -1,9 +1,6 @@
 package com.shadorc.shadbot.command.setting;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandPermission;
-import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import discord4j.core.object.entity.channel.TextChannel;
@@ -11,14 +8,14 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
 
-public class NSFWSetting extends BaseCmd {
+public class NSFWSetting extends SubCmd {
 
     private enum Action {
         TOGGLE, ENABLE, DISABLE
     }
 
-    public NSFWSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public NSFWSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "nsfw", "Manage current channel's NSFW state");
 
         this.addOption(option -> option.name("action")

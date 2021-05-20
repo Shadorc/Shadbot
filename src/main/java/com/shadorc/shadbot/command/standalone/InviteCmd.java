@@ -1,13 +1,13 @@
 package com.shadorc.shadbot.command.standalone;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import reactor.core.publisher.Mono;
 
-public class InviteCmd extends BaseCmd {
+public class InviteCmd extends Cmd {
 
     public InviteCmd() {
         super(CommandCategory.INFO, "invite", "Get an invitation for the bot or for the support server");

@@ -9,17 +9,22 @@ import com.shadorc.shadbot.command.game.rps.RpsCmd;
 import com.shadorc.shadbot.command.game.russianroulette.RussianRouletteCmd;
 import com.shadorc.shadbot.command.game.slotmachine.SlotMachineCmd;
 import com.shadorc.shadbot.command.game.trivia.TriviaCmd;
-import com.shadorc.shadbot.core.command.BaseCmdGroup;
 import com.shadorc.shadbot.core.command.CommandCategory;
+import com.shadorc.shadbot.core.command.GroupCmd;
 
-import java.util.List;
+public class GameGroupCmd extends GroupCmd {
 
-public class GameGroup extends BaseCmdGroup {
-
-    public GameGroup() {
-        super(CommandCategory.GAME, "Game commands",
-                List.of(new RpsCmd(), new RussianRouletteCmd(), new SlotMachineCmd(), new TriviaCmd(),
-                        new HangmanCmd(), new RouletteCmd(), new BlackjackCmd(), new DiceCmd(), new LotteryCmd()));
+    public GameGroupCmd() {
+        super(CommandCategory.GAME, "Game commands");
+        this.addSubCommand(new RpsCmd(this));
+        this.addSubCommand(new RussianRouletteCmd(this));
+        this.addSubCommand(new SlotMachineCmd(this));
+        this.addSubCommand(new TriviaCmd(this));
+        this.addSubCommand(new HangmanCmd(this));
+        this.addSubCommand(new RouletteCmd(this));
+        this.addSubCommand(new BlackjackCmd(this));
+        this.addSubCommand(new DiceCmd(this));
+        this.addSubCommand(new LotteryCmd(this));
     }
 
 }

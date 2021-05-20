@@ -1,6 +1,7 @@
 package com.shadorc.shadbot.command.game.blackjack;
 
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.ShadbotUtil;
@@ -9,8 +10,8 @@ import reactor.core.publisher.Mono;
 
 public class BlackjackCmd extends GameCmd<BlackjackGame> {
 
-    public BlackjackCmd() {
-        super("blackjack", "Start or join a Blackjack game");
+    public BlackjackCmd(final GroupCmd groupCmd) {
+        super(groupCmd, "blackjack", "Start or join a Blackjack game");
 
         this.addOption(option -> option.name("bet")
                 .description("Your bet")

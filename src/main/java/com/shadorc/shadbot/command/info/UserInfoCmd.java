@@ -1,8 +1,9 @@
 package com.shadorc.shadbot.command.info;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
@@ -20,12 +21,12 @@ import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class UserInfoCmd extends BaseCmd {
+public class UserInfoCmd extends SubCmd {
 
     private final DateTimeFormatter dateFormatter;
 
-    public UserInfoCmd() {
-        super(CommandCategory.INFO, "user", "Show user info");
+    public UserInfoCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.INFO, "user", "Show user info");
         this.addOption("user", "If not specified, it will show your info", false,
                 ApplicationCommandOptionType.USER);
 

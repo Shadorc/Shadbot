@@ -1,14 +1,14 @@
 package com.shadorc.shadbot.command.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import reactor.core.publisher.Mono;
 
-public class NameCmd extends BaseCmd {
+public class NameCmd extends Cmd {
 
     public NameCmd() {
         super(CommandCategory.MUSIC, "name", "Current music name");

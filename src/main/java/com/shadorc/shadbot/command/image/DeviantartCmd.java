@@ -5,9 +5,10 @@ import com.shadorc.shadbot.api.json.image.deviantart.Content;
 import com.shadorc.shadbot.api.json.image.deviantart.DeviantArtResponse;
 import com.shadorc.shadbot.api.json.image.deviantart.Image;
 import com.shadorc.shadbot.core.cache.SingleValueCache;
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.data.credential.Credential;
 import com.shadorc.shadbot.data.credential.CredentialManager;
 import com.shadorc.shadbot.object.Emoji;
@@ -25,7 +26,7 @@ import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
-public class DeviantartCmd extends BaseCmd {
+public class DeviantartCmd extends SubCmd {
 
     private static final String OAUTH_URL = "https://www.deviantart.com/oauth2/token";
     private static final String BROWSE_POPULAR_URL = "https://www.deviantart.com/api/v1/oauth2/browse/popular";
@@ -34,8 +35,8 @@ public class DeviantartCmd extends BaseCmd {
     private final String apiSecret;
     private final SingleValueCache<TokenResponse> token;
 
-    public DeviantartCmd() {
-        super(CommandCategory.IMAGE, "deviantart", "Search random image from DeviantArt");
+    public DeviantartCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.IMAGE, "deviantart", "Search random image from DeviantArt");
         this.addOption(option -> option.name("query")
                 .description("Search for an image")
                 .required(true)

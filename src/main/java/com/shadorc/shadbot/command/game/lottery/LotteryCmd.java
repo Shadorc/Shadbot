@@ -1,9 +1,10 @@
 package com.shadorc.shadbot.command.game.lottery;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.core.i18n.I18nManager;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.database.DatabaseManager;
@@ -35,10 +36,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
-public class LotteryCmd extends BaseCmd {
+public class LotteryCmd extends SubCmd {
 
-    public LotteryCmd() {
-        super(CommandCategory.GAME, "lottery",
+    public LotteryCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.GAME, "lottery",
                 "Buy a ticket for the lottery or display the current lottery status");
         this.addOption("number", "The number you bet on", false,
                 ApplicationCommandOptionType.INTEGER);

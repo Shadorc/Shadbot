@@ -16,14 +16,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class AllowedChannelsSetting extends BaseCmd {
+public class AllowedChannelsSetting extends SubCmd {
 
     private enum Action {
         ADD, REMOVE
     }
 
-    public AllowedChannelsSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public AllowedChannelsSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "allowed_channels", "Manage channel(s) in which Shadbot can interact");
 
         this.addOption(option -> option.name("action")

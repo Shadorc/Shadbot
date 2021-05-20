@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.currency;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.database.guilds.entity.DBMember;
@@ -13,7 +13,7 @@ import reactor.util.function.Tuple2;
 
 import java.util.Comparator;
 
-public class LeaderboardCmd extends BaseCmd {
+public class LeaderboardCmd extends Cmd {
 
     private static final int USER_COUNT = 10;
 

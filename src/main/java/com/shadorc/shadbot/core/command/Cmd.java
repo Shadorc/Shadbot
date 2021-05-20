@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public abstract class BaseCmd {
+public abstract class Cmd {
 
     protected static final Supplier<RateLimiter> DEFAULT_RATELIMITER = () ->
             new RateLimiter(3, Duration.ofSeconds(5));
@@ -38,8 +38,8 @@ public abstract class BaseCmd {
     private RateLimiter rateLimiter;
     private boolean isEnabled;
 
-    protected BaseCmd(CommandCategory category, CommandPermission permission, String name, String description,
-                      @Nullable ApplicationCommandOptionType type) {
+    protected Cmd(CommandCategory category, CommandPermission permission, String name, String description,
+                  @Nullable ApplicationCommandOptionType type) {
         this.category = category;
         this.permission = permission;
         this.name = name;
@@ -50,11 +50,11 @@ public abstract class BaseCmd {
         this.isEnabled = true;
     }
 
-    protected BaseCmd(CommandCategory category, CommandPermission permission, String name, String description) {
+    protected Cmd(CommandCategory category, CommandPermission permission, String name, String description) {
         this(category, permission, name, description, null);
     }
 
-    protected BaseCmd(CommandCategory category, String name, String description) {
+    protected Cmd(CommandCategory category, String name, String description) {
         this(category, CommandPermission.USER, name, description);
     }
 
@@ -70,10 +70,6 @@ public abstract class BaseCmd {
 
     public Consumer<EmbedCreateSpec> getHelp(Context context) {
         return new CommandHelpBuilder(context, this).build();
-    }
-
-    public List<BaseCmd> getCommands() {
-        return List.of(this);
     }
 
     public CommandCategory getCategory() {

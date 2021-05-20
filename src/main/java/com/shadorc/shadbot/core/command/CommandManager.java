@@ -3,19 +3,19 @@ package com.shadorc.shadbot.core.command;
 import com.shadorc.shadbot.command.currency.CoinsCmd;
 import com.shadorc.shadbot.command.currency.LeaderboardCmd;
 import com.shadorc.shadbot.command.currency.TransferCoinsCmd;
-import com.shadorc.shadbot.command.donator.DonatorGroup;
+import com.shadorc.shadbot.command.donator.DonatorGroupCmd;
 import com.shadorc.shadbot.command.fun.ChatCmd;
 import com.shadorc.shadbot.command.fun.JokeCmd;
 import com.shadorc.shadbot.command.fun.ThisDayCmd;
-import com.shadorc.shadbot.command.game.GameGroup;
-import com.shadorc.shadbot.command.gamestats.GameStatsGroup;
-import com.shadorc.shadbot.command.image.ImageGroup;
+import com.shadorc.shadbot.command.game.GameGroupCmd;
+import com.shadorc.shadbot.command.gamestats.GameStatsGroupCmd;
+import com.shadorc.shadbot.command.image.ImageGroupCmd;
 import com.shadorc.shadbot.command.image.Rule34Cmd;
-import com.shadorc.shadbot.command.info.InfoGroup;
-import com.shadorc.shadbot.command.moderation.ModerationGroup;
+import com.shadorc.shadbot.command.info.InfoGroupCmd;
+import com.shadorc.shadbot.command.moderation.ModerationGroupCmd;
 import com.shadorc.shadbot.command.music.*;
-import com.shadorc.shadbot.command.owner.OwnerGroup;
-import com.shadorc.shadbot.command.setting.SettingGroup;
+import com.shadorc.shadbot.command.owner.OwnerGroupCmd;
+import com.shadorc.shadbot.command.setting.SettingGroupCmd;
 import com.shadorc.shadbot.command.standalone.*;
 import com.shadorc.shadbot.command.util.*;
 import com.shadorc.shadbot.command.util.poll.PollCmd;
@@ -28,19 +28,20 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
 public class CommandManager {
 
-    private static final Map<String, BaseCmd> COMMANDS_MAP;
+    private static final Map<String, Cmd> COMMANDS_MAP;
 
     static {
         COMMANDS_MAP = CommandManager.initialize(
-                new InfoGroup(), new ImageGroup(), new ModerationGroup(), new OwnerGroup(),
-                new GameStatsGroup(), new SettingGroup(),
-                new DonatorGroup(), new GameGroup(),
+                new InfoGroupCmd(), new ImageGroupCmd(), new ModerationGroupCmd(), new OwnerGroupCmd(),
+                new GameStatsGroupCmd(), new SettingGroupCmd(), new DonatorGroupCmd(), new GameGroupCmd(),
                 // Image
                 new Rule34Cmd(), // TODO Improvement: Add to Image group when Discord autocompletion is implemented
                 // Standalone
@@ -58,9 +59,9 @@ public class CommandManager {
                 new TranslateCmd(), new PollCmd());
     }
 
-    private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {
-        final Map<String, BaseCmd> map = new LinkedHashMap<>(cmds.length);
-        for (final BaseCmd cmd : cmds) {
+    private static Map<String, Cmd> initialize(Cmd... cmds) {
+        final Map<String, Cmd> map = new LinkedHashMap<>(cmds.length);
+        for (final Cmd cmd : cmds) {
             if (map.putIfAbsent(cmd.getName(), cmd) != null) {
                 DEFAULT_LOGGER.error("Command name collision between {} and {}",
                         cmd.getClass().getSimpleName(), map.get(cmd.getName()).getClass().getSimpleName());
@@ -73,7 +74,7 @@ public class CommandManager {
     public static Mono<Void> register(ApplicationService applicationService, long applicationId) {
         final Mono<Long> registerGuildCommands = Flux.fromIterable(COMMANDS_MAP.values())
                 .filter(cmd -> cmd.getCategory() == CommandCategory.OWNER)
-                .map(BaseCmd::asRequest)
+                .map(Cmd::asRequest)
                 .collectList()
                 .flatMapMany(requests -> applicationService
                         .bulkOverwriteGuildApplicationCommand(applicationId, Config.OWNER_GUILD_ID, requests))
@@ -84,7 +85,7 @@ public class CommandManager {
 
         final Mono<Long> registerGlobalCommands = Flux.fromIterable(COMMANDS_MAP.values())
                 .filter(cmd -> cmd.getCategory() != CommandCategory.OWNER)
-                .map(BaseCmd::asRequest)
+                .map(Cmd::asRequest)
                 .collectList()
                 .flatMapMany(requests -> applicationService
                         .bulkOverwriteGlobalApplicationCommand(applicationId, requests))
@@ -96,19 +97,31 @@ public class CommandManager {
                 .and(registerGuildCommands);
     }
 
-    public static Map<String, BaseCmd> getCommands() {
-        return COMMANDS_MAP;
+    public static List<Cmd> getCommands() {
+        return COMMANDS_MAP.values().stream()
+                .flatMap(it -> {
+                    if (it instanceof GroupCmd group) {
+                        return group.getSubCommands().stream();
+                    }
+                    return Stream.of(it);
+                })
+                .toList();
     }
 
-    public static BaseCmd getCommand(String name) {
-        final BaseCmd cmd = COMMANDS_MAP.get(name);
-        if (cmd != null) {
-            return cmd;
-        }
+    public static List<Cmd> getCommands(CommandCategory category) {
+        return CommandManager.getCommands().stream()
+                .filter(cmd -> cmd.getCategory() == category)
+                .toList();
+    }
 
-        return COMMANDS_MAP.values().stream()
-                .flatMap(it -> it.getCommands().stream())
-                .filter(it -> it.getName().equals(name))
+    public static Cmd getCommand(String name) {
+        return CommandManager.getCommands().stream()
+                .filter(cmd -> {
+                    if (cmd instanceof SubCmd subCmd && subCmd.getFullName().equals(name)) {
+                        return true;
+                    }
+                    return cmd.getName().equals(name);
+                })
                 .findFirst()
                 .orElse(null);
     }

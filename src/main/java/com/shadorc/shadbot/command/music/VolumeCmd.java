@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
-public class VolumeCmd extends BaseCmd {
+public class VolumeCmd extends Cmd {
 
     public VolumeCmd() {
         super(CommandCategory.MUSIC, "volume", "Show or set current volume level");

@@ -2,9 +2,10 @@ package com.shadorc.shadbot.command.info;
 
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 import com.shadorc.shadbot.Shadbot;
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
@@ -24,7 +25,7 @@ import java.time.Duration;
 import java.util.Properties;
 import java.util.function.Consumer;
 
-public class BotInfoCmd extends BaseCmd {
+public class BotInfoCmd extends SubCmd {
 
     private static final String JAVA_VERSION = System.getProperty("java.version");
     private static final Properties D4J_PROPERTIES = GitProperties.getProperties();
@@ -32,8 +33,8 @@ public class BotInfoCmd extends BaseCmd {
     private static final String D4J_VERSION = D4J_PROPERTIES.getProperty(GitProperties.APPLICATION_VERSION);
     private static final String LAVAPLAYER_VERSION = PlayerLibrary.VERSION;
 
-    public BotInfoCmd() {
-        super(CommandCategory.INFO, "bot", "Show bot info");
+    public BotInfoCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.INFO, "bot", "Show bot info");
     }
 
     @Override

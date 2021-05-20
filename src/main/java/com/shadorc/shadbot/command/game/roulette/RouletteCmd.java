@@ -2,6 +2,7 @@ package com.shadorc.shadbot.command.game.roulette;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
@@ -15,8 +16,8 @@ public class RouletteCmd extends GameCmd<RouletteGame> {
         NUMBER, RED, BLACK, ODD, EVEN, LOW, HIGH
     }
 
-    public RouletteCmd() {
-        super("roulette", "Start or join a Roulette game");
+    public RouletteCmd(final GroupCmd groupCmd) {
+        super(groupCmd, "roulette", "Start or join a Roulette game");
         this.addOption(option -> option.name("bet")
                 .description("Your bet")
                 .required(true)

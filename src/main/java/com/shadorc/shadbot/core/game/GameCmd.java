@@ -1,8 +1,9 @@
 package com.shadorc.shadbot.core.game;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.CommandPermission;
+import com.shadorc.shadbot.core.command.GroupCmd;
+import com.shadorc.shadbot.core.command.SubCmd;
 import discord4j.common.util.Snowflake;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.util.annotation.Nullable;
@@ -10,18 +11,18 @@ import reactor.util.annotation.Nullable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class GameCmd<G extends Game> extends BaseCmd implements GameListener {
+public abstract class GameCmd<G extends Game> extends SubCmd implements GameListener {
 
     private final Map<Snowflake, G> managers;
 
-    protected GameCmd(String name, String description, @Nullable ApplicationCommandOptionType type) {
-        super(CommandCategory.GAME, CommandPermission.USER, name, description, type);
+    protected GameCmd(GroupCmd groupCmd, String name, String description, @Nullable ApplicationCommandOptionType type) {
+        super(groupCmd, CommandCategory.GAME, CommandPermission.USER, name, description, type);
         this.setGameRateLimiter();
         this.managers = new ConcurrentHashMap<>();
     }
 
-    protected GameCmd(String name, String description) {
-        this(name, description, null);
+    protected GameCmd(GroupCmd groupCmd, String name, String description) {
+        this(groupCmd, name, description, null);
     }
 
     public G getGame(Snowflake channelId) {

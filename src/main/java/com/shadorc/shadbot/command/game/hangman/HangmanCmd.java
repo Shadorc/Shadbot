@@ -2,6 +2,7 @@ package com.shadorc.shadbot.command.game.hangman;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.GroupCmd;
 import com.shadorc.shadbot.core.game.GameCmd;
 import com.shadorc.shadbot.core.game.player.Player;
 import com.shadorc.shadbot.object.Emoji;
@@ -26,8 +27,8 @@ public class HangmanCmd extends GameCmd<HangmanGame> {
     private final WordsList easyWords;
     private final WordsList hardWords;
 
-    public HangmanCmd() {
-        super("hangman", "Start or join a Hangman game", ApplicationCommandOptionType.SUB_COMMAND_GROUP);
+    public HangmanCmd(final GroupCmd groupCmd) {
+        super(groupCmd, "hangman", "Start or join a Hangman game", ApplicationCommandOptionType.SUB_COMMAND_GROUP);
         this.addOption(option -> option.name(JOIN_SUB_COMMAND)
                 .description("Join a Hangman game")
                 .type(ApplicationCommandOptionType.SUB_COMMAND.getValue()));

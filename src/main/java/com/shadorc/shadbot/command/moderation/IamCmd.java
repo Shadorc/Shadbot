@@ -21,12 +21,12 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class IamCmd extends BaseCmd {
+public class IamCmd extends SubCmd {
 
     public static final Unicode REACTION = ReactionEmoji.unicode("✅");
 
-    public IamCmd() {
-        super(CommandCategory.MODERATION, CommandPermission.ADMIN,
+    public IamCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.MODERATION, CommandPermission.ADMIN,
                 "iam", "Create a message with a reaction that gives role(s)");
 
         this.addOption(option -> option.name("role1")

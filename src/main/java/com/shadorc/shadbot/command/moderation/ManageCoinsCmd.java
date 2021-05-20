@@ -1,10 +1,7 @@
 package com.shadorc.shadbot.command.moderation;
 
 import com.shadorc.shadbot.command.CommandException;
-import com.shadorc.shadbot.core.command.BaseCmd;
-import com.shadorc.shadbot.core.command.CommandCategory;
-import com.shadorc.shadbot.core.command.CommandPermission;
-import com.shadorc.shadbot.core.command.Context;
+import com.shadorc.shadbot.core.command.*;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.guilds.entity.DBMember;
@@ -22,7 +19,7 @@ import reactor.util.function.Tuple2;
 
 import java.util.Optional;
 
-public class ManageCoinsCmd extends BaseCmd {
+public class ManageCoinsCmd extends SubCmd {
 
     private static final int MIN_COINS = 1;
 
@@ -31,8 +28,8 @@ public class ManageCoinsCmd extends BaseCmd {
         ADD, REMOVE, RESET
     }
 
-    public ManageCoinsCmd() {
-        super(CommandCategory.MODERATION, CommandPermission.ADMIN,
+    public ManageCoinsCmd(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.MODERATION, CommandPermission.ADMIN,
                 "manage_coins", "Manage users coins");
 
         this.addOption(option -> option.name("action")

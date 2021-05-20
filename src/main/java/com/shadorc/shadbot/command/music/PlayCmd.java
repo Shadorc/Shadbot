@@ -2,7 +2,7 @@ package com.shadorc.shadbot.command.music;
 
 import com.shadorc.shadbot.command.CommandException;
 import com.shadorc.shadbot.command.MissingPermissionException;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeoutException;
 
 import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 
-public class PlayCmd extends BaseCmd {
+public class PlayCmd extends Cmd {
 
     public PlayCmd() {
         super(CommandCategory.MUSIC, "play", "Play the music(s) from the url, search terms or playlist");

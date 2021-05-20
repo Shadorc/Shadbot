@@ -1,6 +1,6 @@
 package com.shadorc.shadbot.command.currency;
 
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.data.Config;
@@ -10,7 +10,7 @@ import com.shadorc.shadbot.object.Emoji;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-public class CoinsCmd extends BaseCmd {
+public class CoinsCmd extends Cmd {
 
     public CoinsCmd() {
         super(CommandCategory.CURRENCY, "coins", "Show user's coins");

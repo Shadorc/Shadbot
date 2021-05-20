@@ -1,7 +1,7 @@
 package com.shadorc.shadbot.command.fun;
 
 import com.shadorc.shadbot.api.json.joke.JokeResponse;
-import com.shadorc.shadbot.core.command.BaseCmd;
+import com.shadorc.shadbot.core.command.Cmd;
 import com.shadorc.shadbot.core.command.CommandCategory;
 import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
 
-public class JokeCmd extends BaseCmd {
+public class JokeCmd extends Cmd {
 
     private static final String HOME_URL = "https://icanhazdadjoke.com/";
 

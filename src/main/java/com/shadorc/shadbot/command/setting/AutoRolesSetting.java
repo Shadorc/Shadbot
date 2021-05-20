@@ -16,14 +16,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class AutoRolesSetting extends BaseCmd {
+public class AutoRolesSetting extends SubCmd {
 
     private enum Action {
         ADD, REMOVE
     }
 
-    public AutoRolesSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public AutoRolesSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "auto_roles", "Manage auto assigned role(s)");
 
         this.addOption("action", "Whether to add or remove a role from the auto ones", true,

@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RestrictedChannelsSetting extends BaseCmd {
+public class RestrictedChannelsSetting extends SubCmd {
 
     private enum Action {
         ADD, REMOVE
@@ -26,8 +26,8 @@ public class RestrictedChannelsSetting extends BaseCmd {
         COMMAND, CATEGORY
     }
 
-    public RestrictedChannelsSetting() {
-        super(CommandCategory.SETTING, CommandPermission.ADMIN,
+    public RestrictedChannelsSetting(final GroupCmd groupCmd) {
+        super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "restricted_channels", "Restrict commands to specific channels");
 
         this.addOption(option -> option.name("action")
@@ -58,16 +58,16 @@ public class RestrictedChannelsSetting extends BaseCmd {
         final Mono<TextChannel> getChannel = context.getOptionAsChannel("channel")
                 .ofType(TextChannel.class);
 
-        final Set<BaseCmd> commands = new HashSet<>();
+        final Set<Cmd> commands = new HashSet<>();
         switch (type) {
             case COMMAND -> {
-                final BaseCmd command = CommandManager.getCommand(name);
-                if (command == null || command instanceof BaseCmdGroup) {
+                final Cmd command = CommandManager.getCommand(name);
+                if (command == null) {
                     return Mono.error(new CommandException(context.localize("restrictedchannels.invalid.command")
                             .formatted(name)));
                 }
 
-                commands.addAll(command.getCommands());
+                commands.add(command);
             }
             case CATEGORY -> {
                 final CommandCategory category = EnumUtil.parseEnum(CommandCategory.class, name);
@@ -75,10 +75,7 @@ public class RestrictedChannelsSetting extends BaseCmd {
                     return Mono.error(new CommandException(context.localize("restrictedchannels.invalid.category")
                             .formatted(name, FormatUtil.format(CommandCategory.class, FormatUtil::capitalizeEnum, ", "))));
                 }
-                commands.addAll(CommandManager.getCommands().values().stream()
-                        .filter(cmd -> cmd.getCategory() == category)
-                        .flatMap(cmd -> cmd.getCommands().stream())
-                        .collect(Collectors.toSet()));
+                commands.addAll(CommandManager.getCommands(category));
             }
         }
 
@@ -86,7 +83,7 @@ public class RestrictedChannelsSetting extends BaseCmd {
                 .switchIfEmpty(Mono.error(new CommandException(context.localize("restrictedchannels.exception.category"))))
                 .flatMap(channel -> {
                     final StringBuilder strBuilder = new StringBuilder();
-                    final Map<Snowflake, Set<BaseCmd>> restrictedCategories = context.getDbGuild().getSettings()
+                    final Map<Snowflake, Set<Cmd>> restrictedCategories = context.getDbGuild().getSettings()
                             .getRestrictedChannels();
 
                     switch (action) {
@@ -116,7 +113,7 @@ public class RestrictedChannelsSetting extends BaseCmd {
                             .collect(Collectors.toMap(
                                     entry -> entry.getKey().asString(),
                                     entry -> entry.getValue().stream()
-                                            .map(BaseCmd::getName)
+                                            .map(Cmd::getName)
                                             .collect(Collectors.toSet())));
 
                     return context.getDbGuild().updateSetting(Setting.RESTRICTED_CHANNELS, setting)
