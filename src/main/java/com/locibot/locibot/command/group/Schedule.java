@@ -32,7 +32,7 @@ public class Schedule extends BaseCmd {
         LocalDate newDate = LocalDate.parse(context.getOptionAsString("date").get(), DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         LocalTime newTime = LocalTime.parse(context.getOptionAsString("time").get());
 
-        if (!group.getOwner().getBean().getName().equals(context.getAuthorName())){
+        if (!group.getOwner().getBean().getName().equals(context.getAuthorName())) {
             return context.createFollowupMessage("Only the group owner is allowed to create a schedule!");
         }
 
@@ -42,9 +42,8 @@ public class Schedule extends BaseCmd {
         group = DatabaseManager.getGroups().getDBGroup(context.getOptionAsString("team_name").get()).block();
         DBGroup finalGroup = group;
 
-        group.getMembers().forEach(dbGroupMember -> {
-            context.getClient().getUserById(dbGroupMember.getId()).block().getPrivateChannel().flatMap(privateChannel -> privateChannel.createEmbed(getMessage(finalGroup, context))).subscribe();
-        });
+        group.getMembers().forEach(dbGroupMember -> context.getClient().getUserById(dbGroupMember.getId()).block().getPrivateChannel()
+                .flatMap(privateChannel -> privateChannel.createEmbed(getMessage(finalGroup, context))).subscribe());
         return context.createFollowupMessage("Group scheduled!");
     }
 
@@ -54,7 +53,7 @@ public class Schedule extends BaseCmd {
 //        LocalTime time = group.getBean().getScheduledTime();
         String dateString = group.getBean().getScheduledDate();
         String timeString = group.getBean().getScheduledTime();
-        if (dateString == null || timeString == null){
+        if (dateString == null || timeString == null) {
             dateString = "---";
             timeString = "---";
         } else {
