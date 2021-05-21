@@ -59,7 +59,7 @@ public class Schedule extends BaseCmd {
 
         String finalDateString = dateString;
         String finalTimeString = timeString;
-        return embedCreateSpec -> embedCreateSpec.setTitle("Team-Invite")
+        return embedCreateSpec -> embedCreateSpec.setTitle("Team-Invite") //TODO: export to a "message manager", so that the thumbnail (and text) will be matched to the group type.
                 .setColor(Color.RED)
                 .setThumbnail("https://img.icons8.com/ios-filled/344/placeholder-thumbnail-xml.png")
                 .setAuthor(user.getUsername(), "", user.getAvatarUrl())
