@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 
 public class Schedule extends BaseCmd {
     protected Schedule() {
-        super(CommandCategory.FUN, "schedule", "schedule a group event");
+        super(CommandCategory.GROUP, "schedule", "schedule a group event");
         this.addOption("team_name", "Team Name", true, ApplicationCommandOptionType.STRING);
         this.addOption("date", "dd.MM.yyyy", true, ApplicationCommandOptionType.STRING);
         this.addOption("time", "hh:mm", true, ApplicationCommandOptionType.STRING);

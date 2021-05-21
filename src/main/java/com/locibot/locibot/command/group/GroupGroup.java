@@ -10,6 +10,6 @@ import java.util.List;
 
 public class GroupGroup extends BaseCmdGroup {
     public GroupGroup() {
-        super(CommandCategory.FUN, CommandPermission.USER_GUILD, "group", "Group Commands", List.of(new Clash(), new AmongUs(), new Schedule()));
+        super(CommandCategory.GROUP, CommandPermission.USER_GUILD, "group", "Group Commands", List.of(new Clash(), new AmongUs(), new Schedule()));
     }
 }

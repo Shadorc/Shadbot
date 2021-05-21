@@ -31,7 +31,7 @@ public abstract class Create extends BaseCmd {
      * @param description command description
      */
     protected Create(int min, int opt, String name, String description, int groupType) {
-        super(CommandCategory.FUN, name, description);
+        super(CommandCategory.GROUP, name, description);
         this.min = min;
         this.opt = opt;
         this.groupType = groupType;
