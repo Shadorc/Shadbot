@@ -30,7 +30,7 @@ public class Schedule extends BaseCmd {
         LocalDate newDate = LocalDate.parse(context.getOptionAsString("date").get(), DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         LocalTime newTime = LocalTime.parse(context.getOptionAsString("time").get());
 
-        if (!group.getOwner().getBean().getName().equals(context.getAuthorName())) {
+        if (!group.getOwner().getBean().getId().equals(context.getAuthor().getId().asLong())) {
             return context.createFollowupMessage("Only the group owner is allowed to create a schedule!");
         }
 

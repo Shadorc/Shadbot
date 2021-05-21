@@ -30,8 +30,6 @@ public class InfoGroupCmd extends BaseCmd {
         } else {
             return getAllGroupInfo(context);
         }
-        //return getAllGroupInfo(context);
-
     }
 
     public Mono<?> getSpecificGroupInfo(Context context, String groupName) {
@@ -48,7 +46,7 @@ public class InfoGroupCmd extends BaseCmd {
                     .setAuthor(owner.getUsername(), "", owner.getAvatarUrl())
                     .addField("Members", group.getMembers().size() + "", true)
                     .addField("Scheduled", dateTime, true)
-                    .addField("Team Created", LocalDate.parse(group.getBean().getCreationDate()).format(DateTimeFormatter.ofPattern("dd. MMMM yyyy")), true);;
+                    .addField("Team Created", LocalDate.parse(group.getBean().getCreationDate()).format(DateTimeFormatter.ofPattern("dd. MMMM yyyy")), true);
             StringBuilder users = new StringBuilder();
             StringBuilder invited = new StringBuilder();
             StringBuilder inviteStatus = new StringBuilder();
