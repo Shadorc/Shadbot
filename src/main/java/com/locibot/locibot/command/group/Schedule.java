@@ -31,6 +31,11 @@ public class Schedule extends BaseCmd {
         DBGroup group = DatabaseManager.getGroups().getDBGroup(context.getOptionAsString("team_name").get()).block();
         LocalDate newDate = LocalDate.parse(context.getOptionAsString("date").get(), DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         LocalTime newTime = LocalTime.parse(context.getOptionAsString("time").get());
+
+        if (!group.getOwner().getBean().getName().equals(context.getAuthorName())){
+            return context.createFollowupMessage("Only the group owner is allowed to create a schedule!");
+        }
+
         group.updateSchedules(newDate, newTime).block();
 
         //update group
