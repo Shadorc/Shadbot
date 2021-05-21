@@ -1,5 +1,6 @@
 package com.locibot.locibot.database.groups;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.locibot.locibot.core.cache.MultiValueCache;
 import com.locibot.locibot.data.Telemetry;
 import com.locibot.locibot.database.DatabaseCollection;
@@ -17,7 +18,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class GroupsCollection extends DatabaseCollection {
@@ -31,6 +34,35 @@ public class GroupsCollection extends DatabaseCollection {
         super(database, "groups");
         this.groupCache = MultiValueCache.Builder.<String, DBGroup>create().withInfiniteTtl().build();
 
+    }
+
+    public List<DBGroup> getAllGroups() {
+        List<DBGroup> dbGroups = new ArrayList<>();
+        List<Document> documents = Flux.from(this.getCollection().find()).collectList().block();
+        if (documents != null)
+            documents.forEach(document -> {
+                try {
+                    dbGroups.add(new DBGroup(NetUtil.MAPPER.readValue(document.toJson(JSON_WRITER_SETTINGS), DBGroupBean.class)));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            });
+        return dbGroups;
+    }
+
+    public boolean containsGroup(String groupName) {
+        List<Document> documents = Flux.from(this.getCollection().find()).collectList().block();
+        if (documents != null) {
+            for (Document document : documents) {
+                try {
+                    if (NetUtil.MAPPER.readValue(document.toJson(JSON_WRITER_SETTINGS), DBGroupBean.class).getGroupName().equals(groupName))
+                        return true;
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
     }
 
 
