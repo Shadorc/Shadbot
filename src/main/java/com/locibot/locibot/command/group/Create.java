@@ -24,10 +24,9 @@ public abstract class Create extends BaseCmd {
     private int groupType;
 
     /**
-     *
-     * @param min count of minimum required members
-     * @param opt count of optional members
-     * @param name command name
+     * @param min         count of minimum required members
+     * @param opt         count of optional members
+     * @param name        command name
      * @param description command description
      */
     protected Create(int min, int opt, String name, String description, int groupType) {
@@ -47,6 +46,8 @@ public abstract class Create extends BaseCmd {
     @Override
     public Mono<?> execute(Context context) {
         String groupName = context.getOptionAsString("team_name").get();
+        if (DatabaseManager.getGroups().containsGroup(groupName))
+            return context.createFollowupMessage("This group name is already taken. Pls try another one.");
         DBGroup group = new DBGroup(groupName, groupType);
         group.insert().block();
         List<DBGroupMember> dbGroupMembers = new ArrayList<>();
@@ -59,7 +60,7 @@ public abstract class Create extends BaseCmd {
         }
         for (int i = 0; i < opt; i++) {
             User user = context.getOptionAsUser("optional_member_" + i).block();
-            if (user != null){
+            if (user != null) {
                 dbGroupMembers.add(new DBGroupMember(user.getId(), groupName, true, false, 0, false));
             }
         }
