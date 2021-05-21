@@ -2,11 +2,9 @@ package com.locibot.locibot.command.group;
 
 import com.locibot.locibot.core.command.BaseCmd;
 import com.locibot.locibot.core.command.CommandCategory;
-import com.locibot.locibot.core.command.CommandPermission;
 import com.locibot.locibot.core.command.Context;
 import com.locibot.locibot.database.DatabaseManager;
 import com.locibot.locibot.database.groups.entity.DBGroup;
-import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
@@ -49,8 +47,6 @@ public class Schedule extends BaseCmd {
 
     public Consumer<EmbedCreateSpec> getMessage(DBGroup group, Context context) {
         User user = context.getEvent().getClient().getUserById(group.getOwner().getId()).block();
-//        LocalDate date = group.getBean().getScheduledDate();
-//        LocalTime time = group.getBean().getScheduledTime();
         String dateString = group.getBean().getScheduledDate();
         String timeString = group.getBean().getScheduledTime();
         if (dateString == null || timeString == null) {
