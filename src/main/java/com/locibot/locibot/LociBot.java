@@ -20,6 +20,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
+import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
 import discord4j.core.retriever.EntityRetrievalStrategy;
@@ -140,9 +141,11 @@ public class LociBot {
                     LociBot.taskManager.schedulePeriodicStats(gateway);
 
                     if (!Config.IS_SNAPSHOT) {
-                        DEFAULT_LOGGER.info("Initializing BotListStats");
-                        LociBot.botListStats = new BotListStats(gateway);
-                        LociBot.taskManager.schedulePostStats(LociBot.botListStats);
+                        if (CredentialManager.get(Credential.BOTLIST_DOT_SPACE_TOKEN) != null) {
+                            DEFAULT_LOGGER.info("Initializing BotListStats");
+                            LociBot.botListStats = new BotListStats(gateway);
+                            LociBot.taskManager.schedulePostStats(LociBot.botListStats);
+                        }
                     }
 
                     DEFAULT_LOGGER.info("Registering listeners");
