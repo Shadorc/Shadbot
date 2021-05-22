@@ -24,7 +24,7 @@ public class Accept extends BaseCmd {
         DBGroup group = DatabaseManager.getGroups().getDBGroup(context.getOptionAsString("group_name").get()).block();
         for (DBGroupMember member : group.getMembers()) {
             if (member.getBean().getId().equals(context.getAuthorId().asLong()) && member.getBean().isInvited()) {
-                return context.createFollowupMessage("You have accepted the invitation! Have fun!").then(group.updateAccept(member.getId(), 1));
+                return context.createFollowupMessage("You have accepted the invite! Have fun!").then(group.updateAccept(member.getId(), 1));
             }
         }
         return context.createFollowupMessage("Nice try! But you are not invited to this group...");
