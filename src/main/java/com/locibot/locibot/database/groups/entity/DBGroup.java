@@ -7,19 +7,18 @@ import com.locibot.locibot.database.SerializableEntity;
 import com.locibot.locibot.database.groups.GroupsCollection;
 import com.locibot.locibot.database.groups.bean.DBGroupBean;
 import com.locibot.locibot.database.guilds.GuildsCollection;
-import com.locibot.locibot.utils.NetUtil;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
-import org.bson.json.JsonWriterSettings;
-import reactor.core.publisher.Flux;
+import discord4j.common.util.Snowflake;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collector;
 
 public class DBGroup extends SerializableEntity<DBGroupBean> implements DatabaseEntity {
 
@@ -91,6 +90,22 @@ public class DBGroup extends SerializableEntity<DBGroupBean> implements Database
                         .doOnNext(result -> GuildsCollection.LOGGER.trace("[DBGroup {}] Group update result: {}",
                                 this.getGroupName(), result))
                         .doOnTerminate(() -> DatabaseManager.getGroups().invalidateCache(this.getGroupName())));
+    }
+
+    public Mono<UpdateResult> updateAccept(Snowflake id, int state) {
+        return Mono.from(DatabaseManager.getGroups()
+                .getCollection()
+                .updateOne(
+                        Filters.and(Filters.eq("_id", this.getGroupName()),
+                                Filters.eq("members._id", id)),
+                        Updates.set("members.$.accepted", state)))
+                .doOnSubscribe(__ -> {
+                    GuildsCollection.LOGGER.debug("[DBGroup {}] Group update: {}", this.getGroupName(), state);
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getUsers().getName()).inc();
+                })
+                .doOnNext(result -> GuildsCollection.LOGGER.trace("[DBGroup {}] Group update result: {}",
+                        this.getGroupName(), result))
+                .doOnTerminate(() -> DatabaseManager.getGroups().invalidateCache(this.getGroupName()));
     }
 
     @Override
