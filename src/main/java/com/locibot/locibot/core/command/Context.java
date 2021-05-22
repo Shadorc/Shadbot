@@ -191,8 +191,7 @@ public class Context implements InteractionContext, I18nContext {
                         DiscordUtil.hasPermission(channel, this.getAuthorId(), Permission.ADMINISTRATOR),
                         Mono.just(channel.getType() == Channel.Type.DM)))
                 .map(__ -> CommandPermission.ADMIN);
-
-        return Flux.merge(ownerPerm, adminPerm, Mono.just(CommandPermission.USER_GUILD));
+        return Flux.merge(ownerPerm, adminPerm, Mono.just(CommandPermission.USER_GUILD), Mono.just(CommandPermission.USER_GLOBAL));
     }
 
     public GuildMusic requireGuildMusic() {
