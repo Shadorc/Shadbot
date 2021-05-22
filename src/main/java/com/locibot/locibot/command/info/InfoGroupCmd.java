@@ -18,7 +18,7 @@ import java.util.Optional;
 
 public class InfoGroupCmd extends BaseCmd {
     protected InfoGroupCmd() {
-        super(CommandCategory.INFO, "group_details", "get a list of all groups");
+        super(CommandCategory.INFO, "groups", "get a list of all groups");
         this.addOption("group_name", "group name", false, ApplicationCommandOptionType.STRING);
     }
 
@@ -33,6 +33,10 @@ public class InfoGroupCmd extends BaseCmd {
     }
 
     public Mono<?> getSpecificGroupInfo(Context context, String groupName) {
+        if (!DatabaseManager.getGroups().containsGroup(groupName)){
+            return context.createFollowupMessage("Huh? The group you are looking  for does not exist!");
+        }
+
         DBGroup group = DatabaseManager.getGroups().getDBGroup(groupName).block();
         return context.createFollowupMessage(embedCreateSpec -> {
             User owner = context.getClient().getUserById(group.getOwner().getId()).block();
@@ -67,7 +71,7 @@ public class InfoGroupCmd extends BaseCmd {
         groups.sort((o1, o2) -> Integer.compare(o2.getMembers().size(), o1.getMembers().size()));
         return context.createFollowupMessage(embedCreateSpec -> {
             embedCreateSpec.setTitle("Group List")
-                    .setFooter("If you need more information about a group, use /group info <groupName>", "https://img.icons8.com/cotton/344/info--v3.png")
+                    .setFooter("If you need more information about a group, use \"/info groups <groupName>\"", "https://img.icons8.com/cotton/344/info--v3.png")
                     .setColor(Color.GREEN)
                     .setThumbnail("https://img.icons8.com/cotton/344/info--v3.png");
             StringBuilder name = new StringBuilder();
@@ -79,6 +83,11 @@ public class InfoGroupCmd extends BaseCmd {
                 String date = group.getBean().getScheduledDate();
                 scheduled.append(date == null ? "---" : LocalDate.parse(date).format(DateTimeFormatter.ofPattern("dd. MMMM yyyy")) + " - " + group.getBean().getScheduledTime()).append(System.getProperty("line.separator"));
             });
+            if (name.isEmpty() || count.isEmpty()){
+                name.append("---");
+                count.append("---");
+                scheduled.append("---");
+            }
             embedCreateSpec.addField("Name", name.toString(), true)
                     .addField("Member Count", count.toString(), true)
                     .addField("Scheduled", scheduled.toString(), true);

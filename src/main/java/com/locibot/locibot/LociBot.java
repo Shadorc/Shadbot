@@ -111,8 +111,8 @@ public class LociBot {
         final long applicationId = Snowflake.asLong(applicationInfo.id());
         DEFAULT_LOGGER.info("Owner ID: {} | Application ID: {}", LociBot.OWNER_ID.get(), applicationId);
 
-//        DEFAULT_LOGGER.info("Registering commands");
-//        CommandManager.register(client.getApplicationService(), applicationId).block();
+        DEFAULT_LOGGER.info("Registering commands");
+        CommandManager.register(client.getApplicationService(), applicationId).block();
 
         DEFAULT_LOGGER.info("Connecting to Discord");
         client.gateway()
