@@ -8,6 +8,7 @@ import com.locibot.locibot.command.donator.DonatorGroup;
 import com.locibot.locibot.command.fun.Hello;
 import com.locibot.locibot.command.game.GameGroup;
 import com.locibot.locibot.command.gamestats.GameStatsGroup;
+import com.locibot.locibot.command.group.Accept;
 import com.locibot.locibot.command.group.GroupGroup;
 import com.locibot.locibot.command.image.ImageGroup;
 import com.locibot.locibot.command.image.Rule34Cmd;
@@ -23,9 +24,6 @@ import com.locibot.locibot.command.util.translate.TranslateCmd;
 import com.locibot.locibot.command.fun.ChatCmd;
 import com.locibot.locibot.command.fun.JokeCmd;
 import com.locibot.locibot.command.fun.ThisDayCmd;
-import com.locibot.locibot.command.music.*;
-import com.locibot.locibot.command.standalone.*;
-import com.locibot.locibot.command.util.*;
 import com.locibot.locibot.data.Config;
 import com.locibot.locibot.object.ExceptionHandler;
 import discord4j.rest.service.ApplicationService;
@@ -60,7 +58,9 @@ public class CommandManager {
                 // Util
                 new MathCmd(), new LyricsCmd(), new UrbanCmd(), new WeatherCmd(), new WikipediaCmd(),
                 new TranslateCmd(), new PollCmd(),
-                new GroupGroup());
+                new GroupGroup(),
+                //Global
+                new Accept());
     }
 
     private static Map<String, BaseCmd> initialize(BaseCmd... cmds) {
