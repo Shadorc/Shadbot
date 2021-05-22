@@ -17,7 +17,6 @@ public class Hello extends BaseCmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        DBGroup group = new DBGroup("TEST");
-        return context.getEvent().getInteractionResponse().createFollowupMessage("Hello").then(group.insert()).log();
+        return context.getEvent().getInteractionResponse().createFollowupMessage("Hello");
     }
 }
