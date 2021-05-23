@@ -97,7 +97,7 @@ public class DBGroup extends SerializableEntity<DBGroupBean> implements Database
                 .getCollection()
                 .updateOne(
                         Filters.and(Filters.eq("_id", this.getGroupName()),
-                                Filters.eq("members._id", id)),
+                                Filters.eq("members._id", id.asLong())),
                         Updates.set("members.$.accepted", state)))
                 .doOnSubscribe(__ -> {
                     GuildsCollection.LOGGER.debug("[DBGroup {}] Group update: {}", this.getGroupName(), state);
