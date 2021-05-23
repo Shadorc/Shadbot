@@ -65,9 +65,7 @@ public class DBGroup extends SerializableEntity<DBGroupBean> implements Database
                 .updateOne(
                         Filters.eq("_id", this.getGroupName()),
                         List.of(Updates.set("scheduledDate", localDate.toString()),
-                                Updates.set("scheduledTime", localTime.toString()),
-                                Updates.set("members.invited", true),
-                                Updates.set("members.accepted", 0)),
+                                Updates.set("scheduledTime", localTime.toString())),
                         new UpdateOptions().upsert(true)))
                 .doOnSubscribe(__ -> {
                     GuildsCollection.LOGGER.debug("[DBGroup {}] Group update: {}", this.getGroupName(), localDate.toString() + " " + localTime.toString());
@@ -75,21 +73,23 @@ public class DBGroup extends SerializableEntity<DBGroupBean> implements Database
                 })
                 .doOnNext(result -> GuildsCollection.LOGGER.trace("[DBGroup {}] Group update result: {}",
                         this.getGroupName(), result))
-                .doOnTerminate(() -> DatabaseManager.getGroups().invalidateCache(this.getGroupName()))
-                //update only the owner
-                .then(Mono.from(DatabaseManager.getGroups()
-                        .getCollection()
-                        .updateOne(
-                                Filters.and(Filters.eq("_id", this.getGroupName()),
-                                        Filters.eq("members._id", getOwner().getId().asLong())),
-                                Updates.set("members.$.accepted", 1)))
-                        .doOnSubscribe(__ -> {
-                            GuildsCollection.LOGGER.debug("[DBGroup {}] Group update: {}", this.getGroupName(), 1);
-                            Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getUsers().getName()).inc();
-                        })
-                        .doOnNext(result -> GuildsCollection.LOGGER.trace("[DBGroup {}] Group update result: {}",
-                                this.getGroupName(), result))
-                        .doOnTerminate(() -> DatabaseManager.getGroups().invalidateCache(this.getGroupName())));
+                .doOnTerminate(() -> DatabaseManager.getGroups().invalidateCache(this.getGroupName()));
+    }
+
+    public Mono<UpdateResult> updateInvited(Snowflake id, boolean state) {
+        return Mono.from(DatabaseManager.getGroups()
+                .getCollection()
+                .updateOne(
+                        Filters.and(Filters.eq("_id", this.getGroupName()),
+                                Filters.eq("members._id", id.asLong())),
+                        Updates.set("members.$.invited", state)))
+                .doOnSubscribe(__ -> {
+                    GuildsCollection.LOGGER.debug("[DBGroup {}] Group update: {}", this.getGroupName(), state);
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getUsers().getName()).inc();
+                })
+                .doOnNext(result -> GuildsCollection.LOGGER.trace("[DBGroup {}] Group update result: {}",
+                        this.getGroupName(), result))
+                .doOnTerminate(() -> DatabaseManager.getGroups().invalidateCache(this.getGroupName()));
     }
 
     public Mono<UpdateResult> updateAccept(Snowflake id, int state) {
