@@ -8,13 +8,14 @@ import com.locibot.locibot.database.groups.entity.DBGroup;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
-import discord4j.rest.util.Color;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
+
+import static com.locibot.locibot.command.group.GroupUtil.sendInviteMessage;
 
 public class Schedule extends BaseCmd {
     protected Schedule() {
@@ -34,39 +35,32 @@ public class Schedule extends BaseCmd {
             return context.createFollowupMessage("Only the group owner is allowed to create a schedule!");
         }
 
+        //update database
         group.updateSchedules(newDate, newTime).block();
+        DBGroup finalGroup1 = group;
+        group.getMembers().forEach(member -> {
+            if (member.getBean().isOwner()) {
+                finalGroup1.updateInvited(member.getId(), true).then(finalGroup1.updateAccept(member.getId(), 1)).block();
+            } else if (!member.getBean().isOptional()) {
+                finalGroup1.updateInvited(member.getId(), true).then(finalGroup1.updateAccept(member.getId(), 0)).block();
+            }
+        });
 
-        //update group
+        //update group object
         group = DatabaseManager.getGroups().getDBGroup(context.getOptionAsString("team_name").get()).block();
         DBGroup finalGroup = group;
 
-        group.getMembers().forEach(dbGroupMember -> context.getClient().getUserById(dbGroupMember.getId()).block().getPrivateChannel()
-                .flatMap(privateChannel -> privateChannel.createEmbed(getMessage(finalGroup, context))).subscribe());
+        //send invitation messages
+        group.getMembers().forEach(dbGroupMember -> {
+            if (dbGroupMember.getBean().isInvited())
+                context.getClient().getUserById(dbGroupMember.getId()).block().getPrivateChannel()
+                        .flatMap(privateChannel -> privateChannel.createEmbed(getMessage(finalGroup, context))).subscribe();
+        });
         return context.createFollowupMessage("Group scheduled!");
     }
 
     public Consumer<EmbedCreateSpec> getMessage(DBGroup group, Context context) {
         User user = context.getEvent().getClient().getUserById(group.getOwner().getId()).block();
-        String dateString = group.getBean().getScheduledDate();
-        String timeString = group.getBean().getScheduledTime();
-        if (dateString == null || timeString == null) {
-            dateString = "---";
-            timeString = "---";
-        } else {
-            dateString = LocalDate.parse(dateString).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-        }
-
-
-        String finalDateString = dateString;
-        String finalTimeString = timeString;
-        return embedCreateSpec -> embedCreateSpec.setTitle("Team-Invite") //TODO: export to a "message manager", so that the thumbnail (and text) will be matched to the group type.
-                .setColor(Color.RED)
-                .setThumbnail("https://img.icons8.com/ios-filled/344/placeholder-thumbnail-xml.png")
-                .setAuthor(user.getUsername(), "", user.getAvatarUrl())
-                .addField("Invitation to " + group.getBean().getGroupName(), "You got invited from " + user.getUsername() + "!", false)
-                .addField("Date", finalDateString, true)
-                .addField("Time", finalTimeString, true)
-                .addField("Accept/ Decline", "If you are interested to join the party, answer with \"/accept " + group.getBean().getGroupName() + "\"\n" +
-                        "You can decline the invite with \"/decline " + group.getBean().getGroupName() + "\" :(", false);
+        return sendInviteMessage(group, user);
     }
 }
