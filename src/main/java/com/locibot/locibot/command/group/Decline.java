@@ -7,11 +7,11 @@ import com.locibot.locibot.core.command.Context;
 import com.locibot.locibot.database.DatabaseManager;
 import com.locibot.locibot.database.groups.entity.DBGroup;
 import com.locibot.locibot.database.groups.entity.DBGroupMember;
+import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
@@ -31,8 +31,10 @@ public class Decline extends BaseCmd {
         return DatabaseManager.getGroups().getDBGroup(context.getOptionAsString("group_name").orElse("")).flatMap(group -> {
                     for (DBGroupMember member : group.getMembers()) {
                         if (member.getBean().getId().equals(context.getAuthorId().asLong()) && member.getBean().isInvited()) {
+                            System.out.println("Inside");
                             //invite next optional member
                             Mono<Message> context1 = inviteNext(context, group, member);
+                            System.out.println(context1 == null);
                             if (context1 != null) return context1;
                         }
                     }
@@ -41,9 +43,9 @@ public class Decline extends BaseCmd {
         );
     }
 
-    @Nullable
     private Mono<Message> inviteNext(Context context, DBGroup group, DBGroupMember member) {
         for (DBGroupMember dbGroupMember : group.getMembers()) {
+            //find optional user
             if (!dbGroupMember.getBean().isInvited() && dbGroupMember.getBean().isOptional()) {
                 return context.getEvent().getClient().getUserById(dbGroupMember.getId()).flatMap(user -> {
                             //update database
@@ -58,7 +60,15 @@ public class Decline extends BaseCmd {
                 );
             }
         }
-        return null;
+        //no optional user found
+        return context.createFollowupMessage("You have declined the invitation!").then(group.updateAccept(member.getId(), 2))
+                //inform owner
+                .then(Mono.zip(context.getClient().getUserById(Snowflake.of(member.getBean().getId())),
+                        context.getClient().getUserById(group.getOwner().getId()))
+                        .flatMap(TupleUtils.function((declinedUser, owner) ->
+                                owner.getPrivateChannel().flatMap(privateChannel ->
+                                        privateChannel.createMessage(declinedUser.getUsername() + " declined your invitation to " + group.getGroupName() + "!\n" +
+                                                "There was no optional member, who could be invited!")))));
     }
 
     @NotNull
