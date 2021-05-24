@@ -60,9 +60,11 @@ public class RpsCmd extends BaseCmd {
                     }));
         } else if (userHandsign == botHandsign) {
             player.resetWinStreak();
+            Telemetry.RPS_SUMMARY.labels("draw");
             strBuilder.append(context.localize("rps.draw"));
         } else {
             player.resetWinStreak();
+            Telemetry.RPS_SUMMARY.labels("lose");
             strBuilder.append(context.localize("rps.lose"));
         }
 

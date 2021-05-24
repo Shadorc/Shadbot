@@ -31,10 +31,8 @@ public class Decline extends BaseCmd {
         return DatabaseManager.getGroups().getDBGroup(context.getOptionAsString("group_name").orElse("")).flatMap(group -> {
                     for (DBGroupMember member : group.getMembers()) {
                         if (member.getBean().getId().equals(context.getAuthorId().asLong()) && member.getBean().isInvited()) {
-                            System.out.println("Inside");
                             //invite next optional member
                             Mono<Message> context1 = inviteNext(context, group, member);
-                            System.out.println(context1 == null);
                             if (context1 != null) return context1;
                         }
                     }

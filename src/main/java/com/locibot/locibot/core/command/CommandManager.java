@@ -77,7 +77,7 @@ public class CommandManager {
 
     public static Mono<Void> register(ApplicationService applicationService, long applicationId) {
         final Mono<Long> registerGuildCommands = Flux.fromIterable(COMMANDS_MAP.values())
-                .filter(cmd -> cmd.getCategory() == CommandCategory.OWNER || cmd.getPermission() == CommandPermission.USER_GUILD)
+                .filter(cmd -> cmd.getCategory() == CommandCategory.OWNER || cmd.getPermission() == CommandPermission.USER_GUILD || cmd.getPermission() == CommandPermission.ADMIN)
                 .map(BaseCmd::asRequest)
                 .collectList()
                 .flatMapMany(requests -> applicationService
@@ -88,7 +88,7 @@ public class CommandManager {
                 .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err)));
 
         final Mono<Long> registerGuildCommands2 = Flux.fromIterable(COMMANDS_MAP.values())
-                .filter(cmd -> cmd.getCategory() == CommandCategory.OWNER || cmd.getPermission() == CommandPermission.USER_GUILD)
+                .filter(cmd -> cmd.getCategory() == CommandCategory.OWNER || cmd.getPermission() == CommandPermission.USER_GUILD || cmd.getPermission() == CommandPermission.ADMIN)
                 .map(BaseCmd::asRequest)
                 .collectList()
                 .flatMapMany(requests -> applicationService

@@ -14,7 +14,7 @@ public class GroupGroup extends BaseCmdGroup {
         super(CommandCategory.GROUP, CommandPermission.USER_GUILD, "group", "Group Commands",
                 List.of(
                         //core
-                        new Schedule(),
+                        new Schedule(), new Delete(),
                         //Groups
                         new Clash(), new AmongUs()));
     }

@@ -125,6 +125,15 @@ public class DBGroup extends SerializableEntity<DBGroupBean> implements Database
 
     @Override
     public Mono<Void> delete() {
-        return null;
+        return Mono.from(DatabaseManager.getGroups()
+                .getCollection()
+                .deleteOne(Filters.eq("_id", this.getGroupName())))
+                .doOnSubscribe(__ -> {
+                    GuildsCollection.LOGGER.debug("[DBGroup {}] Deletion", this.getGroupName());
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGroups().getName()).inc();
+                })
+                .doOnNext(result -> GuildsCollection.LOGGER.trace("[DBGroup {}] Deletion result: {}", this.getGroupName(), result))
+                .doOnTerminate(() -> DatabaseManager.getGroups().invalidateCache(this.getGroupName()))
+                .then();
     }
 }
