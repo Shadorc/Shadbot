@@ -45,7 +45,8 @@ public class DatabaseManager {
             final String port = CredentialManager.get(Credential.DATABASE_PORT);
             if (username != null && pwd != null && host != null && port != null) {
                 settingsBuilder.applyConnectionString(new ConnectionString(
-                        "mongodb://%s:%s@%s:%s/%s".formatted(username, pwd, host, port, Config.DATABASE_NAME)));
+                        //"mongodb://%s:%s@%s:%s/%s".formatted(username, pwd, host, port, Config.DATABASE_NAME)));
+                        "mongodb+srv://%s:%s@%s/%s".formatted(username, pwd, host, Config.DATABASE_NAME)));
             }
         }
 
