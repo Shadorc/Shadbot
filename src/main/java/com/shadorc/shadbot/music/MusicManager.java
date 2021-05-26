@@ -134,9 +134,9 @@ public class MusicManager {
                 .map(GuildMusic::getGateway)
                 .doOnEach(it -> LOGGER.info("{Guild ID: {}} getGateway: {}", guildId.asString(), it))
                 .map(GatewayDiscordClient::getVoiceConnectionRegistry)
-                .doOnEach(it -> LOGGER.info("{Guild ID: {}} getVoiceConnectionRegistry: {}" , guildId.asString(), it))
+                .doOnEach(it -> LOGGER.info("{Guild ID: {}} getVoiceConnectionRegistry: {}", guildId.asString(), it))
                 .flatMap(registry -> registry.getVoiceConnection(guildId))
-                .doOnEach(it -> LOGGER.info("{Guild ID: {}} getVoiceConnection: {}" , guildId.asString(), it))
+                .doOnEach(it -> LOGGER.info("{Guild ID: {}} getVoiceConnection: {}", guildId.asString(), it))
                 .flatMap(VoiceConnection::disconnect)
                 .log("%s:destroyConnection".formatted(guildId.asString()));
     }

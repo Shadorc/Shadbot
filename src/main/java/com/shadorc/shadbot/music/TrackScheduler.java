@@ -3,7 +3,6 @@ package com.shadorc.shadbot.music;
 import com.sedmelluq.discord.lavaplayer.filter.equalizer.EqualizerFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackState;
 import com.shadorc.shadbot.utils.NumberUtil;
 import reactor.util.annotation.Nullable;
 
