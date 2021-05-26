@@ -26,8 +26,11 @@ public class AutoRolesSetting extends SubCmd {
         super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "auto_roles", "Manage auto assigned role(s)");
 
-        this.addOption("action", "Whether to add or remove a role from the auto ones", true,
-                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Action.class));
+        this.addOption(option -> option.name("action")
+                .description("Whether to add or remove a role from the auto ones")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Action.class)));
         this.addOption("role1", "The first role", true, ApplicationCommandOptionType.ROLE);
         this.addOption("role2", "The second role", false, ApplicationCommandOptionType.ROLE);
         this.addOption("role3", "The third role", false, ApplicationCommandOptionType.ROLE);

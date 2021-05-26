@@ -50,10 +50,6 @@ public class AllowedRolesSetting extends SubCmd {
                 .description("The fifth role")
                 .required(false)
                 .type(ApplicationCommandOptionType.ROLE.getValue()));
-
-/* TODO               .addField("Info", "**server owner** and **administrators** "
-                        + "will always be able to interact with Shadbot.", false)
- */
     }
 
     @Override

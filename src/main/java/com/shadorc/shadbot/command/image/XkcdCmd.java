@@ -33,8 +33,11 @@ public class XkcdCmd extends SubCmd {
         super(groupCmd, CommandCategory.IMAGE, "xkcd", "Show random comic from XKCD");
         this.latestId = new AtomicInteger();
 
-        this.addOption("sort", "Sorting option, random by default", false,
-                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Sort.class));
+        this.addOption(option -> option.name("sort")
+                .description("Sorting option, random by default")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Sort.class)));
     }
 
     @Override

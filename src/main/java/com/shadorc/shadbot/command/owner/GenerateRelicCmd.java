@@ -13,8 +13,11 @@ public class GenerateRelicCmd extends SubCmd {
 
     public GenerateRelicCmd(final GroupCmd groupCmd) {
         super(groupCmd, CommandCategory.OWNER, CommandPermission.OWNER, "generate_relic", "Generate a relic");
-        this.addOption("type", "Relic type", true,
-                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(RelicType.class));
+        this.addOption(option -> option.name("type")
+                .description("Relic type")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(RelicType.class)));
     }
 
     @Override

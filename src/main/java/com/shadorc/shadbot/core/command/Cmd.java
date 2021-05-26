@@ -3,7 +3,6 @@ package com.shadorc.shadbot.core.command;
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.discordjson.json.ApplicationCommandOptionChoiceData;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.discordjson.json.ImmutableApplicationCommandOptionData;
@@ -119,13 +118,6 @@ public abstract class Cmd {
     // TODO: Remove
     public void addOption(String name, String description, boolean required, ApplicationCommandOptionType type) {
         this.addOption(option -> option.name(name).description(description).required(required).type(type.getValue()));
-    }
-
-    // TODO: Remove
-    public void addOption(String name, String description, boolean required, ApplicationCommandOptionType type,
-                          List<ApplicationCommandOptionChoiceData> choices) {
-        this.addOption(option -> option.name(name).description(description)
-                .required(required).type(type.getValue()).choices(choices));
     }
 
     public void addOption(Consumer<ImmutableApplicationCommandOptionData.Builder> option) {

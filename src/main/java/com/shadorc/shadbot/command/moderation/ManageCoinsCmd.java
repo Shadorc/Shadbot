@@ -23,7 +23,6 @@ public class ManageCoinsCmd extends SubCmd {
 
     private static final int MIN_COINS = 1;
 
-    // TODO Improvement: Transform these actions as sub-commands
     private enum Action {
         ADD, REMOVE, RESET
     }

@@ -26,10 +26,16 @@ public class AutoMessagesSetting extends SubCmd {
         super(groupCmd, CommandCategory.SETTING, CommandPermission.ADMIN,
                 "auto_messages", "Manage auto-message(s) on user join/leave");
 
-        this.addOption("action", "Whether to enable or disable automatic messages", true,
-                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Action.class));
-        this.addOption("type", "The type of automatic message to configure", true,
-                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Type.class));
+        this.addOption(option -> option.name("action")
+                .description("Whether to enable or disable automatic messages")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Action.class)));
+        this.addOption(option -> option.name("type")
+                .description("The type of automatic message to configure")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Type.class)));
         this.addOption("message", "The message to automatically send", false, ApplicationCommandOptionType.STRING);
         this.addOption("channel", "The channel in which send the automatic message", false, ApplicationCommandOptionType.CHANNEL);
     }

@@ -53,10 +53,15 @@ public class OverwatchCmd extends SubCmd {
 
     public OverwatchCmd(final GroupCmd groupCmd) {
         super(groupCmd, CommandCategory.GAMESTATS, "overwatch", "Search for Overwatch statistics");
-        this.addOption("platform", "User's platform", true, ApplicationCommandOptionType.STRING,
-                DiscordUtil.toOptions(Platform.class));
-        this.addOption("battletag", "User's battletag, case sensitive", true,
-                ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("platform")
+                .description("User's platform")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Platform.class)));
+        this.addOption(option -> option.name("battletag")
+                .description("User's battletag, case sensitive")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
 
         this.cachedValues = MultiValueCache.Builder.<String, OverwatchProfile>create()
                 .withTtl(Config.CACHE_TTL)

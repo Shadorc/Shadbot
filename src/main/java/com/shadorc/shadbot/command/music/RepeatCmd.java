@@ -14,8 +14,11 @@ public class RepeatCmd extends Cmd {
 
     public RepeatCmd() {
         super(CommandCategory.MUSIC, "repeat", "Toggle song/playlist repetition");
-        this.addOption("mode", "none/song/playlist (disable repetition or repeat the current song/playlist)",
-                false, ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(TrackScheduler.RepeatMode.class));
+        this.addOption(option -> option.name("mode")
+                .description("none/song/playlist (disable repetition or repeat the current song/playlist)")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(TrackScheduler.RepeatMode.class)));
     }
 
     @Override

@@ -36,8 +36,11 @@ public class FortniteCmd extends SubCmd {
 
     public FortniteCmd(final GroupCmd groupCmd) {
         super(groupCmd, CommandCategory.GAMESTATS, "fortnite", "Search for Fortnite statistics");
-        this.addOption("platform", "User's platform", true, ApplicationCommandOptionType.STRING,
-                DiscordUtil.toOptions(Platform.class));
+        this.addOption(option -> option.name("platform")
+                .description("User's platform")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Platform.class)));
         this.addOption("username", "Epic nickname", true, ApplicationCommandOptionType.STRING);
 
         this.cachedValues = MultiValueCache.Builder.<String, FortniteResponse>create()

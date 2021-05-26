@@ -21,10 +21,16 @@ public class ManageAchievementsCmd extends SubCmd {
     public ManageAchievementsCmd(final GroupCmd groupCmd) {
         super(groupCmd, CommandCategory.OWNER, CommandPermission.OWNER, "manage_achievements",
                 "Manage user's achievements");
-        this.addOption("action", "Whether to add or remove an achievment", true, ApplicationCommandOptionType.STRING,
-                DiscordUtil.toOptions(Action.class));
-        this.addOption("achievement", "The achievement", true,
-                ApplicationCommandOptionType.STRING, DiscordUtil.toOptions(Achievement.class));
+        this.addOption(option -> option.name("action")
+                .description("Whether to add or remove an achievment")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Action.class)));
+        this.addOption(option -> option.name("achievement")
+                .description("The achievement")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue())
+                .choices(DiscordUtil.toOptions(Achievement.class)));
         this.addOption("user", "The user", true, ApplicationCommandOptionType.USER);
     }
 
