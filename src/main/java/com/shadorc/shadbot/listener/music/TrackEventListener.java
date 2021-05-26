@@ -89,7 +89,8 @@ public class TrackEventListener extends AudioEventAdapter {
                     if (errorCount < IGNORED_ERROR_THRESHOLD) {
                         return guildMusic.getMessageChannel()
                                 .flatMap(channel -> DiscordUtil.sendMessage(Emoji.RED_CROSS,
-                                        I18nManager.localize(this.locale, "trackevent.exception"), channel))
+                                        I18nManager.localize(this.locale, "trackevent.exception")
+                                                .formatted(errMessage.toLowerCase()), channel))
                                 .then(this.nextOrEnd(guildMusic));
                     } else if (errorCount == IGNORED_ERROR_THRESHOLD) {
                         LOGGER.info("{Guild ID: {}} Too many errors in a row. They will be ignored until a music can be played.",
