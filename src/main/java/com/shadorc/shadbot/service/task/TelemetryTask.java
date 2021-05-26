@@ -55,6 +55,7 @@ public class TelemetryTask implements Task {
                     Telemetry.PROCESS_MAX_MEMORY.set(SystemUtil.getProcessMaxMemory());
 
                     Telemetry.GUILD_COUNT_GAUGE.set(Telemetry.GUILD_IDS.size());
+                    Telemetry.VOICE_COUNT_GAUGE.set(Telemetry.CONNECTED_VOICE_CHANNEL_IDS.size());
                     Telemetry.UNIQUE_INTERACTING_USERS.set(Telemetry.INTERACTING_USERS.size());
 
                     for (int i = 0; i < group.getShardCount(); ++i) {

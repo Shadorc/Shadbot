@@ -17,6 +17,8 @@ import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 import reactor.util.Logger;
 
+import java.util.function.Predicate;
+
 public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateEvent> {
 
     private static final Logger LOGGER = LogUtil.getLogger(VoiceStateUpdateListener.class, LogUtil.Category.MUSIC);
@@ -38,13 +40,11 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
             }
             if (event.isLeaveEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel left", guildId.asString());
-                // TODO Bug: It's possible that, on restart without previous shutdown, voice channel is left with the
-                //  gauge being 0 which will set it to a negative value
-                Telemetry.VOICE_COUNT_GAUGE.dec();
+                Telemetry.CONNECTED_VOICE_CHANNEL_IDS.remove(guildId.asLong());
                 return MusicManager.destroyConnection(guildId);
             } else if (event.isJoinEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel joined", guildId.asString());
-                Telemetry.VOICE_COUNT_GAUGE.inc();
+                Telemetry.CONNECTED_VOICE_CHANNEL_IDS.add(guildId.asLong());
                 return Mono.empty();
             } else if (event.isMoveEvent()) {
                 LOGGER.info("{Guild ID: {}} Voice channel moved", guildId.asString());
@@ -91,12 +91,13 @@ public class VoiceStateUpdateListener implements EventListener<VoiceStateUpdateE
                                 guildMusic.getTrackScheduler().getAudioPlayer().setPaused(false);
                                 guildMusic.cancelLeave();
                                 return I18nManager.localize(locale, "voicestateupdate.somebody.joined");
-                            } else {
-                                LOGGER.error("{Guild ID: {}} Illegal state detected! Member count: {}, leaving scheduled: {}",
-                                        guildId.asString(), memberCount, guildMusic.isLeavingScheduled());
-                                return "";
                             }
+
+                            LOGGER.error("{Guild ID: {}} Illegal state detected! Member count: {}, leaving scheduled: {}",
+                                    guildId.asString(), memberCount, guildMusic.isLeavingScheduled());
+                            return "";
                         }))
+                        .filter(Predicate.not(String::isEmpty))
                         .flatMap(content -> guildMusic.getMessageChannel()
                                 .flatMap(channel -> DiscordUtil.sendMessage(Emoji.INFO + " " + content, channel))));
     }
