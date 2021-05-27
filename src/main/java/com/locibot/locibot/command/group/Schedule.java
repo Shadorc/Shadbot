@@ -15,6 +15,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 
+import static com.locibot.locibot.command.group.GroupUtil.parseIntToGroupType;
 import static com.locibot.locibot.command.group.GroupUtil.sendInviteMessage;
 
 public class Schedule extends BaseCmd {
@@ -38,13 +39,22 @@ public class Schedule extends BaseCmd {
         //update database
         group.updateSchedules(newDate, newTime).block();
         DBGroup finalGroup1 = group;
-        group.getMembers().forEach(member -> {
-            if (member.getBean().isOwner()) {
-                finalGroup1.updateInvited(member.getId(), true).then(finalGroup1.updateAccept(member.getId(), 1)).block();
-            } else if (!member.getBean().isOptional()) {
-                finalGroup1.updateInvited(member.getId(), true).then(finalGroup1.updateAccept(member.getId(), 0)).block();
-            }
-        });
+        if (parseIntToGroupType(group.getBean().getTeamType()).isInviteOptional()) {
+            group.getMembers().forEach(member -> {
+                if (member.getBean().isOwner()) {
+                    finalGroup1.updateInvited(member.getId(), true).then(finalGroup1.updateAccept(member.getId(), 1)).block();
+                } else {
+                    finalGroup1.updateInvited(member.getId(), true).then(finalGroup1.updateAccept(member.getId(), 0)).block();
+                }
+            });
+        } else
+            group.getMembers().forEach(member -> {
+                if (member.getBean().isOwner()) {
+                    finalGroup1.updateInvited(member.getId(), true).then(finalGroup1.updateAccept(member.getId(), 1)).block();
+                } else if (!member.getBean().isOptional()) {
+                    finalGroup1.updateInvited(member.getId(), true).then(finalGroup1.updateAccept(member.getId(), 0)).block();
+                }
+            });
 
         //update group object
         group = DatabaseManager.getGroups().getDBGroup(context.getOptionAsString("team_name").get()).block();
