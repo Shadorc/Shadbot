@@ -6,19 +6,20 @@ import com.locibot.locibot.database.DatabaseManager;
 import com.locibot.locibot.database.SerializableEntity;
 import com.locibot.locibot.database.groups.GroupsCollection;
 import com.locibot.locibot.database.groups.bean.DBGroupBean;
+import com.locibot.locibot.database.groups.bean.DBGroupMemberBean;
 import com.locibot.locibot.database.guilds.GuildsCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import discord4j.common.util.Snowflake;
+import discord4j.core.object.entity.User;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collector;
 
 public class DBGroup extends SerializableEntity<DBGroupBean> implements DatabaseEntity {
 
@@ -135,5 +136,21 @@ public class DBGroup extends SerializableEntity<DBGroupBean> implements Database
                 .doOnNext(result -> GuildsCollection.LOGGER.trace("[DBGroup {}] Deletion result: {}", this.getGroupName(), result))
                 .doOnTerminate(() -> DatabaseManager.getGroups().invalidateCache(this.getGroupName()))
                 .then();
+    }
+
+    public Mono<UpdateResult> addMember(User user) {
+        this.getBean().getMembers().add(new DBGroupMemberBean(user.getId().asLong(), this.getBean().getGroupName(), true, false, 0, false));
+        return Mono.from(DatabaseManager.getGroups()
+                .getCollection()
+                .updateOne(
+                        Filters.eq("_id", this.getGroupName()),
+                        Updates.set("members", this.toDocument().get("members"))))
+                .doOnSubscribe(__ -> {
+                    GuildsCollection.LOGGER.debug("[DBGroup {}] GroupMember added: {}", this.getGroupName(), user.getId());
+                    Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getUsers().getName()).inc();
+                })
+                .doOnNext(result -> GuildsCollection.LOGGER.trace("[DBGroup {}] GroupMember added result: {}",
+                        this.getGroupName(), result))
+                .doOnTerminate(() -> DatabaseManager.getGroups().invalidateCache(this.getGroupName()));
     }
 }
