@@ -15,7 +15,7 @@ public class GroupGroup extends BaseCmdGroup {
         super(CommandCategory.GROUP, CommandPermission.USER_GUILD, "group", "Group Commands",
                 List.of(
                         //core
-                        new Schedule(), new Delete(),
+                        new Schedule(), new Delete(), new AddToGroup(),
                         //Groups
                         new Clash(), new AmongUs(), new Valorant()));
     }
