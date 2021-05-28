@@ -41,8 +41,10 @@ public class LotteryCmd extends SubCmd {
     public LotteryCmd(final GroupCmd groupCmd) {
         super(groupCmd, CommandCategory.GAME, "lottery",
                 "Buy a ticket for the lottery or display the current lottery status");
-        this.addOption("number", "The number you bet on", false,
-                ApplicationCommandOptionType.INTEGER);
+        this.addOption(option -> option.name("number")
+                .description("The number you bet on")
+                .required(false)
+                .type(ApplicationCommandOptionType.INTEGER.getValue()));
     }
 
     @Override

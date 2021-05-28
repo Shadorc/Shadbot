@@ -116,6 +116,7 @@ public abstract class Cmd {
     }
 
     // TODO: Remove
+    @Deprecated
     public void addOption(String name, String description, boolean required, ApplicationCommandOptionType type) {
         this.addOption(option -> option.name(name).description(description).required(required).type(type.getValue()));
     }

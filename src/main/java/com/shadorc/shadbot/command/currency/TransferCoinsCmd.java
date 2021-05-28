@@ -16,8 +16,14 @@ public class TransferCoinsCmd extends Cmd {
 
     public TransferCoinsCmd() {
         super(CommandCategory.CURRENCY, "transfer", "Transfer coins to a user");
-        this.addOption("coins", "Number of coins to transfer", true, ApplicationCommandOptionType.INTEGER);
-        this.addOption("user", "User to transfer coins to", true, ApplicationCommandOptionType.USER);
+        this.addOption(option -> option.name("coins")
+                .description("Number of coins to transfer")
+                .required(true)
+                .type(ApplicationCommandOptionType.INTEGER.getValue()));
+        this.addOption(option -> option.name("user")
+                .description("User to transfer coins to")
+                .required(true)
+                .type(ApplicationCommandOptionType.USER.getValue()));
     }
 
     @Override

@@ -19,7 +19,10 @@ public class ActivateRelicCmd extends SubCmd {
 
     public ActivateRelicCmd(final GroupCmd groupCmd) {
         super(groupCmd, CommandCategory.DONATOR, "activate_relic", "Activate a relic");
-        this.addOption("relic", "The relic to activate", true, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("relic")
+                .description("The relic to activate")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override
