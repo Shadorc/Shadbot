@@ -15,7 +15,6 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NetUtil;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.voice.retry.VoiceGatewayException;
 import reactor.core.publisher.Mono;
@@ -51,13 +50,12 @@ public class PlayCmd extends Cmd {
         final boolean isSoundcloud = context.getOptionAsBool("soundcloud").orElse(false);
 
         return DiscordUtil.requireVoiceChannel(context)
-                .zipWith(context.getChannel())
-                .flatMap(TupleUtils.function((voiceChannel, textChannel) -> {
+                .flatMap(voiceChannel -> {
                     final String identifier = PlayCmd.getIdentifier(query, isSoundcloud);
                     return MusicManager
                             .getOrCreate(context.getClient(), context.getLocale(), context.getGuildId(), voiceChannel.getId())
-                            .flatMap(guildMusic -> PlayCmd.play(context, textChannel, guildMusic, identifier, playFirst));
-                }))
+                            .flatMap(guildMusic -> PlayCmd.play(context, guildMusic, identifier, playFirst));
+                })
                 .onErrorMap(err -> {
                     LOGGER.info("{Guild ID: {}} An error occurred while joining a voice channel: {}",
                             context.getGuildId().asString(), err.getMessage());
@@ -76,9 +74,9 @@ public class PlayCmd extends Cmd {
                 });
     }
 
-    private static String getIdentifier(String query, boolean isSoundcloude) {
+    private static String getIdentifier(String query, boolean isSoundCloud) {
         // If this is a SoundCloud search...
-        if (isSoundcloude) {
+        if (isSoundCloud) {
             return AudioLoadResultListener.SC_SEARCH + query;
         }
         // ... else if the argument is a valid URL...
@@ -91,7 +89,7 @@ public class PlayCmd extends Cmd {
         }
     }
 
-    private static Mono<?> play(Context context, TextChannel channel, GuildMusic guildMusic, String identifier, boolean playFirst) {
+    private static Mono<?> play(Context context, GuildMusic guildMusic, String identifier, boolean playFirst) {
         // Someone is already selecting a music...
         if (guildMusic.isWaitingForChoice()) {
             if (guildMusic.getDjId().equals(context.getAuthorId())) {
