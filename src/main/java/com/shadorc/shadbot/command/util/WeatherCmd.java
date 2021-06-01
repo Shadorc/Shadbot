@@ -13,11 +13,11 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import net.aksingh.owmjapis.api.APIException;
 import net.aksingh.owmjapis.core.OWM;
 import net.aksingh.owmjapis.core.OWM.Country;
 import net.aksingh.owmjapis.core.OWM.Unit;
-import org.apache.http.HttpStatus;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -82,7 +82,7 @@ public class WeatherCmd extends Cmd {
     }
 
     private static Predicate<Throwable> isNotFound() {
-        return thr -> thr instanceof APIException err && err.getCode() == HttpStatus.SC_NOT_FOUND;
+        return thr -> thr instanceof APIException err && err.getCode() == HttpResponseStatus.NOT_FOUND.code();
     }
 
     private Consumer<EmbedCreateSpec> formatEmbed(Context context, WeatherWrapper weather) {
