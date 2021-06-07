@@ -80,12 +80,6 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
             LOGGER.debug("{Guild ID: {}} Empty playlist: {}", this.guildId.asString(), audioPlaylist.hashCode());
             this.onNoMatches();
         }
-        // If a track is specifically selected
-        // TODO Question: Do we want to load only one track?
-        else if (audioPlaylist.getSelectedTrack() != null) {
-            LOGGER.debug("{Guild ID: {}} Playlist loaded, track selected: {}", this.guildId.asString(), audioPlaylist.hashCode());
-            this.trackLoaded(audioPlaylist.getSelectedTrack());
-        }
         // The user is searching something
         else if (audioPlaylist.isSearchResult()) {
             LOGGER.debug("{Guild ID: {}} Playlist loaded, search results: {}", this.guildId.asString(), audioPlaylist.hashCode());
