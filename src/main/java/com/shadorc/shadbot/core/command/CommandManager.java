@@ -83,7 +83,9 @@ public class CommandManager {
                         cmdCount, Config.OWNER_GUILD_ID))
                 .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err)));
 
-        final Mono<Long> registerGlobalCommands = Flux.fromIterable(COMMANDS_MAP.values())
+        final Mono<Long> registerGlobalCommands = Flux.empty().count();
+        /*
+        Flux.fromIterable(COMMANDS_MAP.values())
                 .filter(cmd -> cmd.getCategory() != CommandCategory.OWNER)
                 .map(Cmd::asRequest)
                 .collectList()
@@ -92,6 +94,7 @@ public class CommandManager {
                 .count()
                 .doOnNext(cmdCount -> DEFAULT_LOGGER.info("{} global commands registered", cmdCount))
                 .onErrorResume(err -> Mono.fromRunnable(() -> ExceptionHandler.handleUnknownError(err)));
+         */
 
         return registerGlobalCommands
                 .and(registerGuildCommands);
