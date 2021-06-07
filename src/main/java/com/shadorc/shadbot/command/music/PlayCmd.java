@@ -18,7 +18,6 @@ import discord4j.core.object.entity.User;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.voice.retry.VoiceGatewayException;
 import reactor.core.publisher.Mono;
-import reactor.function.TupleUtils;
 
 import java.util.concurrent.TimeoutException;
 
