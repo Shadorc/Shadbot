@@ -26,6 +26,7 @@ import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -130,15 +131,14 @@ public class MusicManager {
         }
 
         return Mono.justOrEmpty(guildMusic)
-                .doOnEach(it -> LOGGER.info("{Guild ID: {}} justOrEmpty: {}", guildId.asString(), it))
                 .map(GuildMusic::getGateway)
-                .doOnEach(it -> LOGGER.info("{Guild ID: {}} getGateway: {}", guildId.asString(), it))
                 .map(GatewayDiscordClient::getVoiceConnectionRegistry)
-                .doOnEach(it -> LOGGER.info("{Guild ID: {}} getVoiceConnectionRegistry: {}", guildId.asString(), it))
                 .flatMap(registry -> registry.getVoiceConnection(guildId))
-                .doOnEach(it -> LOGGER.info("{Guild ID: {}} getVoiceConnection: {}", guildId.asString(), it))
-                .flatMap(VoiceConnection::disconnect)
-                .log("%s:destroyConnection".formatted(guildId.asString()));
+                .flatMap(voiceConnection -> voiceConnection.disconnect()
+                        // TODO: See https://github.com/Discord4J/Discord4J/issues/934
+                        .timeout(Duration.ofMinutes(2))
+                        .onErrorResume(err -> Mono.fromRunnable(() ->
+                                LOGGER.info("{Guild ID: {}} VoiceConnection#disconnect timed out", guildId.asString()))));
     }
 
     public static Optional<GuildMusic> getGuildMusic(Snowflake guildId) {
