@@ -217,5 +217,10 @@
             <version>5.8.0-M1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.merakianalytics.orianna</groupId>
+            <artifactId>orianna</artifactId>
+            <version>4.0.0-rc7</version>
+        </dependency>
     </dependencies>
 </project>

@@ -9,7 +9,6 @@ import com.locibot.locibot.data.Config;
 import com.locibot.locibot.data.Telemetry;
 import com.locibot.locibot.data.credential.Credential;
 import com.locibot.locibot.data.credential.CredentialManager;
-import com.locibot.locibot.listener.*;
 import com.locibot.locibot.object.ExceptionHandler;
 import com.locibot.locibot.utils.FormatUtil;
 import com.locibot.locibot.utils.LogUtil;
@@ -20,7 +19,6 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
-import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
 import discord4j.core.retriever.EntityRetrievalStrategy;
@@ -139,6 +137,8 @@ public class LociBot {
                     LociBot.taskManager = new TaskManager();
                     LociBot.taskManager.scheduleLottery(gateway);
                     LociBot.taskManager.schedulePeriodicStats(gateway);
+                    LociBot.taskManager.scheduleGroups(gateway);
+                    LociBot.taskManager.scheduleDeleteOldGroups();
 
                     if (!Config.IS_SNAPSHOT) {
                         if (CredentialManager.get(Credential.BOTLIST_DOT_SPACE_TOKEN) != null) {
