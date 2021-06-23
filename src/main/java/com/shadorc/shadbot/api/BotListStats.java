@@ -24,7 +24,7 @@ public class BotListStats {
 
     private static final Logger LOGGER = LogUtil.getLogger(BotListStats.class);
 
-    private static final String BOTLIST_DOT_SPACE = "https://botlist.space";
+    private static final String DISCORDLIST_DOT_SPACE = "https://discordlist.space";
     private static final String BOTS_ONDISCORD_DOT_XYZ = "https://bots.ondiscord.xyz";
     private static final String WONDERBOTLIST_DOT_COM = "https://wonderbotlist.com";
     private static final String DISCORDBOTLIST_DOT_COM = "https://discordbotlist.com";
@@ -47,7 +47,7 @@ public class BotListStats {
         final int shardCount = this.gateway.getGatewayClientGroup().getShardCount();
         return this.gateway.getGuilds().count()
                 .flatMap(guildCount -> Mono.when(
-                        this.postOnBotlistDotSpace(guildCount),
+                        this.postOnDiscordlistDotSpace(guildCount),
                         this.postOnBotsOndiscordDotXyz(guildCount),
                         this.postOnDiscordbotlistDotCom(shardCount, guildCount),
                         this.postOnWonderbotlistDotCom(shardCount, guildCount),
@@ -60,14 +60,14 @@ public class BotListStats {
     }
 
     /**
-     * Documentation: https://docs.botlist.space/bl-docs/bots
+     * Documentation: https://docs.discordlist.space/bl-docs/bots
      */
-    private Mono<String> postOnBotlistDotSpace(long guildCount) {
+    private Mono<String> postOnDiscordlistDotSpace(long guildCount) {
         final JSONObject content = new JSONObject()
                 .put("server_count", guildCount);
-        final String url = "https://api.botlist.space/v1/bots/%d".formatted(this.selfId);
-        return BotListStats.post(url, CredentialManager.get(Credential.BOTLIST_DOT_SPACE_TOKEN), content)
-                .onErrorResume(BotListStats.handleError(BOTLIST_DOT_SPACE));
+        final String url = "https://api.discordlist.space/v1/bots/%d".formatted(this.selfId);
+        return BotListStats.post(url, CredentialManager.get(Credential.DISCORDLIST_DOT_SPACE_TOKEN), content)
+                .onErrorResume(BotListStats.handleError(DISCORDLIST_DOT_SPACE));
     }
 
     /**
