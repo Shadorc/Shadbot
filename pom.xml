@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.shadorc.shadbot</groupId>
     <artifactId>shadbot</artifactId>
-    <version>4.0.19-SNAPSHOT</version>
+    <version>4.0.19</version>
     <name>Shadbot</name>
     <url>https://github.com/Shadorc/Shadbot</url>
     <description>
