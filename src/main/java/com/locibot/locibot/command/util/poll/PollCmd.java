@@ -8,6 +8,7 @@ import com.locibot.locibot.utils.DiscordUtil;
 import com.locibot.locibot.utils.NumberUtil;
 import com.locibot.locibot.utils.TimeUtil;
 import discord4j.common.util.Snowflake;
+import discord4j.core.object.command.ApplicationCommandInteraction;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.Permission;
@@ -59,9 +60,9 @@ public class PollCmd extends BaseCmd {
         return context.getChannel()
                 .flatMap(channel -> DiscordUtil.requirePermissions(channel, Permission.ADD_REACTIONS))
                 .thenReturn(this.createPoll(context))
-                .doOnNext(pollManager -> this.managers.put(context.getEvent().getCommandId(), pollManager))
+                .doOnNext(pollManager -> this.managers.put(context.getEvent().getInteraction().getCommandInteraction().flatMap(ApplicationCommandInteraction::getId).orElseThrow(), pollManager))
                 .flatMap(PollManager::show)
-                .doOnError(__ -> this.managers.remove(context.getEvent().getCommandId()));
+                .doOnError(__ -> this.managers.remove(context.getEvent().getInteraction().getCommandInteraction().flatMap(ApplicationCommandInteraction::getId).orElseThrow()));
     }
 
     private PollManager createPoll(Context context) {

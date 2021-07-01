@@ -13,7 +13,7 @@ import com.locibot.locibot.utils.DiscordUtil;
 import com.locibot.locibot.utils.EnumUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.domain.InteractionCreateEvent;
+import discord4j.core.event.domain.interaction.InteractionCreateEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.object.entity.*;
@@ -69,7 +69,7 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     public Optional<String> getSubCommandGroupName() {
-        return DiscordUtil.flattenOptions(this.event.getInteraction().getCommandInteraction())
+        return DiscordUtil.flattenOptions(this.event.getInteraction().getCommandInteraction().orElseThrow())
                 .stream()
                 .filter(option -> option.getType() == ApplicationCommandOptionType.SUB_COMMAND_GROUP)
                 .map(ApplicationCommandInteractionOption::getName)
@@ -77,7 +77,7 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     public Optional<String> getSubCommandName() {
-        return DiscordUtil.flattenOptions(this.event.getInteraction().getCommandInteraction())
+        return DiscordUtil.flattenOptions(this.event.getInteraction().getCommandInteraction().orElseThrow())
                 .stream()
                 .filter(option -> option.getType() == ApplicationCommandOptionType.SUB_COMMAND)
                 .map(ApplicationCommandInteractionOption::getName)
@@ -85,7 +85,7 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     public String getCommandName() {
-        return this.event.getCommandName();
+        return this.event.getInteraction().getCommandInteraction().get().getName().get();
     }
 
     public String getLastCommandName() {
@@ -132,7 +132,7 @@ public class Context implements InteractionContext, I18nContext {
 
     public Optional<ApplicationCommandInteractionOptionValue> getOption(String name) {
         final List<ApplicationCommandInteractionOption> options =
-                DiscordUtil.flattenOptions(this.getEvent().getInteraction().getCommandInteraction());
+                DiscordUtil.flattenOptions(this.getEvent().getInteraction().getCommandInteraction().get());
         return options.stream()
                 .filter(option -> option.getName().equals(name))
                 .filter(option -> option.getValue().isPresent())

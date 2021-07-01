@@ -7,6 +7,7 @@ import com.locibot.locibot.utils.FormatUtil;
 import com.locibot.locibot.utils.MapUtil;
 import com.locibot.locibot.utils.ShadbotUtil;
 import discord4j.common.util.Snowflake;
+import discord4j.core.object.command.ApplicationCommandInteraction;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
@@ -65,7 +66,7 @@ public class PollManager {
     }
 
     private Mono<Message> end(Snowflake messageId) {
-        return Mono.fromRunnable(() -> this.pollCmd.getManagers().remove(this.context.getEvent().getCommandId()))
+        return Mono.fromRunnable(() -> this.pollCmd.getManagers().remove(this.context.getEvent().getInteraction().getCommandInteraction().flatMap(ApplicationCommandInteraction::getId).orElseThrow()))
                 .then(this.context.getClient()
                         .getMessageById(this.context.getChannelId(), messageId))
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),

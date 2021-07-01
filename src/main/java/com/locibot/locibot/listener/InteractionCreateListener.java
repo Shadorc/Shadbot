@@ -7,7 +7,8 @@ import com.locibot.locibot.data.Config;
 import com.locibot.locibot.data.Telemetry;
 import com.locibot.locibot.object.Emoji;
 import com.locibot.locibot.utils.ReactorUtil;
-import discord4j.core.event.domain.InteractionCreateEvent;
+import discord4j.core.event.domain.interaction.InteractionCreateEvent;
+import discord4j.core.object.command.ApplicationCommandInteraction;
 import discord4j.core.object.entity.channel.PrivateChannel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.rest.util.Permission;
@@ -27,7 +28,7 @@ public class InteractionCreateListener implements EventListener<InteractionCreat
         // TODO Feature: Interactions from DM
         if (event.getInteraction().getGuildId().isEmpty()) {
             //return event.getInteraction().getChannel().ofType(PrivateChannel.class).flatMap(privateChannel -> CommandProcessor.processCommand(new PrivateContext(event))); //TODO: Parse with CommandProcessor
-            final BaseCmd command = CommandManager.getCommand(event.getCommandName());
+            final BaseCmd command = CommandManager.getCommand(event.getInteraction().getCommandInteraction().flatMap(ApplicationCommandInteraction::getName).orElseThrow());
             return event.acknowledge().then(command.execute(new PrivateContext(event)));
         }
 
