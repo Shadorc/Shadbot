@@ -13,7 +13,7 @@ public class CommandHelpBuilder extends HelpBuilder {
         this.options.addAll(cmd.getOptions());
 
         this.setAuthor(context.localize("help.cmd.title").formatted(this.cmd.getName()),
-                "https://github.com/Shadorc/Shadbot/wiki/Commands");
+                "https://github.com/LociStar/");
         this.setDescription(cmd.getDescription());
     }
 

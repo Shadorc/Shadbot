@@ -53,9 +53,10 @@ public class HelpCmd extends BaseCmd {
     private static Consumer<EmbedCreateSpec> formatEmbed(I18nContext context, Map<CommandCategory, Collection<String>> map, String avatarUrl) {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> {
-                    embed.setAuthor(context.localize("help.title"), "https://github.com/Shadorc/Shadbot/wiki/Commands", avatarUrl);
+                    embed.setAuthor(context.localize("help.title"), "https://github.com/LociStar/", avatarUrl);
                     embed.setDescription(context.localize("help.description")
-                            .formatted(Config.SUPPORT_SERVER_URL, Config.PATREON_URL));
+                            //.formatted(Config.SUPPORT_SERVER_URL, Config.PATREON_URL));
+                            .formatted("https://discord.gg/Mb8AD99v", "https://github.com/LociStar/"));
                     embed.setFooter(context.localize("help.footer"), "https://i.imgur.com/eaWQxvS.png");
 
                     for (final CommandCategory category : CommandCategory.values()) {
