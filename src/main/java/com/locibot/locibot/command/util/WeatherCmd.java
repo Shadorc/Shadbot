@@ -8,6 +8,7 @@ import com.locibot.locibot.core.command.Context;
 import com.locibot.locibot.data.credential.Credential;
 import com.locibot.locibot.data.credential.CredentialManager;
 import com.locibot.locibot.object.Emoji;
+import com.locibot.locibot.utils.CreateHeatMap;
 import com.locibot.locibot.utils.EnumUtil;
 import com.locibot.locibot.utils.ShadbotUtil;
 import com.locibot.locibot.utils.StringUtil;
@@ -20,6 +21,7 @@ import net.aksingh.owmjapis.core.OWM.Unit;
 import org.apache.http.HttpStatus;
 import reactor.core.publisher.Mono;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -45,6 +47,10 @@ public class WeatherCmd extends BaseCmd {
         } else {
             this.owm = null;
         }
+    }
+
+    private static Predicate<Throwable> isNotFound() {
+        return thr -> thr instanceof APIException err && err.getCode() == HttpStatus.SC_NOT_FOUND;
     }
 
     @Override
@@ -78,11 +84,18 @@ public class WeatherCmd extends BaseCmd {
                     return context.editFollowupMessage(Emoji.MAGNIFYING_GLASS, context.localize("weather.exception.city")
                             .formatted(city));
                 })
-                .onErrorMap(APIException.class, IOException::new);
-    }
-
-    private static Predicate<Throwable> isNotFound() {
-        return thr -> thr instanceof APIException err && err.getCode() == HttpStatus.SC_NOT_FOUND;
+                .onErrorMap(APIException.class, IOException::new)
+                .then(context.getChannel().flatMap(textChannel ->
+                        textChannel.createMessage(messageCreateSpec -> {
+                            try {
+                                byte[] bytes = CreateHeatMap.create(city, this.owm);
+                                if (bytes.length > 0)
+                                    messageCreateSpec.addFile("temperature.png",
+                                            new ByteArrayInputStream(bytes));
+                                else messageCreateSpec.setContent("Please provide a real city ;)");
+                            } catch (IOException ignored) {
+                            }
+                        })));
     }
 
     private Consumer<EmbedCreateSpec> formatEmbed(Context context, WeatherWrapper weather) {

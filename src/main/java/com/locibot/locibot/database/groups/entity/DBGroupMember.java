@@ -6,7 +6,6 @@ import com.locibot.locibot.database.DatabaseManager;
 import com.locibot.locibot.database.SerializableEntity;
 import com.locibot.locibot.database.groups.GroupsCollection;
 import com.locibot.locibot.database.groups.bean.DBGroupMemberBean;
-import com.locibot.locibot.database.guilds.GuildsCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
@@ -28,8 +27,8 @@ public class DBGroupMember extends SerializableEntity<DBGroupMemberBean> impleme
         this.groupName = groupName;
     }
 
-    public DBGroupMember(Long id, @Nullable String groupName, boolean optional, boolean invited, int accepted, boolean owner){
-        super(new DBGroupMemberBean(id, groupName, optional, invited, accepted, owner));
+    public DBGroupMember(Snowflake id, @Nullable String groupName, boolean optional, boolean invited, int accepted, boolean owner) {
+        super(new DBGroupMemberBean(id.asLong(), groupName, optional, invited, accepted, owner));
         this.groupName = groupName;
     }
 

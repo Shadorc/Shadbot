@@ -46,6 +46,7 @@ public class RpsCmd extends BaseCmd {
                         botHandsign.getEmoji(), botHandsign.getHandsign(context)));
 
         final RpsPlayer player = this.getPlayer(context.getGuildId(), context.getAuthorId());
+        final long gains_min = Math.min((long) Constants.GAINS, Config.MAX_COINS);
         if (userHandsign.isSuperior(botHandsign)) {
             player.incrementWinStream();
             final int winStreak = player.getWinStreak();
@@ -60,9 +61,11 @@ public class RpsCmd extends BaseCmd {
                     }));
         } else if (userHandsign == botHandsign) {
             player.resetWinStreak();
+            Telemetry.RPS_SUMMARY.labels("draw").observe(gains_min);
             strBuilder.append(context.localize("rps.draw"));
         } else {
             player.resetWinStreak();
+            Telemetry.RPS_SUMMARY.labels("lose").observe(gains_min);
             strBuilder.append(context.localize("rps.lose"));
         }
 

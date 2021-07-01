@@ -9,7 +9,6 @@ import com.locibot.locibot.data.Config;
 import com.locibot.locibot.data.Telemetry;
 import com.locibot.locibot.data.credential.Credential;
 import com.locibot.locibot.data.credential.CredentialManager;
-import com.locibot.locibot.listener.*;
 import com.locibot.locibot.object.ExceptionHandler;
 import com.locibot.locibot.utils.FormatUtil;
 import com.locibot.locibot.utils.LogUtil;
@@ -138,11 +137,15 @@ public class LociBot {
                     LociBot.taskManager = new TaskManager();
                     LociBot.taskManager.scheduleLottery(gateway);
                     LociBot.taskManager.schedulePeriodicStats(gateway);
+                    LociBot.taskManager.scheduleGroups(gateway);
+                    LociBot.taskManager.scheduleDeleteOldGroups();
 
                     if (!Config.IS_SNAPSHOT) {
-                        DEFAULT_LOGGER.info("Initializing BotListStats");
-                        LociBot.botListStats = new BotListStats(gateway);
-                        LociBot.taskManager.schedulePostStats(LociBot.botListStats);
+                        if (CredentialManager.get(Credential.BOTLIST_DOT_SPACE_TOKEN) != null) {
+                            DEFAULT_LOGGER.info("Initializing BotListStats");
+                            LociBot.botListStats = new BotListStats(gateway);
+                            LociBot.taskManager.schedulePostStats(LociBot.botListStats);
+                        }
                     }
 
                     DEFAULT_LOGGER.info("Registering listeners");

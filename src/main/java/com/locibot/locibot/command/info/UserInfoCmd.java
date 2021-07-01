@@ -68,7 +68,7 @@ public class UserInfoCmd extends BaseCmd {
                         FormatUtil.formatLongDuration(context.getLocale(), createTime));
 
         final String joinTitle = Emoji.DATE + " " + context.localize("userinfo.join");
-        final LocalDateTime joinTime = TimeUtil.toLocalDateTime(member.getJoinTime());
+        final LocalDateTime joinTime = TimeUtil.toLocalDateTime(member.getJoinTime().get());
         final String joinField = "%s%n(%s)"
                 .formatted(joinTime.format(dateFormatter),
                         FormatUtil.formatLongDuration(context.getLocale(), joinTime));
