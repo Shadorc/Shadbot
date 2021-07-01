@@ -14,6 +14,7 @@ import com.locibot.locibot.utils.EnumUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.InteractionCreateEvent;
+import discord4j.core.object.command.ApplicationCommandInteraction;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.object.entity.*;
@@ -85,7 +86,7 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     public String getCommandName() {
-        return this.event.getInteraction().getCommandInteraction().get().getName().get();
+        return this.event.getInteraction().getCommandInteraction().flatMap(ApplicationCommandInteraction::getName).orElseThrow();
     }
 
     public String getLastCommandName() {
