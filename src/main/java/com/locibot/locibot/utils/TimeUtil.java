@@ -85,7 +85,7 @@ public class TimeUtil {
      * @param instant The instant to create the date-time from.
      * @return {@code instant} converted as a {@link LocalDateTime} using the {@code ZoneId.systemDefault()} time-zone.
      */
-    public static LocalDateTime toLocalDateTime(@NonNull Instant instant) {
+    public static LocalDateTime toLocalDateTime(Instant instant) {
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
 

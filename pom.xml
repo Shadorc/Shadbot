@@ -217,10 +217,16 @@
             <version>5.8.0-M1</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.image-charts/image-charts -->
         <dependency>
-            <groupId>com.merakianalytics.orianna</groupId>
-            <artifactId>orianna</artifactId>
-            <version>4.0.0-rc7</version>
+            <groupId>com.image-charts</groupId>
+            <artifactId>image-charts</artifactId>
+            <version>5.6.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.knowm.xchart</groupId>
+            <artifactId>xchart</artifactId>
+            <version>3.8.0</version>
         </dependency>
     </dependencies>
 </project>
