@@ -49,9 +49,9 @@ public class CommandManager {
                 // Standalone
                 new PingCmd(), new HelpCmd(), new AchievementsCmd(), new FeedbackCmd(), new InviteCmd(),
                 // Music
-                new BackwardCmd(), new BassBoostCmd(), new ClearCmd(), new ForwardCmd(), new NameCmd(),
-                new PauseCmd(), new PlaylistCmd(), new RepeatCmd(), new ShuffleCmd(), new SkipCmd(),
-                new StopCmd(), new VolumeCmd(), new PlayCmd(),
+//                new BackwardCmd(), new BassBoostCmd(), new ClearCmd(), new ForwardCmd(), new NameCmd(),
+//                new PauseCmd(), new PlaylistCmd(), new RepeatCmd(), new ShuffleCmd(), new SkipCmd(),
+//                new StopCmd(), new VolumeCmd(), new PlayCmd(),
                 // Currency
                 new CoinsCmd(), new LeaderboardCmd(), new TransferCoinsCmd(),
                 // Fun
