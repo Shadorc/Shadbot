@@ -13,8 +13,7 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.object.entity.Guild;
-import discord4j.discordjson.json.ImmutableEmbedFieldData;
-import discord4j.discordjson.possible.Possible;
+import discord4j.core.spec.EmbedCreateFields;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 import reactor.util.function.Tuple2;
@@ -69,17 +68,15 @@ public class RelicStatusCmd extends SubCmd {
                         titleBuilder.append(context.localize("relicstatus.activated"));
                     }
 
-                    return ImmutableEmbedFieldData.of(titleBuilder.toString(), descBuilder.toString(), Possible.of(false));
+                    return EmbedCreateFields.Field.of(titleBuilder.toString(), descBuilder.toString(), false);
                 }))
                 .collectList()
                 .filter(Predicate.not(List::isEmpty))
-                .map(fields -> ShadbotUtil.getDefaultLegacyEmbed(
-                        embed -> {
-                            embed.setAuthor(context.localize("relicstatus.title"), null, context.getAuthorAvatar())
-                                    .setThumbnail("https://i.imgur.com/R0N6kW3.png");
-
-                            fields.forEach(field -> embed.addField(field.name(), field.value(), field.inline().get()));
-                        }))
+                .map(fields -> ShadbotUtil.createEmbedBuilder()
+                        .author(context.localize("relicstatus.title"), null, context.getAuthorAvatar())
+                        .thumbnail("https://i.imgur.com/R0N6kW3.png")
+                        .fields(fields)
+                        .build())
                 .flatMap(context::createFollowupMessage)
                 .switchIfEmpty(context.createFollowupMessage(Emoji.INFO, context.localize("relicstatus.not.donator")
                         .formatted(Config.PATREON_URL, Emoji.HEARTS)));

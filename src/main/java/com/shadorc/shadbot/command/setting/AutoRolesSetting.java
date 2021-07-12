@@ -31,11 +31,26 @@ public class AutoRolesSetting extends SubCmd {
                 .required(true)
                 .type(ApplicationCommandOptionType.STRING.getValue())
                 .choices(DiscordUtil.toOptions(Action.class)));
-        this.addOption("role1", "The first role", true, ApplicationCommandOptionType.ROLE);
-        this.addOption("role2", "The second role", false, ApplicationCommandOptionType.ROLE);
-        this.addOption("role3", "The third role", false, ApplicationCommandOptionType.ROLE);
-        this.addOption("role4", "The fourth role", false, ApplicationCommandOptionType.ROLE);
-        this.addOption("role5", "The fifth role", false, ApplicationCommandOptionType.ROLE);
+        this.addOption(option -> option.name("role1")
+                .description("The first role")
+                .required(true)
+                .type(ApplicationCommandOptionType.ROLE.getValue()));
+        this.addOption(option -> option.name("role2")
+                .description("The second role")
+                .required(false)
+                .type(ApplicationCommandOptionType.ROLE.getValue()));
+        this.addOption(option -> option.name("role3")
+                .description("The third role")
+                .required(false)
+                .type(ApplicationCommandOptionType.ROLE.getValue()));
+        this.addOption(option -> option.name("role4")
+                .description("The fourth role")
+                .required(false)
+                .type(ApplicationCommandOptionType.ROLE.getValue()));
+        this.addOption(option -> option.name("role5")
+                .description("The fifth role")
+                .required(false)
+                .type(ApplicationCommandOptionType.ROLE.getValue()));
     }
 
     @Override

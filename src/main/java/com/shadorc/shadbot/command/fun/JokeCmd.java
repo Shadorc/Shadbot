@@ -7,12 +7,10 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import reactor.core.publisher.Mono;
-
-import java.util.function.Consumer;
 
 public class JokeCmd extends Cmd {
 
@@ -29,10 +27,11 @@ public class JokeCmd extends Cmd {
                 .flatMap(joke -> context.editFollowupMessage(JokeCmd.formatEmbed(context, joke)));
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, String joke) {
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor(context.localize("joke.title"), HOME_URL, context.getAuthorAvatar())
-                        .setDescription(joke));
+    private static EmbedCreateSpec formatEmbed(Context context, String joke) {
+        return ShadbotUtil.createEmbedBuilder()
+                .author(context.localize("joke.title"), HOME_URL, context.getAuthorAvatar())
+                .description(joke)
+                .build();
     }
 
     private static Mono<String> getRandomJoke() {

@@ -14,13 +14,12 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -33,7 +32,10 @@ public class WallhavenCmd extends SubCmd {
 
     public WallhavenCmd(final GroupCmd groupCmd) {
         super(groupCmd, CommandCategory.IMAGE, "wallhaven", "Search random wallpaper from Wallhaven");
-        this.addOption("query", "Search for a wallpaper", false, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("query")
+                .description("Search for a wallpaper")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
 
         this.apiKey = CredentialManager.get(Credential.WALLHAVEN_API_KEY);
     }
@@ -57,23 +59,22 @@ public class WallhavenCmd extends SubCmd {
                         context.localize("wallhaven.not.found").formatted(query)));
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, String title, Wallpaper wallpaper) {
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> {
-                    wallpaper.getSource().ifPresent(source -> {
-                        if (NetUtil.isUrl(source)) {
-                            embed.setDescription(context.localize("wallhaven.source.url").formatted(source));
-                        } else {
-                            embed.addField(context.localize("wallhaven.source"), source, false);
-                        }
-                    });
+    private static EmbedCreateSpec formatEmbed(Context context, String title, Wallpaper wallpaper) {
+        final EmbedCreateSpec.Builder embed = ShadbotUtil.createEmbedBuilder();
+        wallpaper.getSource().ifPresent(source -> {
+            if (NetUtil.isUrl(source)) {
+                embed.description(context.localize("wallhaven.source.url").formatted(source));
+            } else {
+                embed.addField(context.localize("wallhaven.source"), source, false);
+            }
+        });
 
-                    embed.setAuthor(title, wallpaper.url(), context.getAuthorAvatar())
-                            .setThumbnail("https://wallhaven.cc/images/layout/logo_sm.png")
-                            .setImage(wallpaper.path())
-                            .addField(context.localize("wallhaven.resolution"), wallpaper.resolution(), false);
+        embed.author(title, wallpaper.url(), context.getAuthorAvatar())
+                .thumbnail("https://wallhaven.cc/images/layout/logo_sm.png")
+                .image(wallpaper.path())
+                .addField(context.localize("wallhaven.resolution"), wallpaper.resolution(), false);
 
-                });
+        return embed.build();
     }
 
     private Mono<Wallpaper> getWallpaper(final String query) {

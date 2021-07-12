@@ -9,7 +9,7 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.reaction.ReactionEmoji.Unicode;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Flux;
@@ -17,7 +17,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -69,14 +68,14 @@ public class IamCmd extends SubCmd {
                                     .formatted(REACTION.getRaw(), FormatUtil.format(roles,
                                             role -> "`@%s`".formatted(role.getName()), "\n")));
 
-                            final Consumer<LegacyEmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultLegacyEmbed(
-                                    embed -> embed.setAuthor("Iam: %s"
-                                                    .formatted(FormatUtil.format(roles,
-                                                            role -> "@%s".formatted(role.getName()), ", ")),
+                            final EmbedCreateSpec embed = ShadbotUtil.createEmbedBuilder()
+                                    .author("Iam: %s".formatted(FormatUtil.format(roles,
+                                            role -> "@%s".formatted(role.getName()), ", ")),
                                             null, context.getAuthorAvatar())
-                                            .setDescription(description));
+                                    .description(description)
+                                    .build();
 
-                            return context.createFollowupMessage(embedConsumer)
+                            return context.createFollowupMessage(embed)
                                     .flatMap(message -> message.addReaction(REACTION)
                                             .thenReturn(message))
                                     .flatMap(message -> {

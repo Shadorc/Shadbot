@@ -20,7 +20,6 @@ import discord4j.core.object.entity.*;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.spec.EmbedCreateSpec;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.discordjson.json.WebhookExecuteRequest;
 import discord4j.discordjson.json.WebhookMessageEditRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
@@ -35,7 +34,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 
 public class Context implements InteractionContext, I18nContext {
 
@@ -248,22 +246,6 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     @Override
-    @Deprecated
-    public Mono<Message> createFollowupMessage(Consumer<LegacyEmbedCreateSpec> embed) {
-        return Mono.defer(() -> {
-            final LegacyEmbedCreateSpec mutatedSpec = new LegacyEmbedCreateSpec();
-            embed.accept(mutatedSpec);
-            return this.event.getInteractionResponse().createFollowupMessage(MultipartRequest.ofRequest(
-                    WebhookExecuteRequest.builder()
-                            .addEmbed(mutatedSpec.asRequest())
-                            .build()))
-                    .map(data -> new Message(this.getClient(), data))
-                    .doOnNext(message -> this.replyId.set(message.getId().asLong()))
-                    .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc());
-        });
-    }
-
-    @Override
     public Mono<Message> createFollowupMessage(EmbedCreateSpec embed) {
         return this.event.getInteractionResponse().createFollowupMessage(MultipartRequest.ofRequest(
                 WebhookExecuteRequest.builder()
@@ -290,25 +272,6 @@ public class Context implements InteractionContext, I18nContext {
     @Override
     public Mono<Message> editFollowupMessage(Emoji emoji, String message) {
         return this.editFollowupMessage("%s %s".formatted(emoji, message));
-    }
-
-    @Override
-    @Deprecated
-    public Mono<Message> editFollowupMessage(Consumer<LegacyEmbedCreateSpec> embed) {
-        return Mono.fromCallable(this.replyId::get)
-                .filter(messageId -> messageId > 0)
-                .flatMap(messageId -> {
-                    final LegacyEmbedCreateSpec mutatedSpec = new LegacyEmbedCreateSpec();
-                    embed.accept(mutatedSpec);
-                    return this.event.getInteractionResponse()
-                            .editFollowupMessage(messageId, WebhookMessageEditRequest.builder()
-                                    .content("")
-                                    .embeds(List.of(mutatedSpec.asRequest()))
-                                    .build(), true);
-                })
-                .map(data -> new Message(this.getClient(), data))
-                .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc())
-                .switchIfEmpty(this.createFollowupMessage(embed));
     }
 
     @Override

@@ -11,12 +11,11 @@ import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class Rule34Cmd extends Cmd {
 
@@ -25,7 +24,10 @@ public class Rule34Cmd extends Cmd {
 
     public Rule34Cmd() {
         super(CommandCategory.IMAGE, "rule34", "Search random image from Rule34");
-        this.addOption("query", "Search for a Rule34 image", true, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("query")
+                .description("Search for a Rule34 image")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override
@@ -73,26 +75,26 @@ public class Rule34Cmd extends Cmd {
         return post.hasChildren() || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"));
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, R34Post post, String tag) {
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> {
-                    post.getSource().ifPresent(source -> {
-                        if (NetUtil.isUrl(source)) {
-                            embed.setDescription(context.localize("rule34.source.url").formatted(source));
-                        } else {
-                            embed.addField(context.localize("rule34.source"), source, false);
-                        }
-                    });
+    private static EmbedCreateSpec formatEmbed(Context context, R34Post post, String tag) {
+        final EmbedCreateSpec.Builder embed = ShadbotUtil.createEmbedBuilder();
+        post.getSource().ifPresent(source -> {
+            if (NetUtil.isUrl(source)) {
+                embed.description(context.localize("rule34.source.url").formatted(source));
+            } else {
+                embed.addField(context.localize("rule34.source"), source, false);
+            }
+        });
 
-                    final String resolution = "%dx%d".formatted(post.width(), post.height());
-                    final String formattedTags = Rule34Cmd.formatTags(post.getTags());
-                    embed.setAuthor(context.localize("rule34.title").formatted(tag), post.fileUrl(), context.getAuthorAvatar())
-                            .setThumbnail("https://i.imgur.com/t6JJWFN.png")
-                            .addField(context.localize("rule34.resolution"), resolution, false)
-                            .addField(context.localize("rule34.tags"), formattedTags, false)
-                            .setImage(post.fileUrl())
-                            .setFooter(context.localize("rule34.footer"), null);
-                });
+        final String resolution = "%dx%d".formatted(post.width(), post.height());
+        final String formattedTags = Rule34Cmd.formatTags(post.getTags());
+        embed.author(context.localize("rule34.title").formatted(tag), post.fileUrl(), context.getAuthorAvatar())
+                .thumbnail("https://i.imgur.com/t6JJWFN.png")
+                .addField(context.localize("rule34.resolution"), resolution, false)
+                .addField(context.localize("rule34.tags"), formattedTags, false)
+                .image(post.fileUrl())
+                .footer(context.localize("rule34.footer"), null);
+
+        return embed.build();
     }
 
     private static String formatTags(final List<String> tags) {

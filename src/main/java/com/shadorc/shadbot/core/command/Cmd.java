@@ -2,7 +2,7 @@ package com.shadorc.shadbot.core.command;
 
 import com.shadorc.shadbot.core.ratelimiter.RateLimiter;
 import com.shadorc.shadbot.object.help.CommandHelpBuilder;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.discordjson.json.ImmutableApplicationCommandOptionData;
@@ -67,7 +67,7 @@ public abstract class Cmd {
 
     public abstract Mono<?> execute(Context context);
 
-    public Consumer<LegacyEmbedCreateSpec> getHelp(Context context) {
+    public EmbedCreateSpec getHelp(Context context) {
         return new CommandHelpBuilder(context, this).build();
     }
 
@@ -113,12 +113,6 @@ public abstract class Cmd {
 
     public void setEnabled(boolean isEnabled) {
         this.isEnabled = isEnabled;
-    }
-
-    // TODO: Remove
-    @Deprecated
-    public void addOption(String name, String description, boolean required, ApplicationCommandOptionType type) {
-        this.addOption(option -> option.name(name).description(description).required(required).type(type.getValue()));
     }
 
     public void addOption(Consumer<ImmutableApplicationCommandOptionData.Builder> option) {

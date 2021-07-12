@@ -39,19 +39,54 @@ public class PollCmd extends Cmd {
         super(CommandCategory.UTILS, "poll", "Create a poll");
         this.managers = new ConcurrentHashMap<>();
 
-        this.addOption("duration", "Number of seconds or formatted time (e.g. 72 or 1m12s), 1h max",
-                true, ApplicationCommandOptionType.STRING);
-        this.addOption("question", "The question to ask", true, ApplicationCommandOptionType.STRING);
-        this.addOption("choice1", "The first choice", true, ApplicationCommandOptionType.STRING);
-        this.addOption("choice2", "The second choice", true, ApplicationCommandOptionType.STRING);
-        this.addOption("choice3", "The third choice", false, ApplicationCommandOptionType.STRING);
-        this.addOption("choice4", "The fourth choice", false, ApplicationCommandOptionType.STRING);
-        this.addOption("choice5", "The fifth choice", false, ApplicationCommandOptionType.STRING);
-        this.addOption("choice6", "The sixth choice", false, ApplicationCommandOptionType.STRING);
-        this.addOption("choice7", "The seventh choice", false, ApplicationCommandOptionType.STRING);
-        this.addOption("choice8", "The eighth choice", false, ApplicationCommandOptionType.STRING);
-        this.addOption("choice9", "The ninth choice", false, ApplicationCommandOptionType.STRING);
-        this.addOption("choice10", "The tenth choice", false, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("duration")
+                .description("Number of seconds or formatted time (e.g. 72 or 1m12s), 1h max")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("question")
+                .description("The question to ask")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("choice1")
+                .description("The first choice")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("choice2")
+                .description("The second choice")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("choice3")
+                .description("The third choice")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("choice4")
+                .description("The fourth choice")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("choice5")
+                .description("The fifth choice")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("choice6")
+                .description("The sixth choice")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("choice7")
+                .description("The seventh choice")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("choice8")
+                .description("The eighth choice")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("choice9")
+                .description("The ninth choice")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("choice10")
+                .description("The tenth choice")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override

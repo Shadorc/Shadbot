@@ -15,7 +15,7 @@ import com.shadorc.shadbot.utils.SystemUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.common.GitProperties;
 import discord4j.core.object.entity.User;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.gateway.GatewayClient;
 import discord4j.gateway.ShardInfo;
 import reactor.core.publisher.Mono;
@@ -23,7 +23,6 @@ import reactor.function.TupleUtils;
 
 import java.time.Duration;
 import java.util.Properties;
-import java.util.function.Consumer;
 
 public class BotInfoCmd extends SubCmd {
 
@@ -50,7 +49,7 @@ public class BotInfoCmd extends SubCmd {
                 }));
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, long start, User owner, long guildCount) {
+    private static EmbedCreateSpec formatEmbed(Context context, long start, User owner, long guildCount) {
         final long gatewayLatency = context.getClient().getGatewayClientGroup()
                 .find(context.getEvent().getShardInfo().getIndex())
                 .map(GatewayClient::getResponseTime)
@@ -81,12 +80,13 @@ public class BotInfoCmd extends SubCmd {
                         SystemUtil.getProcessCpuUsage(),
                         context.localize(SystemUtil.getThreadCount()));
 
-        return ShadbotUtil.getDefaultLegacyEmbed(embed -> embed
-                .setAuthor(context.localize("botinfo.title"), null, context.getAuthorAvatar())
+        return ShadbotUtil.createEmbedBuilder()
+                .author(context.localize("botinfo.title"), null, context.getAuthorAvatar())
                 .addField(shadbotTitle, shadbotField, true)
                 .addField(versionsTitle, versionsField, true)
                 .addField(performanceTitle, performanceField, true)
-                .addField(networkTitle, networkField, true));
+                .addField(networkTitle, networkField, true)
+                .build();
     }
 
 }

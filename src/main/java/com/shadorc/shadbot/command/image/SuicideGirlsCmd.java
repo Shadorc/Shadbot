@@ -8,11 +8,9 @@ import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
-
-import java.util.function.Consumer;
 
 public class SuicideGirlsCmd extends SubCmd {
 
@@ -36,11 +34,12 @@ public class SuicideGirlsCmd extends SubCmd {
                 });
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, SuicideGirl post) {
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor("SuicideGirls", post.getUrl(), context.getAuthorAvatar())
-                        .setDescription(context.localize("suicidegirls.name").formatted(post.getName()))
-                        .setImage(post.getImageUrl()));
+    private static EmbedCreateSpec formatEmbed(Context context, SuicideGirl post) {
+        return ShadbotUtil.createEmbedBuilder()
+                .author("SuicideGirls", post.getUrl(), context.getAuthorAvatar())
+                .description(context.localize("suicidegirls.name").formatted(post.getName()))
+                .image(post.getImageUrl())
+                .build();
     }
 
     private static Mono<SuicideGirl> getRandomSuicideGirl() {

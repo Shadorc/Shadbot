@@ -9,13 +9,12 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 public class XkcdCmd extends SubCmd {
 
@@ -49,10 +48,11 @@ public class XkcdCmd extends SubCmd {
                 .flatMap(xkcd -> context.editFollowupMessage(XkcdCmd.formatEmbed(context.getAuthorAvatar(), xkcd)));
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(String avatarUrl, XkcdResponse xkcd) {
-        return ShadbotUtil.getDefaultLegacyEmbed(embed ->
-                embed.setAuthor("XKCD: %s".formatted(xkcd.title()), "%s/%d".formatted(HOME_URL, xkcd.num()), avatarUrl)
-                        .setImage(xkcd.img()));
+    private static EmbedCreateSpec formatEmbed(String avatarUrl, XkcdResponse xkcd) {
+        return ShadbotUtil.createEmbedBuilder()
+                .author("XKCD: %s".formatted(xkcd.title()), "%s/%d".formatted(HOME_URL, xkcd.num()), avatarUrl)
+                .image(xkcd.img())
+                .build();
     }
 
     private Mono<XkcdResponse> getRandomXkcd() {

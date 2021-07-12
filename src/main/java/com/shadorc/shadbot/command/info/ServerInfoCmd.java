@@ -14,7 +14,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.object.entity.channel.VoiceChannel;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Image.Format;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class ServerInfoCmd extends SubCmd {
 
@@ -46,8 +45,8 @@ public class ServerInfoCmd extends SubCmd {
                 .flatMap(context::createFollowupMessage);
     }
 
-    private Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, Guild guild, List<GuildChannel> channels,
-                                                        Member owner, Region region) {
+    private EmbedCreateSpec formatEmbed(Context context, Guild guild, List<GuildChannel> channels,
+                                        Member owner, Region region) {
         final LocalDateTime creationTime = TimeUtil.toLocalDateTime(guild.getId().getTimestamp());
         final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
         final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
@@ -66,16 +65,17 @@ public class ServerInfoCmd extends SubCmd {
                 .formatted(Emoji.MICROPHONE, voiceChannels, Emoji.KEYBOARD, textChannels);
         final String membersTitle = Emoji.BUSTS_IN_SILHOUETTE + " " + context.localize("serverinfo.members");
 
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor(context.localize("serverinfo.title").formatted(guild.getName()), null,
+        return ShadbotUtil.createEmbedBuilder()
+                .author(context.localize("serverinfo.title").formatted(guild.getName()), null,
                         context.getAuthorAvatar())
-                        .setThumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
-                        .addField(idTitle, guild.getId().asString(), true)
-                        .addField(ownerTitle, owner.getTag(), true)
-                        .addField(regionTitle, region.getName(), true)
-                        .addField(creationTitle, creationField, true)
-                        .addField(channelsTitle, channelsField, true)
-                        .addField(membersTitle, context.localize(guild.getMemberCount()), true));
+                .thumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
+                .addField(idTitle, guild.getId().asString(), true)
+                .addField(ownerTitle, owner.getTag(), true)
+                .addField(regionTitle, region.getName(), true)
+                .addField(creationTitle, creationField, true)
+                .addField(channelsTitle, channelsField, true)
+                .addField(membersTitle, context.localize(guild.getMemberCount()), true)
+                .build();
     }
 
 }

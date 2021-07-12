@@ -2,12 +2,11 @@ package com.shadorc.shadbot.utils;
 
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.shadorc.shadbot.data.Config;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.EmbedData;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -25,15 +24,12 @@ public class ShadbotUtilTest {
 
     @Test
     public void testGetDefaultEmbed() {
-        final Consumer<LegacyEmbedCreateSpec> consumer = ShadbotUtil.getDefaultLegacyEmbed(embed -> {
-        });
-        final LegacyEmbedCreateSpec spec = new LegacyEmbedCreateSpec();
-        consumer.accept(spec);
+        final EmbedCreateSpec embed = ShadbotUtil.createEmbedBuilder().build();
         final EmbedData expected = EmbedData.builder()
                 .color(Config.BOT_COLOR.getRGB())
                 .fields(Collections.emptyList())
                 .build();
-        assertEquals(expected, spec.asRequest());
+        assertEquals(expected, embed.asRequest());
     }
 
 }

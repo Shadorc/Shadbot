@@ -14,7 +14,6 @@ import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
@@ -24,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 
@@ -81,24 +79,25 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
 
     @Override
     public Mono<Message> show() {
-        return Mono.defer(() -> {
-            final String description = "**%s**\n**%s**\n%s"
-                    .formatted(this.context.localize("trivia.description"), this.trivia.getQuestion(),
-                            FormatUtil.numberedList(this.answers.size(), this.answers.size(),
-                                    count -> "\t**%d**. %s".formatted(count, this.answers.get(count - 1))));
+        return Mono.
+                fromCallable(() -> {
+                    final String description = "**%s**\n**%s**\n%s"
+                            .formatted(this.context.localize("trivia.description"), this.trivia.getQuestion(),
+                                    FormatUtil.numberedList(this.answers.size(), this.answers.size(),
+                                            count -> "\t**%d**. %s".formatted(count, this.answers.get(count - 1))));
 
-            final Consumer<LegacyEmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultLegacyEmbed(
-                    embed -> embed.setAuthor(this.context.localize("trivia.title"), null, this.context.getAuthorAvatar())
-                            .setDescription(description)
+                    return ShadbotUtil.createEmbedBuilder()
+                            .author(this.context.localize("trivia.title"), null, this.context.getAuthorAvatar())
+                            .description(description)
                             .addField(this.context.localize("trivia.category"),
                                     "`%s`".formatted(this.trivia.category()), true)
                             .addField(this.context.localize("trivia.difficulty"),
                                     "`%s`".formatted(this.trivia.difficulty()), true)
-                            .setFooter(this.context.localize("trivia.footer")
-                                    .formatted(this.duration.toSeconds(), Emoji.RED_CROSS), null));
-
-            return this.context.createFollowupMessage(embedConsumer);
-        });
+                            .footer(this.context.localize("trivia.footer")
+                                    .formatted(this.duration.toSeconds(), Emoji.RED_CROSS), null)
+                            .build();
+                })
+                .flatMap(this.context::createFollowupMessage);
     }
 
     protected Mono<Message> win(Member member) {

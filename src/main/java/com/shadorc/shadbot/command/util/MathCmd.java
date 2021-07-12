@@ -18,8 +18,10 @@ public class MathCmd extends Cmd {
 
     public MathCmd() {
         super(CommandCategory.UTILS, "math", "Evaluate an expression");
-        this.addOption("expression", "Expression to evaluate (example: 2*cos(pi))", true,
-                ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("expression")
+                .description("Expression to evaluate (example: 2*cos(pi))")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
 
         this.evaluator = new DoubleEvaluator();
     }

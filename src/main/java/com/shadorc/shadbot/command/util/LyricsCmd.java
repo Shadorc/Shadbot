@@ -17,7 +17,7 @@ import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.object.Embed;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -30,7 +30,6 @@ import reactor.util.retry.Retry;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -63,15 +62,16 @@ public class LyricsCmd extends Cmd {
                         context.localize("lyrics.not.found").formatted(search)));
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, Musixmatch musixmatch) {
+    private static EmbedCreateSpec formatEmbed(Context context, Musixmatch musixmatch) {
         final String artist = StringUtil.abbreviate(musixmatch.getArtist(), MAX_TITLE_LENGTH);
         final String musicTitle = StringUtil.abbreviate(musixmatch.getTitle(), MAX_TITLE_LENGTH);
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor(context.localize("lyrics.title").formatted(artist, musicTitle),
+        return ShadbotUtil.createEmbedBuilder()
+                .author(context.localize("lyrics.title").formatted(artist, musicTitle),
                         musixmatch.url(), context.getAuthorAvatar())
-                        .setThumbnail(musixmatch.getImageUrl())
-                        .setDescription(StringUtil.abbreviate(musixmatch.getLyrics(), MAX_LYRICS_LENGTH))
-                        .setFooter(context.localize("lyrics.footer"), "https://i.imgur.com/G7q6Hmq.png"));
+                .thumbnail(musixmatch.getImageUrl())
+                .description(StringUtil.abbreviate(musixmatch.getLyrics(), MAX_LYRICS_LENGTH))
+                .footer(context.localize("lyrics.footer"), "https://i.imgur.com/G7q6Hmq.png")
+                .build();
     }
 
     private static Mono<Musixmatch> getMusixmatch(String search) {

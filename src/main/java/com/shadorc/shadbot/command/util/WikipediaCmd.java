@@ -12,19 +12,21 @@ import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.object.Embed;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class WikipediaCmd extends Cmd {
 
     public WikipediaCmd() {
         super(CommandCategory.UTILS, "wikipedia", "Search for Wikipedia article");
-        this.addOption("word", "The word to search", true, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("word")
+                .description("The word to search")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override
@@ -45,15 +47,16 @@ public class WikipediaCmd extends Cmd {
                         .formatted(word)));
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, WikipediaPage page) {
+    private static EmbedCreateSpec formatEmbed(Context context, WikipediaPage page) {
         final String extract = StringUtil.abbreviate(page.extract().orElseThrow(), Embed.MAX_DESCRIPTION_LENGTH);
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor(context.localize("wikipedia.title").formatted(page.title()),
+        return ShadbotUtil.createEmbedBuilder()
+                .author(context.localize("wikipedia.title").formatted(page.title()),
                         "https://%s.wikipedia.org/wiki/%s"
                                 .formatted(context.getLocale().getLanguage(),
                                         page.getEncodedTitle()), context.getAuthorAvatar())
-                        .setThumbnail("https://i.imgur.com/7X7Cvhf.png")
-                        .setDescription(extract));
+                .thumbnail("https://i.imgur.com/7X7Cvhf.png")
+                .description(extract)
+                .build();
     }
 
     private static Mono<WikipediaPage> getWikipediaPage(Locale locale, String search) {

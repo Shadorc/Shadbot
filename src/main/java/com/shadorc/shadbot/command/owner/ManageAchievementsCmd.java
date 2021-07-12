@@ -31,7 +31,10 @@ public class ManageAchievementsCmd extends SubCmd {
                 .required(true)
                 .type(ApplicationCommandOptionType.STRING.getValue())
                 .choices(DiscordUtil.toOptions(Achievement.class)));
-        this.addOption("user", "The user", true, ApplicationCommandOptionType.USER);
+        this.addOption(option -> option.name("user")
+                .description("The user")
+                .required(true)
+                .type(ApplicationCommandOptionType.USER.getValue()));
     }
 
     @Override

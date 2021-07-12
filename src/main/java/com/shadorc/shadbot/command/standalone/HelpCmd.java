@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.database.guilds.entity.Settings;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,13 +17,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 public class HelpCmd extends Cmd {
 
     public HelpCmd() {
         super(CommandCategory.INFO, "help", "Show the list of available commands");
-        this.addOption("command", "Show help about a specific command", false, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("command")
+                .description("Show help about a specific command")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override
@@ -46,22 +48,23 @@ public class HelpCmd extends Cmd {
                 .flatMap(context::createFollowupMessage);
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(I18nContext context, Map<CommandCategory, Collection<String>> map, String avatarUrl) {
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> {
-                    embed.setAuthor(context.localize("help.title"), "https://github.com/Shadorc/Shadbot/wiki/Commands", avatarUrl);
-                    embed.setDescription(context.localize("help.description")
-                            .formatted(Config.SUPPORT_SERVER_URL, Config.PATREON_URL));
-                    embed.setFooter(context.localize("help.footer"), "https://i.imgur.com/eaWQxvS.png");
+    private static EmbedCreateSpec formatEmbed(I18nContext context, Map<CommandCategory, Collection<String>> map,
+                                               String avatarUrl) {
+        final EmbedCreateSpec.Builder embed = ShadbotUtil.createEmbedBuilder()
+                .author(context.localize("help.title"), "https://github.com/Shadorc/Shadbot/wiki/Commands", avatarUrl)
+                .description(context.localize("help.description")
+                        .formatted(Config.SUPPORT_SERVER_URL, Config.PATREON_URL))
+                .footer(context.localize("help.footer"), "https://i.imgur.com/eaWQxvS.png");
 
-                    for (final CommandCategory category : CommandCategory.values()) {
-                        final Collection<String> cmds = map.get(category);
-                        if (cmds != null && !cmds.isEmpty()) {
-                            embed.addField(context.localize("help.field.title").formatted(category.getName()),
-                                    String.join(" ", cmds), false);
-                        }
-                    }
-                });
+        for (final CommandCategory category : CommandCategory.values()) {
+            final Collection<String> cmds = map.get(category);
+            if (cmds != null && !cmds.isEmpty()) {
+                embed.addField(context.localize("help.field.title").formatted(category.getName()),
+                        String.join(" ", cmds), false);
+            }
+        }
+
+        return embed.build();
     }
 
     private static Mono<Map<CommandCategory, Collection<String>>> getMultiMap(Context context, List<CommandPermission> authorPermissions) {

@@ -15,13 +15,12 @@ import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.util.function.Consumer;
 
 public class FortniteCmd extends SubCmd {
 
@@ -41,7 +40,10 @@ public class FortniteCmd extends SubCmd {
                 .required(true)
                 .type(ApplicationCommandOptionType.STRING.getValue())
                 .choices(DiscordUtil.toOptions(Platform.class)));
-        this.addOption("username", "Epic nickname", true, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("username")
+                .description("Epic nickname")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
 
         this.cachedValues = MultiValueCache.Builder.<String, FortniteResponse>create()
                 .withTtl(Config.CACHE_TTL)
@@ -88,11 +90,12 @@ public class FortniteCmd extends SubCmd {
                 .formatted(platform.name().toLowerCase(), encodedUsername);
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, String profileUrl, String description) {
-        return ShadbotUtil.getDefaultLegacyEmbed(embed ->
-                embed.setAuthor(context.localize("fortnite.title"), profileUrl, context.getAuthorAvatar())
-                        .setThumbnail("https://i.imgur.com/8NrvS8e.png")
-                        .setDescription(description));
+    private static EmbedCreateSpec formatEmbed(Context context, String profileUrl, String description) {
+        return ShadbotUtil.createEmbedBuilder()
+                .author(context.localize("fortnite.title"), profileUrl, context.getAuthorAvatar())
+                .thumbnail("https://i.imgur.com/8NrvS8e.png")
+                .description(description)
+                .build();
     }
 
     private static String formatDescription(Context context, Stats stats, String username) {

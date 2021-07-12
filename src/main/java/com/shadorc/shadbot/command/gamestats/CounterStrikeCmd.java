@@ -23,13 +23,12 @@ import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class CounterStrikeCmd extends SubCmd {
@@ -145,7 +144,7 @@ public class CounterStrikeCmd extends SubCmd {
                 .next();
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, PlayerSummary player, List<Stats> stats) {
+    private static EmbedCreateSpec formatEmbed(Context context, PlayerSummary player, List<Stats> stats) {
         final Map<String, Integer> statsMap = stats.stream()
                 .collect(Collectors.toMap(Stats::name, Stats::value));
 
@@ -167,19 +166,20 @@ public class CounterStrikeCmd extends SubCmd {
         final int killsHeadshot = statsMap.get("total_kills_headshot");
         final float headshotRate = (float) killsHeadshot / kills * 100;
 
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor(context.localize("cs.title"),
+        return ShadbotUtil.createEmbedBuilder()
+                .author(context.localize("cs.title"),
                         "http://steamcommunity.com/profiles/%s".formatted(player.steamId()), context.getAuthorAvatar())
-                        .setThumbnail(player.avatarFull())
-                        .setDescription(context.localize("cs.description").formatted(player.personaName()))
-                        .addField(context.localize("cs.kills"), context.localize(kills), true)
-                        .addField(context.localize("cs.playtime"), context.localize("counterstrike.time.played")
-                                .formatted(context.localize(timePlayed)), true)
-                        .addField(context.localize("cs.mvp"), context.localize(mvps), true)
-                        .addField(context.localize("cs.win"), "%s%%".formatted(context.localize(winRate)), true)
-                        .addField(context.localize("cs.accuracy"), "%s%%".formatted(context.localize(accuracyRate)), true)
-                        .addField(context.localize("cs.headshot"), "%s%%".formatted(context.localize(headshotRate)), true)
-                        .addField(context.localize("cs.ratio"), context.localize(ratio), true));
+                .thumbnail(player.avatarFull())
+                .description(context.localize("cs.description").formatted(player.personaName()))
+                .addField(context.localize("cs.kills"), context.localize(kills), true)
+                .addField(context.localize("cs.playtime"), context.localize("counterstrike.time.played")
+                        .formatted(context.localize(timePlayed)), true)
+                .addField(context.localize("cs.mvp"), context.localize(mvps), true)
+                .addField(context.localize("cs.win"), "%s%%".formatted(context.localize(winRate)), true)
+                .addField(context.localize("cs.accuracy"), "%s%%".formatted(context.localize(accuracyRate)), true)
+                .addField(context.localize("cs.headshot"), "%s%%".formatted(context.localize(headshotRate)), true)
+                .addField(context.localize("cs.ratio"), context.localize(ratio), true)
+                .build();
     }
 
 }

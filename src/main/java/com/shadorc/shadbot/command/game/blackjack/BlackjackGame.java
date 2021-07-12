@@ -65,7 +65,7 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
                     final Hand visibleDealerHand = this.isScheduled() ?
                             new Hand(this.dealerHand.getCards().subList(0, 1)) : this.dealerHand;
 
-                    final EmbedCreateSpec.Builder embed = ShadbotUtil.getDefaultEmbed()
+                    final EmbedCreateSpec.Builder embed = ShadbotUtil.createEmbedBuilder()
                             .author(this.context.localize("blackjack.title"), null, this.getContext().getAuthorAvatar())
                             .thumbnail("https://i.imgur.com/oESeVrU.png")
                             .description(this.context.localize("blackjack.description")

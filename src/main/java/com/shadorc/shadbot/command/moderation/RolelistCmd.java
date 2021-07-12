@@ -10,6 +10,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -44,35 +45,46 @@ public class RolelistCmd extends SubCmd {
 
                     return Mono.zip(Mono.just(mentionedRoles), getUsernames);
                 })
-                .map(TupleUtils.function((mentionedRoles, usernames) -> ShadbotUtil.getDefaultLegacyEmbed(
-                        embed -> {
-                            embed.setAuthor(context.localize("rolelist.title"), null, context.getAuthorAvatar());
+                .map(TupleUtils.function((mentionedRoles, usernames) -> {
+                    final EmbedCreateSpec.Builder embed = ShadbotUtil.createEmbedBuilder()
+                            .author(context.localize("rolelist.title"), null, context.getAuthorAvatar());
 
-                            if (usernames.isEmpty()) {
-                                if (mentionedRoles.size() == 1) {
-                                    embed.setDescription(context.localize("rolelist.nobody.singular"));
-                                } else {
-                                    embed.setDescription(context.localize("rolelist.nobody.plural"));
-                                }
-                                return;
-                            }
+                    if (usernames.isEmpty()) {
+                        if (mentionedRoles.size() == 1) {
+                            embed.description(context.localize("rolelist.nobody.singular"));
+                        } else {
+                            embed.description(context.localize("rolelist.nobody.plural"));
+                        }
+                        return embed.build();
+                    }
 
-                            final String rolesFormatted = FormatUtil.format(mentionedRoles, Role::getMention, ", ");
-                            embed.setDescription(context.localize("rolelist.description")
-                                    .formatted(rolesFormatted));
+                    final String rolesFormatted = FormatUtil.format(mentionedRoles, Role::getMention, ", ");
+                    embed.description(context.localize("rolelist.description")
+                            .formatted(rolesFormatted));
 
-                            FormatUtil.createColumns(usernames, 25)
-                                    .forEach(field -> embed.addField(field.name(), field.value(), true));
-                        })))
+                    FormatUtil.createColumns(usernames, 25)
+                            .forEach(field -> embed.addField(field.name(), field.value(), true));
+
+                    return embed.build();
+                }))
                 .flatMap(context::createFollowupMessage);
     }
 
     public RolelistCmd(final GroupCmd groupCmd) {
         super(groupCmd, CommandCategory.MODERATION, "rolelist", "Show a list of members with specific role(s)");
 
-        this.addOption("role1", "The first role to have", true, ApplicationCommandOptionType.ROLE);
-        this.addOption("role2", "The second role to have", false, ApplicationCommandOptionType.ROLE);
-        this.addOption("role3", "The third role to have", false, ApplicationCommandOptionType.ROLE);
+        this.addOption(option -> option.name("role1")
+                .description("The first role to have")
+                .required(true)
+                .type(ApplicationCommandOptionType.ROLE.getValue()));
+        this.addOption(option -> option.name("role2")
+                .description("The second role to have")
+                .required(false)
+                .type(ApplicationCommandOptionType.ROLE.getValue()));
+        this.addOption(option -> option.name("role3")
+                .description("The third role to have")
+                .required(false)
+                .type(ApplicationCommandOptionType.ROLE.getValue()));
     }
 
 }

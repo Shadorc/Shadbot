@@ -11,13 +11,12 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.object.Embed;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.function.Consumer;
 
 public class ThisDayCmd extends Cmd {
 
@@ -47,12 +46,13 @@ public class ThisDayCmd extends Cmd {
                 .flatMap(thisDay -> context.editFollowupMessage(ThisDayCmd.formatEmbed(context, thisDay)));
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, ThisDay thisDay) {
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor(context.localize("thisday.title").formatted(thisDay.getDate()),
+    private static EmbedCreateSpec formatEmbed(Context context, ThisDay thisDay) {
+        return ShadbotUtil.createEmbedBuilder()
+                .author(context.localize("thisday.title").formatted(thisDay.getDate()),
                         HOME_URL, context.getAuthorAvatar())
-                        .setThumbnail("https://i.imgur.com/FdfyJDD.png")
-                        .setDescription(StringUtil.abbreviate(thisDay.getEvents(), Embed.MAX_DESCRIPTION_LENGTH)));
+                .thumbnail("https://i.imgur.com/FdfyJDD.png")
+                .description(StringUtil.abbreviate(thisDay.getEvents(), Embed.MAX_DESCRIPTION_LENGTH))
+                .build();
     }
 
     private static Duration getNextUpdate() {

@@ -32,16 +32,46 @@ public abstract class RemoveMembersCmd extends SubCmd {
         this.permission = permission;
         this.keyword = keyword;
 
-        this.addOption("user1", "The first user to %s".formatted(keyword), true, ApplicationCommandOptionType.USER);
-        this.addOption("user2", "The second user to %s".formatted(keyword), false, ApplicationCommandOptionType.USER);
-        this.addOption("user3", "The third user to %s".formatted(keyword), false, ApplicationCommandOptionType.USER);
-        this.addOption("user4", "The fourth user to %s".formatted(keyword), false, ApplicationCommandOptionType.USER);
-        this.addOption("user5", "The fifth user to %s".formatted(keyword), false, ApplicationCommandOptionType.USER);
-        this.addOption("user6", "The sixth user to %s".formatted(keyword), false, ApplicationCommandOptionType.USER);
-        this.addOption("user7", "The seventh user to %s".formatted(keyword), false, ApplicationCommandOptionType.USER);
-        this.addOption("user8", "The eighth user to %s".formatted(keyword), false, ApplicationCommandOptionType.USER);
-        this.addOption("user9", "The ninth user to %s".formatted(keyword), false, ApplicationCommandOptionType.USER);
-        this.addOption("reason", "The reason", false, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("user1")
+                .description("The first user to %s".formatted(keyword))
+                .required(true)
+                .type(ApplicationCommandOptionType.USER.getValue()));
+        this.addOption(option -> option.name("user2")
+                .description("The second user to %s".formatted(keyword))
+                .required(false)
+                .type(ApplicationCommandOptionType.USER.getValue()));
+        this.addOption(option -> option.name("user3")
+                .description("The third user to %s".formatted(keyword))
+                .required(false)
+                .type(ApplicationCommandOptionType.USER.getValue()));
+        this.addOption(option -> option.name("user4")
+                .description("The fourth user to %s".formatted(keyword))
+                .required(false)
+                .type(ApplicationCommandOptionType.USER.getValue()));
+        this.addOption(option -> option.name("user5")
+                .description("The fifth user to %s".formatted(keyword))
+                .required(false)
+                .type(ApplicationCommandOptionType.USER.getValue()));
+        this.addOption(option -> option.name("user6")
+                .description("The sixth user to %s".formatted(keyword))
+                .required(false)
+                .type(ApplicationCommandOptionType.USER.getValue()));
+        this.addOption(option -> option.name("user7")
+                .description("The seventh user to %s".formatted(keyword))
+                .required(false)
+                .type(ApplicationCommandOptionType.USER.getValue()));
+        this.addOption(option -> option.name("user8")
+                .description("The eighth user to %s".formatted(keyword))
+                .required(false)
+                .type(ApplicationCommandOptionType.USER.getValue()));
+        this.addOption(option -> option.name("user9")
+                .description("The ninth user to %s".formatted(keyword))
+                .required(false)
+                .type(ApplicationCommandOptionType.USER.getValue()));
+        this.addOption(option -> option.name("reason")
+                .description("The reason")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override

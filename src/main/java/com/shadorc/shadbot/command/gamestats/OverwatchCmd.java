@@ -17,14 +17,13 @@ import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
 import java.io.IOException;
 import java.util.Locale;
-import java.util.function.Consumer;
 
 public class OverwatchCmd extends SubCmd {
 
@@ -83,28 +82,29 @@ public class OverwatchCmd extends SubCmd {
                 });
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, OverwatchProfile overwatchProfile, Platform platform) {
+    private static EmbedCreateSpec formatEmbed(Context context, OverwatchProfile overwatchProfile, Platform platform) {
         final ProfileResponse profile = overwatchProfile.profile();
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor(context.localize("overwatch.title"),
+        return ShadbotUtil.createEmbedBuilder()
+                .author(context.localize("overwatch.title"),
                         "https://playoverwatch.com/en-gb/career/%s/%s"
                                 .formatted(platform.getName(), profile.username()),
                         context.getAuthorAvatar())
-                        .setThumbnail(profile.portrait())
-                        .setDescription(context.localize("overwatch.description")
-                                .formatted(profile.username()))
-                        .addField(context.localize("overwatch.level"),
-                                Integer.toString(profile.level()), true)
-                        .addField(context.localize("overwatch.playtime"),
-                                profile.getQuickplayPlaytime(), true)
-                        .addField(context.localize("overwatch.games.won"),
-                                context.localize(profile.games().getQuickplayWon()), true)
-                        .addField(context.localize("overwatch.ranks"),
-                                OverwatchCmd.formatCompetitive(context, profile.competitive()), true)
-                        .addField(context.localize("overwatch.heroes.played"),
-                                overwatchProfile.getQuickplay().getPlayed(), true)
-                        .addField(context.localize("overwatch.heroes.ratio"),
-                                overwatchProfile.getQuickplay().getEliminationsPerLife(), true));
+                .thumbnail(profile.portrait())
+                .description(context.localize("overwatch.description")
+                        .formatted(profile.username()))
+                .addField(context.localize("overwatch.level"),
+                        Integer.toString(profile.level()), true)
+                .addField(context.localize("overwatch.playtime"),
+                        profile.getQuickplayPlaytime(), true)
+                .addField(context.localize("overwatch.games.won"),
+                        context.localize(profile.games().getQuickplayWon()), true)
+                .addField(context.localize("overwatch.ranks"),
+                        OverwatchCmd.formatCompetitive(context, profile.competitive()), true)
+                .addField(context.localize("overwatch.heroes.played"),
+                        overwatchProfile.getQuickplay().getPlayed(), true)
+                .addField(context.localize("overwatch.heroes.ratio"),
+                        overwatchProfile.getQuickplay().getEliminationsPerLife(), true)
+                .build();
     }
 
     private static String formatCompetitive(Context context, Competitive competitive) {

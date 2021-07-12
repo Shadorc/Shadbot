@@ -36,8 +36,14 @@ public class AutoMessagesSetting extends SubCmd {
                 .required(true)
                 .type(ApplicationCommandOptionType.STRING.getValue())
                 .choices(DiscordUtil.toOptions(Type.class)));
-        this.addOption("message", "The message to automatically send", false, ApplicationCommandOptionType.STRING);
-        this.addOption("channel", "The channel in which send the automatic message", false, ApplicationCommandOptionType.CHANNEL);
+        this.addOption(option -> option.name("message")
+                .description("The message to automatically send")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("channel")
+                .description("The channel in which send the automatic message")
+                .required(false)
+                .type(ApplicationCommandOptionType.CHANNEL.getValue()));
     }
 
     @Override

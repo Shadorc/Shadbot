@@ -62,12 +62,12 @@ public class RussianRouletteCmd extends SubCmd {
                     }
                 }))
                 .map(StringBuilder::toString)
-                .map(description -> ShadbotUtil.getDefaultLegacyEmbed(
-                        embed -> embed.setAuthor(context.localize("russianroulette.title"),
-                                null, context.getAuthorAvatar())
-                                .addField(context.localize("russianroulette.tries"),
-                                        "%d/6".formatted(player.getRemaining()), false)
-                                .setDescription(description)))
+                .map(description -> ShadbotUtil.createEmbedBuilder()
+                        .author(context.localize("russianroulette.title"), null, context.getAuthorAvatar())
+                        .addField(context.localize("russianroulette.tries"),
+                                "%d/6".formatted(player.getRemaining()), false)
+                        .description(description)
+                        .build())
                 .flatMap(context::createFollowupMessage);
     }
 

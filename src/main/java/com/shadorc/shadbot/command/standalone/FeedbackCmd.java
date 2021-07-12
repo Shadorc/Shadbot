@@ -18,7 +18,10 @@ public class FeedbackCmd extends Cmd {
     public FeedbackCmd() {
         super(CommandCategory.INFO, "feedback", "Send a feedback");
         this.setRateLimiter(new RateLimiter(1, Duration.ofMinutes(10)));
-        this.addOption("message", "Your feedback", true, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("message")
+                .description("Your feedback")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override

@@ -10,7 +10,7 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class UserInfoCmd extends SubCmd {
 
@@ -27,8 +26,10 @@ public class UserInfoCmd extends SubCmd {
 
     public UserInfoCmd(final GroupCmd groupCmd) {
         super(groupCmd, CommandCategory.INFO, "user", "Show user info");
-        this.addOption("user", "If not specified, it will show your info", false,
-                ApplicationCommandOptionType.USER);
+        this.addOption(option -> option.name("user")
+                .description("If not specified, it will show your info")
+                .required(false)
+                .type(ApplicationCommandOptionType.USER.getValue()));
 
         this.dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.MEDIUM);
     }
@@ -44,7 +45,7 @@ public class UserInfoCmd extends SubCmd {
                 .flatMap(context::createFollowupMessage);
     }
 
-    private Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, Member member, List<Role> roles) {
+    private EmbedCreateSpec formatEmbed(Context context, Member member, List<Role> roles) {
         final DateTimeFormatter dateFormatter = this.dateFormatter.withLocale(context.getLocale());
 
         final StringBuilder usernameBuilder = new StringBuilder(member.getTag());
@@ -77,25 +78,25 @@ public class UserInfoCmd extends SubCmd {
         final String badgesField = FormatUtil.format(member.getPublicFlags(), FormatUtil::capitalizeEnum, "\n");
         final String rolesField = FormatUtil.format(roles, Role::getMention, "\n");
 
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> {
-                    embed.setAuthor(context.localize("userinfo.title").formatted(usernameBuilder), null, context.getAuthorAvatar())
-                            .setThumbnail(member.getAvatarUrl())
-                            .addField(idTitle, member.getId().asString(), true)
-                            .addField(nameTitle, member.getDisplayName(), true)
-                            .addField(creationTitle, creationField, true)
-                            .addField(joinTitle, joinField, true);
+        final EmbedCreateSpec.Builder embed = ShadbotUtil.createEmbedBuilder()
+                .author(context.localize("userinfo.title").formatted(usernameBuilder), null, context.getAuthorAvatar())
+                .thumbnail(member.getAvatarUrl())
+                .addField(idTitle, member.getId().asString(), true)
+                .addField(nameTitle, member.getDisplayName(), true)
+                .addField(creationTitle, creationField, true)
+                .addField(joinTitle, joinField, true);
 
-                    if (!badgesField.isEmpty()) {
-                        final String badgesTitle = Emoji.MILITARY_MEDAL + " " + context.localize("userinfo.badges");
-                        embed.addField(badgesTitle, badgesField, true);
-                    }
+        if (!badgesField.isEmpty()) {
+            final String badgesTitle = Emoji.MILITARY_MEDAL + " " + context.localize("userinfo.badges");
+            embed.addField(badgesTitle, badgesField, true);
+        }
 
-                    if (!rolesField.isEmpty()) {
-                        final String rolesTitle = Emoji.LOCK + " " + context.localize("userinfo.roles");
-                        embed.addField(rolesTitle, rolesField, true);
-                    }
-                });
+        if (!rolesField.isEmpty()) {
+            final String rolesTitle = Emoji.LOCK + " " + context.localize("userinfo.roles");
+            embed.addField(rolesTitle, rolesField, true);
+        }
+
+        return embed.build();
     }
 
 }

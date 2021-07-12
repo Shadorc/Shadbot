@@ -4,13 +4,12 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import reactor.util.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public abstract class HelpBuilder {
@@ -41,22 +40,23 @@ public abstract class HelpBuilder {
         return this;
     }
 
-    public Consumer<LegacyEmbedCreateSpec> build() {
-        return ShadbotUtil.getDefaultLegacyEmbed(embed -> {
-            if (!StringUtil.isBlank(this.authorName)) {
-                embed.setAuthor(this.authorName, this.authorUrl, this.context.getAuthorAvatar());
-            }
-            embed.addField(this.context.localize("help.usage"), this.getUsage(), false);
+    public EmbedCreateSpec build() {
+        final EmbedCreateSpec.Builder embed = ShadbotUtil.createEmbedBuilder();
+        if (!StringUtil.isBlank(this.authorName)) {
+            embed.author(this.authorName, this.authorUrl, this.context.getAuthorAvatar());
+        }
+        embed.addField(this.context.localize("help.usage"), this.getUsage(), false);
 
-            if (!StringUtil.isBlank(this.description)) {
-                embed.setDescription(this.description);
-            }
+        if (!StringUtil.isBlank(this.description)) {
+            embed.description(this.description);
+        }
 
-            final String args = this.getArguments();
-            if (!StringUtil.isBlank(args)) {
-                embed.addField(this.context.localize("help.arguments"), args, false);
-            }
-        });
+        final String args = this.getArguments();
+        if (!StringUtil.isBlank(args)) {
+            embed.addField(this.context.localize("help.arguments"), args, false);
+        }
+
+        return embed.build();
     }
 
     protected abstract String getCommandName();

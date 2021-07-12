@@ -21,8 +21,10 @@ public class SkipCmd extends Cmd {
         super(CommandCategory.MUSIC, "skip",
                 "Skip current music and play the next one or directly skip to a music in the playlist");
         this.setRateLimiter(new RateLimiter(1, Duration.ofSeconds(1)));
-        this.addOption("index", "The index of the music in the playlist to play",
-                false, ApplicationCommandOptionType.INTEGER);
+        this.addOption(option -> option.name("index")
+                .description("The index of the music in the playlist to play")
+                .required(false)
+                .type(ApplicationCommandOptionType.INTEGER.getValue()));
     }
 
     @Override

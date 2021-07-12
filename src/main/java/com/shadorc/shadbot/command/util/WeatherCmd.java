@@ -11,7 +11,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.EnumUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import net.aksingh.owmjapis.api.APIException;
@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class WeatherCmd extends Cmd {
@@ -34,8 +33,14 @@ public class WeatherCmd extends Cmd {
 
     public WeatherCmd() {
         super(CommandCategory.UTILS, "weather", "Search weather report for a city");
-        this.addOption("city", "The city", true, ApplicationCommandOptionType.STRING);
-        this.addOption("country", "The country", false, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("city")
+                .description("The city")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("country")
+                .description("The country")
+                .required(false)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
 
         this.dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.MEDIUM);
         final String apiKey = CredentialManager.get(Credential.OPENWEATHERMAP_API_KEY);
@@ -85,7 +90,7 @@ public class WeatherCmd extends Cmd {
         return thr -> thr instanceof APIException err && err.getCode() == HttpResponseStatus.NOT_FOUND.code();
     }
 
-    private Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, WeatherWrapper weather) {
+    private EmbedCreateSpec formatEmbed(Context context, WeatherWrapper weather) {
         final DateTimeFormatter formatter = this.dateFormatter.withLocale(context.getLocale());
 
         final String title = context.localize("weather.title")
@@ -102,15 +107,16 @@ public class WeatherCmd extends Cmd {
         final String humidity = "%s%%".formatted(context.localize(weather.getHumidity()));
         final String temperature = "%s°C".formatted(context.localize(weather.getTemp()));
 
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor(title, url, context.getAuthorAvatar())
-                        .setThumbnail(weather.getIconLink())
-                        .setDescription(context.localize("weather.last.updated").formatted(lastUpdated))
-                        .addField(Emoji.CLOUD + " " + context.localize("weather.clouds"), clouds, true)
-                        .addField(Emoji.WIND + " " + context.localize("weather.wind"), wind, true)
-                        .addField(Emoji.RAIN + " " + context.localize("weather.rain"), rain, true)
-                        .addField(Emoji.DROPLET + " " + context.localize("weather.humidity"), humidity, true)
-                        .addField(Emoji.THERMOMETER + " " + context.localize("weather.temperature"), temperature, true));
+        return ShadbotUtil.createEmbedBuilder()
+                .author(title, url, context.getAuthorAvatar())
+                .thumbnail(weather.getIconLink())
+                .description(context.localize("weather.last.updated").formatted(lastUpdated))
+                .addField(Emoji.CLOUD + " " + context.localize("weather.clouds"), clouds, true)
+                .addField(Emoji.WIND + " " + context.localize("weather.wind"), wind, true)
+                .addField(Emoji.RAIN + " " + context.localize("weather.rain"), rain, true)
+                .addField(Emoji.DROPLET + " " + context.localize("weather.humidity"), humidity, true)
+                .addField(Emoji.THERMOMETER + " " + context.localize("weather.temperature"), temperature, true)
+                .build();
     }
 
 }

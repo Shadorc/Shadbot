@@ -9,6 +9,7 @@ import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.object.entity.Message;
+import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -62,10 +63,11 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
     @Override
     public Mono<Message> show() {
         return Mono.
-                fromCallable(() -> ShadbotUtil.getDefaultLegacyEmbed(embed -> {
-                    embed.setAuthor(this.context.localize("dice.title"), null, this.getContext().getAuthorAvatar())
-                            .setThumbnail("https://i.imgur.com/XgOilIW.png")
-                            .setDescription(this.context.localize("dice.description")
+                fromCallable(() -> {
+                    final EmbedCreateSpec.Builder embed = ShadbotUtil.createEmbedBuilder()
+                            .author(this.context.localize("dice.title"), null, this.getContext().getAuthorAvatar())
+                            .thumbnail("https://i.imgur.com/XgOilIW.png")
+                            .description(this.context.localize("dice.description")
                                     .formatted(this.context.getCommandName(), this.context.getSubCommandGroupName().orElseThrow(),
                                             DiceCmd.JOIN_SUB_COMMAND, this.context.localize(this.bet)))
                             .addField(this.context.localize("dice.player.title"), FormatUtil.format(this.players.values(),
@@ -75,12 +77,13 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
 
                     if (this.isScheduled()) {
                         final Duration remainingDuration = this.getDuration().minus(TimeUtil.elapsed(this.startTimer));
-                        embed.setFooter(this.context.localize("dice.footer.remaining")
+                        embed.footer(this.context.localize("dice.footer.remaining")
                                 .formatted(remainingDuration.toSeconds()), null);
                     } else {
-                        embed.setFooter(this.context.localize("dice.footer.finished"), null);
+                        embed.footer(this.context.localize("dice.footer.finished"), null);
                     }
-                }))
+                    return embed.build();
+                })
                 .flatMap(this.context::editFollowupMessage);
     }
 

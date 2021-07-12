@@ -18,10 +18,10 @@ public class ForwardCmd extends Cmd {
 
     public ForwardCmd() {
         super(CommandCategory.MUSIC, "forward", "Fast forward the current music a specified amount of time");
-        this.addOption("time",
-                "Number of seconds or formatted time (e.g. 72 or 1m12s)",
-                true,
-                ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("time")
+                .description("Number of seconds or formatted time (e.g. 72 or 1m12s)")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override

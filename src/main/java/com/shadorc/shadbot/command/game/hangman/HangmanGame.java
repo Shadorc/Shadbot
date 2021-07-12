@@ -11,6 +11,7 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.object.entity.Message;
+import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -62,14 +63,15 @@ public class HangmanGame extends MultiplayerGame<Player> {
 
     @Override
     public Mono<Message> show() {
-        return Mono.fromCallable(() -> ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> {
-                    embed.setAuthor(this.context.localize("hangman.title"), null, this.getContext().getAuthorAvatar());
-                    embed.setThumbnail("https://i.imgur.com/Vh9WyaU.png");
-                    embed.addField(this.context.localize("hangman.word"), this.getRepresentation(this.word), false);
-                    embed.setDescription(this.context.localize("hangman.description")
-                            .formatted(this.context.getCommandName(), this.context.getSubCommandGroupName().orElseThrow(),
-                                    HangmanCmd.JOIN_SUB_COMMAND));
+        return Mono.
+                fromCallable(() -> {
+                    final EmbedCreateSpec.Builder embed = ShadbotUtil.createEmbedBuilder()
+                            .author(this.context.localize("hangman.title"), null, this.getContext().getAuthorAvatar())
+                            .thumbnail("https://i.imgur.com/Vh9WyaU.png")
+                            .description(this.context.localize("hangman.description")
+                                    .formatted(this.context.getCommandName(), this.context.getSubCommandGroupName().orElseThrow(),
+                                            HangmanCmd.JOIN_SUB_COMMAND))
+                            .addField(this.context.localize("hangman.word"), this.getRepresentation(this.word), false);
 
                     final List<String> missedLetters = this.lettersTested.stream()
                             .filter(letter -> !this.word.contains(letter))
@@ -82,17 +84,19 @@ public class HangmanGame extends MultiplayerGame<Player> {
 
                     if (this.isScheduled()) {
                         final Duration remainingDuration = this.getDuration().minus(TimeUtil.elapsed(this.startTimer));
-                        embed.setFooter(this.context.localize("hangman.footer.remaining")
+                        embed.footer(this.context.localize("hangman.footer.remaining")
                                 .formatted(remainingDuration.toSeconds()), null);
                     } else {
-                        embed.setFooter(this.context.localize("hangman.footer.finished")
+                        embed.footer(this.context.localize("hangman.footer.finished")
                                 .formatted(this.word), null);
                     }
 
                     if (this.failCount > 0) {
-                        embed.setImage(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failCount) - 1));
+                        embed.image(IMG_LIST.get(Math.min(IMG_LIST.size(), this.failCount) - 1));
                     }
-                }))
+
+                    return embed.build();
+                })
                 .flatMap(this.context::editFollowupMessage);
     }
 

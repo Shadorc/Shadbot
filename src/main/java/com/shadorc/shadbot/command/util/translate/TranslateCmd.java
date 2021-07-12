@@ -9,13 +9,11 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import org.json.JSONArray;
 import org.json.JSONException;
 import reactor.core.publisher.Mono;
-
-import java.util.function.Consumer;
 
 public class TranslateCmd extends Cmd {
 
@@ -23,11 +21,18 @@ public class TranslateCmd extends Cmd {
 
     public TranslateCmd() {
         super(CommandCategory.UTILS, "translate", "Translate a text");
-        this.addOption("source_lang", "Source language, 'auto' to automatically detect",
-                true, ApplicationCommandOptionType.STRING);
-        this.addOption("destination_lang", "Destination language", true,
-                ApplicationCommandOptionType.STRING);
-        this.addOption("text", "The text to translate", true, ApplicationCommandOptionType.STRING);
+        this.addOption(option -> option.name("source_lang")
+                .description("Source language, 'auto' to automatically detect")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("destination_lang")
+                .description("Destination language")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
+        this.addOption(option -> option.name("text")
+                .description("The text to translate")
+                .required(true)
+                .type(ApplicationCommandOptionType.STRING.getValue()));
     }
 
     @Override
@@ -49,15 +54,16 @@ public class TranslateCmd extends Cmd {
                                         .formatted(err.getMessage(), DOC_URL))));
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, TranslateRequest request,
-                                                               TranslateResponse response) {
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor(context.localize("translate.title"), null, context.getAuthorAvatar())
-                        .setDescription("**%s**%n%s%n%n**%s**%n%s".formatted(
-                                StringUtil.capitalize(request.isoToLang(response.sourceLang())),
-                                request.getSourceText(),
-                                StringUtil.capitalize(request.isoToLang(request.getDestLang())),
-                                response.translatedText())));
+    private static EmbedCreateSpec formatEmbed(Context context, TranslateRequest request,
+                                               TranslateResponse response) {
+        return ShadbotUtil.createEmbedBuilder()
+                .author(context.localize("translate.title"), null, context.getAuthorAvatar())
+                .description("**%s**%n%s%n%n**%s**%n%s".formatted(
+                        StringUtil.capitalize(request.isoToLang(response.sourceLang())),
+                        request.getSourceText(),
+                        StringUtil.capitalize(request.isoToLang(request.getDestLang())),
+                        response.translatedText()))
+                .build();
     }
 
     private static Mono<TranslateResponse> getTranslation(TranslateRequest data) {

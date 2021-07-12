@@ -18,7 +18,7 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.User;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -29,7 +29,6 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.music.MusicManager.LOGGER;
 
@@ -152,7 +151,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
-    private Consumer<LegacyEmbedCreateSpec> formatResultsEmbed(AudioPlaylist playlist, String avatarUrl, Locale locale) {
+    private EmbedCreateSpec formatResultsEmbed(AudioPlaylist playlist, String avatarUrl, Locale locale) {
         final String choices = FormatUtil.numberedList(Config.MUSIC_SEARCHES, playlist.getTracks().size(),
                 count -> {
                     final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
@@ -161,13 +160,14 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
         final String search = playlist.getName().split(":")[1].trim();
         final String abbrSearch = StringUtil.abbreviate(search, MAX_PLAYLIST_NAME_LENGTH);
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor(I18nManager.localize(locale, "audioresult.playlist.name").formatted(abbrSearch),
+        return ShadbotUtil.createEmbedBuilder()
+                .author(I18nManager.localize(locale, "audioresult.playlist.name").formatted(abbrSearch),
                         null, avatarUrl)
-                        .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
-                        .setDescription(I18nManager.localize(locale, "audioresult.embed.description").formatted(choices))
-                        .setFooter(I18nManager.localize(locale, "audioresult.embed.footer")
-                                .formatted(Config.MUSIC_CHOICE_DURATION), null));
+                .thumbnail("https://i.imgur.com/IG3Hj2W.png")
+                .description(I18nManager.localize(locale, "audioresult.embed.description").formatted(choices))
+                .footer(I18nManager.localize(locale, "audioresult.embed.footer")
+                        .formatted(Config.MUSIC_CHOICE_DURATION), null)
+                .build();
     }
 
     @Override

@@ -42,9 +42,10 @@ public class LeaderboardCmd extends Cmd {
                                         .formatted(count, tuple.getT1(), context.localize(tuple.getT2()));
                             });
                 })
-                .map(description -> ShadbotUtil.getDefaultLegacyEmbed(
-                        embed -> embed.setAuthor(context.localize("leaderboard.title"), null, context.getAuthorAvatar())
-                                .setDescription(description)))
+                .map(description -> ShadbotUtil.createEmbedBuilder()
+                        .author(context.localize("leaderboard.title"), null, context.getAuthorAvatar())
+                        .description(description)
+                        .build())
                 .flatMap(context::createFollowupMessage);
     }
 

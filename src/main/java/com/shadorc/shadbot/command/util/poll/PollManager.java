@@ -10,7 +10,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Flux;
@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
 
 public class PollManager {
 
@@ -42,17 +41,17 @@ public class PollManager {
             representation.append("\n\t**%d.** %s".formatted(i + 1, this.spec.choices().keySet().toArray()[i]));
         }
 
-        final Consumer<LegacyEmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor(this.context.localize("poll.title")
-                                .formatted(this.context.getAuthorName()),
+        final EmbedCreateSpec embed = ShadbotUtil.createEmbedBuilder()
+                .author(this.context.localize("poll.title").formatted(this.context.getAuthorName()),
                         null, this.context.getAuthorAvatar())
-                        .setDescription(this.context.localize("poll.description")
-                                .formatted(this.spec.question(), representation))
-                        .setFooter(this.context.localize("poll.footer")
-                                        .formatted(FormatUtil.formatDuration(this.spec.duration()), Emoji.RED_CROSS),
-                                "https://i.imgur.com/jcrUDLY.png"));
+                .description(this.context.localize("poll.description")
+                        .formatted(this.spec.question(), representation))
+                .footer(this.context.localize("poll.footer")
+                                .formatted(FormatUtil.formatDuration(this.spec.duration()), Emoji.RED_CROSS),
+                        "https://i.imgur.com/jcrUDLY.png")
+                .build();
 
-        return this.context.createFollowupMessage(embedConsumer)
+        return this.context.createFollowupMessage(embed)
                 .flatMap(message -> Flux.fromIterable(this.spec.choices().values())
                         .flatMap(message::addReaction)
                         .then(Mono.fromRunnable(() -> this.scheduleEnd(message.getId()))));
@@ -103,14 +102,14 @@ public class PollManager {
             representation.append(this.context.localize("poll.choices.removed"));
         }
 
-        final Consumer<LegacyEmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor(this.context.localize("poll.results.title"),
-                        null, this.context.getAuthorAvatar())
-                        .setDescription("__**%s**__%s".formatted(this.spec.question(), representation))
-                        .setFooter(this.context.localize("poll.results.footer")
-                                .formatted(this.context.getAuthorName()), null));
+        final EmbedCreateSpec embed = ShadbotUtil.createEmbedBuilder()
+                .author(this.context.localize("poll.results.title"), null, this.context.getAuthorAvatar())
+                .description("__**%s**__%s".formatted(this.spec.question(), representation))
+                .footer(this.context.localize("poll.results.footer")
+                        .formatted(this.context.getAuthorName()), null)
+                .build();
 
-        return this.context.createFollowupMessage(embedConsumer);
+        return this.context.createFollowupMessage(embed);
     }
 
 }

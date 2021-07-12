@@ -10,12 +10,11 @@ import com.shadorc.shadbot.database.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.object.entity.Member;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
 import java.util.EnumSet;
-import java.util.function.Consumer;
 
 public class AchievementsCmd extends Cmd {
 
@@ -37,22 +36,22 @@ public class AchievementsCmd extends Cmd {
                 .flatMap(context::createFollowupMessage);
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(I18nContext context, EnumSet<Achievement> achievements,
-                                                               Member member) {
-        return ShadbotUtil.getDefaultLegacyEmbed(embed -> {
-            embed.setAuthor(context.localize("achievement.title").formatted(member.getUsername()),
-                    null, member.getAvatarUrl());
-            embed.setThumbnail("https://i.imgur.com/IMHDI7D.png");
-            embed.setTitle(context.localize("achievement.progression")
-                    .formatted(achievements.size(), Achievement.values().length));
+    private static EmbedCreateSpec formatEmbed(I18nContext context, EnumSet<Achievement> achievements,
+                                               Member member) {
+        final EmbedCreateSpec.Builder embed = ShadbotUtil.createEmbedBuilder()
+                .author(context.localize("achievement.title").formatted(member.getUsername()),
+                        null, member.getAvatarUrl())
+                .thumbnail("https://i.imgur.com/IMHDI7D.png")
+                .title(context.localize("achievement.progression")
+                        .formatted(achievements.size(), Achievement.values().length));
 
-            final StringBuilder description = new StringBuilder();
-            for (final Achievement achievement : Achievement.values()) {
-                description.append(
-                        AchievementsCmd.formatAchievement(context, achievement, achievements.contains(achievement)));
-            }
-            embed.setDescription(description.toString());
-        });
+        final StringBuilder description = new StringBuilder();
+        for (final Achievement achievement : Achievement.values()) {
+            description.append(
+                    AchievementsCmd.formatAchievement(context, achievement, achievements.contains(achievement)));
+        }
+        embed.description(description.toString());
+        return embed.build();
     }
 
     private static String formatAchievement(I18nContext context, Achievement achievement, boolean unlocked) {

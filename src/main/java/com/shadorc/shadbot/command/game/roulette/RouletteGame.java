@@ -8,6 +8,7 @@ import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.*;
 import discord4j.core.object.entity.Message;
+import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -47,8 +48,8 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
 
     @Override
     public Mono<Message> show() {
-        return Mono.fromCallable(() -> ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> {
+        return Mono.
+                fromCallable(() -> {
                     final String description = this.context.localize("roulette.description")
                             .formatted(this.context.getFullCommandName());
                     final String desc = FormatUtil.format(this.players.values(),
@@ -62,21 +63,23 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
                             .map(StringUtil::capitalize)
                             .collect(Collectors.joining("\n"));
 
-                    embed.setAuthor(this.context.localize("roulette.title"), null, this.context.getAuthorAvatar())
-                            .setThumbnail("https://i.imgur.com/D7xZd6C.png")
-                            .setDescription(description)
+                    final EmbedCreateSpec.Builder embed = ShadbotUtil.createEmbedBuilder()
+                            .author(this.context.localize("roulette.title"), null, this.context.getAuthorAvatar())
+                            .thumbnail("https://i.imgur.com/D7xZd6C.png")
+                            .description(description)
                             .addField(this.context.localize("roulette.player.title"), desc, true)
                             .addField(this.context.localize("roulette.place.title"), place, true);
 
                     if (this.isScheduled()) {
                         final Duration remainingDuration = this.getDuration()
                                 .minus(TimeUtil.elapsed(this.startTimer));
-                        embed.setFooter(this.context.localize("roulette.footer.remaining")
+                        embed.footer(this.context.localize("roulette.footer.remaining")
                                 .formatted(remainingDuration.toSeconds()), null);
                     } else {
-                        embed.setFooter(this.context.localize("roulette.footer.finished"), null);
+                        embed.footer(this.context.localize("roulette.footer.finished"), null);
                     }
-                }))
+                    return embed.build();
+                })
                 .flatMap(this.context::editFollowupMessage);
     }
 

@@ -16,13 +16,12 @@ import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 
@@ -80,14 +79,15 @@ public class DeviantartCmd extends SubCmd {
                 .flatMap(Mono::justOrEmpty);
     }
 
-    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, String query, Image image) {
-        return ShadbotUtil.getDefaultLegacyEmbed(
-                embed -> embed.setAuthor("DeviantArt: %s".formatted(query), image.url(), context.getAuthorAvatar())
-                        .setThumbnail("https://i.imgur.com/gT4hHUB.png")
-                        .addField(context.localize("deviantart.title"), image.title(), false)
-                        .addField(context.localize("deviantart.author"), image.author().username(), false)
-                        .addField(context.localize("deviantart.category"), image.categoryPath(), false)
-                        .setImage(image.content().map(Content::source).orElseThrow()));
+    private static EmbedCreateSpec formatEmbed(Context context, String query, Image image) {
+        return ShadbotUtil.createEmbedBuilder()
+                .author("DeviantArt: %s".formatted(query), image.url(), context.getAuthorAvatar())
+                .thumbnail("https://i.imgur.com/gT4hHUB.png")
+                .addField(context.localize("deviantart.title"), image.title(), false)
+                .addField(context.localize("deviantart.author"), image.author().username(), false)
+                .addField(context.localize("deviantart.category"), image.categoryPath(), false)
+                .image(image.content().map(Content::source).orElseThrow())
+                .build();
     }
 
     private Mono<TokenResponse> requestAccessToken() {
