@@ -17,7 +17,7 @@ import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -83,9 +83,9 @@ public class OverwatchCmd extends SubCmd {
                 });
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, OverwatchProfile overwatchProfile, Platform platform) {
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, OverwatchProfile overwatchProfile, Platform platform) {
         final ProfileResponse profile = overwatchProfile.profile();
-        return ShadbotUtil.getDefaultEmbed(
+        return ShadbotUtil.getDefaultLegacyEmbed(
                 embed -> embed.setAuthor(context.localize("overwatch.title"),
                         "https://playoverwatch.com/en-gb/career/%s/%s"
                                 .formatted(platform.getName(), profile.username()),

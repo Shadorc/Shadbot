@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import reactor.util.annotation.Nullable;
 
 import java.net.URLEncoder;
@@ -51,7 +51,7 @@ public class NetUtil {
         document.select("br").append("\\n");
         document.select("p").prepend("\\n\\n");
         final String str = document.html().replace("\\\\n", "\n");
-        return Jsoup.clean(str, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+        return Jsoup.clean(str, "", Safelist.none(), new Document.OutputSettings().prettyPrint(false));
     }
 
     /**

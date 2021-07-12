@@ -77,7 +77,7 @@ public class SettingShow extends SubCmd {
                 getAutoJoinMessage, getAutoLeaveMessage, getAllowedTextChannels, getAllowedVoiceChannels)
                 .map(TupleUtils.function((allowedRoles, autoRoles, restrictedChannels, restrictedRoles,
                                           autoJoinMessage, autoLeaveMessage, allowedTextChannels, allowedVoiceChannels) ->
-                        ShadbotUtil.getDefaultEmbed(embed -> {
+                        ShadbotUtil.getDefaultLegacyEmbed(embed -> {
                             embed.setAuthor(context.localize("settings.title"),
                                     "https://github.com/Shadorc/Shadbot/wiki/Settings",
                                     context.getAuthorAvatar());

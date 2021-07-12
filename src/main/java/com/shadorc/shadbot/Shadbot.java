@@ -121,7 +121,7 @@ public class Shadbot {
                     /* Intent.GUILD_MESSAGE_REACTIONS */
                     Shadbot.register(gateway, new ReactionListener.ReactionAddListener());
                     Shadbot.register(gateway, new ReactionListener.ReactionRemoveListener());
-                    Shadbot.register(gateway, new InteractionCreateListener());
+                    Shadbot.register(gateway, new SlashCommandListener());
 
                     DEFAULT_LOGGER.info("Shadbot is ready");
                     return gateway.onDisconnect();

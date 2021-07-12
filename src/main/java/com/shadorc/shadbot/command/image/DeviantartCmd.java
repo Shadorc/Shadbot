@@ -16,7 +16,7 @@ import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -80,8 +80,8 @@ public class DeviantartCmd extends SubCmd {
                 .flatMap(Mono::justOrEmpty);
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, String query, Image image) {
-        return ShadbotUtil.getDefaultEmbed(
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, String query, Image image) {
+        return ShadbotUtil.getDefaultLegacyEmbed(
                 embed -> embed.setAuthor("DeviantArt: %s".formatted(query), image.url(), context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/gT4hHUB.png")
                         .addField(context.localize("deviantart.title"), image.title(), false)

@@ -11,7 +11,7 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.object.Embed;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
 
@@ -47,8 +47,8 @@ public class ThisDayCmd extends Cmd {
                 .flatMap(thisDay -> context.editFollowupMessage(ThisDayCmd.formatEmbed(context, thisDay)));
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, ThisDay thisDay) {
-        return ShadbotUtil.getDefaultEmbed(
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, ThisDay thisDay) {
+        return ShadbotUtil.getDefaultLegacyEmbed(
                 embed -> embed.setAuthor(context.localize("thisday.title").formatted(thisDay.getDate()),
                         HOME_URL, context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/FdfyJDD.png")

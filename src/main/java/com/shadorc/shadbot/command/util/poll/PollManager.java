@@ -10,7 +10,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.reaction.ReactionEmoji;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.http.client.ClientException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Flux;
@@ -42,7 +42,7 @@ public class PollManager {
             representation.append("\n\t**%d.** %s".formatted(i + 1, this.spec.choices().keySet().toArray()[i]));
         }
 
-        final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultEmbed(
+        final Consumer<LegacyEmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultLegacyEmbed(
                 embed -> embed.setAuthor(this.context.localize("poll.title")
                                 .formatted(this.context.getAuthorName()),
                         null, this.context.getAuthorAvatar())
@@ -103,7 +103,7 @@ public class PollManager {
             representation.append(this.context.localize("poll.choices.removed"));
         }
 
-        final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultEmbed(
+        final Consumer<LegacyEmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultLegacyEmbed(
                 embed -> embed.setAuthor(this.context.localize("poll.results.title"),
                         null, this.context.getAuthorAvatar())
                         .setDescription("__**%s**__%s".formatted(this.spec.question(), representation))

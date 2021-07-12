@@ -11,6 +11,7 @@ import com.shadorc.shadbot.object.casino.Hand;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.object.entity.Message;
+import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -60,27 +61,31 @@ public class BlackjackGame extends MultiplayerGame<BlackjackPlayer> {
     @Override
     public Mono<Message> show() {
         return Mono.
-                fromCallable(() -> ShadbotUtil.getDefaultEmbed(embed -> {
+                fromCallable(() -> {
                     final Hand visibleDealerHand = this.isScheduled() ?
                             new Hand(this.dealerHand.getCards().subList(0, 1)) : this.dealerHand;
-                    embed.setAuthor(this.context.localize("blackjack.title"), null, this.getContext().getAuthorAvatar())
-                            .setThumbnail("https://i.imgur.com/oESeVrU.png")
-                            .setDescription(this.context.localize("blackjack.description")
+
+                    final EmbedCreateSpec.Builder embed = ShadbotUtil.getDefaultEmbed()
+                            .author(this.context.localize("blackjack.title"), null, this.getContext().getAuthorAvatar())
+                            .thumbnail("https://i.imgur.com/oESeVrU.png")
+                            .description(this.context.localize("blackjack.description")
                                     .formatted(this.context.getFullCommandName()))
                             .addField(this.context.localize("blackjack.dealer.hand"), visibleDealerHand.format(), true);
 
                     if (this.isScheduled()) {
                         final Duration remainingDuration = this.getDuration().minus(TimeUtil.elapsed(this.startTimer));
-                        embed.setFooter(this.context.localize("blackjack.footer.remaining")
+                        embed.footer(this.context.localize("blackjack.footer.remaining")
                                 .formatted(remainingDuration.toSeconds()), null);
                     } else {
-                        embed.setFooter(this.context.localize("blackjack.footer.finished"), null);
+                        embed.footer(this.context.localize("blackjack.footer.finished"), null);
                     }
 
                     this.players.values().stream()
                             .map(player -> player.format(this.context.getLocale()))
                             .forEach(field -> embed.addField(field.name(), field.value(), field.inline().get()));
-                }))
+
+                    return embed.build();
+                })
                 .flatMap(this.context::editInitialFollowupMessage);
     }
 

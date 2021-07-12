@@ -22,7 +22,7 @@ public class PlaylistCmd extends Cmd {
     public Mono<?> execute(Context context) {
         final GuildMusic guildMusic = context.requireGuildMusic();
 
-        return context.createFollowupMessage(ShadbotUtil.getDefaultEmbed(
+        return context.createFollowupMessage(ShadbotUtil.getDefaultLegacyEmbed(
                 embed -> embed.setAuthor(context.localize("playlist.title"), null, context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
                         .setDescription(PlaylistCmd.formatPlaylist(context, guildMusic.getTrackScheduler()))));

@@ -8,7 +8,7 @@ import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
 
@@ -36,8 +36,8 @@ public class SuicideGirlsCmd extends SubCmd {
                 });
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, SuicideGirl post) {
-        return ShadbotUtil.getDefaultEmbed(
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, SuicideGirl post) {
+        return ShadbotUtil.getDefaultLegacyEmbed(
                 embed -> embed.setAuthor("SuicideGirls", post.getUrl(), context.getAuthorAvatar())
                         .setDescription(context.localize("suicidegirls.name").formatted(post.getName()))
                         .setImage(post.getImageUrl()));

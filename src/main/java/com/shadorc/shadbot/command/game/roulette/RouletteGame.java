@@ -47,7 +47,7 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
 
     @Override
     public Mono<Message> show() {
-        return Mono.fromCallable(() -> ShadbotUtil.getDefaultEmbed(
+        return Mono.fromCallable(() -> ShadbotUtil.getDefaultLegacyEmbed(
                 embed -> {
                     final String description = this.context.localize("roulette.description")
                             .formatted(this.context.getFullCommandName());

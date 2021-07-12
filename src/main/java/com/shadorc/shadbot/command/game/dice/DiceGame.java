@@ -62,7 +62,7 @@ public class DiceGame extends MultiplayerGame<DicePlayer> {
     @Override
     public Mono<Message> show() {
         return Mono.
-                fromCallable(() -> ShadbotUtil.getDefaultEmbed(embed -> {
+                fromCallable(() -> ShadbotUtil.getDefaultLegacyEmbed(embed -> {
                     embed.setAuthor(this.context.localize("dice.title"), null, this.getContext().getAuthorAvatar())
                             .setThumbnail("https://i.imgur.com/XgOilIW.png")
                             .setDescription(this.context.localize("dice.description")

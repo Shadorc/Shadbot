@@ -62,7 +62,7 @@ public class RussianRouletteCmd extends SubCmd {
                     }
                 }))
                 .map(StringBuilder::toString)
-                .map(description -> ShadbotUtil.getDefaultEmbed(
+                .map(description -> ShadbotUtil.getDefaultLegacyEmbed(
                         embed -> embed.setAuthor(context.localize("russianroulette.title"),
                                 null, context.getAuthorAvatar())
                                 .addField(context.localize("russianroulette.tries"),

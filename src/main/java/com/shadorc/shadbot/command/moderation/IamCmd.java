@@ -9,7 +9,7 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.reaction.ReactionEmoji.Unicode;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Flux;
@@ -69,7 +69,7 @@ public class IamCmd extends SubCmd {
                                     .formatted(REACTION.getRaw(), FormatUtil.format(roles,
                                             role -> "`@%s`".formatted(role.getName()), "\n")));
 
-                            final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultEmbed(
+                            final Consumer<LegacyEmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultLegacyEmbed(
                                     embed -> embed.setAuthor("Iam: %s"
                                                     .formatted(FormatUtil.format(roles,
                                                             role -> "@%s".formatted(role.getName()), ", ")),

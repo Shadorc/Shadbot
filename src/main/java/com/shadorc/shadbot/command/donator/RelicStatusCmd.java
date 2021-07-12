@@ -73,7 +73,7 @@ public class RelicStatusCmd extends SubCmd {
                 }))
                 .collectList()
                 .filter(Predicate.not(List::isEmpty))
-                .map(fields -> ShadbotUtil.getDefaultEmbed(
+                .map(fields -> ShadbotUtil.getDefaultLegacyEmbed(
                         embed -> {
                             embed.setAuthor(context.localize("relicstatus.title"), null, context.getAuthorAvatar())
                                     .setThumbnail("https://i.imgur.com/R0N6kW3.png");

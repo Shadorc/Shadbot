@@ -119,7 +119,7 @@ public class MusicManager {
                 // Do not join the voice channel if the current voice connection is not disconnected
                 .filterWhen(__ -> isDisconnected)
                 .doOnNext(__ -> LOGGER.info("{Guild ID: {}} Joining voice channel...", guildId.asString()))
-                .flatMap(voiceChannel -> voiceChannel.join(spec -> spec.setProvider(audioProvider)))
+                .flatMap(voiceChannel -> voiceChannel.join().withProvider(audioProvider))
                 .doOnTerminate(() -> GUILD_JOINING.remove(guildId));
     }
 

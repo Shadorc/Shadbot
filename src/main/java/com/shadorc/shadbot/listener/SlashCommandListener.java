@@ -8,20 +8,20 @@ import com.shadorc.shadbot.data.Telemetry;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.ReactorUtil;
-import discord4j.core.event.domain.InteractionCreateEvent;
+import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
 
-public class InteractionCreateListener implements EventListener<InteractionCreateEvent> {
+public class SlashCommandListener implements EventListener<SlashCommandEvent> {
 
     @Override
-    public Class<InteractionCreateEvent> getEventType() {
-        return InteractionCreateEvent.class;
+    public Class<SlashCommandEvent> getEventType() {
+        return SlashCommandEvent.class;
     }
 
     @Override
-    public Mono<?> execute(InteractionCreateEvent event) {
+    public Mono<?> execute(SlashCommandEvent event) {
         Telemetry.INTERACTING_USERS.add(event.getInteraction().getUser().getId().asLong());
 
         if (event.getInteraction().getGuildId().isEmpty()) {
@@ -34,8 +34,9 @@ public class InteractionCreateListener implements EventListener<InteractionCreat
                 .filterWhen(ReactorUtil.filterOrExecute(
                         permissions -> permissions.contains(Permission.SEND_MESSAGES)
                                 && permissions.contains(Permission.VIEW_CHANNEL),
-                        event.replyEphemeral(Emoji.RED_CROSS
-                                + I18nManager.localize(Config.DEFAULT_LOCALE, "interaction.missing.permissions"))))
+                        event.reply().withEphemeral(true)
+                                .withContent(Emoji.RED_CROSS
+                                        + I18nManager.localize(Config.DEFAULT_LOCALE, "interaction.missing.permissions"))))
                 .flatMap(__ -> Mono.justOrEmpty(event.getInteraction().getGuildId()))
                 .flatMap(guildId -> DatabaseManager.getGuilds().getDBGuild(guildId))
                 .map(dbGuild -> new Context(event, dbGuild))

@@ -37,7 +37,7 @@ public class NSFWSetting extends SubCmd {
                             case ENABLE -> true;
                             case DISABLE -> false;
                         }))
-                        .flatMap(nsfw -> channel.edit(spec -> spec.setNsfw(nsfw))))
+                        .flatMap(nsfw -> channel.edit().withNsfw(nsfw)))
                 .map(channel -> channel.isNsfw()
                         ? context.localize("setting.nsfw.nsfw").formatted(channel.getMention())
                         : context.localize("setting.nsfw.sfw").formatted(channel.getMention()))

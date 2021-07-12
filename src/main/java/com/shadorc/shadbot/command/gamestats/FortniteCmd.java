@@ -15,7 +15,7 @@ import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
@@ -88,8 +88,8 @@ public class FortniteCmd extends SubCmd {
                 .formatted(platform.name().toLowerCase(), encodedUsername);
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, String profileUrl, String description) {
-        return ShadbotUtil.getDefaultEmbed(embed ->
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, String profileUrl, String description) {
+        return ShadbotUtil.getDefaultLegacyEmbed(embed ->
                 embed.setAuthor(context.localize("fortnite.title"), profileUrl, context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/8NrvS8e.png")
                         .setDescription(description));

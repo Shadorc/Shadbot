@@ -44,7 +44,7 @@ public class RolelistCmd extends SubCmd {
 
                     return Mono.zip(Mono.just(mentionedRoles), getUsernames);
                 })
-                .map(TupleUtils.function((mentionedRoles, usernames) -> ShadbotUtil.getDefaultEmbed(
+                .map(TupleUtils.function((mentionedRoles, usernames) -> ShadbotUtil.getDefaultLegacyEmbed(
                         embed -> {
                             embed.setAuthor(context.localize("rolelist.title"), null, context.getAuthorAvatar());
 

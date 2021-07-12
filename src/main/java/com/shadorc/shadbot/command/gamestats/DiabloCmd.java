@@ -20,7 +20,7 @@ import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
@@ -120,8 +120,8 @@ public class DiabloCmd extends SubCmd {
                 .formatted(region, NetUtil.encode(battletag), heroId.id(), accessToken);
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, ProfileResponse profile,
-                                                         List<HeroResponse> heroResponses) {
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, ProfileResponse profile,
+                                                               List<HeroResponse> heroResponses) {
         final String description = context.localize("diablo3.description")
                 .formatted(profile.battleTag(), profile.guildName(),
                         profile.paragonLevel(), profile.paragonLevelHardcore(),
@@ -133,7 +133,7 @@ public class DiabloCmd extends SubCmd {
         final String damages = FormatUtil.format(heroResponses,
                 hero -> context.localize("diablo3.hero.dps").formatted(context.localize(hero.stats().damage())), "\n");
 
-        return ShadbotUtil.getDefaultEmbed(embed ->
+        return ShadbotUtil.getDefaultLegacyEmbed(embed ->
                 embed.setAuthor(context.localize("diablo3.title"), null, context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/QUS9QkX.png")
                         .setDescription(description)

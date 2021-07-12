@@ -17,7 +17,7 @@ import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.object.Embed;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -63,10 +63,10 @@ public class LyricsCmd extends Cmd {
                         context.localize("lyrics.not.found").formatted(search)));
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, Musixmatch musixmatch) {
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, Musixmatch musixmatch) {
         final String artist = StringUtil.abbreviate(musixmatch.getArtist(), MAX_TITLE_LENGTH);
         final String musicTitle = StringUtil.abbreviate(musixmatch.getTitle(), MAX_TITLE_LENGTH);
-        return ShadbotUtil.getDefaultEmbed(
+        return ShadbotUtil.getDefaultLegacyEmbed(
                 embed -> embed.setAuthor(context.localize("lyrics.title").formatted(artist, musicTitle),
                         musixmatch.url(), context.getAuthorAvatar())
                         .setThumbnail(musixmatch.getImageUrl())

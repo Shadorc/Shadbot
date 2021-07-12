@@ -11,7 +11,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.EnumUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import net.aksingh.owmjapis.api.APIException;
@@ -85,7 +85,7 @@ public class WeatherCmd extends Cmd {
         return thr -> thr instanceof APIException err && err.getCode() == HttpResponseStatus.NOT_FOUND.code();
     }
 
-    private Consumer<EmbedCreateSpec> formatEmbed(Context context, WeatherWrapper weather) {
+    private Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, WeatherWrapper weather) {
         final DateTimeFormatter formatter = this.dateFormatter.withLocale(context.getLocale());
 
         final String title = context.localize("weather.title")
@@ -102,7 +102,7 @@ public class WeatherCmd extends Cmd {
         final String humidity = "%s%%".formatted(context.localize(weather.getHumidity()));
         final String temperature = "%s°C".formatted(context.localize(weather.getTemp()));
 
-        return ShadbotUtil.getDefaultEmbed(
+        return ShadbotUtil.getDefaultLegacyEmbed(
                 embed -> embed.setAuthor(title, url, context.getAuthorAvatar())
                         .setThumbnail(weather.getIconLink())
                         .setDescription(context.localize("weather.last.updated").formatted(lastUpdated))

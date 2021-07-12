@@ -62,7 +62,7 @@ public class HangmanGame extends MultiplayerGame<Player> {
 
     @Override
     public Mono<Message> show() {
-        return Mono.fromCallable(() -> ShadbotUtil.getDefaultEmbed(
+        return Mono.fromCallable(() -> ShadbotUtil.getDefaultLegacyEmbed(
                 embed -> {
                     embed.setAuthor(this.context.localize("hangman.title"), null, this.getContext().getAuthorAvatar());
                     embed.setThumbnail("https://i.imgur.com/Vh9WyaU.png");

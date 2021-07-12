@@ -4,7 +4,7 @@ import com.shadorc.shadbot.core.command.Context;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import reactor.util.annotation.Nullable;
 
@@ -41,8 +41,8 @@ public abstract class HelpBuilder {
         return this;
     }
 
-    public Consumer<EmbedCreateSpec> build() {
-        return ShadbotUtil.getDefaultEmbed(embed -> {
+    public Consumer<LegacyEmbedCreateSpec> build() {
+        return ShadbotUtil.getDefaultLegacyEmbed(embed -> {
             if (!StringUtil.isBlank(this.authorName)) {
                 embed.setAuthor(this.authorName, this.authorUrl, this.context.getAuthorAvatar());
             }

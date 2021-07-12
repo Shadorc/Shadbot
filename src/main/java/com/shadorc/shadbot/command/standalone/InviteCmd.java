@@ -15,7 +15,7 @@ public class InviteCmd extends Cmd {
 
     @Override
     public Mono<?> execute(Context context) {
-        return context.createFollowupMessage(ShadbotUtil.getDefaultEmbed(
+        return context.createFollowupMessage(ShadbotUtil.getDefaultLegacyEmbed(
                 embed -> embed.setAuthor(context.localize("invite.title"), Config.INVITE_URL, context.getAuthorAvatar())
                         .addField(context.localize("invite.bot"), context.localize("invite.link")
                                 .formatted(Config.INVITE_URL), true)

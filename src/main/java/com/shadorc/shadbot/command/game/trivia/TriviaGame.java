@@ -14,7 +14,7 @@ import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
@@ -87,7 +87,7 @@ public class TriviaGame extends MultiplayerGame<TriviaPlayer> {
                             FormatUtil.numberedList(this.answers.size(), this.answers.size(),
                                     count -> "\t**%d**. %s".formatted(count, this.answers.get(count - 1))));
 
-            final Consumer<EmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultEmbed(
+            final Consumer<LegacyEmbedCreateSpec> embedConsumer = ShadbotUtil.getDefaultLegacyEmbed(
                     embed -> embed.setAuthor(this.context.localize("trivia.title"), null, this.context.getAuthorAvatar())
                             .setDescription(description)
                             .addField(this.context.localize("trivia.category"),

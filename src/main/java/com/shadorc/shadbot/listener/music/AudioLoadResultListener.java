@@ -18,7 +18,7 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.User;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -152,7 +152,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
-    private Consumer<EmbedCreateSpec> formatResultsEmbed(AudioPlaylist playlist, String avatarUrl, Locale locale) {
+    private Consumer<LegacyEmbedCreateSpec> formatResultsEmbed(AudioPlaylist playlist, String avatarUrl, Locale locale) {
         final String choices = FormatUtil.numberedList(Config.MUSIC_SEARCHES, playlist.getTracks().size(),
                 count -> {
                     final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
@@ -161,7 +161,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
         final String search = playlist.getName().split(":")[1].trim();
         final String abbrSearch = StringUtil.abbreviate(search, MAX_PLAYLIST_NAME_LENGTH);
-        return ShadbotUtil.getDefaultEmbed(
+        return ShadbotUtil.getDefaultLegacyEmbed(
                 embed -> embed.setAuthor(I18nManager.localize(locale, "audioresult.playlist.name").formatted(abbrSearch),
                         null, avatarUrl)
                         .setThumbnail("https://i.imgur.com/IG3Hj2W.png")

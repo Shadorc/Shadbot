@@ -17,6 +17,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.*;
 import discord4j.core.spec.MessageCreateSpec;
+import discord4j.core.spec.legacy.LegacyMessageCreateSpec;
 import discord4j.discordjson.json.ApplicationCommandOptionChoiceData;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.AllowedMentions;
@@ -55,7 +56,7 @@ public class DiscordUtil {
      * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
      * it is emitted through the Mono.
      */
-    public static Mono<Message> sendMessage(Consumer<MessageCreateSpec> spec, MessageChannel channel, boolean hasEmbed) {
+    public static Mono<Message> sendMessage(Consumer<LegacyMessageCreateSpec> spec, MessageChannel channel, boolean hasEmbed) {
         return Mono.zip(
                 DiscordUtil.hasPermission(channel, channel.getClient().getSelfId(), Permission.SEND_MESSAGES),
                 DiscordUtil.hasPermission(channel, channel.getClient().getSelfId(), Permission.EMBED_LINKS))
@@ -183,7 +184,7 @@ public class DiscordUtil {
     }
 
     public static List<ApplicationCommandInteractionOption> flattenOptions(ApplicationCommandInteraction interaction) {
-        final ArrayList<ApplicationCommandInteractionOption> options = new ArrayList<>();
+        final List<ApplicationCommandInteractionOption> options = new ArrayList<>();
         DiscordUtil.flattenOptionRecursive(options, interaction.getOptions());
         return options;
     }

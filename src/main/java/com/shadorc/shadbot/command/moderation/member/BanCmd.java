@@ -14,6 +14,8 @@ public class BanCmd extends RemoveMembersCmd {
 
     @Override
     public Mono<?> action(Member memberToRemove, String reason) {
-        return memberToRemove.ban(spec -> spec.setDeleteMessageDays(7).setReason(reason));
+        return memberToRemove.ban()
+                .withDeleteMessageDays(7)
+                .withReason(reason);
     }
 }
