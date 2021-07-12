@@ -51,7 +51,6 @@ public enum Emoji {
     BROKEN_HEART("broken_heart"),
     ID("id"),
     CROWN("crown"),
-    MAP("map"),
     BIRTHDAY("birthday"),
     BUSTS_IN_SILHOUETTE("busts_in_silhouette"),
     MICROPHONE("microphone2"),
