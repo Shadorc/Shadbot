@@ -60,6 +60,6 @@ see http://www.gnu.org/licenses/
 </pre>
 <a href="https://github.com/Shadorc/Shadbot/blob/master/LICENSE">The full licence can be found here.</a>
 <hr>
-<p><i>Bot originally inspired by <a href="https://github.com/Mantaro/MantaroBot">MantaroBot</i></a>
+<p><i>Bot originally inspired by <a href="https://github.com/Mantaro/MantaroBot">MantaroBot</a>.</i>
 </body>
 </html>

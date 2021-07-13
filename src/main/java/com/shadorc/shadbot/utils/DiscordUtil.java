@@ -17,7 +17,6 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.*;
 import discord4j.core.spec.MessageCreateSpec;
-import discord4j.core.spec.legacy.LegacyMessageCreateSpec;
 import discord4j.discordjson.json.ApplicationCommandOptionChoiceData;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.util.AllowedMentions;
@@ -28,7 +27,6 @@ import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
@@ -36,7 +34,7 @@ import static com.shadorc.shadbot.Shadbot.DEFAULT_LOGGER;
 public class DiscordUtil {
 
     public static Mono<Message> sendMessage(Emoji emoji, String message, MessageChannel channel) {
-        return DiscordUtil.sendMessage(emoji + " " + message, channel);
+        return DiscordUtil.sendMessage("%s %s".formatted(emoji, message), channel);
     }
 
     /**
@@ -46,40 +44,39 @@ public class DiscordUtil {
      * it is emitted through the Mono.
      */
     public static Mono<Message> sendMessage(String content, MessageChannel channel) {
-        return DiscordUtil.sendMessage(spec -> spec.setContent(content), channel, false);
+        return DiscordUtil.sendMessage(MessageCreateSpec.create().withContent(content), channel, false);
     }
 
     /**
-     * @param spec     A {@link Consumer} that provides a "blank" {@link MessageCreateSpec} to be operated on.
+     * @param spec     A {@link MessageCreateSpec} to be operated on.
      * @param channel  The {@link MessageChannel} in which to send the message.
-     * @param hasEmbed Whether or not the spec contains an embed.
-     * @return A {@link Mono} where, upon successful completion, emits the created Message. If an error is received,
+     * @param hasEmbed Whether the spec contains an embed.
+     * @return A {@link Mono} where, upon successful completion, emits the created {@link Message}. If an error is received,
      * it is emitted through the Mono.
      */
-    public static Mono<Message> sendMessage(Consumer<LegacyMessageCreateSpec> spec, MessageChannel channel, boolean hasEmbed) {
+    public static Mono<Message> sendMessage(MessageCreateSpec spec, MessageChannel channel, boolean hasEmbed) {
+        final Snowflake selfId = channel.getClient().getSelfId();
         return Mono.zip(
-                DiscordUtil.hasPermission(channel, channel.getClient().getSelfId(), Permission.SEND_MESSAGES),
-                DiscordUtil.hasPermission(channel, channel.getClient().getSelfId(), Permission.EMBED_LINKS))
+                DiscordUtil.hasPermission(channel, selfId, Permission.SEND_MESSAGES),
+                DiscordUtil.hasPermission(channel, selfId, Permission.EMBED_LINKS))
                 .flatMap(TupleUtils.function((canSendMessage, canSendEmbed) -> {
                     if (!canSendMessage) {
                         DEFAULT_LOGGER.info("{Channel ID: {}} Missing permission: {}",
-                                channel.getId().asLong(), FormatUtil.capitalizeEnum(Permission.SEND_MESSAGES));
+                                channel.getId().asString(), FormatUtil.capitalizeEnum(Permission.SEND_MESSAGES));
                         return Mono.empty();
                     }
 
                     if (!canSendEmbed && hasEmbed) {
                         DEFAULT_LOGGER.info("{Channel ID: {}} Missing permission: {}",
-                                channel.getId().asLong(), FormatUtil.capitalizeEnum(Permission.EMBED_LINKS));
+                                channel.getId().asString(), FormatUtil.capitalizeEnum(Permission.EMBED_LINKS));
                         // TODO I18n
                         return DiscordUtil.sendMessage(Emoji.ACCESS_DENIED,
-                                "I cannot send embed links.\nPlease, check my permissions and channel-specific ones to verify that **%s** is checked."
+                                ("I cannot send embed links." +
+                                        "\nPlease, check my permissions and channel-specific ones to verify that **%s** is checked.")
                                         .formatted(FormatUtil.capitalizeEnum(Permission.EMBED_LINKS)), channel);
                     }
 
-                    return channel.createMessage(spec
-                            .andThen(messageSpec -> messageSpec.setAllowedMentions(AllowedMentions.builder()
-                                    .parseType(AllowedMentions.Type.ROLE, AllowedMentions.Type.USER)
-                                    .build())));
+                    return channel.createMessage(spec.withAllowedMentions(AllowedMentions.suppressEveryone()));
                 }))
                 // 403 Forbidden means that the bot is not in the guild
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()), err -> Mono.empty())

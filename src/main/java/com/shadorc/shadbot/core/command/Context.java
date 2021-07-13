@@ -22,6 +22,7 @@ import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.WebhookExecuteRequest;
 import discord4j.discordjson.json.WebhookMessageEditRequest;
+import discord4j.discordjson.possible.Possible;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.MultipartRequest;
 import discord4j.rest.util.Permission;
@@ -262,7 +263,7 @@ public class Context implements InteractionContext, I18nContext {
                 .filter(messageId -> messageId > 0)
                 .flatMap(messageId -> this.event.getInteractionResponse()
                         .editFollowupMessage(messageId, WebhookMessageEditRequest.builder()
-                                .content(message)
+                                .content(Possible.of(Optional.of(message)))
                                 .build(), true))
                 .map(data -> new Message(this.getClient(), data))
                 .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc())
@@ -280,7 +281,7 @@ public class Context implements InteractionContext, I18nContext {
                 .filter(messageId -> messageId > 0)
                 .flatMap(messageId -> this.event.getInteractionResponse()
                         .editFollowupMessage(messageId, WebhookMessageEditRequest.builder()
-                                .content("")
+                                .content(Possible.of(Optional.of("")))
                                 .embeds(List.of(embed.asRequest()))
                                 .build(), true))
                 .map(data -> new Message(this.getClient(), data))
@@ -292,7 +293,7 @@ public class Context implements InteractionContext, I18nContext {
     public Mono<Message> editInitialFollowupMessage(EmbedCreateSpec embed) {
         return this.event.getInteractionResponse()
                 .editInitialResponse(WebhookMessageEditRequest.builder()
-                        .content("")
+                        .content(Possible.of(Optional.of("")))
                         .embeds(List.of(embed.asRequest()))
                         .build())
                 .map(data -> new Message(this.getClient(), data))
