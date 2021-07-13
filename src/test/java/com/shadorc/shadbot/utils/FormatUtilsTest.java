@@ -36,7 +36,7 @@ public class FormatUtilsTest {
         assertEquals("Test one", FormatUtil.capitalizeEnum(TestEnum1.TEST_ONE));
         assertEquals("Test two", FormatUtil.capitalizeEnum(TestEnum1.test_Two));
         assertEquals("Testthree", FormatUtil.capitalizeEnum(TestEnum1.testThree));
-        assertEquals("Test_toString", FormatUtil.capitalizeEnum(TestEnum2.Test));
+        assertEquals("Test tostring", FormatUtil.capitalizeEnum(TestEnum2.Test));
     }
 
     @Test
