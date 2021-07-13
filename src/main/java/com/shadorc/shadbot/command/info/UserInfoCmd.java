@@ -7,7 +7,7 @@ import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import com.shadorc.shadbot.utils.TimeUtil;
+import discord4j.common.util.TimestampFormat;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -15,14 +15,10 @@ import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
+import java.time.Instant;
 import java.util.List;
 
 public class UserInfoCmd extends SubCmd {
-
-    private final DateTimeFormatter dateFormatter;
 
     public UserInfoCmd(final GroupCmd groupCmd) {
         super(groupCmd, CommandCategory.INFO, "user", "Show user info");
@@ -30,8 +26,6 @@ public class UserInfoCmd extends SubCmd {
                 .description("If not specified, it will show your info")
                 .required(false)
                 .type(ApplicationCommandOptionType.USER.getValue()));
-
-        this.dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.MEDIUM);
     }
 
     @Override
@@ -46,8 +40,6 @@ public class UserInfoCmd extends SubCmd {
     }
 
     private EmbedCreateSpec formatEmbed(Context context, Member member, List<Role> roles) {
-        final DateTimeFormatter dateFormatter = this.dateFormatter.withLocale(context.getLocale());
-
         final StringBuilder usernameBuilder = new StringBuilder(member.getTag());
         if (member.isBot()) {
             usernameBuilder
@@ -64,16 +56,16 @@ public class UserInfoCmd extends SubCmd {
         final String nameTitle = Emoji.BUST_IN_SILHOUETTE + " " + context.localize("userinfo.name");
 
         final String creationTitle = Emoji.BIRTHDAY + " " + context.localize("userinfo.creation");
-        final LocalDateTime createTime = TimeUtil.toLocalDateTime(member.getId().getTimestamp());
+        final Instant creationInstant = member.getId().getTimestamp();
         final String creationField = "%s%n(%s)"
-                .formatted(createTime.format(dateFormatter),
-                        FormatUtil.formatLongDuration(context.getLocale(), createTime));
+                .formatted(TimestampFormat.SHORT_DATE_TIME.format(creationInstant),
+                        FormatUtil.formatRelativeTime(context.getLocale(), creationInstant));
 
         final String joinTitle = Emoji.DATE + " " + context.localize("userinfo.join");
-        final LocalDateTime joinTime = TimeUtil.toLocalDateTime(member.getJoinTime().orElseThrow());
+        final Instant joinInstant = member.getJoinTime().orElseThrow();
         final String joinField = "%s%n(%s)"
-                .formatted(joinTime.format(dateFormatter),
-                        FormatUtil.formatLongDuration(context.getLocale(), joinTime));
+                .formatted(TimestampFormat.SHORT_DATE_TIME.format(joinInstant),
+                        FormatUtil.formatRelativeTime(context.getLocale(), joinInstant));
 
         final String badgesField = FormatUtil.format(member.getPublicFlags(), FormatUtil::capitalizeEnum, "\n");
         final String rolesField = FormatUtil.format(roles, Role::getMention, "\n");

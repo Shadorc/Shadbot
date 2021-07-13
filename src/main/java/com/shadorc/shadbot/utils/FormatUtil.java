@@ -84,17 +84,18 @@ public class FormatUtil {
     }
 
     /**
-     * @param locale The locale used to translate the message.
-     * @param date   The {@link LocalDateTime} to format.
+     * @param locale  The locale used to translate the message.
+     * @param instant The {@link Instant} to format.
      * @return The formatted instant (e.g Y year(s), M month(s), D day(s)).
      */
-    public static String formatLongDuration(Locale locale, LocalDateTime date) {
-        final Duration diff = Duration.between(date, LocalDateTime.now(ZoneId.systemDefault()));
+    public static String formatRelativeTime(Locale locale, Instant instant) {
+        final Duration diff = Duration.between(instant, Instant.now());
         if (diff.toHours() < Duration.ofDays(1).toHours()) {
             return FormatUtil.formatDuration(diff);
         }
 
-        final Period period = Period.between(date.toLocalDate(), LocalDate.now(ZoneId.systemDefault()));
+        final Period period = Period.between(LocalDate.ofInstant(instant, ZoneId.systemDefault()),
+                LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault()));
         final int years = period.getYears();
         final int months = period.getMonths();
         final int days = period.getDays();

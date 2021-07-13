@@ -2,12 +2,11 @@ package com.shadorc.shadbot.api.wrapper;
 
 import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.utils.NumberUtil;
-import com.shadorc.shadbot.utils.TimeUtil;
 import net.aksingh.owmjapis.model.CurrentWeather;
 import net.aksingh.owmjapis.model.param.Rain;
 import net.aksingh.owmjapis.model.param.Weather;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 @SuppressWarnings("ConstantConditions") // Removes NullPointerException warnings
@@ -37,8 +36,8 @@ public class WeatherWrapper {
         return this.currentWeather.getCityId();
     }
 
-    public LocalDateTime getDateTime() {
-        return TimeUtil.toLocalDateTime(this.currentWeather.getDateTime().toInstant());
+    public Instant getDateTime() {
+        return this.currentWeather.getDateTime().toInstant();
     }
 
     public String getCloudsDescription() {

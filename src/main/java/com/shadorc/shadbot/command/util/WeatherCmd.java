@@ -11,6 +11,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.EnumUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
+import discord4j.common.util.TimestampFormat;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -21,14 +22,11 @@ import net.aksingh.owmjapis.core.OWM.Unit;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 public class WeatherCmd extends Cmd {
 
-    private final DateTimeFormatter dateFormatter;
     private final OWM owm;
 
     public WeatherCmd() {
@@ -42,7 +40,6 @@ public class WeatherCmd extends Cmd {
                 .required(false)
                 .type(ApplicationCommandOptionType.STRING.getValue()));
 
-        this.dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.MEDIUM);
         final String apiKey = CredentialManager.get(Credential.OPENWEATHERMAP_API_KEY);
         if (apiKey != null) {
             this.owm = new OWM(apiKey);
@@ -91,12 +88,10 @@ public class WeatherCmd extends Cmd {
     }
 
     private EmbedCreateSpec formatEmbed(Context context, WeatherWrapper weather) {
-        final DateTimeFormatter formatter = this.dateFormatter.withLocale(context.getLocale());
-
         final String title = context.localize("weather.title")
                 .formatted(weather.getCityName(), weather.getCountryCode());
         final String url = "https://openweathermap.org/city/%d".formatted(weather.getCityId());
-        final String lastUpdated = formatter.format(weather.getDateTime());
+        final String lastUpdated = TimestampFormat.SHORT_DATE_TIME.format(weather.getDateTime());
 
         final String clouds = StringUtil.capitalize(weather.getCloudsDescription());
         final String wind = context.localize("weather.wind.speed")

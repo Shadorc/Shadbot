@@ -7,7 +7,7 @@ import com.shadorc.shadbot.core.command.SubCmd;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import com.shadorc.shadbot.utils.TimeUtil;
+import discord4j.common.util.TimestampFormat;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.GuildChannel;
@@ -18,18 +18,13 @@ import discord4j.rest.util.Image.Format;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
+import java.time.Instant;
 import java.util.List;
 
 public class ServerInfoCmd extends SubCmd {
 
-    private final DateTimeFormatter dateFormatter;
-
     public ServerInfoCmd(final GroupCmd groupCmd) {
         super(groupCmd, CommandCategory.INFO, "server", "Show server info");
-        this.dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.MEDIUM);
     }
 
     @Override
@@ -43,20 +38,17 @@ public class ServerInfoCmd extends SubCmd {
                 .flatMap(context::createFollowupMessage);
     }
 
-    private EmbedCreateSpec formatEmbed(Context context, Guild guild, List<GuildChannel> channels,
-                                        Member owner) {
-        final LocalDateTime creationTime = TimeUtil.toLocalDateTime(guild.getId().getTimestamp());
+    private EmbedCreateSpec formatEmbed(Context context, Guild guild, List<GuildChannel> channels, Member owner) {
         final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
         final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
-
-        final DateTimeFormatter dateFormatter = this.dateFormatter.withLocale(context.getLocale());
 
         final String idTitle = Emoji.ID + " " + context.localize("serverinfo.id");
         final String ownerTitle = Emoji.CROWN + " " + context.localize("serverinfo.owner");
         final String creationTitle = Emoji.BIRTHDAY + " " + context.localize("serverinfo.creation");
+        final Instant creationInstant = guild.getId().getTimestamp();
         final String creationField = "%s\n(%s)"
-                .formatted(creationTime.format(dateFormatter),
-                        FormatUtil.formatLongDuration(context.getLocale(), creationTime));
+                .formatted(TimestampFormat.SHORT_DATE_TIME.format(creationInstant),
+                        FormatUtil.formatRelativeTime(context.getLocale(), creationInstant));
         final String channelsTitle = Emoji.SPEECH_BALLOON + " " + context.localize("serverinfo.channels");
         final String channelsField = context.localize("serverinfo.channels.field")
                 .formatted(Emoji.MICROPHONE, voiceChannels, Emoji.KEYBOARD, textChannels);

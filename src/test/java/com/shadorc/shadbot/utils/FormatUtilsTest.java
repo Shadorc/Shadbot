@@ -5,8 +5,7 @@ import com.shadorc.shadbot.data.Config;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
@@ -91,24 +90,15 @@ public class FormatUtilsTest {
     }
 
     @Test
-    public void formatLongDuration() {
+    public void testFormatRelativeTime() {
         final Locale locale = Config.DEFAULT_LOCALE;
-        final LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
-        assertEquals("0:01", FormatUtil.formatLongDuration(locale, now.minusSeconds(1)));
-        assertEquals("1:00:00", FormatUtil.formatLongDuration(locale, now.minusHours(1)));
-        assertEquals("1:01:15",
-                FormatUtil.formatLongDuration(locale, now.minusHours(1).minusMinutes(1).minusSeconds(15)));
-        assertEquals("1 day", FormatUtil.formatLongDuration(locale, now.minusDays(1)));
-
-        final LocalDateTime dateTime = LocalDateTime.of(2021, 5, 26, 0, 0, 0);
-        assertEquals("1 month", FormatUtil.formatLongDuration(locale, dateTime.minusMonths(1)));
-        assertEquals("1 year", FormatUtil.formatLongDuration(locale, dateTime.minusYears(1)));
-        assertEquals("3 months, 4 days",
-                FormatUtil.formatLongDuration(locale, dateTime.minusMonths(3).minusDays(4)));
-        assertEquals("2 years, 4 days",
-                FormatUtil.formatLongDuration(locale, dateTime.minusYears(2).minusDays(4)));
-        assertEquals("2 years, 3 months, 4 days",
-                FormatUtil.formatLongDuration(locale, dateTime.minusYears(2).minusMonths(3).minusDays(4)));
+        final Instant now = Instant.now();
+        assertEquals("0:01", FormatUtil.formatRelativeTime(locale, now.minusSeconds(1)));
+        assertEquals("1:00:00", FormatUtil.formatRelativeTime(locale, now.minus(Duration.ofHours(1))));
+        assertEquals("1:01:15", FormatUtil.formatRelativeTime(locale, now.minus(Duration.ofHours(1))
+                .minus(Duration.ofMinutes(1))
+                .minus(Duration.ofSeconds(15))));
+        assertEquals("1 day", FormatUtil.formatRelativeTime(locale, now.minus(Duration.ofDays(1))));
     }
 
     @Test

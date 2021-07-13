@@ -51,9 +51,4 @@ public class TimeUtilTest {
         assertThrows(IllegalArgumentException.class, () -> TimeUtil.parseTime("1ms"));
     }
 
-    @Test
-    public void testToLocalDateTime() {
-        final Instant now = Instant.now();
-        assertEquals(LocalDateTime.ofInstant(now, ZoneId.systemDefault()), TimeUtil.toLocalDateTime(now));
-    }
 }
