@@ -2,8 +2,8 @@ package com.shadorc.shadbot.utils;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.shadorc.shadbot.core.i18n.I18nManager;
+import discord4j.discordjson.json.EmbedFieldData;
 import discord4j.discordjson.json.ImmutableEmbedFieldData;
-import discord4j.discordjson.possible.Possible;
 import reactor.util.annotation.Nullable;
 
 import java.text.NumberFormat;
@@ -31,16 +31,17 @@ public class FormatUtil {
     /**
      * @param list    The list to create columns from.
      * @param rowSize The number of row in each column.
-     * @return A list of {@link ImmutableEmbedFieldData}.
+     * @return A list of {@link EmbedFieldData}.
      */
     public static List<ImmutableEmbedFieldData> createColumns(List<String> list, int rowSize) {
         return ListUtil.partition(list, rowSize)
                 .stream()
-                .map(sublist -> ImmutableEmbedFieldData.of(
-                        "\u200C",
-                        String.join("\n", sublist),
-                        Possible.of(true)))
-                .collect(Collectors.toList());
+                .map(sublist -> EmbedFieldData.builder()
+                        .name("\u200C")
+                        .value(String.join("\n", sublist))
+                        .inline(true)
+                        .build())
+                .toList();
     }
 
     /**
