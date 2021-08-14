@@ -46,7 +46,7 @@ public class HangmanInputs extends MessageInputs {
     public Mono<Void> processEvent(MessageCreateEvent event) {
         final String content = event.getMessage().getContent().toLowerCase().trim();
 
-        // Check only if content is an unique word/letter
+        // Check only if content is a unique word/letter
         if (!WORD_PATTERN.matcher(content).matches()) {
             return Mono.empty();
         }

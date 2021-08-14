@@ -184,7 +184,7 @@ public class Context implements InteractionContext, I18nContext {
                 .filter(Shadbot.getOwnerId()::equals)
                 .map(__ -> CommandPermission.OWNER);
 
-        // The member is an administrator or it's a private message
+        // The member is an administrator, or it's a private message
         final Mono<CommandPermission> adminPerm = this.getChannel()
                 .filterWhen(channel -> BooleanUtils.or(
                         DiscordUtil.hasPermission(channel, this.getAuthorId(), Permission.ADMINISTRATOR),

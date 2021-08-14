@@ -91,7 +91,7 @@ public class BlacklistSetting extends SubCmd {
                 .map(category -> EnumUtil.parseEnum(CommandCategory.class, category))
                 .collect(Collectors.toSet());
 
-        // Do not allow to blacklist setting category
+        // Do not allow blacklisting setting category
         if (categories.contains(CommandCategory.SETTING)) {
             return Mono.error(new CommandException(context.localize("blacklist.exception.category.setting")));
         }
@@ -135,7 +135,7 @@ public class BlacklistSetting extends SubCmd {
                     .formatted(FormatUtil.format(unknownCmds, "`%s`"::formatted, ", "))));
         }
 
-        // Do not allow to blacklist setting command
+        // Do not allow blacklisting setting command
         if (cmdNames.contains(context.getCommandName())) {
             return Mono.error(new CommandException(context.localize("blacklist.exception.command.setting")
                     .formatted(context.getCommandName())));

@@ -102,7 +102,7 @@ public class CounterStrikeCmd extends SubCmd {
     }
 
     private static String getIdentificator(String arg) {
-        // The user provided an URL that can contains a pseudo or an ID
+        // The user provided a URL that can contains a pseudo or an ID
         if (arg.contains("/")) {
             final List<String> splittedUrl = StringUtil.split(arg, "/");
             if (splittedUrl.isEmpty()) {

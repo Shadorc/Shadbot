@@ -78,7 +78,7 @@ public class StringUtil {
 
     /**
      * @param str The string to split, may be {@code null}.
-     * @return A list without limits containing all the elements resulting of {@code str} splitted using space excluding
+     * @return A list without limits containing all the elements resulting of {@code str} split using space excluding
      * empty results.
      */
     public static List<String> split(@Nullable String str) {
@@ -88,7 +88,7 @@ public class StringUtil {
     /**
      * @param str   The string to split, may be {@code null}.
      * @param limit The result threshold.
-     * @return An endless list containing all the elements resulting of {@code str} splitted using space excluding
+     * @return An endless list containing all the elements resulting of {@code str} split using space excluding
      * empty results.
      */
     public static List<String> split(@Nullable String str, int limit) {
@@ -99,7 +99,7 @@ public class StringUtil {
      * @param str       The string to split, may be {@code null}.
      * @param limit     The result threshold.
      * @param delimiter The delimiting regular expression.
-     * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} splitted
+     * @return A list with a maximum number of {@code limit} elements containing all the results of {@code str} split
      * using {@code delimiter} excluding empty results.
      */
     public static List<String> split(@Nullable String str, int limit, @NonNull String delimiter) {
@@ -115,7 +115,7 @@ public class StringUtil {
     /**
      * @param str       The string to split, may be {@code null}.
      * @param delimiter The delimiting regular expression.
-     * @return An endless list all the elements resulting of {@code str} splitted using {@code delimiter} excluding
+     * @return An endless list all the elements resulting of {@code str} split using {@code delimiter} excluding
      * empty results.
      */
     public static List<String> split(@Nullable String str, @NonNull String delimiter) {

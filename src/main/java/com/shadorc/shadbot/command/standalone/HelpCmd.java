@@ -70,9 +70,9 @@ public class HelpCmd extends Cmd {
     private static Mono<Map<CommandCategory, Collection<String>>> getMultiMap(Context context, List<CommandPermission> authorPermissions) {
         final Settings settings = context.getDbGuild().getSettings();
         return Flux.fromIterable(CommandManager.getCommands())
-                // Removes commands that the author cannot use
+                // Remove commands that the author cannot use
                 .filter(cmd -> authorPermissions.contains(cmd.getPermission()))
-                // Removes commands that are not allowed by the guild
+                // Remove commands that are not allowed by the guild
                 .filter(cmd -> settings.isCommandAllowed(cmd)
                         && settings.isCommandAllowedInChannel(cmd, context.getChannelId()))
                 .map(cmd -> Tuples.of(cmd.getCategory(), cmd instanceof SubCmd subCmd ? subCmd.getFullName() : cmd.getName()))

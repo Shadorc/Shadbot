@@ -33,7 +33,7 @@ public class TimeUtil {
     }
 
     /**
-     * Convert a string, case insensitive, representing time (e.g. 1m03s) or seconds (e.g. 72) into duration.<br>
+     * Convert a string, case-insensitive, representing time (e.g. 1m03s) or seconds (e.g. 72) into duration.<br>
      * Supported units: s (second), m (minute), h (hour)
      *
      * @param str The text to parse.

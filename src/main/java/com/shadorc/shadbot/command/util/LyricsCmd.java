@@ -96,7 +96,7 @@ public class LyricsCmd extends Cmd {
                         throw new CommandException(context.localize("lyrics.not.listening"));
                     }
                     final AudioTrackInfo info = track.getInfo();
-                    // Remove from title (case insensitive): official, video, music, [, ], (, )
+                    // Remove from title (case-insensitive): official, video, music, [, ], (, )
                     return PATTERN.matcher(info.title).replaceAll("").trim();
                 });
     }

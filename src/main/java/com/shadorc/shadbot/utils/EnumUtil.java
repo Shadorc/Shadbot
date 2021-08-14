@@ -6,7 +6,7 @@ public class EnumUtil {
 
     /**
      * @param enumClass The {@link Enum} class.
-     * @param value     The string representing the enumeration, case insensitive, may be {@code null}.
+     * @param value     The string representing the enumeration, case-insensitive, may be {@code null}.
      * @return The {@link Enum} corresponding to the {@code value} from {@code enumClass} or null if it does not exist.
      */
     @Nullable
