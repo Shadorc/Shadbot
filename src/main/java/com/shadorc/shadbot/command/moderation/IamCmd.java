@@ -70,7 +70,7 @@ public class IamCmd extends SubCmd {
 
                             final EmbedCreateSpec embed = ShadbotUtil.createEmbedBuilder()
                                     .author("Iam: %s".formatted(FormatUtil.format(roles,
-                                            role -> "@%s".formatted(role.getName()), ", ")),
+                                                    role -> "@%s".formatted(role.getName()), ", ")),
                                             null, context.getAuthorAvatar())
                                     .description(description)
                                     .build();

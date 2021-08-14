@@ -36,10 +36,10 @@ public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> imp
     @Override
     public Mono<Void> insert() {
         return Mono.from(DatabaseManager.getLottery()
-                .getCollection()
-                .replaceOne(Filters.eq("_id", "historic"),
-                        this.toDocument(),
-                        new ReplaceOptions().upsert(true)))
+                        .getCollection()
+                        .replaceOne(Filters.eq("_id", "historic"),
+                                this.toDocument(),
+                                new ReplaceOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[LotteryHistoric] Insertion result: {}", result))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[LotteryHistoric] Insertion");
@@ -52,8 +52,8 @@ public class LotteryHistoric extends SerializableEntity<LotteryHistoricBean> imp
     @Override
     public Mono<Void> delete() {
         return Mono.from(DatabaseManager.getLottery()
-                .getCollection()
-                .deleteOne(Filters.eq("_id", "historic")))
+                        .getCollection()
+                        .deleteOne(Filters.eq("_id", "historic")))
                 .doOnNext(result -> LOGGER.trace("[LotteryHistoric] Deletion result: {}", result))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[LotteryHistoric] Deletion");

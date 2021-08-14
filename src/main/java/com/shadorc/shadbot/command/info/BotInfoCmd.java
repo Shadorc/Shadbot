@@ -39,9 +39,9 @@ public class BotInfoCmd extends SubCmd {
     @Override
     public Mono<?> execute(Context context) {
         return Mono.zip(
-                context.getClient().getUserById(Shadbot.getOwnerId()),
-                context.getChannel(),
-                context.getClient().getGuilds().count())
+                        context.getClient().getUserById(Shadbot.getOwnerId()),
+                        context.getChannel(),
+                        context.getClient().getGuilds().count())
                 .flatMap(TupleUtils.function((owner, channel, guildCount) -> {
                     final long start = System.currentTimeMillis();
                     return context.createFollowupMessage(Emoji.GEAR, context.localize("testing.ping"))

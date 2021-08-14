@@ -114,8 +114,8 @@ public class PlayCmd extends Cmd {
                     guildMusic.addAudioLoadResultListener(resultListener);
                 })
                 .switchIfEmpty(context.editFollowupMessage(Emoji.LOCK,
-                        context.localize("playlist.limit.reached")
-                                .formatted(Config.PLAYLIST_SIZE, Config.PATREON_URL))
+                                context.localize("playlist.limit.reached")
+                                        .formatted(Config.PLAYLIST_SIZE, Config.PATREON_URL))
                         .then(Mono.empty()));
     }
 

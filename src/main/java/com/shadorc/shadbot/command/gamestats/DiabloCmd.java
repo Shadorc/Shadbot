@@ -80,7 +80,7 @@ public class DiabloCmd extends SubCmd {
                 .flatMap(token -> {
                     final String profileUrl = DiabloCmd.buildProfileApiUrl(token, region, battletag);
                     return this.profileCache.getOrCache(profileUrl, RequestHelper.fromUrl(profileUrl)
-                            .to(ProfileResponse.class))
+                                    .to(ProfileResponse.class))
                             .flatMap(profile -> {
                                 if ("NOTFOUND".equals(profile.code().orElse(""))) {
                                     return context.editFollowupMessage(Emoji.MAGNIFYING_GLASS,

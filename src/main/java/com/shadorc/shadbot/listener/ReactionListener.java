@@ -69,8 +69,8 @@ public class ReactionListener {
                         guild.getRoleById(roleId),
                         DatabaseManager.getGuilds().getDBGuild(guild.getId()).map(DBGuild::getLocale)))
                 .flatMap(TupleUtils.function((selfMember, role, locale) -> Mono.zip(
-                        selfMember.getBasePermissions().map(set -> set.contains(Permission.MANAGE_ROLES)),
-                        selfMember.hasHigherRoles(Set.of(role.getId())))
+                                selfMember.getBasePermissions().map(set -> set.contains(Permission.MANAGE_ROLES)),
+                                selfMember.hasHigherRoles(Set.of(role.getId())))
                         .flatMap(TupleUtils.function((canManageRoles, hasHigherRoles) -> {
                             if (!canManageRoles) {
                                 return new TemporaryMessage(message.getClient(), message.getChannelId(), TMP_MESSAGE_DURATION)

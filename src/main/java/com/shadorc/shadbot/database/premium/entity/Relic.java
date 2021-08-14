@@ -68,12 +68,12 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
 
     public Mono<UpdateResult> activate(Snowflake userId, @Nullable Snowflake guildId) {
         return Mono.from(DatabaseManager.getPremium()
-                .getCollection()
-                .updateOne(Filters.eq("_id", this.getId()),
-                        Updates.combine(
-                                Updates.set("user_id", userId.asString()),
-                                Updates.set("guild_id", guildId == null ? null : guildId.asString()),
-                                Updates.set("activation", Instant.now().toEpochMilli()))))
+                        .getCollection()
+                        .updateOne(Filters.eq("_id", this.getId()),
+                                Updates.combine(
+                                        Updates.set("user_id", userId.asString()),
+                                        Updates.set("guild_id", guildId == null ? null : guildId.asString()),
+                                        Updates.set("activation", Instant.now().toEpochMilli()))))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[Relic {}] Activation", this.getId());
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getPremium().getName()).inc();
@@ -85,8 +85,8 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
     @Override
     public Mono<Void> insert() {
         return Mono.from(DatabaseManager.getPremium()
-                .getCollection()
-                .insertOne(this.toDocument()))
+                        .getCollection()
+                        .insertOne(this.toDocument()))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[Relic {}] Insertion", this.getId());
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getPremium().getName()).inc();
@@ -99,8 +99,8 @@ public class Relic extends SerializableEntity<RelicBean> implements DatabaseEnti
     @Override
     public Mono<Void> delete() {
         return Mono.from(DatabaseManager.getPremium()
-                .getCollection()
-                .deleteOne(Filters.eq("_id", this.getId())))
+                        .getCollection()
+                        .deleteOne(Filters.eq("_id", this.getId())))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[Relic {}] Deletion", this.getId());
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getPremium().getName()).inc();

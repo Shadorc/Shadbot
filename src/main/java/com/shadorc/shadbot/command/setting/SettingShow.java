@@ -75,7 +75,7 @@ public class SettingShow extends SubCmd {
                         .collectMap(Tuple2::getT1, Tuple2::getT2);
 
         return Mono.zip(getAllowedRoles, getAutoRoles, getRestrictedChannels, getRestrictedRoles,
-                getAutoJoinMessage, getAutoLeaveMessage, getAllowedTextChannels, getAllowedVoiceChannels)
+                        getAutoJoinMessage, getAutoLeaveMessage, getAllowedTextChannels, getAllowedVoiceChannels)
                 .map(TupleUtils.function((allowedRoles, autoRoles, restrictedChannels, restrictedRoles,
                                           autoJoinMessage, autoLeaveMessage, allowedTextChannels, allowedVoiceChannels) ->
                 {

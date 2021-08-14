@@ -106,7 +106,7 @@ public class LotteryCollection extends DatabaseCollection {
 
     public Mono<DeleteResult> resetGamblers() {
         return Mono.from(this.getCollection()
-                .deleteOne(Filters.eq("_id", "gamblers")))
+                        .deleteOne(Filters.eq("_id", "gamblers")))
                 .doOnNext(result -> LOGGER.trace("[Lottery] Gamblers deletion result: {}", result))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[Lottery] Gamblers deletion");
@@ -119,9 +119,9 @@ public class LotteryCollection extends DatabaseCollection {
         final long value = (long) Math.ceil(coins / 100.0f);
 
         return Mono.from(this.getCollection()
-                .updateOne(Filters.eq("_id", "jackpot"),
-                        Updates.inc("jackpot", value),
-                        new UpdateOptions().upsert(true)))
+                        .updateOne(Filters.eq("_id", "jackpot"),
+                                Updates.inc("jackpot", value),
+                                new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[Lottery] Jackpot update result: {}", result))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[Lottery] Jackpot update: {} coins", value);
@@ -132,7 +132,7 @@ public class LotteryCollection extends DatabaseCollection {
 
     public Mono<DeleteResult> resetJackpot() {
         return Mono.from(this.getCollection()
-                .deleteOne(Filters.eq("_id", "jackpot")))
+                        .deleteOne(Filters.eq("_id", "jackpot")))
                 .doOnNext(result -> LOGGER.trace("[Lottery] Jackpot deletion result: {}", result))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[Lottery] Jackpot deletion");

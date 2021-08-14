@@ -61,11 +61,11 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
      */
     public <T> Mono<UpdateResult> updateSetting(Setting setting, T value) {
         return Mono.from(DatabaseManager.getGuilds()
-                .getCollection()
-                .updateOne(
-                        Filters.eq("_id", this.getId().asString()),
-                        Updates.set("settings.%s".formatted(setting), value),
-                        new UpdateOptions().upsert(true)))
+                        .getCollection()
+                        .updateOne(
+                                Filters.eq("_id", this.getId().asString()),
+                                Updates.set("settings.%s".formatted(setting), value),
+                                new UpdateOptions().upsert(true)))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[DBGuild {}] Setting update: {}={}", this.getId().asString(), setting, value);
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
@@ -77,10 +77,10 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
 
     public Mono<UpdateResult> removeSetting(Setting setting) {
         return Mono.from(DatabaseManager.getGuilds()
-                .getCollection()
-                .updateOne(
-                        Filters.eq("_id", this.getId().asString()),
-                        Updates.unset("settings.%s".formatted(setting))))
+                        .getCollection()
+                        .updateOne(
+                                Filters.eq("_id", this.getId().asString()),
+                                Updates.unset("settings.%s".formatted(setting))))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[DBGuild {}] Setting deletion: {}", this.getId().asString(), setting);
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
@@ -92,10 +92,10 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
 
     public Mono<UpdateResult> resetSettings() {
         return Mono.from(DatabaseManager.getGuilds()
-                .getCollection()
-                .updateOne(
-                        Filters.eq("_id", this.getId().asString()),
-                        Updates.unset("settings")))
+                        .getCollection()
+                        .updateOne(
+                                Filters.eq("_id", this.getId().asString()),
+                                Updates.unset("settings")))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[DBGuild {}] Settings reset", this.getId().asString());
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
@@ -108,8 +108,8 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
     @Override
     public Mono<Void> insert() {
         return Mono.from(DatabaseManager.getGuilds()
-                .getCollection()
-                .insertOne(this.toDocument()))
+                        .getCollection()
+                        .insertOne(this.toDocument()))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[DBGuild {}] Insertion", this.getId().asString());
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
@@ -123,8 +123,8 @@ public class DBGuild extends SerializableEntity<DBGuildBean> implements Database
     @Override
     public Mono<Void> delete() {
         return Mono.from(DatabaseManager.getGuilds()
-                .getCollection()
-                .deleteOne(Filters.eq("_id", this.getId().asString())))
+                        .getCollection()
+                        .deleteOne(Filters.eq("_id", this.getId().asString())))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[DBGuild {}] Deletion", this.getId().asString());
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();

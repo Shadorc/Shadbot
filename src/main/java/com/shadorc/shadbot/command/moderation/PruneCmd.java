@@ -53,7 +53,7 @@ public class PruneCmd extends SubCmd {
                 .then(context.getChannel())
                 .cast(GuildMessageChannel.class)
                 .flatMap(channel -> DiscordUtil.requirePermissions(channel,
-                        Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)
+                                Permission.MANAGE_MESSAGES, Permission.READ_MESSAGE_HISTORY)
                         .then(PruneCmd.getLimit(context))
                         .flatMapMany(limit -> Flux.defer(() -> {
                             final List<String> words = StringUtil.split(

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class PollCmd extends Cmd {
@@ -117,7 +116,7 @@ public class PollCmd extends Cmd {
                 .map(index -> context.getOptionAsString("choice%d".formatted(index)).orElse(""))
                 .filter(Predicate.not(String::isBlank))
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         if (choices.size() < MIN_CHOICES_NUM) {
             throw new CommandException(context.localize("poll.exception.min.choices"));

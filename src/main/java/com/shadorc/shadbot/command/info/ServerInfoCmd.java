@@ -31,9 +31,9 @@ public class ServerInfoCmd extends SubCmd {
     public Mono<?> execute(Context context) {
         final Mono<Guild> getGuild = context.getGuild().cache();
         return Mono.zip(Mono.just(context),
-                getGuild,
-                getGuild.flatMapMany(Guild::getChannels).collectList(),
-                getGuild.flatMap(Guild::getOwner))
+                        getGuild,
+                        getGuild.flatMapMany(Guild::getChannels).collectList(),
+                        getGuild.flatMap(Guild::getOwner))
                 .map(TupleUtils.function(this::formatEmbed))
                 .flatMap(context::createFollowupMessage);
     }

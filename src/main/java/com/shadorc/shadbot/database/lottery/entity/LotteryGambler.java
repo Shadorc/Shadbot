@@ -40,10 +40,10 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
     @Override
     public Mono<Void> insert() {
         return Mono.from(DatabaseManager.getLottery()
-                .getCollection()
-                .updateOne(Filters.eq("_id", "gamblers"),
-                        Updates.push("gamblers", this.toDocument()),
-                        new UpdateOptions().upsert(true)))
+                        .getCollection()
+                        .updateOne(Filters.eq("_id", "gamblers"),
+                                Updates.push("gamblers", this.toDocument()),
+                                new UpdateOptions().upsert(true)))
                 .doOnNext(result -> LOGGER.trace("[LotteryGambler {}/{}] Insertion result: {}",
                         this.getUserId().asString(), this.getGuildId().asString(), result))
                 .doOnSubscribe(__ -> {
@@ -58,11 +58,11 @@ public class LotteryGambler extends SerializableEntity<LotteryGamblerBean> imple
     @Override
     public Mono<Void> delete() {
         return Mono.from(DatabaseManager.getLottery()
-                .getCollection()
-                .deleteOne(Filters.and(
-                        Filters.eq("_id", "gamblers"),
-                        Filters.eq("gamblers.guild_id", this.getGuildId().asString()),
-                        Filters.eq("gamblers.user_id", this.getUserId().asString()))))
+                        .getCollection()
+                        .deleteOne(Filters.and(
+                                Filters.eq("_id", "gamblers"),
+                                Filters.eq("gamblers.guild_id", this.getGuildId().asString()),
+                                Filters.eq("gamblers.user_id", this.getUserId().asString()))))
                 .doOnNext(result -> LOGGER.trace("[LotteryGambler {}/{}] Deletion result: {}",
                         this.getUserId().asString(), this.getGuildId().asString(), result))
                 .doOnSubscribe(__ -> {

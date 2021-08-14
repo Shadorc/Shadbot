@@ -57,8 +57,8 @@ public class DiscordUtil {
     public static Mono<Message> sendMessage(MessageCreateSpec spec, MessageChannel channel, boolean hasEmbed) {
         final Snowflake selfId = channel.getClient().getSelfId();
         return Mono.zip(
-                DiscordUtil.hasPermission(channel, selfId, Permission.SEND_MESSAGES),
-                DiscordUtil.hasPermission(channel, selfId, Permission.EMBED_LINKS))
+                        DiscordUtil.hasPermission(channel, selfId, Permission.SEND_MESSAGES),
+                        DiscordUtil.hasPermission(channel, selfId, Permission.EMBED_LINKS))
                 .flatMap(TupleUtils.function((canSendMessage, canSendEmbed) -> {
                     if (!canSendMessage) {
                         DEFAULT_LOGGER.info("{Channel ID: {}} Missing permission: {}",
