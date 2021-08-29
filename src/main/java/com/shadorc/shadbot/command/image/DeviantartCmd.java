@@ -16,7 +16,7 @@ import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -64,13 +64,13 @@ public class DeviantartCmd extends SubCmd {
 
     private Mono<Image> getPopularImage(String accessToken, String query) {
         return Mono.fromCallable(() ->
-                "%s?".formatted(BROWSE_POPULAR_URL)
-                        + "q=%s".formatted(NetUtil.encode(query))
-                        + "&timerange=alltime"
-                        + "&limit=25" // The pagination limit (min: 1 max: 50)
-                        // The pagination offset (min: 0 max: 50000)
-                        + "&offset=%d".formatted(ThreadLocalRandom.current().nextInt(150))
-                        + "&access_token=%s".formatted(accessToken))
+                        "%s?".formatted(BROWSE_POPULAR_URL)
+                                + "q=%s".formatted(NetUtil.encode(query))
+                                + "&timerange=alltime"
+                                + "&limit=25" // The pagination limit (min: 1 max: 50)
+                                // The pagination offset (min: 0 max: 50000)
+                                + "&offset=%d".formatted(ThreadLocalRandom.current().nextInt(150))
+                                + "&access_token=%s".formatted(accessToken))
                 .flatMap(url -> RequestHelper.fromUrl(url)
                         .to(DeviantArtResponse.class))
                 .flatMapIterable(DeviantArtResponse::results)
@@ -80,7 +80,7 @@ public class DeviantartCmd extends SubCmd {
                 .flatMap(Mono::justOrEmpty);
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, String query, Image image) {
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, String query, Image image) {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor("DeviantArt: %s".formatted(query), image.url(), context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/gT4hHUB.png")
@@ -92,10 +92,10 @@ public class DeviantartCmd extends SubCmd {
 
     private Mono<TokenResponse> requestAccessToken() {
         return Mono.fromCallable(() ->
-                "%s?".formatted(OAUTH_URL)
-                        + "client_id=%s".formatted(this.clientId)
-                        + "&client_secret=%s".formatted(this.apiSecret)
-                        + "&grant_type=client_credentials")
+                        "%s?".formatted(OAUTH_URL)
+                                + "client_id=%s".formatted(this.clientId)
+                                + "&client_secret=%s".formatted(this.apiSecret)
+                                + "&grant_type=client_credentials")
                 .flatMap(url -> RequestHelper.fromUrl(url)
                         .to(TokenResponse.class))
                 .doOnNext(token -> DEFAULT_LOGGER.info("DeviantArt token generated {}, expires in {}s",

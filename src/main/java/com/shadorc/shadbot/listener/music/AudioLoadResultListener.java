@@ -18,7 +18,7 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.User;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.voice.VoiceConnection;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -108,7 +108,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                             .flatMapMany(__ ->
                                     // TODO Clean-up: This looks bad
                                     AudioLoadResultMessageInputs.create(guildMusic.getGateway(), Duration.ofSeconds(30),
-                                            guildMusic.getMessageChannelId(), this)
+                                                    guildMusic.getMessageChannelId(), this)
                                             .waitForInputs()
                                             .then(Mono.fromRunnable(() -> guildMusic.setWaitingForChoice(false))));
                 })
@@ -119,8 +119,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
     private void onPlaylistLoaded(AudioPlaylist playlist) {
         Mono.zip(
-                Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId)),
-                DatabaseManager.getPremium().isPremium(this.guildId, this.djId))
+                        Mono.justOrEmpty(MusicManager.getGuildMusic(this.guildId)),
+                        DatabaseManager.getPremium().isPremium(this.guildId, this.djId))
                 .map(TupleUtils.function((guildMusic, isPremium) -> {
                     final TrackScheduler trackScheduler = guildMusic.getTrackScheduler();
                     final StringBuilder strBuilder = new StringBuilder();
@@ -152,7 +152,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
                 .subscribe(null, ExceptionHandler::handleUnknownError);
     }
 
-    private Consumer<EmbedCreateSpec> formatResultsEmbed(AudioPlaylist playlist, String avatarUrl, Locale locale) {
+    private Consumer<LegacyEmbedCreateSpec> formatResultsEmbed(AudioPlaylist playlist, String avatarUrl, Locale locale) {
         final String choices = FormatUtil.numberedList(Config.MUSIC_SEARCHES, playlist.getTracks().size(),
                 count -> {
                     final AudioTrackInfo info = playlist.getTracks().get(count - 1).getInfo();
@@ -163,7 +163,7 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
         final String abbrSearch = StringUtil.abbreviate(search, MAX_PLAYLIST_NAME_LENGTH);
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(I18nManager.localize(locale, "audioresult.playlist.name").formatted(abbrSearch),
-                        null, avatarUrl)
+                                null, avatarUrl)
                         .setThumbnail("https://i.imgur.com/IG3Hj2W.png")
                         .setDescription(I18nManager.localize(locale, "audioresult.embed.description").formatted(choices))
                         .setFooter(I18nManager.localize(locale, "audioresult.embed.footer")
@@ -176,8 +176,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
         final String errMessage = ShadbotUtil.cleanLavaplayerErr(err).toLowerCase();
         LOGGER.info("{Guild ID: {}} Load failed: {}", this.guildId.asString(), errMessage);
         this.interaction.createFollowupMessage(Emoji.RED_CROSS,
-                I18nManager.localize(this.locale, "audioresult.load.failed")
-                        .formatted(errMessage))
+                        I18nManager.localize(this.locale, "audioresult.load.failed")
+                                .formatted(errMessage))
                 .then(this.terminate())
                 .subscribeOn(DEFAULT_SCHEDULER)
                 .subscribe(null, ExceptionHandler::handleUnknownError);
@@ -191,8 +191,8 @@ public class AudioLoadResultListener implements AudioLoadResultHandler {
 
     private void onNoMatches() {
         this.interaction.createFollowupMessage(Emoji.MAGNIFYING_GLASS,
-                I18nManager.localize(this.locale, "audioresult.no.matches")
-                        .formatted(StringUtil.remove(this.identifier, YT_SEARCH, SC_SEARCH)))
+                        I18nManager.localize(this.locale, "audioresult.no.matches")
+                                .formatted(StringUtil.remove(this.identifier, YT_SEARCH, SC_SEARCH)))
                 .then(this.terminate())
                 .subscribeOn(DEFAULT_SCHEDULER)
                 .subscribe(null, ExceptionHandler::handleUnknownError);

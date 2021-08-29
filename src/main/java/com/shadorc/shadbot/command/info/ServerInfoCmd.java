@@ -14,7 +14,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.object.entity.channel.VoiceChannel;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.Image.Format;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -38,16 +38,16 @@ public class ServerInfoCmd extends SubCmd {
     public Mono<?> execute(Context context) {
         final Mono<Guild> getGuild = context.getGuild().cache();
         return Mono.zip(Mono.just(context),
-                getGuild,
-                getGuild.flatMapMany(Guild::getChannels).collectList(),
-                getGuild.flatMap(Guild::getOwner),
-                getGuild.flatMap(Guild::getRegion))
+                        getGuild,
+                        getGuild.flatMapMany(Guild::getChannels).collectList(),
+                        getGuild.flatMap(Guild::getOwner),
+                        getGuild.flatMap(Guild::getRegion))
                 .map(TupleUtils.function(this::formatEmbed))
                 .flatMap(context::createFollowupMessage);
     }
 
-    private Consumer<EmbedCreateSpec> formatEmbed(Context context, Guild guild, List<GuildChannel> channels,
-                                                  Member owner, Region region) {
+    private Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, Guild guild, List<GuildChannel> channels,
+                                                        Member owner, Region region) {
         final LocalDateTime creationTime = TimeUtil.toLocalDateTime(guild.getId().getTimestamp());
         final long voiceChannels = channels.stream().filter(VoiceChannel.class::isInstance).count();
         final long textChannels = channels.stream().filter(TextChannel.class::isInstance).count();
@@ -68,7 +68,7 @@ public class ServerInfoCmd extends SubCmd {
 
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(context.localize("serverinfo.title").formatted(guild.getName()), null,
-                        context.getAuthorAvatar())
+                                context.getAuthorAvatar())
                         .setThumbnail(guild.getIconUrl(Format.JPEG).orElse(""))
                         .addField(idTitle, guild.getId().asString(), true)
                         .addField(ownerTitle, owner.getTag(), true)

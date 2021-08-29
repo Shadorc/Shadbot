@@ -77,12 +77,12 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
 
     private Mono<UpdateResult> update(Bson update, Document document) {
         return Mono.from(DatabaseManager.getGuilds()
-                .getCollection()
-                .updateOne(
-                        Filters.and(
-                                Filters.eq("_id", this.getGuildId().asString()),
-                                Filters.eq("members._id", this.getId().asString())),
-                        update))
+                        .getCollection()
+                        .updateOne(
+                                Filters.and(
+                                        Filters.eq("_id", this.getGuildId().asString()),
+                                        Filters.eq("members._id", this.getId().asString())),
+                                update))
                 .doOnNext(result -> LOGGER.trace("[DBMember {}/{}] Update result: {}",
                         this.getId().asString(), this.getGuildId().asString(), result))
                 .map(UpdateResult::getModifiedCount)
@@ -92,10 +92,10 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
                         LOGGER.debug("[DBMember {}/{}] Not updated. Upsert member",
                                 this.getId().asString(), this.getGuildId().asString());
                         return Mono.from(DatabaseManager.getGuilds()
-                                .getCollection()
-                                .updateOne(Filters.eq("_id", this.getGuildId().asString()),
-                                        Updates.push("members", document),
-                                        new UpdateOptions().upsert(true)))
+                                        .getCollection()
+                                        .updateOne(Filters.eq("_id", this.getGuildId().asString()),
+                                                Updates.push("members", document),
+                                                new UpdateOptions().upsert(true)))
                                 .doOnNext(result -> LOGGER.trace("[DBMember {}/{}] Upsert result: {}",
                                         this.getId().asString(), this.getGuildId().asString(), result))
                                 .doOnSubscribe(__ -> Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc());
@@ -116,10 +116,10 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
     @Override
     public Mono<Void> insert() {
         return Mono.from(DatabaseManager.getGuilds()
-                .getCollection()
-                .updateOne(Filters.eq("_id", this.getGuildId().asString()),
-                        Updates.push("members", this.toDocument()),
-                        new UpdateOptions().upsert(true)))
+                        .getCollection()
+                        .updateOne(Filters.eq("_id", this.getGuildId().asString()),
+                                Updates.push("members", this.toDocument()),
+                                new UpdateOptions().upsert(true)))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[DBMember {}/{}] Insertion", this.getId().asString(), this.getGuildId().asString());
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();
@@ -133,9 +133,9 @@ public class DBMember extends SerializableEntity<DBMemberBean> implements Databa
     @Override
     public Mono<Void> delete() {
         return Mono.from(DatabaseManager.getGuilds()
-                .getCollection()
-                .updateOne(Filters.eq("_id", this.getGuildId().asString()),
-                        Updates.pull("members", Filters.eq("_id", this.getId().asString()))))
+                        .getCollection()
+                        .updateOne(Filters.eq("_id", this.getGuildId().asString()),
+                                Updates.pull("members", Filters.eq("_id", this.getId().asString()))))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[DBMember {}/{}] Deletion", this.getId().asString(), this.getGuildId().asString());
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getGuilds().getName()).inc();

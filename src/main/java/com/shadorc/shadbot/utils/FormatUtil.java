@@ -57,20 +57,20 @@ public class FormatUtil {
         final StringBuilder strBuilder = new StringBuilder();
         if (days > 0) {
             strBuilder.append(days == 1
-                    ? I18nManager.localize(locale, "one.day")
-                    : I18nManager.localize(locale, "several.days").formatted(I18nManager.localize(locale, days)))
+                            ? I18nManager.localize(locale, "one.day")
+                            : I18nManager.localize(locale, "several.days").formatted(I18nManager.localize(locale, days)))
                     .append(' ');
         }
         if (hours > 0) {
             strBuilder.append(hours == 1
-                    ? I18nManager.localize(locale, "one.hour")
-                    : I18nManager.localize(locale, "several.hours").formatted(hours))
+                            ? I18nManager.localize(locale, "one.hour")
+                            : I18nManager.localize(locale, "several.hours").formatted(hours))
                     .append(' ');
         }
         if (minutes > 0) {
             strBuilder.append(minutes == 1
-                    ? I18nManager.localize(locale, "one.minute")
-                    : I18nManager.localize(locale, "several.minutes").formatted(minutes))
+                            ? I18nManager.localize(locale, "one.minute")
+                            : I18nManager.localize(locale, "several.minutes").formatted(minutes))
                     .append(' ');
         }
         if (seconds > 0 || days == 0 && hours == 0 && minutes == 0) {

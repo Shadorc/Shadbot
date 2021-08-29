@@ -54,11 +54,11 @@ public class DBUser extends SerializableEntity<DBUserBean> implements DatabaseEn
         }
 
         return Mono.from(DatabaseManager.getUsers()
-                .getCollection()
-                .updateOne(
-                        Filters.eq("_id", this.getId().asString()),
-                        Updates.set("achievements", achievements),
-                        new UpdateOptions().upsert(true)))
+                        .getCollection()
+                        .updateOne(
+                                Filters.eq("_id", this.getId().asString()),
+                                Updates.set("achievements", achievements),
+                                new UpdateOptions().upsert(true)))
                 .doOnSubscribe(__ -> {
                     LOGGER.debug("[DBUser {}] Achievements update: {}", this.getId().asString(), achievements);
                     Telemetry.DB_REQUEST_COUNTER.labels(DatabaseManager.getUsers().getName()).inc();

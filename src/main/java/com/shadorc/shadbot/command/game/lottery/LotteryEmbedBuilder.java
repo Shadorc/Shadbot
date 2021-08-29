@@ -5,7 +5,7 @@ import com.shadorc.shadbot.database.lottery.entity.LotteryGambler;
 import com.shadorc.shadbot.database.lottery.entity.LotteryHistoric;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -13,13 +13,13 @@ import java.util.function.Consumer;
 public class LotteryEmbedBuilder {
 
     private final Context context;
-    private Consumer<EmbedCreateSpec> embedConsumer;
+    private Consumer<LegacyEmbedCreateSpec> embedConsumer;
 
     private LotteryEmbedBuilder(Context context) {
         this.context = context;
         this.embedConsumer = ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(context.localize("lottery.embed.title"),
-                        null, context.getAuthorAvatar())
+                                null, context.getAuthorAvatar())
                         .setThumbnail("https://i.imgur.com/peLGtkS.png")
                         .setDescription(context.localize("lottery.embed.description")
                                 .formatted(FormatUtil.formatDurationWords(context.getLocale(), LotteryCmd.getDelay()),
@@ -70,7 +70,7 @@ public class LotteryEmbedBuilder {
         return this;
     }
 
-    public Consumer<EmbedCreateSpec> build() {
+    public Consumer<LegacyEmbedCreateSpec> build() {
         return this.embedConsumer;
     }
 

@@ -11,7 +11,7 @@ import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.RandUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -73,7 +73,7 @@ public class Rule34Cmd extends Cmd {
         return post.hasChildren() || tags.stream().anyMatch(tag -> tag.contains("loli") || tag.contains("shota"));
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, R34Post post, String tag) {
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, R34Post post, String tag) {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> {
                     post.getSource().ifPresent(source -> {

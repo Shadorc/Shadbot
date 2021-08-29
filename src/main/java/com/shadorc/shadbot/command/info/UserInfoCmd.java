@@ -10,7 +10,7 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 import reactor.function.TupleUtils;
@@ -44,7 +44,7 @@ public class UserInfoCmd extends SubCmd {
                 .flatMap(context::createFollowupMessage);
     }
 
-    private Consumer<EmbedCreateSpec> formatEmbed(Context context, Member member, List<Role> roles) {
+    private Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, Member member, List<Role> roles) {
         final DateTimeFormatter dateFormatter = this.dateFormatter.withLocale(context.getLocale());
 
         final StringBuilder usernameBuilder = new StringBuilder(member.getTag());

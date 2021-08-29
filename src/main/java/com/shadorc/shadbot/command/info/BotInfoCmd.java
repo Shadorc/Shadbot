@@ -15,7 +15,7 @@ import com.shadorc.shadbot.utils.SystemUtil;
 import com.shadorc.shadbot.utils.TimeUtil;
 import discord4j.common.GitProperties;
 import discord4j.core.object.entity.User;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.gateway.GatewayClient;
 import discord4j.gateway.ShardInfo;
 import reactor.core.publisher.Mono;
@@ -40,9 +40,9 @@ public class BotInfoCmd extends SubCmd {
     @Override
     public Mono<?> execute(Context context) {
         return Mono.zip(
-                context.getClient().getUserById(Shadbot.getOwnerId()),
-                context.getChannel(),
-                context.getClient().getGuilds().count())
+                        context.getClient().getUserById(Shadbot.getOwnerId()),
+                        context.getChannel(),
+                        context.getClient().getGuilds().count())
                 .flatMap(TupleUtils.function((owner, channel, guildCount) -> {
                     final long start = System.currentTimeMillis();
                     return context.createFollowupMessage(Emoji.GEAR, context.localize("testing.ping"))
@@ -50,7 +50,7 @@ public class BotInfoCmd extends SubCmd {
                 }));
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, long start, User owner, long guildCount) {
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, long start, User owner, long guildCount) {
         final long gatewayLatency = context.getClient().getGatewayClientGroup()
                 .find(context.getEvent().getShardInfo().getIndex())
                 .map(GatewayClient::getResponseTime)

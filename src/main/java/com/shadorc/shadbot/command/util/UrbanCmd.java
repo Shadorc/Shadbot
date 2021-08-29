@@ -13,7 +13,7 @@ import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
 import discord4j.core.object.Embed;
 import discord4j.core.object.Embed.Field;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import reactor.core.publisher.Mono;
@@ -54,13 +54,13 @@ public class UrbanCmd extends Cmd {
                 });
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, UrbanDefinition urbanDef) {
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, UrbanDefinition urbanDef) {
         final String definition = StringUtil.abbreviate(urbanDef.getDefinition(), Embed.MAX_DESCRIPTION_LENGTH);
         final String example = StringUtil.abbreviate(urbanDef.getExample(), Field.MAX_VALUE_LENGTH);
         return ShadbotUtil.getDefaultEmbed(
                 embed -> {
                     embed.setAuthor(context.localize("urban.title").formatted(urbanDef.word()),
-                            urbanDef.permalink(), context.getAuthorAvatar())
+                                    urbanDef.permalink(), context.getAuthorAvatar())
                             .setThumbnail("https://i.imgur.com/7KJtwWp.png")
                             .setDescription(definition);
 

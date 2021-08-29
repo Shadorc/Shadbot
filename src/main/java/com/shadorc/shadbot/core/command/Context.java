@@ -13,13 +13,14 @@ import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.EnumUtil;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.domain.InteractionCreateEvent;
+import discord4j.core.event.domain.interaction.InteractionCreateEvent;
+import discord4j.core.object.command.ApplicationCommandInteraction;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.object.entity.*;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.TextChannel;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.discordjson.json.ImmutableWebhookMessageEditRequest;
 import discord4j.discordjson.json.WebhookExecuteRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
@@ -60,6 +61,10 @@ public class Context implements InteractionContext, I18nContext {
         return this.event.getClient();
     }
 
+    public ApplicationCommandInteraction getCommand() {
+        return this.event.getInteraction().getCommandInteraction().orElseThrow();
+    }
+
     public String getFullCommandName() {
         final List<String> cmds = new ArrayList<>();
         cmds.add(this.getCommandName());
@@ -69,7 +74,7 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     public Optional<String> getSubCommandGroupName() {
-        return DiscordUtil.flattenOptions(this.event.getInteraction().getCommandInteraction())
+        return DiscordUtil.flattenOptions(this.getCommand())
                 .stream()
                 .filter(option -> option.getType() == ApplicationCommandOptionType.SUB_COMMAND_GROUP)
                 .map(ApplicationCommandInteractionOption::getName)
@@ -77,7 +82,7 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     public Optional<String> getSubCommandName() {
-        return DiscordUtil.flattenOptions(this.event.getInteraction().getCommandInteraction())
+        return DiscordUtil.flattenOptions(this.getCommand())
                 .stream()
                 .filter(option -> option.getType() == ApplicationCommandOptionType.SUB_COMMAND)
                 .map(ApplicationCommandInteractionOption::getName)
@@ -85,7 +90,11 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     public String getCommandName() {
-        return this.event.getCommandName();
+        return this.event.getInteraction()
+                .getCommandInteraction()
+                .orElseThrow()
+                .getName()
+                .orElseThrow();
     }
 
     public String getLastCommandName() {
@@ -132,7 +141,7 @@ public class Context implements InteractionContext, I18nContext {
 
     public Optional<ApplicationCommandInteractionOptionValue> getOption(String name) {
         final List<ApplicationCommandInteractionOption> options =
-                DiscordUtil.flattenOptions(this.getEvent().getInteraction().getCommandInteraction());
+                DiscordUtil.flattenOptions(this.getEvent().getInteraction().getCommandInteraction().orElseThrow());
         return options.stream()
                 .filter(option -> option.getName().equals(name))
                 .filter(option -> option.getValue().isPresent())
@@ -226,7 +235,8 @@ public class Context implements InteractionContext, I18nContext {
 
     @Override
     public Mono<Void> replyEphemeral(Emoji emoji, String message) {
-        return this.event.replyEphemeral("%s %s".formatted(emoji, message))
+        return this.event.reply("%s %s".formatted(emoji, message))
+                .withEphemeral(true)
                 .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc());
     }
 
@@ -245,13 +255,13 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     @Override
-    public Mono<Message> createFollowupMessage(Consumer<EmbedCreateSpec> embed) {
-        final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
+    public Mono<Message> createFollowupMessage(Consumer<LegacyEmbedCreateSpec> embed) {
+        final LegacyEmbedCreateSpec mutatedSpec = new LegacyEmbedCreateSpec();
         embed.accept(mutatedSpec);
         return this.event.getInteractionResponse().createFollowupMessage(MultipartRequest.ofRequest(
-                WebhookExecuteRequest.builder()
-                        .addEmbed(mutatedSpec.asRequest())
-                        .build()))
+                        WebhookExecuteRequest.builder()
+                                .addEmbed(mutatedSpec.asRequest())
+                                .build()))
                 .map(data -> new Message(this.getClient(), data))
                 .doOnNext(message -> this.replyId.set(message.getId().asLong()))
                 .doOnSuccess(__ -> Telemetry.MESSAGE_SENT_COUNTER.inc());
@@ -276,11 +286,11 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     @Override
-    public Mono<Message> editFollowupMessage(Consumer<EmbedCreateSpec> embed) {
+    public Mono<Message> editFollowupMessage(Consumer<LegacyEmbedCreateSpec> embed) {
         return Mono.fromCallable(this.replyId::get)
                 .filter(messageId -> messageId > 0)
                 .flatMap(messageId -> {
-                    final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
+                    final LegacyEmbedCreateSpec mutatedSpec = new LegacyEmbedCreateSpec();
                     embed.accept(mutatedSpec);
                     return this.event.getInteractionResponse()
                             .editFollowupMessage(messageId, ImmutableWebhookMessageEditRequest.builder()
@@ -294,9 +304,9 @@ public class Context implements InteractionContext, I18nContext {
     }
 
     @Override
-    public Mono<Message> editInitialFollowupMessage(Consumer<EmbedCreateSpec> embed) {
+    public Mono<Message> editInitialFollowupMessage(Consumer<LegacyEmbedCreateSpec> embed) {
         return Mono.defer(() -> {
-            final EmbedCreateSpec mutatedSpec = new EmbedCreateSpec();
+            final LegacyEmbedCreateSpec mutatedSpec = new LegacyEmbedCreateSpec();
             embed.accept(mutatedSpec);
             return this.event.getInteractionResponse()
                     .editInitialResponse(ImmutableWebhookMessageEditRequest.builder()

@@ -20,7 +20,7 @@ import com.shadorc.shadbot.utils.DiscordUtil;
 import com.shadorc.shadbot.utils.FormatUtil;
 import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
@@ -81,7 +81,7 @@ public class DiabloCmd extends SubCmd {
                 .flatMap(token -> {
                     final String profileUrl = DiabloCmd.buildProfileApiUrl(token, region, battletag);
                     return this.profileCache.getOrCache(profileUrl, RequestHelper.fromUrl(profileUrl)
-                            .to(ProfileResponse.class))
+                                    .to(ProfileResponse.class))
                             .flatMap(profile -> {
                                 if ("NOTFOUND".equals(profile.code().orElse(""))) {
                                     return context.editFollowupMessage(Emoji.MAGNIFYING_GLASS,
@@ -120,8 +120,8 @@ public class DiabloCmd extends SubCmd {
                 .formatted(region, NetUtil.encode(battletag), heroId.id(), accessToken);
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, ProfileResponse profile,
-                                                         List<HeroResponse> heroResponses) {
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, ProfileResponse profile,
+                                                               List<HeroResponse> heroResponses) {
         final String description = context.localize("diablo3.description")
                 .formatted(profile.battleTag(), profile.guildName(),
                         profile.paragonLevel(), profile.paragonLevelHardcore(),

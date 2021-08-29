@@ -6,7 +6,7 @@ import com.shadorc.shadbot.core.i18n.I18nContext;
 import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.database.guilds.entity.Settings;
 import com.shadorc.shadbot.utils.ShadbotUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -46,7 +46,7 @@ public class HelpCmd extends Cmd {
                 .flatMap(context::createFollowupMessage);
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(I18nContext context, Map<CommandCategory, Collection<String>> map, String avatarUrl) {
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(I18nContext context, Map<CommandCategory, Collection<String>> map, String avatarUrl) {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> {
                     embed.setAuthor(context.localize("help.title"), "https://github.com/Shadorc/Shadbot/wiki/Commands", avatarUrl);

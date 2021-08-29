@@ -9,7 +9,7 @@ import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.object.RequestHelper;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,8 +49,8 @@ public class TranslateCmd extends Cmd {
                                         .formatted(err.getMessage(), DOC_URL))));
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, TranslateRequest request,
-                                                         TranslateResponse response) {
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, TranslateRequest request,
+                                                               TranslateResponse response) {
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(context.localize("translate.title"), null, context.getAuthorAvatar())
                         .setDescription("**%s**%n%s%n%n**%s**%n%s".formatted(

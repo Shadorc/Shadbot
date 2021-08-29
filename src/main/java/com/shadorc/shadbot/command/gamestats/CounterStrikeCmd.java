@@ -23,7 +23,7 @@ import com.shadorc.shadbot.utils.NetUtil;
 import com.shadorc.shadbot.utils.NumberUtil;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import com.shadorc.shadbot.utils.StringUtil;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -145,7 +145,7 @@ public class CounterStrikeCmd extends SubCmd {
                 .next();
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(Context context, PlayerSummary player, List<Stats> stats) {
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(Context context, PlayerSummary player, List<Stats> stats) {
         final Map<String, Integer> statsMap = stats.stream()
                 .collect(Collectors.toMap(Stats::name, Stats::value));
 
@@ -169,7 +169,7 @@ public class CounterStrikeCmd extends SubCmd {
 
         return ShadbotUtil.getDefaultEmbed(
                 embed -> embed.setAuthor(context.localize("cs.title"),
-                        "http://steamcommunity.com/profiles/%s".formatted(player.steamId()), context.getAuthorAvatar())
+                                "http://steamcommunity.com/profiles/%s".formatted(player.steamId()), context.getAuthorAvatar())
                         .setThumbnail(player.avatarFull())
                         .setDescription(context.localize("cs.description").formatted(player.personaName()))
                         .addField(context.localize("cs.kills"), context.localize(kills), true)

@@ -10,7 +10,7 @@ import com.shadorc.shadbot.database.users.entity.achievement.Achievement;
 import com.shadorc.shadbot.object.Emoji;
 import com.shadorc.shadbot.utils.ShadbotUtil;
 import discord4j.core.object.entity.Member;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
@@ -37,8 +37,8 @@ public class AchievementsCmd extends Cmd {
                 .flatMap(context::createFollowupMessage);
     }
 
-    private static Consumer<EmbedCreateSpec> formatEmbed(I18nContext context, EnumSet<Achievement> achievements,
-                                                         Member member) {
+    private static Consumer<LegacyEmbedCreateSpec> formatEmbed(I18nContext context, EnumSet<Achievement> achievements,
+                                                               Member member) {
         return ShadbotUtil.getDefaultEmbed(embed -> {
             embed.setAuthor(context.localize("achievement.title").formatted(member.getUsername()),
                     null, member.getAvatarUrl());

@@ -7,7 +7,7 @@ import com.shadorc.shadbot.data.Config;
 import com.shadorc.shadbot.database.DatabaseManager;
 import com.shadorc.shadbot.database.guilds.entity.DBMember;
 import discord4j.common.util.Snowflake;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import org.jsoup.Jsoup;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.NonNull;
@@ -48,9 +48,9 @@ public class ShadbotUtil {
     }
 
     /**
-     * @return A default {@link EmbedCreateSpec} with the default color set.
+     * @return A default {@link LegacyEmbedCreateSpec} with the default color set.
      */
-    public static Consumer<EmbedCreateSpec> getDefaultEmbed(Consumer<EmbedCreateSpec> embed) {
+    public static Consumer<LegacyEmbedCreateSpec> getDefaultEmbed(Consumer<LegacyEmbedCreateSpec> embed) {
         return embed.andThen(spec -> spec.setColor(Config.BOT_COLOR));
     }
 

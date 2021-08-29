@@ -2,7 +2,7 @@ package com.shadorc.shadbot.utils;
 
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.shadorc.shadbot.data.Config;
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.spec.legacy.LegacyEmbedCreateSpec;
 import discord4j.discordjson.json.EmbedData;
 import org.junit.jupiter.api.Test;
 
@@ -25,9 +25,9 @@ public class ShadbotUtilTest {
 
     @Test
     public void testGetDefaultEmbed() {
-        final Consumer<EmbedCreateSpec> consumer = ShadbotUtil.getDefaultEmbed(embed -> {
+        final Consumer<LegacyEmbedCreateSpec> consumer = ShadbotUtil.getDefaultEmbed(embed -> {
         });
-        final EmbedCreateSpec spec = new EmbedCreateSpec();
+        final LegacyEmbedCreateSpec spec = new LegacyEmbedCreateSpec();
         consumer.accept(spec);
         final EmbedData expected = EmbedData.builder()
                 .color(Config.BOT_COLOR.getRGB())

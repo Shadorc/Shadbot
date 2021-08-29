@@ -36,7 +36,7 @@ public class RussianRouletteCmd extends SubCmd {
                 .then(Mono.defer(() -> {
                     if (!player.isAlive()) {
                         return context.createFollowupMessage(Emoji.BROKEN_HEART, context.localize("russianroulette.already.dead")
-                                .formatted(FormatUtil.formatDurationWords(context.getLocale(), player.getResetDuration())))
+                                        .formatted(FormatUtil.formatDurationWords(context.getLocale(), player.getResetDuration())))
                                 .then(Mono.empty());
                     }
 
@@ -64,7 +64,7 @@ public class RussianRouletteCmd extends SubCmd {
                 .map(StringBuilder::toString)
                 .map(description -> ShadbotUtil.getDefaultEmbed(
                         embed -> embed.setAuthor(context.localize("russianroulette.title"),
-                                null, context.getAuthorAvatar())
+                                        null, context.getAuthorAvatar())
                                 .addField(context.localize("russianroulette.tries"),
                                         "%d/6".formatted(player.getRemaining()), false)
                                 .setDescription(description)))

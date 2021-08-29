@@ -48,35 +48,35 @@ public class RouletteGame extends MultiplayerGame<RoulettePlayer> {
     @Override
     public Mono<Message> show() {
         return Mono.fromCallable(() -> ShadbotUtil.getDefaultEmbed(
-                embed -> {
-                    final String description = this.context.localize("roulette.description")
-                            .formatted(this.context.getFullCommandName());
-                    final String desc = FormatUtil.format(this.players.values(),
-                            player -> this.context.localize("roulette.player.field")
-                                    .formatted(player.getUsername().orElseThrow(), this.context.localize(player.getBet())), "\n");
-                    final String place = this.getPlayers().values().stream()
-                            .map(player -> player.getPlace() == Place.NUMBER
-                                    ? player.getNumber().orElseThrow()
-                                    : player.getPlace())
-                            .map(Object::toString)
-                            .map(StringUtil::capitalize)
-                            .collect(Collectors.joining("\n"));
+                        embed -> {
+                            final String description = this.context.localize("roulette.description")
+                                    .formatted(this.context.getFullCommandName());
+                            final String desc = FormatUtil.format(this.players.values(),
+                                    player -> this.context.localize("roulette.player.field")
+                                            .formatted(player.getUsername().orElseThrow(), this.context.localize(player.getBet())), "\n");
+                            final String place = this.getPlayers().values().stream()
+                                    .map(player -> player.getPlace() == Place.NUMBER
+                                            ? player.getNumber().orElseThrow()
+                                            : player.getPlace())
+                                    .map(Object::toString)
+                                    .map(StringUtil::capitalize)
+                                    .collect(Collectors.joining("\n"));
 
-                    embed.setAuthor(this.context.localize("roulette.title"), null, this.context.getAuthorAvatar())
-                            .setThumbnail("https://i.imgur.com/D7xZd6C.png")
-                            .setDescription(description)
-                            .addField(this.context.localize("roulette.player.title"), desc, true)
-                            .addField(this.context.localize("roulette.place.title"), place, true);
+                            embed.setAuthor(this.context.localize("roulette.title"), null, this.context.getAuthorAvatar())
+                                    .setThumbnail("https://i.imgur.com/D7xZd6C.png")
+                                    .setDescription(description)
+                                    .addField(this.context.localize("roulette.player.title"), desc, true)
+                                    .addField(this.context.localize("roulette.place.title"), place, true);
 
-                    if (this.isScheduled()) {
-                        final Duration remainingDuration = this.getDuration()
-                                .minus(TimeUtil.elapsed(this.startTimer));
-                        embed.setFooter(this.context.localize("roulette.footer.remaining")
-                                .formatted(remainingDuration.toSeconds()), null);
-                    } else {
-                        embed.setFooter(this.context.localize("roulette.footer.finished"), null);
-                    }
-                }))
+                            if (this.isScheduled()) {
+                                final Duration remainingDuration = this.getDuration()
+                                        .minus(TimeUtil.elapsed(this.startTimer));
+                                embed.setFooter(this.context.localize("roulette.footer.remaining")
+                                        .formatted(remainingDuration.toSeconds()), null);
+                            } else {
+                                embed.setFooter(this.context.localize("roulette.footer.finished"), null);
+                            }
+                        }))
                 .flatMap(this.context::editFollowupMessage);
     }
 
