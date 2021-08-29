@@ -65,7 +65,7 @@ public class PollManager {
     }
 
     private Mono<Message> end(Snowflake messageId) {
-        return Mono.fromRunnable(() -> this.pollCmd.getManagers().remove(this.context.getCommand().getId().orElseThrow()))
+        return Mono.fromRunnable(() -> this.pollCmd.getManagers().remove(this.context.getCommandId()))
                 .then(this.context.getClient()
                         .getMessageById(this.context.getChannelId(), messageId))
                 .onErrorResume(ClientException.isStatusCode(HttpResponseStatus.FORBIDDEN.code()),
