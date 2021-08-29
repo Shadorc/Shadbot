@@ -7,19 +7,20 @@
     <h1>Shadbot</h1>
     <p><b>A configurable multipurpose bot bringing you music, multiplayer games, moderation commands and more!</b></p>
     <hr>
-    <h2>Usage</h2>
-    <a href="https://discordbots.org/bot/331146243596091403">
-        <img src="https://discordbots.org/api/widget/331146243596091403.svg">
-    </a>
-    <p><b>Add Shadbot on your own server by clicking on this <a href="https://discord.com/oauth2/authorize?client_id=331146243596091403&scope=bot%20applications.commands&permissions=271674454">link</a>!</b></p>
+    <h2>End of life</h2>
+    <p>Shadbot is no longer maintained and will soon no longer be usable on Discord.
+    <br>It was a great adventure and I thank all the people who helped me, who supported me on Patreon and who used this bot during all these years.
+    <br>Feel free to fork it and maintain your own version!</p>
     <hr>
-    <h2>Support</h2>
-    <p><b><a href="https://discord.gg/CKnV4ff">Join</a> the support server if you have any questions, suggestions or if you just want to talk.</b></p>
-    <hr>
-    <h2>Privacy</h2>
-    In order to store custom settings or coins, I may save server ID, channel(s) ID, role(s) ID or user(s) ID in a persistent database. 
-    <br>If an error occurs while you're interacting with Shadbot, I may log the content of the message that triggered the command for debugging purpose.
-    <br>If you have any questions or requests, do not hesitate to <a href="https://discord.gg/CKnV4ff">join</a> the support server or directly contact me via Discord (Shadorc#8423).
+    <h2>Getting Started</h2>
+    <br>1. Make sure Java 16 is installed.
+    <br>2. Fork the Shadbot repository: https://github.com/Shadorc/Shadbot/fork
+    <br>3. Clone your forked repository, ie. <code>git clone http://github.com/&lt;YOUR-USERNAME&gt;/shadbot.git</code>
+    <br>4. Read this: https://github.com/Shadorc/Shadbot/wiki/Build-&-Configure
+    <br>5. Run <code><a href="https://maven.apache.org/">mvn</a> package</code>.
+    <br>6. Locate the <code>shadbot-&lt;VERSION&gt;.jar</code>.  
+    <br>7. Open command prompt and run <code>java -jar shadbot-&lt;VERSION&gt;.jar</code>.
+    <br>8. You're done!    
     <hr>
     <h2>Libraries used</h2>
     <ul>
@@ -34,16 +35,6 @@
         <li><a href="https://github.com/junit-team/junit5">JUnit5</a></li>
         <li>And <a href="pom.xml">many others...</a></li>
     </ul>
-    <hr>
-    <h2>Getting Started</h2>
-    <br>1. Make sure Java 16 is installed.
-    <br>2. Fork the Shadbot repository: https://github.com/Shadorc/Shadbot/fork
-    <br>3. Clone your forked repository, ie. <code>git clone http://github.com/&lt;YOUR-USERNAME&gt;/shadbot.git</code>
-    <br>4. Read this: https://github.com/Shadorc/Shadbot/wiki/Build-&-Configure
-    <br>5. Run <code><a href="https://maven.apache.org/">mvn</a> package</code>.
-    <br>6. Locate the <code>shadbot-&lt;VERSION&gt;.jar</code>.  
-    <br>7. Open command prompt and run <code>java -jar shadbot-&lt;VERSION&gt;.jar</code>.
-    <br>8. You're done!
     <h2>Licence</h2>
     <p>Copyright (C) 2021 <b>Shadorc</b>
         <pre>
