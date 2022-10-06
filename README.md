@@ -8,7 +8,7 @@
     <p><b>A configurable multipurpose bot bringing you music, multiplayer games, moderation commands and more!</b></p>
     <hr>
     <h2>End of life</h2>
-    <p>Shadbot is no longer maintained and will soon no longer be usable on Discord.
+    <p>Shadbot is no longer maintained nor usable on Discord.
     <br>It was a great adventure and I thank all the people who helped me, who supported me on Patreon and who used this bot during all these years.
     <br>Feel free to fork it and maintain your own version!</p>
     <hr>
@@ -36,7 +36,7 @@
         <li>And <a href="pom.xml">many others...</a></li>
     </ul>
     <h2>Licence</h2>
-    <p>Copyright (C) 2021 <b>Shadorc</b>
+    <p>Copyright (C) 2022 <b>Shadorc</b>
         <pre>
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
